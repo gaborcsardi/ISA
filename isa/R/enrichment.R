@@ -168,12 +168,12 @@ isa.GOListHyperGTest <- function(p) {
   gocat.ent <- lapply(gocat.ent, intersect, p@universeGeneIds)  
     
   result <- lapply(p@geneIds, function(genes) {
-    my.gocat.ent <- gocat.ent[ sapply(gocat.ent, length) != 0 ]
+    count <- sapply(gocat.ent, function(x) sum(genes %in% x))
+    my.gocat.ent <- gocat.ent[ count != 0 ]
+    count <- count[ count != 0 ]
+    size <- sapply(my.gocat.ent, length)
     genes <- intersect(genes, p@universeGeneIds)
     res <- .doHyperGTest(p, my.gocat.ent, list(), genes)
-    size <- sapply(my.gocat.ent, length)
-    count <- sapply(my.gocat.ent, function(x) sum(genes %in%
-                                                  x))
     res <- data.frame(Pvalue=res$p, OddsRatio=res$odds,
                       ExpCount=res$expected, Count=count,
                       Size=size, row.names=names(res$p))
