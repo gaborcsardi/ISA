@@ -1,10 +1,17 @@
 
+##################################################
+## GOListHyperGParams
+##################################################
+
 setClass("GOListHyperGParams",
          representation(ontology="character",
                         conditional="logical"),
          contains="HyperGParams",
          prototype=prototype(categoryName="GOList",
            conditional=FALSE))
+
+##################
+## makeValidParams
 
 setMethod("makeValidParams", "GOListHyperGParams",
           function(object) {
@@ -15,7 +22,13 @@ setMethod("makeValidParams", "GOListHyperGParams",
             object
           })
 
+##################
+## ontology
+
 setMethod("ontology", "GOListHyperGParams", function(r) r@ontology)
+
+##################
+## ontology<-
 
 setReplaceMethod("ontology", c("GOListHyperGParams", "character"),
                  function(r, value) {
@@ -25,7 +38,13 @@ setReplaceMethod("ontology", c("GOListHyperGParams", "character"),
                      r
                  })
 
+##################
+## conditional
+
 setMethod("conditional", "GOListHyperGParams", function(r) r@conditional)
+
+##################
+## conditional<-
 
 setReplaceMethod("conditional", c("GOListHyperGParams", "logical"),
                  function(r, value) {
@@ -35,16 +54,9 @@ setReplaceMethod("conditional", c("GOListHyperGParams", "logical"),
                      r
                  })
 
-setClass("GOListHyperGResult",
-         contains="HyperGResultBase",
-         representation=representation(
-           reslist="list",
-           conditional="logical",
-           universeGeneIds="character"),
-         prototype=prototype(
-           testName="GO",
-           reslist=list(),
-           universeGeneIds=character()))
+##################
+## categoryToEntrezBuilder
+## Create a mapping from the categories to the Entrez ids
 
 setMethod("categoryToEntrezBuilder",
          signature(p="GOListHyperGParams"),
@@ -101,31 +113,8 @@ WHERE %s IN (%s) AND go_id IN (%s)"
              split(ans[[GENEIDS]], ans[["go_id"]])
          })
 
-setMethod("summary", signature(object="GOListHyperGResult"),
-          function(object, pvalue=pvalueCutoff(object), categorySize=NULL) {
-
-            if (! is.null(categorySize)) {
-              lapply(object@reslist, function(x) {
-                show <- x$Pvalue < pvalue & x$Size >= categorySize
-                x[show,]
-              })
-            } else {
-              lapply(object@reslist, function(x) {
-                show <- x$Pvalue < pvalue
-                x[show,]
-              })
-            }
-          })
-
-setMethod("htmlReport", signature=(r="GOListHyperGResult"),
-          function(r, file="", append=FALSE, label="", digits=3,
-                   summary.args=NULL) {
-            callNextMethod(r=r, file=file, append=append,
-                           label=label, digits=digits,
-                           summary.args=summary.args)            
-          })
-
-## TODO: this is the current bottleneck
+######################
+## universeBuilder
 ## It returns the Entrez ids from the supplied universe that
 ## have at least one annotation in the supplied GO ontology
 setMethod("universeBuilder", signature=(p="GOListHyperGParams"),
@@ -196,8 +185,26 @@ isa.GOListHyperGTest <- function(p) {
       universeGeneIds=p@universeGeneIds)
 }
 
+#####################
+## hyperGTest
+
 setMethod("hyperGTest",
           signature(p="GOListHyperGParams"), isa.GOListHyperGTest)
+
+##################################################
+## GOListHyperGResult
+##################################################
+
+setClass("GOListHyperGResult",
+         contains="HyperGResultBase",
+         representation=representation(
+           reslist="list",
+           conditional="logical",
+           universeGeneIds="character"),
+         prototype=prototype(
+           testName="GO",
+           reslist=list(),
+           universeGeneIds=character()))
 
 ## TODO: make this properly
 setMethod("show", signature(object="GOListHyperGResult"),
@@ -216,6 +223,30 @@ setMethod("show", signature(object="GOListHyperGResult"),
             cat("Selected gene set size:", "TODO", "\n")
             cat("    Gene universe size:", "TODO", "\n")
             cat("    Annotation package:", annotation(object), "\n")
+          })
+
+setMethod("summary", signature(object="GOListHyperGResult"),
+          function(object, pvalue=pvalueCutoff(object), categorySize=NULL) {
+
+            if (! is.null(categorySize)) {
+              lapply(object@reslist, function(x) {
+                show <- x$Pvalue < pvalue & x$Size >= categorySize
+                x[show,]
+              })
+            } else {
+              lapply(object@reslist, function(x) {
+                show <- x$Pvalue < pvalue
+                x[show,]
+              })
+            }
+          })
+
+setMethod("htmlReport", signature=(r="GOListHyperGResult"),
+          function(r, file="", append=FALSE, label="", digits=3,
+                   summary.args=NULL) {
+            callNextMethod(r=r, file=file, append=append,
+                           label=label, digits=digits,
+                           summary.args=summary.args)            
           })
 
 isa.GO <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
