@@ -260,6 +260,19 @@ setMethod("pvalues", signature(r="GOListHyperGResult"),
             structure(x$Pvalue, names=rownames(x))
           }))
 
+setMethod("geneCounts", signature(r="GOListHyperGResult"),
+          function(r) lapply(r@reslist, function(x) {
+            structure(x$Count, names=rownames(x))
+          }))
+
+setMethod("universeCounts", signature(r="GOListHyperGResult"),
+          function(r) lapply(r@reslist, function(x) {
+            structure(x$Size, names=rownames(x))
+          }))
+
+setMethod("universeMappedCount", signature(r="GOListHyperGResult"),
+          function(r) length(r@universeGeneIds))
+
 isa.GO <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
                    hgCutoff=0.001, correction=TRUE) {
 
