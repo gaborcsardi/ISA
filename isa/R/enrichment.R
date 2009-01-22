@@ -7,7 +7,7 @@ setClass("GOListHyperGParams",
          representation(ontology="character",
                         conditional="logical"),
          contains="HyperGParams",
-         prototype=prototype(categoryName="GOList",
+         prototype=prototype(categoryName=c("GO", "List"),
            conditional=FALSE))
 
 ##################
@@ -186,11 +186,12 @@ isa.GOListHyperGTest <- function(p) {
       reslist=result,
       annotation=p@annotation,
       geneIds=p@geneIds,
-      testName=categoryName(p),
+      testName=c("GO", "List", ontology(p)),
       testDirection=p@testDirection,
       pvalueCutoff=p@pvalueCutoff,
       conditional=p@conditional,
-      universeGeneIds=p@universeGeneIds)
+      universeGeneIds=p@universeGeneIds,
+      catToGeneId=gocat.ent)
 }
 
 #####################
@@ -208,11 +209,13 @@ setClass("GOListHyperGResult",
          representation=representation(
            reslist="list",
            conditional="logical",
-           universeGeneIds="character"),
+           universeGeneIds="character",
+           catToGeneId="list"),
          prototype=prototype(
            testName="GO",
            reslist=list(),
-           universeGeneIds=character()))
+           universeGeneIds=character(),
+           catToGeneId=list()))
 
 ## TODO: make this properly
 setMethod("show", signature(object="GOListHyperGResult"),
@@ -267,6 +270,16 @@ setMethod("geneCounts", signature(r="GOListHyperGResult"),
             structure(x$Count, names=rownames(x))
           }))
 
+setMethod("oddsRatios", signature(r="GOListHyperGResult"),
+          function(r) lapply(r@reslist, function(x) {
+            structure(x$OddsRatio, names=rownames(x))
+          }))
+
+setMethod("expectedCounts", signature(r="GOListHyperGResult"),
+          function(r) lapply(r@reslist, function(x) {
+            structure(x$ExpCount, names=rownames(x))
+          }))
+
 setMethod("universeCounts", signature(r="GOListHyperGResult"),
           function(r) lapply(r@reslist, function(x) {
             structure(x$Size, names=rownames(x))
@@ -277,6 +290,33 @@ setMethod("universeMappedCount", signature(r="GOListHyperGResult"),
 
 setMethod("geneMappedCount", signature(r="GOListHyperGResult"),
           function(r) sapply(r@geneIds, length))
+
+setMethod("geneIdUniverse", signature(r="GOListHyperGResult"),
+          function(r, cond=FALSE) r@catToGeneId)
+
+setMethod("condGeneIdUniverse", signature(r="GOListHyperGResult"),
+          function(r) geneIdUniverse(r, cond=TRUE))
+
+## This function gives all the hits for the tested categories.
+setMethod("geneIdsByCategory", signature(r="GOListHyperGResult"),
+          function(r, catids=NULL) {
+            lapply(r@geneIds, function(genes) {
+              tmp <- lapply(r@catToGeneId, function(x) {
+                genes [ genes %in% x ]
+              })
+              tmp <- tmp[ sapply(tmp, length) != 0 ]
+              ord <- order(names(tmp))
+              tmp <- tmp[ord]
+            })
+          })
+
+setMethod("sigCategories", signature(r="GOListHyperGResult"),
+          function(r, p) {
+            if (missing(p)) { p <- pvalueCutoff(r) }
+            lapply(r@reslist, function(x) {
+              rownames(x)[x$Pvalue < p]
+            })
+          })
 
 isa.GO <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
                    hgCutoff=0.001, correction=TRUE) {
