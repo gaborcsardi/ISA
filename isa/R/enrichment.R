@@ -217,23 +217,26 @@ setClass("GOListHyperGResult",
            universeGeneIds=character(),
            catToGeneId=list()))
 
-## TODO: make this properly
 setMethod("show", signature(object="GOListHyperGResult"),
           function(object) {
-            no.sign <- sum(sapply(object@reslist, function(x) {
+            no.sign <- sapply(object@reslist, function(x) {
               sum(x$Pvalue < object@pvalueCutoff[1])
-            }))
+            })
+            no.sign <- paste(min(no.sign), sep="-", max(no.sign))
             tested <- sum(sapply(object@reslist, function(x) {
               nrow(x)
             }))
+
+            gs <- range(geneMappedCount(object))
+            gs <- paste(gs[1], sep="-", gs[2])
             
             cat(description(object), "\n")
             cat(tested, testName(object), "ids tested ")
             cat("(", no.sign, " have p < ", object@pvalueCutoff[1],
                 ")\n", sep="")
-            cat("Selected gene set size:", "TODO", "\n")
-            cat("    Gene universe size:", "TODO", "\n")
-            cat("    Annotation package:", annotation(object), "\n")
+            cat("Selected gene set sizes:", gs, "\n")
+            cat("     Gene universe size:", universeMappedCount(object), "\n")
+            cat("     Annotation package:", annotation(object), "\n")
           })
 
 setMethod("summary", signature(object="GOListHyperGResult"),
