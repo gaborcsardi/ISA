@@ -19,6 +19,12 @@ setMethod("makeValidParams", "GOListHyperGParams",
             if (!is.list(object@geneIds)) {
               object@geneIds <- list(object@geneIds)
             }
+            if (p@conditional) {
+              stop("Conditional GO test is not implemented yet")
+            }
+            if (p@direction != "over") {
+              stop("Only overrepresentation test is implemented yet")
+            }
             object
           })
 
