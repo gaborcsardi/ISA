@@ -255,6 +255,11 @@ setMethod("htmlReport", signature=(r="GOListHyperGResult"),
                            summary.args=summary.args)            
           })
 
+setMethod("pvalues", signature(r="GOListHyperGResult"),
+          function(r) lapply(r@reslist, function(x) {
+            structure(x$Pvalue, names=rownames(x))
+          }))
+
 isa.GO <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
                    hgCutoff=0.001, correction=TRUE) {
 
