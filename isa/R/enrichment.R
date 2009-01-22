@@ -166,13 +166,15 @@ isa.GOListHyperGTest <- function(p) {
   ## categories (in this subtree).
   gocat.ent <- as.list(categoryToEntrezBuilder(p))
   gocat.ent <- lapply(gocat.ent, intersect, p@universeGeneIds)  
-    
+
+  ## Keep only genes that are in the universe
+  p@geneIds <- lapply(p@geneIds, intersect, p@universeGeneIds)
+
   result <- lapply(p@geneIds, function(genes) {
     count <- sapply(gocat.ent, function(x) sum(genes %in% x))
     my.gocat.ent <- gocat.ent[ count != 0 ]
     count <- count[ count != 0 ]
     size <- sapply(my.gocat.ent, length)
-    genes <- intersect(genes, p@universeGeneIds)
     res <- .doHyperGTest(p, my.gocat.ent, list(), genes)
     res <- data.frame(Pvalue=res$p, OddsRatio=res$odds,
                       ExpCount=res$expected, Count=count,
@@ -272,6 +274,9 @@ setMethod("universeCounts", signature(r="GOListHyperGResult"),
 
 setMethod("universeMappedCount", signature(r="GOListHyperGResult"),
           function(r) length(r@universeGeneIds))
+
+setMethod("geneMappedCount", signature(r="GOListHyperGResult"),
+          function(r) sapply(r@geneIds, length))
 
 isa.GO <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
                    hgCutoff=0.001, correction=TRUE) {
