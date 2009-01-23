@@ -27,23 +27,6 @@ setMethod("makeValidParams", "KEGGListHyperGParams",
             object
           })
 
-
-##################
-## ontology
-
-setMethod("ontology", "KEGGListHyperGParams", function(r) r@ontology)
-
-##################
-## ontology<-
-
-setReplaceMethod("ontology", c("KEGGListHyperGParams", "character"),
-                 function(r, value) {
-                     if (is.na(value) || length(value) != 1)
-                       stop("value must be a length one character vector")
-                     r@ontology <- value
-                     r
-                 })
-
 ##################
 ## conditional
 
