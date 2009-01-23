@@ -200,6 +200,14 @@ isa.GOListHyperGTest <- function(p) {
 setMethod("hyperGTest",
           signature(p="GOListHyperGParams"), isa.GOListHyperGTest)
 
+setMethod("show", signature(object="GOListHyperGParams"),
+          function(object) {
+              cat("A", class(object), "instance\n")
+              cat("  category:", object@categoryName, "\n")
+              cat("  ontology:", object@ontology, "\n")
+              cat("annotation:", object@annotation, "\n")
+          })
+
 ##################################################
 ## GOListHyperGResult
 ##################################################
