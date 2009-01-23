@@ -1,4 +1,280 @@
+
+##################################################
+## KEGGListHyperGParams
+##################################################
+
+setClass("KEGGListHyperGParams",
+         representation(conditional="logical"),
+         contains="HyperGParams",
+         prototype=prototype(categoryName=c("KEGG", "List"),
+           conditional=FALSE))
+
+##################
+## makeValidParams
+
+setMethod("makeValidParams", "KEGGListHyperGParams",
+          function(object) {
+            ## TODO: proper checks
+            if (!is.list(object@geneIds)) {
+              object@geneIds <- list(object@geneIds)
+            }
+            if (object@conditional) {
+              stop("Conditional KEGG test is not implemented yet")
+            }
+            if (object@testDirection != "over") {
+              stop("Only overrepresentation test is implemented yet")
+            }
+            object
+          })
+
+
+##################
+## ontology
+
+setMethod("ontology", "KEGGListHyperGParams", function(r) r@ontology)
+
+##################
+## ontology<-
+
+setReplaceMethod("ontology", c("KEGGListHyperGParams", "character"),
+                 function(r, value) {
+                     if (is.na(value) || length(value) != 1)
+                       stop("value must be a length one character vector")
+                     r@ontology <- value
+                     r
+                 })
+
+##################
+## conditional
+
+setMethod("conditional", "KEGGListHyperGParams", function(r) r@conditional)
+
+##################
+## conditional<-
+
+setReplaceMethod("conditional", c("KEGGListHyperGParams", "logical"),
+                 function(r, value) {
+                     if (is.na(value))
+                       stop("value must be TRUE or FALSE")
+                     r@conditional <- value
+                     r
+                 })
+
+##################
+## categoryToEntrezBuilder
+## Create a mapping from the categories to the Entrez ids
+
+setMethod("categoryToEntrezBuilder",
+         signature(p="KEGGListHyperGParams"),
+         function(p) {
+           keep.all <- switch(testDirection(p),
+                              over=FALSE,
+                              under=TRUE,
+                              stop("Bad testDirection slot"))
+
+           geneIds <- unique(unlist(geneIds(p)))
+           lib <- annotation(p)
+           isORGEG = grep("org.*.eg", lib)
+           if( length(isORGEG) > 0 )
+             kegg2allprobes <- Category:::getDataEnv("PATH2EG", lib)
+           else
+             kegg2allprobes <- Category:::getDataEnv("PATH2PROBE", lib)
+           probeAnnot <- Category:::getKeggToProbeMap(kegg2allprobes)
+           Category:::probeToEntrezMapHelper(probeAnnot, geneIds, p@datPkg, universeGeneIds(p),
+                                             keep.all=keep.all)
+         
+         })
+
+######################
+## universeBuilder
+## It returns the Entrez ids from the supplied universe that
+## have at least one KEGG annotation
+setMethod("universeBuilder", signature=(p="KEGGListHyperGParams"),
+          function(p) {
+            entrezIds <- universeGeneIds(p)
+            SQL <- "select distinct gene_id from genes, kegg where genes._id = kegg._id"
+            db <- do.call(paste(p@annotation, sep="_", "dbconn"), list())            
+            univ <- dbGetQuery(db, SQL)[[1]]
+            if (!is.null(entrezIds) && length(entrezIds) > 0)
+              univ <- intersect(univ, unlist(entrezIds))
+            if (length(univ) < 1)
+              stop("No Entrez Gene ids left in universe")
+            univ
+          })
+
+isa.KEGGListHyperGTest <- function(p) {
+  p <- makeValidParams(p)
   
+  ## Filter the universe to the genes that have at least one
+  ## annotation 
+  p@universeGeneIds <- universeBuilder(p)
+
+  ## We need the reverse mapping, the Entrez ids for all KEGG
+  ## categories (in this subtree).
+  keggcat.ent <- as.list(categoryToEntrezBuilder(p))
+  keggcat.ent <- lapply(keggcat.ent, intersect, p@universeGeneIds)  
+
+  ## Keep only genes that are in the universe
+  p@geneIds <- lapply(p@geneIds, intersect, p@universeGeneIds)
+
+  result <- lapply(p@geneIds, function(genes) {
+    count <- sapply(keggcat.ent, function(x) sum(genes %in% x))
+    my.keggcat.ent <- keggcat.ent[ count != 0 ]
+    count <- count[ count != 0 ]
+    size <- sapply(my.keggcat.ent, length)
+    res <- .doHyperGTest(p, my.keggcat.ent, list(), genes)
+    res <- data.frame(Pvalue=res$p, OddsRatio=res$odds,
+                      ExpCount=res$expected, Count=count,
+                      Size=size, row.names=names(res$p))
+    res[ order(res$Pvalue), ]
+  })
+
+  new("KEGGListHyperGResult",
+      reslist=result,
+      annotation=p@annotation,
+      geneIds=p@geneIds,
+      testName=c("KEGG", "List"),
+      testDirection=p@testDirection,
+      pvalueCutoff=p@pvalueCutoff,
+      conditional=p@conditional,
+      universeGeneIds=p@universeGeneIds,
+      catToGeneId=keggcat.ent)
+}
+
+#####################
+## hyperGTest
+
+setMethod("hyperGTest",
+          signature(p="KEGGListHyperGParams"), isa.KEGGListHyperGTest)
+
+setMethod("show", signature(object="KEGGListHyperGParams"),
+          function(object) {
+              cat("A", class(object), "instance\n")
+              cat("  category:", object@categoryName, "\n")
+              cat("annotation:", object@annotation, "\n")
+          })
+
+##################################################
+## KEGGListHyperGResult
+##################################################
+
+setClass("KEGGListHyperGResult",
+         contains="HyperGResultBase",
+         representation=representation(
+           reslist="list",
+           conditional="logical",
+           universeGeneIds="character",
+           catToGeneId="list"),
+         prototype=prototype(
+           testName="KEGG",
+           reslist=list(),
+           universeGeneIds=character(),
+           catToGeneId=list()))
+
+setMethod("show", signature(object="KEGGListHyperGResult"),
+          function(object) {
+            no.sign <- sapply(object@reslist, function(x) {
+              sum(x$Pvalue < object@pvalueCutoff[1])
+            })
+            no.sign <- paste(min(no.sign), sep="-", max(no.sign))
+            tested <- sum(sapply(object@reslist, function(x) {
+              nrow(x)
+            }))
+
+            gs <- range(geneMappedCount(object))
+            gs <- paste(gs[1], sep="-", gs[2])
+            
+            cat(description(object), "\n")
+            cat(tested, testName(object), "ids tested ")
+            cat("(", no.sign, " have p < ", object@pvalueCutoff[1],
+                ")\n", sep="")
+            cat("Selected gene set sizes:", gs, "\n")
+            cat("     Gene universe size:", universeMappedCount(object), "\n")
+            cat("     Annotation package:", annotation(object), "\n")
+          })
+
+setMethod("summary", signature(object="KEGGListHyperGResult"),
+          function(object, pvalue=pvalueCutoff(object), categorySize=NULL) {
+
+            if (! is.null(categorySize)) {
+              lapply(object@reslist, function(x) {
+                show <- x$Pvalue < pvalue & x$Size >= categorySize
+                x[show,]
+              })
+            } else {
+              lapply(object@reslist, function(x) {
+                show <- x$Pvalue < pvalue
+                x[show,]
+              })
+            }
+          })
+
+setMethod("htmlReport", signature=(r="KEGGListHyperGResult"),
+          function(r, file="", append=FALSE, label="", digits=3,
+                   summary.args=NULL) {
+            callNextMethod(r=r, file=file, append=append,
+                           label=label, digits=digits,
+                           summary.args=summary.args)            
+          })
+
+setMethod("pvalues", signature(r="KEGGListHyperGResult"),
+          function(r) lapply(r@reslist, function(x) {
+            structure(x$Pvalue, names=rownames(x))
+          }))
+
+setMethod("geneCounts", signature(r="KEGGListHyperGResult"),
+          function(r) lapply(r@reslist, function(x) {
+            structure(x$Count, names=rownames(x))
+          }))
+
+setMethod("oddsRatios", signature(r="KEGGListHyperGResult"),
+          function(r) lapply(r@reslist, function(x) {
+            structure(x$OddsRatio, names=rownames(x))
+          }))
+
+setMethod("expectedCounts", signature(r="KEGGListHyperGResult"),
+          function(r) lapply(r@reslist, function(x) {
+            structure(x$ExpCount, names=rownames(x))
+          }))
+
+setMethod("universeCounts", signature(r="KEGGListHyperGResult"),
+          function(r) lapply(r@reslist, function(x) {
+            structure(x$Size, names=rownames(x))
+          }))
+
+setMethod("universeMappedCount", signature(r="KEGGListHyperGResult"),
+          function(r) length(r@universeGeneIds))
+
+setMethod("geneMappedCount", signature(r="KEGGListHyperGResult"),
+          function(r) sapply(r@geneIds, length))
+
+setMethod("geneIdUniverse", signature(r="KEGGListHyperGResult"),
+          function(r, cond=FALSE) r@catToGeneId)
+
+setMethod("condGeneIdUniverse", signature(r="KEGGListHyperGResult"),
+          function(r) geneIdUniverse(r, cond=TRUE))
+
+## This function gives all the hits for the tested categories.
+setMethod("geneIdsByCategory", signature(r="KEGGListHyperGResult"),
+          function(r, catids=NULL) {
+            lapply(r@geneIds, function(genes) {
+              tmp <- lapply(r@catToGeneId, function(x) {
+                genes [ genes %in% x ]
+              })
+              tmp <- tmp[ sapply(tmp, length) != 0 ]
+              ord <- order(names(tmp))
+              tmp <- tmp[ord]
+            })
+          })
+
+setMethod("sigCategories", signature(r="KEGGListHyperGResult"),
+          function(r, p) {
+            if (missing(p)) { p <- pvalueCutoff(r) }
+            lapply(r@reslist, function(x) {
+              rownames(x)[x$Pvalue < p]
+            })
+          })
+
 isa.KEGG <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
                      hgCutoff=0.001, correction=TRUE) {
 
@@ -27,99 +303,12 @@ isa.KEGG <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
   entrezUniverse <- unique(unlist(mget(features, ENTREZ)))
 
   params <-
-    try( new("KEGGHyperGParams", geneIds = character(),
+    try( new("KEGGListHyperGParams", geneIds = selectedEntrezIds,
              universeGeneIds = entrezUniverse, annotation = annotation,
              pvalueCutoff = hgCutoff, testDirection = "over") )
 
-  valid <- sapply(selectedEntrezIds, length) != 0
-  params@geneIds <- selectedEntrezIds[valid]
-
-  hgOver <- vector(mode="list", length=length(selectedEntrezIds))
-
   cat(" -- Doing test\n")
-  hgOver[valid] <- QhyperGTestKEGG(params, correction=correction)
+  hgOver <- hyperGTest(params)
 
   hgOver
-}
-
-QhyperGTestKEGG <- function(params, correction) {
-
-  ## These are not yet implemented
-  if (params@testDirection == "under") {
-    stop("Under-representation is not implemented yet")
-  }
-  
-  ## Check that we have the require Entrez <-> GO mappings,
-  pkg <- sub(".db", "", params@datPkg@name, fixed=TRUE)
-  organism <- get(paste(sep="", pkg, "ORGANISM"))
-  organism <- abbreviate(organism, 2)
-
-##   maps <- paste(sep=".", "org", organism,
-##                 c("egPATH", "egPATH2EG", "egPATHHAVE"))
-##   if (any(! sapply(maps, exists))) {
-##     stop("Some Entrez <-> KEGG mappings do not exist: ", sapply(maps,exists))
-##  }
-
-  ## Filter the gene universe to include genes that have at least one annotation
-  ## in the current ontology
-  havelist <- get(paste(sep="", "org.", organism, ".egPATHHAVE"))
-  if (length(params@universeGeneIds)==0) {
-    params@univerGeneIds <- havelist
-  } else { 
-    params@universeGeneIds <- intersect(havelist, params@universeGeneIds)
-  }
-
-  ## Pre-generate the filtered list of probes, only include those that are
-  ## in the universe
-  if (!is.list(params@geneIds)) {
-    params@geneIds <-list(params@geneIds)
-  }
-  all.egs <- get(paste(sep=".", "org", organism, "egPATH2EG"))
-  if (length(params@geneIds) > 3) {
-    simplified <- TRUE
-    egPATH2EG.mine <- new.env()
-    all <- as.list(all.egs)
-    all <- lapply(all, function(x) intersect(x, params@universeGeneIds))
-    for (n in seq(all)) {
-      assign(names(all)[n], all[[n]], envir=egPATH2EG.mine)
-    }
-  } else {
-    simplified <- FALSE
-    egPATH2EG.mine <- all.egs
-  }
-
-  ## Ok, start testing
-  all.cc <- get(paste(sep="", "org.", organism, ".egPATH"))
-      
-  result <- lapply(params@geneIds, function(genes) {
-
-    genes <- as.character(genes[!is.na(genes)])
-    tmp <- mget(genes, all.cc, ifnotfound=NA)
-    tmp <- tmp[ !is.na(tmp) ]
-    
-    tmp2 <- unique(as.character(unlist(unname(tmp))))
-    tmp5 <- mget(tmp2, egPATH2EG.mine)
-    if (!simplified) {
-      tmp5 <- lapply(tmp5, function(x) intersect(x, params@universeGeneIds))
-    }
-
-    selected <- genes[ genes %in% params@universeGeneIds ]
-    res <- .doHyperGTest(params, tmp5, list(), selected)
-    res$size <- sapply(tmp5, length)
-    res$count <- sapply(tmp5, function(x) sum(selected %in% x))
-    drive <- lapply(tmp5, function(x) genes[which(genes %in% x)])
-    res$drive <- sapply(drive, paste, collapse=";")
-
-    if (correction && length(res$p)>0) {
-      res$p <- res$p * length(res$size)
-      res$p <- pmin(res$p, 1)
-    }
-    
-    res <- data.frame(Pvalue=res$p, OddsRatio=res$odds, ExpCount=res$expected,
-                      Count=res$count, Size=res$size, Drive=res$drive,
-                      row.names=names(res$p))
-    res[ order(res$Pvalue), ]
-  })
-
-  result
 }
