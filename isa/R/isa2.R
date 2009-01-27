@@ -104,9 +104,10 @@ isa <- function(normeddata, g=NULL, c=NULL, tc, tg=tc, down=c(TRUE, FALSE),
   
   N <- ncol(g)
   iter <- 0
-  prev <- result1 <- g
+  result1 <- g
   result1[] <- NA
   result2 <- matrix(NA, ncol(normeddata[[1]]), ncol=ncol(g))
+  prev <- list(result1, result2)
   index <- seq(ncol(g))
   iterresult <- rep(NA, ncol(g))
   fire <- character(N)
@@ -122,22 +123,24 @@ isa <- function(normeddata, g=NULL, c=NULL, tc, tg=tc, down=c(TRUE, FALSE),
   convergence=match.arg(convergence)
   if (convergence=="pos.genes") {
     check.convergence <- function() {
-      apply( (g>0) == (prev>0), 2, all)      
+      apply( (g>0) == (prev[[1]]>0), 2, all)      
     }
   } else if (convergence=="eps") {
     if (missing(eps)) {
       stop("`eps' convergence check chosen, but no `eps' argument")
     }
     check.convergence <- function() {
-      apply(g-prev, 2, function(x) all(abs(x)<eps))
+      res <- (apply(g-prev[[1]], 2, function(x) all(abs(x)<eps)) &
+              apply(cond-prev[[2]], 2, function(x) all(abs(x)<eps)))
+      res & !is.na(res)
     }
   } else if (convergence=="loosy") {
     check.convergence <- function() {
-      apply(g,2,function(x) sum(x>0)) == apply(prev, 2, function(x) sum(x>0))
+      apply(g,2,function(x) sum(x>0)) == apply(prev[[1]], 2, function(x) sum(x>0))
     }
   } else if (convergence=="no.pos.genes") {
     check.convergence <- function() {
-      apply(g>0, 2, sum) == apply(prev>0, 2, sum)
+      apply(g>0, 2, sum) == apply(prev[[1]]>0, 2, sum)
     }
   } else if (convergence=="no.pos.genes.m3") {
     no.pos <- numeric()
@@ -154,6 +157,7 @@ isa <- function(normeddata, g=NULL, c=NULL, tc, tg=tc, down=c(TRUE, FALSE),
     res <- isa.step(normeddata, g, tc=tc, tg=tg, down=down,
                     threshold.type=threshold.type, normalization=normalization)
     g <- res[[2]]
+    cond <- res[[1]]
 
     if (iter > miniter) {
       
@@ -194,6 +198,7 @@ isa <- function(normeddata, g=NULL, c=NULL, tc, tg=tc, down=c(TRUE, FALSE),
         result2[,index[drop]] <- res[[1]][,drop]
         iterresult[index[drop]] <- iter
         g <- g[,-drop,drop=FALSE]
+        cond <- cond[,-drop,drop=FALSE]
         if (oscillation) {
           fire <- fire[-drop]
         }
@@ -211,7 +216,7 @@ isa <- function(normeddata, g=NULL, c=NULL, tc, tg=tc, down=c(TRUE, FALSE),
     ## Check for maxiter
     if (iter >= maxiter) { break }
     
-    prev <- g
+    prev <- list(g, cond)
   }
   result1[,index] <- NA  
   
