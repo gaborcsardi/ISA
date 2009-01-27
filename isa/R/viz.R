@@ -1,29 +1,48 @@
 
-gograph <- function(table, colbar.length=30, label.cex=1) {
+gograph <- function(table, colbar.length=30, label.cex=1, GOGRAPHS=NULL,
+                    go.terms=NULL) {
 
   require(GO.db)
   require(igraph)
-  
+
   terms <- as.character(table[,1])
   pval <- table[,2]
 
   #######################
   # Check which GO tree
   
-  term.objs <- mget(terms, GOTERM)
-  cats <- sapply(term.objs, Ontology)
-  cats <- unname(unique(cats))
-  if (length(cats) != 1) {
-    stop("Table contains different categories")
-  }
-  go.graph <- if (cats=="CC") {
-    CC.graph
-  } else if (cats=="BP") {
-    BP.graph
-  } else if (cats=="MF") {
-    MF.graph
-  }
+  cats <- get(terms[1], GOTERM)@Ontology
 
+  #######################
+  # Create a list of terms
+  
+  if (is.null(go.terms)) {
+    db <- GO_dbconn()
+    query <- paste("SELECT go_id, term, definition FROM go_term ",
+                   "WHERE ontology=='", cats, "'",
+                   sep="")
+    go.terms <- dbGetQuery(db, query)
+    rownames(go.terms) <- go.terms[,1]
+    go.terms <- go.terms[,-1]
+  }
+    
+  #######################
+  # Create the igraph object if it was not passed as an argument
+  
+  if (is.null(GOGRAPHS)) {
+    query <- paste("SELECT id1.go_id, id2.go_id, par.relationship_type FROM",
+                   " go_", tolower(cats), "_parents AS par,",
+                   " go_term AS id1, go_term AS id2",
+                   " WHERE par._id==id1._id AND par._parent_id==id2._id",
+                   sep="")
+    db <- GO_dbconn()
+    parents <- dbGetQuery(db, query)
+    colnames(parents) <- c("from", "to", "relationship")
+    go.graph <- graph.data.frame(parents, directed=TRUE)
+  } else {
+    go.graph <- switch(cats, CC=GOGRAPHS$CC, BP=GOGRAPHS$BP, MF=GOGRAPHS$MF)
+  }
+  
   #######################
   # Create a subgraph containing all up-paths from the
   # given vertices
@@ -87,10 +106,9 @@ gograph <- function(table, colbar.length=30, label.cex=1) {
   #######################
   ## Abbreviate GO terms
 
-  definition <- sapply(go.terms[ V(g2)$name ], function(x)
-                       if (is.null(x)) "OBSOLOTE" else x@Definition)
-  desc <- sapply(go.terms[ V(g2)$name ], function(x)
-                 if (is.null(x)) "OBSOLOTE" else x@Term)
+  go.terms.sub <- go.terms[ V(g2)$name, ]
+  definition <- go.terms.sub$definition
+  desc <- go.terms.sub$term
   abbrv <- unname(abbreviate(desc))
   if (any(nchar(abbrv) > 10)) {
     abbrv <- abbreviate(abbrv, method="both.sides")
