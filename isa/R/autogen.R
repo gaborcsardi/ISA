@@ -246,6 +246,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   require(isa)
   require(affy)
   require(TeachingDemos)
+  require(igraph)
 
   nexp <- nm[[2]]
 
@@ -259,12 +260,33 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   library(paste(sep="", "org.", abbreviate(organism,2), ".eg.db"),
           character.only=TRUE)
 
+  ####################
+  # create go.terms object
+  
   db <- GO_dbconn()
   query <- "SELECT go_id, term, definition FROM go_term"
   go.terms <- dbGetQuery(db, query)
   rownames(go.terms) <- go.terms[,1]
   go.terms <- go.terms[,-1]
 
+  ####################
+  # Create GOGRAPHS object
+
+  go.graph <- function(cats) {
+    query <- paste("SELECT id1.go_id, id2.go_id, par.relationship_type FROM",
+                   " go_", tolower(cats), "_parents AS par,",
+                   " go_term AS id1, go_term AS id2",
+                   " WHERE par._id==id1._id AND par._parent_id==id2._id",
+                   sep="")
+    parents <- dbGetQuery(db, query)
+    colnames(parents) <- c("from", "to", "relationship")
+    go.graph <- graph.data.frame(parents, directed=TRUE)
+    go.graph
+  }
+  GOGRAPHS <- list(BP=go.graph("BP"),
+                   CC=go.graph("CC"),
+                   MF=go.graph("MF"))
+  
   color.table <- function(t) {
     ## colorify every second row, plus the first one
     t[1] <- sub('<tr>', '<tr class="head">', t[1])
@@ -693,7 +715,8 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
                   coords=list(x=numeric(), y=numeric())))
     }
     gop <- gograph(data.frame(names(pval), pval),
-                   colbar.length=20, label.cex=1)
+                   colbar.length=20, label.cex=1,
+                   go.terms=go.terms, GOGRAPHS=GOGRAPHS)
     CairoPNG(file=filename, width=gop$width*4, height=gop$height*4)
     co <- gograph.plot(gop)
     dev.off()
