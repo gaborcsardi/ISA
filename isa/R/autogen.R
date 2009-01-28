@@ -201,7 +201,7 @@ autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
                             GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL,
                             cond.to.include=NULL,
                             markup=numeric(), markdown=numeric(),
-                            sep=NULL, do.drive=FALSE, seed=NULL) {
+                            sep=NULL, seed=NULL) {
 
   if (!file.exists(target.dir)) {
     dir.create(target.dir)
@@ -224,14 +224,20 @@ autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
     file.copy(paste(sep="", template, "/images/", f),
               paste(sep="", target.dir, "/images/", f) )
   }
-
+  
+  drive.BP <- geneIdsByCategory(GO[[1]])[modules]
+  drive.CC <- geneIdsByCategory(GO[[2]])[modules]
+  drive.MF <- geneIdsByCategory(GO[[3]])[modules]
+  drive.KEGG <- geneIdsByCategory(KEGG)[modules]
+  
   ## Then generate modules
   sapply(modules, function(x) {
     isa.autogen.module(nm, isares, x, target.dir=target.dir, template=template,
                        GO=GO, KEGG=KEGG, miRNA=miRNA, CHR=CHR,
                        cond.to.include=cond.to.include,
                        markup=markup, markdown=markdown, sep=sep,
-                       do.drive=do.drive, seed=seed)
+                       seed=seed, drive.BP=drive.BP, drive.CC=drive.CC,
+                       drive.MF=drive.MF, drive.KEGG=drive.KEGG)
   })
 
   invisible(NULL)
@@ -239,8 +245,9 @@ autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
 
 isa.autogen.module <- function(nm, isares, module, target.dir, template,
                                GO, KEGG, miRNA, CHR, cond.to.include,
-                               markup, markdown, sep=NULL, do.drive=FALSE,
-                               seed=NULL) {
+                               markup, markdown, sep=NULL,
+                               seed=NULL, drive.BP=NULL, drive.CC=NULL,
+                               drive.MF=NULL, drive.KEGG=NULL) {
 
   require(Cairo)
   require(isa)
@@ -316,16 +323,15 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
     
     df <- data.frame(Pvalue=pval, ECount=round(ec, 2), Count=gc, Size=uc,
                      Term=nn)
-    if (do.drive) {
-      drive <- strsplit(as.character(obj$Drive[v]), ";", fixed=TRUE)
-      drive <- lapply(drive, function(x) unname(unlist(mget(x, SYMBOL))))
-      drive <- lapply(drive, sort)
-      drive <- lapply(drive, paste, collapse=", ")
-      df$Count <- paste(sep="", '<a href="#" onclick="togglestuff2(\'d.', cat, '.', seq(along=df[,1]),
+
+    drive <- drive[rownames(obj)][v]
+    drive <- lapply(drive, function(x) unname(unlist(mget(x, SYMBOL))))
+    drive <- lapply(drive, sort)
+    drive <- lapply(drive, paste, collapse=", ")
+    df$Count <- paste(sep="", '<a href="#" onclick="togglestuff2(\'d.', cat, '.', seq(along=df[,1]),
                       '\'); return false;">', df$Count, '</a><br/><span id="d.', cat, '.', seq(along=df[,1]),
                       '" class="d.', cat, '" style="font-size:0.8em;display:none;visibility:hidden;">', drive,
                       '</span>')
-    }
   
     xdf <- xtable(df, display=c("s", "e", "g", "g", "d", "s"),
                   digits=c(NA, 3, 4, 4, 4, NA))
@@ -349,21 +355,22 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
     foo <- sub("(<td[^>]*>[ ]*)(GO:[0-9]+)",
                paste(sep="", '\\1<a href="', link, '\\2"> \\2 </a>'), foo)
     
-    if (do.drive) {
-      foo <- sub("<th> Count </th>",
-                 paste(sep="",
-                       '<th> <a href="#" onclick="togglestuff3(\'d.', cat,
-                       '\');return false;"> Count </a> </th>'),
-                 foo, fixed=TRUE)
-    }
+    foo <- sub("<th> Count </th>",
+               paste(sep="",
+                     '<th> <a href="#" onclick="togglestuff3(\'d.', cat,
+                     '\');return false;"> Count </a> </th>'),
+               foo, fixed=TRUE)
     
     foo <- color.table(foo)
     paste(foo, collapse="\n")
   }
 
-  tables.BP <- f(GO[[1]]@reslist[[module]], pvalue=0.05, maxlines=NA)
-  tables.CC <- f(GO[[2]]@reslist[[module]], pvalue=0.05, maxlines=NA)
-  tables.MF <- f(GO[[3]]@reslist[[module]], pvalue=0.05, maxlines=NA)
+  tables.BP <- f(GO[[1]]@reslist[[module]], pvalue=0.05, maxlines=NA,
+                 drive=drive.BP[[module]], cat="BP")
+  tables.CC <- f(GO[[2]]@reslist[[module]], pvalue=0.05, maxlines=NA,
+                 drive=drive.CC[[module]], cat="CC")
+  tables.MF <- f(GO[[3]]@reslist[[module]], pvalue=0.05, maxlines=NA,
+                 drive=drive.MF[[module]], cat="MF")
 
   g <- function(obj, pvalue=0.05, maxlines=NA, drive=NULL) {
     if (class(obj)=="NULL") {
@@ -385,16 +392,15 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
     df <- data.frame(Pvalue=pval, ECount=round(ec, 2), Count=gc, Size=uc,
                      Term=nn)
     cat <- "ke"
-    if (do.drive) {
-      drive0 <- strsplit(as.character(obj$Drive[v]), ";", fixed=TRUE)
-      drive <- lapply(drive0, function(x) unname(unlist(mget(x, SYMBOL))))
-      drive <- lapply(drive, sort)
-      drive2 <- lapply(drive, paste, collapse=", ")
-      df$Count <- paste(sep="", '<a href="#" onclick="togglestuff2(\'d.', cat, '.', seq(along=df[,1]),
-                        '\'); return false;">', df$Count, '</a><br/><span id="d.', cat, '.', seq(along=df[,1]),
-                        '" class="d.', cat, '" style="font-size:0.8em;display:none;visibility:hidden;">', drive2,
-                        '</span>')
-    }  
+
+    drive0 <- drive[rownames(obj)][v]
+    drive <- lapply(drive0, function(x) unname(unlist(mget(x, SYMBOL))))
+    drive <- lapply(drive, sort)
+    drive2 <- lapply(drive, paste, collapse=", ")
+    df$Count <- paste(sep="", '<a href="#" onclick="togglestuff2(\'d.', cat, '.', seq(along=df[,1]),
+                      '\'); return false;">', df$Count, '</a><br/><span id="d.', cat, '.', seq(along=df[,1]),
+                      '" class="d.', cat, '" style="font-size:0.8em;display:none;visibility:hidden;">', drive2,
+                      '</span>')
     
     xdf <- xtable(df, display=c("s", "e", "g", "g", "d", "s"),
                   digits=c(NA, 3, 4, 4, 4, NA))
@@ -420,29 +426,27 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
     foo <- sub("(<td[^>]*>[ ]*)([0-9]+)",
                paste(sep="", '\\1<a href="', link[1], keggorg,
                      '\\2', link[2], '"> \\2 </a>'), foo)
-    if (do.drive) {
-      ## mark genes on pathway, we still have 'drive0'
-      drive2 <- sapply(drive0, paste, collapse="/")
-      for (i in seq_along(foo)[-1]) {
-        foo[[i]] <- sub(link[2], paste(sep="", link[2], drive2[[i-1]]),
-                        foo[[i]], fixed=TRUE)
-      }
+
+    ## mark genes on pathway, we still have 'drive0'
+    drive2 <- sapply(drive0, paste, collapse="/")
+    for (i in seq_along(foo)[-1]) {
+      foo[[i]] <- sub(link[2], paste(sep="", link[2], drive2[[i-1]]),
+                      foo[[i]], fixed=TRUE)
     }
     
-    if (do.drive) {
-      foo <- sub("<th> Count </th>",
-                 paste(sep="",
-                       '<th> <a href="#" onclick="togglestuff3(\'d.', cat,
-                       '\');return false;"> Count </a> </th>'),
-                 foo, fixed=TRUE)
-    }
+    foo <- sub("<th> Count </th>",
+               paste(sep="",
+                     '<th> <a href="#" onclick="togglestuff3(\'d.', cat,
+                     '\');return false;"> Count </a> </th>'),
+               foo, fixed=TRUE)
     
     foo <- color.table(foo)
     paste(foo, collapse="\n")
   }
 
   require(KEGG.db)
-  tables.KEGG <- g(KEGG@reslist[[module]], pvalue=0.05, maxlines=NA)
+  tables.KEGG <- g(KEGG@reslist[[module]], pvalue=0.05, maxlines=NA,
+                   drive=drive.KEGG[[module]])
 
   if (!is.null(miRNA)) {
 
