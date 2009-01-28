@@ -1,0 +1,115 @@
+function showstuff(boxid){
+   document.getElementById(boxid).style.visibility="visible";
+   document.getElementById(boxid).style.display="block";
+}
+function hidestuff(boxid){
+   document.getElementById(boxid).style.visibility="hidden";
+   document.getElementById(boxid).style.display="none";
+}
+function togglestuff(boxid){
+   if (document.getElementById(boxid).style.visibility=="hidden") {
+     document.getElementById(boxid).style.visibility="visible";
+     document.getElementById(boxid).style.display="block";
+     document.getElementById(boxid+".1").style.display="block";
+     document.getElementById(boxid+".2").style.display="none";
+   } else {
+     document.getElementById(boxid).style.visibility="hidden";
+     document.getElementById(boxid).style.display="none";
+     document.getElementById(boxid+".1").style.display="none";
+     document.getElementById(boxid+".2").style.display="block";
+   }
+}
+function togglestuff2(boxid){
+   if (document.getElementById(boxid).style.visibility=="hidden") {
+     document.getElementById(boxid).style.visibility="visible";
+     document.getElementById(boxid).style.display="block";
+   } else {
+     document.getElementById(boxid).style.visibility="hidden";
+     document.getElementById(boxid).style.display="none";
+   }
+}
+function togglestuff3(classid) {
+   var Elist=document.getElementsByTagName('span');
+   for (var i=0; i<Elist.length; i++) {
+     if (Elist[i].className==classid) {
+       if (Elist[i].style.visibility=="hidden") {
+          Elist[i].style.visibility="visible";
+          Elist[i].style.display="block";
+       } else {
+          Elist[i].style.visibility="hidden";
+          Elist[i].style.display="none";
+       }
+     }
+  }
+}
+           
+function findPos(obj) {
+     var curleft = curtop = 0;
+     if (obj.offsetParent) {
+ 	do {
+	  curleft += obj.offsetLeft;
+          curtop += obj.offsetTop;
+        } while (obj = obj.offsetParent);
+     }
+     return [curleft,curtop];
+}
+function writeCoords(e) {
+   var opos=findPos(document.getElementById("expimage"));
+   var mouseX=0, mouseY=0;
+   if (!e) var e = window.event||window.Event;
+
+   if('undefined'!=typeof e.pageX)
+   {
+     mouseX = e.pageX;
+     mouseY = e.pageY;
+   } else {
+     mouseX = e.clientX + document.body.scrollLeft;
+     mouseY = e.clientY + document.body.scrollTop;
+   }
+   var pos_x=mouseX-opos[0]-exppos[0];
+   var pos_y=mouseY-opos[1]-exppos[2];
+   var gene_width=exppos[4];
+   var cond_height=exppos[5];
+   var gene=genes[Math.floor(pos_x/gene_width)];
+   var cond=conditions[conditions.length-Math.floor(pos_y/cond_height)-1];
+
+   document.getElementById("cross.x").style.left=exppos[0]+opos[0]+'px';
+   document.getElementById("cross.y").style.top=exppos[2]+opos[1]+'px';
+
+   if (gene) {
+     document.getElementById("exp.x").value=gene;
+   }
+   if (cond) {
+     document.getElementById("exp.y").value=cond;
+   }
+
+   if (pos_x > exppos[1]-exppos[0]) { 
+     mouseX = mouseX - pos_x + exppos[1]-exppos[0];
+   } else if (pos_x < 1) {
+     mouseX = mouseX - pos_x;
+   }
+   if (pos_y > exppos[3]-exppos[2]) {
+     mouseY = mouseY - pos_y + exppos[3]-exppos[2]-2;
+   } else if (pos_y < 1) {
+     mouseY = mouseY - pos_y - 2;
+   }
+   document.getElementById("cross.x").style.top=mouseY + 'px';
+   document.getElementById("cross.x").style.display="block";
+   document.getElementById("cross.y").style.left=mouseX + 'px';
+   document.getElementById("cross.y").style.display="block";
+}
+
+var exppos= [ 
+// exppos
+// /exppos
+];
+
+var genes=[
+// genes
+// /genes
+];
+var conditions=[
+// conditions
+// /conditions
+];
+

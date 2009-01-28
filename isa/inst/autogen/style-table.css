@@ -1,0 +1,167 @@
+body {
+	text-align:center;
+	font-family:"Trebuchet ms",Arial,Helvetica,sans-serif;
+	font-size:.9em;
+	background:#f8f8f8;
+	color:#000;
+        text-align: left;
+	margin: 0px 20px 0px 20px;
+}
+h1 {
+    color: #fff;
+    margin: 0px 0px 10px 0px;
+    padding: 7px 0 7px 15px;
+    text-shadow: 0px 1px 2px #000;
+    background: #aeaeae url(images/headerbg.png) repeat-x;
+    border-bottom: 1px solid #1c477f;
+    font-size: large;
+}
+h2 {
+    color: #fff;
+    margin: 10px 0px 10px 0px;
+    padding: 7px 0 7px 15px;
+    text-shadow: 0px 1px 2px #000;
+    background: #aeaeae url(images/headerbg.png) repeat-x;
+    border-bottom: 1px solid #1c477f;
+    font-size: 1em;
+    text-align: left;
+}
+h3 {
+    font-size: 1em;
+    text-align: left;
+}
+h4 {
+    font-size: 0.8em;
+    text-align: left;
+}
+td {
+    padding-right: 2em;
+    padding-left: 1em;
+    border-left: 1px solid #AAA;
+}
+th { 
+    padding-right: 2em;
+    padding-left: 1em;
+    padding-bottom: 5px;
+    border-left: 1px solid #AAA;
+    border-bottom: 1px solid #AAA;
+}
+a { color: #00f; text-decoration: none }
+a:visited { color: #00c }
+a:hover { color: #00f; text-decoration: underline }
+h1 a, h1 a:visited, h1 a:hover { color: #fff; text-decoration: none }
+h2 a, h2 a:visited, h2 a:hover { color: #000; text-decoration: none }
+h3 a, h3 a:visited, h3 a:hover { color: #000; text-decoration: none }
+ul.menu {
+  font-size: 0.8em;
+  list-style-type: none;
+  padding: 0; margin: 0;
+}
+ul.menu li {
+  display: inline;
+}
+ul.menu li:before {
+  content: "\00BB \0020";
+}
+ul.menu li.first:before {
+  content: " ";
+}
+ul.menu2 {
+  font-size: 0.8em;
+  list-style-type: none;
+  padding: 0; margin: 0;
+}
+ul.menu2 li {
+  display: inline;
+}
+ul.menu2 li:before {
+  content: "\00AB \0020";
+}
+ul.menu2 li.first:before {
+  content: " ";
+}
+span.hideshow {
+  float: right;
+  font-size: 0.8em;
+  color: #FFF;
+  margin: 5px 10px;
+  clear: right;  
+  position: relative;
+  width: 300px;
+  text-align: right;
+}
+span.hideshow a, div.hideshow a:visited { color: #FFF }
+div.logo {
+  float: right;   
+}
+p.note {
+  color: darkgrey;
+  font-weight: bold;
+  font-size:0.8em;
+  margin: 0px 0px 10px 50px;
+}
+a.tag0 { font-size: 6px; color: #A5E763; }
+a.tag1 { font-size: 7px; color: #A5E763; }
+a.tag2 { font-size: 8px; color: #A5E763; }
+a.tag3 { font-size: 9px; color: #A5E763; }
+a.tag4 { font-size: 10px; color: #A5E763; }
+a.tag5 { font-size: 11px; color: #73C729; }
+a.tag6 { font-size: 12px; color: #4AA608; }
+a.tag7 { font-size: 13px; color: #297910; }
+a.tag8 { font-size: 14px; color: #184908; }
+a.tag9 { font-size: 15px; color: #C77329; }
+a.tag10 { font-size: 16px; color: #491808; }
+
+a span {
+	display: none;
+}
+
+a:hover {
+	position: relative;
+}
+
+a:hover span {
+	display: block;
+   	position: absolute;
+	width:200px;
+	padding:4px;
+	border:#222 2px solid;
+	background:#666;
+	color:#fff;
+	-moz-border-radius:8px;
+	border-radius:8px;
+	z-index:11;
+	font-size:small;
+}
+
+a:hover span {
+	top: 20px; left: 20px;
+}
+
+tr.under {
+  color: green;
+}
+tr.under a {
+  color: green;
+}
+tr.over {
+  color: red;
+}
+tr.over a {
+  color: red;
+}
+tr.even {
+  background-color: #EEE;
+}
+tr.head {
+  background-color: #CCC;
+  font-weight: bold;
+}
+
+span.pvalue {
+  color: grey;
+  font-size: .8em;
+}
+tr:hover {
+  background-color: #BBB;
+}

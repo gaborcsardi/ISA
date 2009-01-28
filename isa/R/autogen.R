@@ -1,5 +1,6 @@
 
-autogen.table <- function(nm, isares, target.dir, template="autogen",
+autogen.table <- function(nm, isares, target.dir,
+                          template=system.file("autogen", package="isa"),
                           GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL,
                           htmltitle=NULL, notes=NULL, seed=NULL) {
 
@@ -12,6 +13,12 @@ autogen.table <- function(nm, isares, target.dir, template="autogen",
 
   ################################################
   ## GO
+
+  db <- GO_dbconn()
+  query <- "SELECT go_id, term, definition FROM go_term"
+  go.terms <- dbGetQuery(db, query)
+  rownames(go.terms) <- go.terms[,1]
+  go.terms <- go.terms[,-1]
   
   options(digits=2)
   
@@ -28,18 +35,18 @@ autogen.table <- function(nm, isares, target.dir, template="autogen",
       gc <- obj$Count[1]
       ca <- rownames(obj)[1]
     }
-  
-    nn <- go.terms[[ca]]@Term
+    
+    nn <- go.terms[ca,]$term
     paste(sep="", nn, " <span class=\"pvalue\"><br/>(", format(pval), "/", format(ec),
           "/", gc, "/", uc, ")</span>")
   }
   
   print("  -- GO BP")
-  tables.BP <- lapply(GO[[1]][modules], function(x) f(x))
+  tables.BP <- lapply(GO[[1]]@reslist[modules], function(x) f(x))
   print("  -- GO CC")
-  tables.CC <- lapply(GO[[2]][modules], function(x) f(x))
+  tables.CC <- lapply(GO[[2]]@reslist[modules], function(x) f(x))
   print("  -- GO MF")
-  tables.MF <- lapply(GO[[3]][modules], function(x) f(x))
+  tables.MF <- lapply(GO[[3]]@reslist[modules], function(x) f(x))
 
   g <- function(obj, pvalue=0.05) {
     
@@ -62,7 +69,7 @@ autogen.table <- function(nm, isares, target.dir, template="autogen",
   
   require(KEGG.db)
   print("  -- KEGG")
-  tables.KEGG <- sapply(KEGG[modules], g, pvalue=0.05)
+  tables.KEGG <- sapply(KEGG@reslist[modules], g, pvalue=0.05)
   
   if (!is.null(miRNA)) {
     
@@ -189,7 +196,8 @@ autogen.table <- function(nm, isares, target.dir, template="autogen",
                           
 
 autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
-                            target.dir, template="autogen",
+                            target.dir,
+                            template=system.file("autogen", package="isa"),
                             GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL,
                             cond.to.include=NULL,
                             markup=numeric(), markdown=numeric(),
@@ -210,7 +218,7 @@ autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
     file.copy(paste(sep="", template, "/", f),
               paste(sep="", target.dir, "/", f) )
   }
-  ff <- list.files("autogen/images")
+  ff <- list.files(paste(sep="/", template, "images"))
 
   for (f in ff) {
     file.copy(paste(sep="", template, "/images/", f),
@@ -251,6 +259,12 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   library(paste(sep="", "org.", abbreviate(organism,2), ".eg.db"),
           character.only=TRUE)
 
+  db <- GO_dbconn()
+  query <- "SELECT go_id, term, definition FROM go_term"
+  go.terms <- dbGetQuery(db, query)
+  rownames(go.terms) <- go.terms[,1]
+  go.terms <- go.terms[,-1]
+
   color.table <- function(t) {
     ## colorify every second row, plus the first one
     t[1] <- sub('<tr>', '<tr class="head">', t[1])
@@ -275,7 +289,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
       ec <- unname(obj$ExpCount)[v][1:maxlines]
       gc <- unname(obj$Count)[v][1:maxlines]
       ca <- rownames(obj)[v][1:maxlines]
-      nn <- unname(sapply(go.terms[ca], function(x) x@Term))    
+      nn <- go.terms[ca,]$term
     }
     
     df <- data.frame(Pvalue=pval, ECount=round(ec, 2), Count=gc, Size=uc,
@@ -325,9 +339,9 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
     paste(foo, collapse="\n")
   }
 
-  tables.BP <- f(GO[[1]][[module]], pvalue=0.05, maxlines=NA)
-  tables.CC <- f(GO[[2]][[module]], pvalue=0.05, maxlines=NA)
-  tables.MF <- f(GO[[3]][[module]], pvalue=0.05, maxlines=NA)
+  tables.BP <- f(GO[[1]]@reslist[[module]], pvalue=0.05, maxlines=NA)
+  tables.CC <- f(GO[[2]]@reslist[[module]], pvalue=0.05, maxlines=NA)
+  tables.MF <- f(GO[[3]]@reslist[[module]], pvalue=0.05, maxlines=NA)
 
   g <- function(obj, pvalue=0.05, maxlines=NA, drive=NULL) {
     if (class(obj)=="NULL") {
@@ -406,7 +420,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   }
 
   require(KEGG.db)
-  tables.KEGG <- g(KEGG[[module]], pvalue=0.05, maxlines=NA)
+  tables.KEGG <- g(KEGG@reslist[[module]], pvalue=0.05, maxlines=NA)
 
   if (!is.null(miRNA)) {
 
@@ -685,11 +699,11 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
     dev.off()
     list(graph=gop, coords=co)
   }
-  c.BP <- gp(GO[[1]][[m]], 0.01,
+  c.BP <- gp(GO[[1]]@reslist[[m]], 0.01,
              filename=paste(sep="", target.dir, "/go-BP-", m, ".png"))
-  c.CC <- gp(GO[[2]][[m]], 0.01,
+  c.CC <- gp(GO[[2]]@reslist[[m]], 0.01,
              filename=paste(sep="", target.dir, "/go-CC-", m, ".png"))
-  c.MF <- gp(GO[[3]][[m]], 0.01,
+  c.MF <- gp(GO[[3]]@reslist[[m]], 0.01,
              filename=paste(sep="", target.dir, "/go-MF-", m, ".png"))
 
   # Go tree annotation

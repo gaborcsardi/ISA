@@ -1,0 +1,864 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>
+    <!-- title -->
+  </title>
+
+<link rel="stylesheet" type="text/css" href="style-mod-<!--no-->.css"></link>
+
+<script type="text/javascript" src="mapevents.js"></script>
+
+<script type="text/javascript" src="module-<!--no-->.js"></script>
+
+</head><body>
+
+<h1><span style="float:right;margin:0px 10px 0px 0px;">
+<a href="module-<!--prev.no-->.html">Previous module</a> |
+<a href="module-<!--next.no-->.html">Next module</a>
+</span>
+<!-- title -->
+</h1>
+
+<div class="logo">
+<a href="http://serverdgm.unil.ch/bergmann/">
+<img src="images/CBG_clip_image001_small.jpg" alt="" style="border:0px;"/>
+</a>
+</div>
+
+<ul class="menu2">
+<li><a href="maintree.html">Module tree/table</a></li>
+</ul>
+<ul class="menu">
+<li><a href="#expr">Expression data</a></li>
+<li><a href="#over">Overlap plot</a></li>
+<!-- <li><a href="#closeup">Closeup</a></li> -->
+</ul><ul class="menu">
+<li><a href="#GOtreeBP">The BP GO tree</a></li>
+<li><a href="#GOtreeCC">The CC GO tree</a></li>
+<li><a href="#GOtreeMF">The MF GO tree</a></li>
+</ul><ul class="menu">
+<li><a href="#GOBP">GO BP enrichment</a></li>
+<li><a href="#GOCC">GO CC enrichment</a></li>
+<li><a href="#GOMF">GO MF enrichment</a></li>
+<li><a href="#KEGG">KEGG enrichment</a></li> 
+<li><a href="#miRNA">miRNA enrichment</a></li>
+<li><a href="#CHR">Chromosome enrichment</a></li>
+</ul><ul class="menu">
+<li><a href="#genes">Genes</a></li>
+<li><a href="#conds">Conditions</a></li>
+</ul>
+
+<div style="clear:both;"/>
+<h2 id="expr"><span class="hideshow">
+<span id="section.5.1" style="position:absolute;top:0;right:0;">
+<a href="#" onclick="togglestuff2('help.5'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.5'); return false;">Hide</a> |
+<a href="#">Top</a>
+</span>
+<span id="section.5.2" style="position:absolute;top:0;right:0;display:none;">
+<a href="#" onclick="togglestuff2('help.5'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.5'); return false;">Show</a> |
+<a href="#">Top</a>
+</span>
+</span>
+Expression data</h2>
+
+<div id="help.5" style="background:#eaeaea;display:none;visibility:hidden;width:100%;">
+<div style="width:800px;margin:10px 10px 10px 10px;">
+<h3>HELP</h3>
+<p>
+The image plot shows the color-coded level of gene expression, for the
+genes and conditions in a  given transcription module. The genes are on
+the horizontal, the conditions on the vertical axis.
+</p>
+<p>
+The genes are ordered according to their ISA gene scores, similarly
+the conditions are ordered according to their condition scores. The
+score of a gene means the &laquo;degree of inclusion&raquo; in 
+the module: a high score gene is essential in the module.
+</p>
+
+<p>
+Condition scores can also be negative, that means that the genes of
+the module are all down-regulated in the condition. Here the absolute
+value of the score gives the &laquo;degree of inclusion&raquo;.
+</p>
+
+<p>
+The plots above and beside the expression matrix show the gene scores
+and condition scores, respectively.
+</p>
+
+<p>
+Note that the plot is interactive, you can see the name of the gene
+and condition under the mouse cursor.
+</p>
+
+<p>
+The expression matrix was normalized to have mean zero and standard
+deviation one for every gene separately across all conditions
+(i.e. not just for the conditions in the module).
+</p>
+
+<p class="note">
+&mdash; Click on the <i>Help</i> button again to close this help window.
+</p>
+
+</div>
+
+<div style="clear:both;height:2px;background:url(images/headerbg.png) repeat-x;"></div>
+</div>
+
+<div id="section.5">
+
+<form action="">
+<p>
+<label for="exp.x">Gene: </label><input id="exp.x" value=""
+  readonly="readonly" style="width:800px; border: none;"/><br/>
+<label for="exp.y">Condition: </label><input id="exp.y" value=""
+  readonly="readonly" style="width:800px; border: none;"/>
+</p>
+</form>
+<div>
+
+<div id="cross.x"
+     style="position:absolute;width:<!--expx-->px;height:1px;background: yellow;left:101px;display:none;z-index:11;">
+</div>
+<div id="cross.y"
+     style="position:absolute;width:1px;height:<!--expy-->px;background: yellow;left:101px;display:none;z-index:11;">
+</div>
+
+<img src="expression-<!--no-->.png" alt="Expression data for module #<!--no-->" 
+     onmousemove="writeCoords(event);" id="expimage" 
+     style="position:relative;left:0px;top:10px;"/>
+</div>
+<div style="clear:both; height:10px;"></div>
+<p class="note"><img src="expcolbar-<!--no-->.png" alt="color bar"/><br/>
+Under-expression is coded with <span style="color:green;">green</span>, 
+over-expression with <span style="color:red;">red</span> color.</p>
+</div>
+
+<div style="clear:both;"/>
+<h2 id="over"><span class="hideshow">
+<span id="section.13.1" style="position:absolute;top:0;right:0;display:block;">
+<a href="#" onclick="togglestuff2('help.13'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.13'); return false;">Hide</a> |
+<a href="#">Top</a>
+</span>
+<span id="section.13.2" style="position:absolute;top:0;right:0;display:none;">
+<a href="#" onclick="togglestuff2('help.13'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.13'); return false;">Show</a> |
+<a href="#">Top</a>
+</span>
+</span>
+Overlap plot</h2>
+
+<div id="help.13" style="background:#eaeaea;display:none;visibility:hidden;width:100%;">
+<div style="width:800px;margin:10px 10px 10px 10px;">
+<h3>HELP</h3>
+<p>
+  The overlap plot shows all modules at the same gene and condition
+  thresholds and their relationship. If there is significant
+  correlation (or anti-correlation) between two modules' gene scores,
+  then they are placed close to each other. If the correlation exceeds
+  the 0.3 limit, then and edge is drawn between the two
+  modules. Green edges denote correlation, red anti-correlation. The
+  edge widths also code the correlation.
+</p>
+
+<p>
+  The overlap table shows how many genes and conditions the selected
+  module has in common with the other modules (at the same gene and
+  condition thresholds). The first column is the id of the module,
+  <b>Genes</b> is the number of genes, <b>Conds.</b> the number of
+  conditions in the module. <b>Common Genes</b> is the number of genes
+  common in the given and the selected module, the next column
+  (<b>%</b>) gives the percentage of the genes (also) included in the
+  selected module, and <b>Cor.</b> is the correlation between the two
+  modules' gene score vectors. The last three columns give the same
+  information for conditions.
+</p>
+
+<p>
+  Move the mouse cursor over the modules on the graph to show the
+  overlap tables of other modules, clicking on the modules takes you
+  to their module page.
+</p>
+
+<p class="note">
+&mdash; Click on the <i>Help</i> button again to close this help window.
+</p>
+</div>
+<div style="clear:both;height:2px;background:url(images/headerbg.png) repeat-x;"></div>
+</div>
+
+<div id="section.13" style="display:block;">
+
+<div style="float:left;">
+<dl class="map" id="mapover">
+<!-- overlaptext -->
+<!-- /overlaptext -->
+</dl>
+</div>
+
+<div style="float:left;">
+<p></p><p></p>
+<!-- overlaptable -->
+<!-- /overlaptable -->
+</div>
+
+<div style="clear:both;"></div>
+</div>
+
+<h2 id="GOtreeBP"><span class="hideshow">
+<span id="section.7.1" style="position:absolute;top:0;right:0;">
+<a href="#" onclick="togglestuff2('help.7'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.7'); return false;">Hide</a> |
+<a href="#">Top</a>
+</span>
+<span id="section.7.2" style="position:absolute;top:0;right:0;display:none;">
+<a href="#" onclick="togglestuff2('help.7'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.7'); return false;">Show</a> |
+<a href="#">Top</a>
+</span>
+</span>
+The GO tree &mdash; Biological processes</h2>
+
+<div id="help.7" style="background:#eaeaea;display:none;visibility:hidden;width:100%;">
+<div style="width:800px;margin:10px 10px 10px 10px;">
+<h3>HELP</h3>
+<p>
+This is one of three sections showing Gene Ontology enrichment of the
+current module: in this case for <b>biological processes</b>. 
+</p>
+
+<p>
+The graph shows the hierarchy of the GO categories, their enrichment
+for the current module is color coded, and the blue number beside the
+category is the minus log ten p-value of the enrichment. (Calculated
+using the standard hypergeometric test.) The color of the arrows code
+&laquo;is a&raquo; (cyan) and &laquo;part of&raquo; relationships.
+</p>
+
+<p>
+The tree was built the following way. First all GO terms with more
+significant enrichment p-value than 0.001 were collected. Then all
+paths from these terms to the root node of the GO tree were included
+too. If a GO term is included more than once in the tree, then the
+green numbers show 1) the id of the node, this makes it easier to find
+other appereances of the term, and 2) the number of appearences.
+</p>
+
+<p>
+Note that the same GO category might show up on the graph many
+times. This is because the GO was &laquo;straightened&raquo; for this
+graph, i.e. if there are more paths from a GO term to the root node of
+the tree, all of them are included. The green numbers 
+</p>
+
+<p>
+Move the mouse cursor over the terms to get their definition. Clicking
+on them takes you to the corresponding Gene Ontology web page.
+</p>
+
+<p>
+If you cannot see a graph here at all, that means that there were no 
+significantly enriched GO categories, at the 0.001 level.
+</p>
+
+<p class="note">
+&mdash; Click on the <i>Help</i> button again to close this help window.
+</p>
+</div>
+<div style="clear:both;height:2px;background:url(images/headerbg.png) repeat-x;"></div>
+</div>
+
+<div id="section.7">
+
+<p class="note"><img src="images/colbar.png" alt="color bar" /></p>
+<dl class="map" id="mapbp">
+<!-- GOtreeBP -->
+<!-- /GOtreeBP -->
+</dl>
+</div>
+
+<h2 id="GOtreeCC"><span class="hideshow">
+<span id="section.10.1" style="position:absolute;top:0;right:0;">
+<a href="#" onclick="togglestuff2('help.10'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.10'); return false;">Hide</a> |
+<a href="#">Top</a>
+</span>
+<span id="section.10.2" style="position:absolute;top:0;right:0;display:none;">
+<a href="#" onclick="togglestuff2('help.10'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.10'); return false;">Show</a> |
+<a href="#">Top</a>
+</span>
+</span>
+The GO tree &mdash; Cellular Components</h2>
+
+<div id="help.10" style="background:#eaeaea;display:none;visibility:hidden;width:100%;">
+<div style="width:800px;margin:10px 10px 10px 10px;">
+<h3>HELP</h3>
+<p>
+This is one of three sections showing Gene Ontology enrichment of the
+current module: in this case for <b>cellular components</b>. 
+</p>
+
+<p>
+The graph shows the hierarchy of the GO categories, their enrichment
+for the current module is color coded, and the blue number beside the
+category is the minus log ten p-value of the enrichment. (Calculated
+using the standard hypergeometric test.) The color of the arrows code
+&laquo;is a&raquo; (cyan) and &laquo;part of&raquo; relationships.
+</p>
+
+<p>
+The tree was built the following way. First all GO terms with more
+significant enrichment p-value than 0.001 were collected. Then all
+paths from these terms to the root node of the GO tree were included
+too. If a GO term is included more than once in the tree, then the
+green numbers show 1) the id of the node, this makes it easier to find
+other appereances of the term, and 2) the number of appearences.
+</p>
+
+<p>
+Note that the same GO category might show up on the graph many
+times. This is because the GO was &laquo;straightened&raquo; for this
+graph, i.e. if there are more paths from a GO term to the root node of
+the tree, all of them are included. The green numbers 
+</p>
+
+<p>
+Move the mouse cursor over the terms to get their definition. Clicking
+on them takes you to the corresponding Gene Ontology web page.
+</p>
+
+<p>
+If you cannot see a graph here at all, that means that there were no 
+significantly enriched GO categories, at the 0.001 level.
+</p>
+
+<p class="note">
+&mdash; Click on the <i>Help</i> button again to close this help window.
+</p>
+</div>
+<div style="clear:both;height:2px;background:url(images/headerbg.png) repeat-x;"></div>
+</div>
+
+<div id="section.10">
+
+<p class="note"><img src="images/colbar.png" alt="color bar"/></p>
+<dl class="map" id="mapcc">
+<!-- GOtreeCC -->
+<!-- /GOtreeCC -->
+</dl>
+</div>
+
+<h2 id="GOtreeMF"><span class="hideshow">
+<span id="section.11.1" style="position:absolute;top:0;right:0;">
+<a href="#" onclick="togglestuff2('help.11'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.11'); return false;">Hide</a> |
+<a href="#">Top</a>
+</span>
+<span id="section.11.2" style="position:absolute;top:0;right:0;display:none;">
+<a href="#" onclick="togglestuff2('help.11'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.11'); return false;">Show</a> |
+<a href="#">Top</a>
+</span>
+</span>
+The GO tree &mdash; Molecular Function</h2>
+
+<div id="help.11" style="background:#eaeaea;display:none;visibility:hidden;width:100%;">
+<div style="width:800px;margin:10px 10px 10px 10px;">
+<h3>HELP</h3>
+<p>
+This is one of three sections showing Gene Ontology enrichment of the
+current module: in this case for <b>molecular function</b>. 
+</p>
+
+<p>
+The graph shows the hierarchy of the GO categories, their enrichment
+for the current module is color coded, and the blue number beside the
+category is the minus log ten p-value of the enrichment. (Calculated
+using the standard hypergeometric test.) The color of the arrows code
+&laquo;is a&raquo; (cyan) and &laquo;part of&raquo; relationships.
+</p>
+
+<p>
+The tree was built the following way. First all GO terms with more
+significant enrichment p-value than 0.001 were collected. Then all
+paths from these terms to the root node of the GO tree were included
+too. If a GO term is included more than once in the tree, then the
+green numbers show 1) the id of the node, this makes it easier to find
+other appereances of the term, and 2) the number of appearences.
+</p>
+
+<p>
+Note that the same GO category might show up on the graph many
+times. This is because the GO was &laquo;straightened&raquo; for this
+graph, i.e. if there are more paths from a GO term to the root node of
+the tree, all of them are included. The green numbers 
+</p>
+
+<p>
+Move the mouse cursor over the terms to get their definition. Clicking
+on them takes you to the corresponding Gene Ontology web page.
+</p>
+
+<p>
+If you cannot see a graph here at all, that means that there were no 
+significantly enriched GO categories, at the 0.001 level.
+</p>
+
+<p class="note">
+&mdash; Click on the <i>Help</i> button again to close this help window.
+</p>
+</div>
+<div style="clear:both;height:2px;background:url(images/headerbg.png) repeat-x;"></div>
+</div>
+
+<div id="section.11">
+
+<p class="note"><img src="images/colbar.png" alt="color bar"/></p>
+<dl class="map" id="mapmf">
+<!-- GOtreeMF -->
+<!-- /GOtreeMF -->
+</dl>
+</div>
+
+<h2 id="GOBP"><span class="hideshow">
+<span id="section.1.1" style="position:absolute;top:0;right:0;display:none;">
+<a href="#" onclick="togglestuff2('help.1'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.1'); return false;">Hide</a> |
+<a href="#">Top</a>
+</span>
+<span id="section.1.2" style="position:absolute;top:0;right:0;">
+<a href="#" onclick="togglestuff2('help.1'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.1'); return false;">Show</a> |
+<a href="#">Top</a>
+</span>
+</span>
+GO BP test for over-representation</h2>
+
+<div id="help.1" style="background:#eaeaea;display:none;visibility:hidden;width:100%;">
+<div style="width:800px;margin:10px 10px 10px 10px;">
+<h3>HELP</h3>
+<p>
+List of all enriched GO categories (biological processes), at the 0.05
+p-value level.
+</p>
+
+<p>
+The columns: 
+<ul><li><b>ECount</b> is the expected count of genes in the
+module annotated with the given GO term, just by chance. </li>
+<li><b>Count</b>
+is the number of genes in the module annotated with the given GO
+term. </li>
+<li><b>Size</b> is the total number of genes (in our universe)
+annotated with the GO term.</li>
+</ul>
+</p>
+
+<p>
+Clicking on the GO identifiers takes you to the Gene Ontology web
+pages.
+</p>
+
+<p class="note">
+&mdash; Click on the <i>Help</i> button again to close this help window.
+</p>
+</div>
+<div style="clear:both;height:2px;background:url(images/headerbg.png) repeat-x;"></div>
+</div>
+
+<div id="section.1" style="display:none;visibility:hidden;">
+
+<table style="border:0px;">
+<!-- tableGOBP -->
+<!-- /tableGOBP -->
+</table>
+</div>
+
+<h2 id="GOCC"><span class="hideshow">
+<span id="section.2.1" style="position:absolute;top:0;right:0;display:none;">
+<a href="#" onclick="togglestuff2('help.2'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.2'); return false;">Hide</a> |
+<a href="#">Top</a>
+</span>
+<span id="section.2.2" style="position:absolute;top:0;right:0;">
+<a href="#" onclick="togglestuff2('help.2'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.2'); return false;">Show</a> |
+<a href="#">Top</a>
+</span>
+</span>
+GO CC test for over-representation</h2>
+
+<div id="help.2" style="background:#eaeaea;display:none;visibility:hidden;width:100%;">
+<div style="width:800px;margin:10px 10px 10px 10px;">
+<h3>HELP</h3>
+<p>
+List of all enriched GO categories (cellular components), at the 0.05
+p-value level.
+</p>
+
+<p>
+The columns: 
+<ul><li><b>ECount</b> is the expected count of genes in the
+module annotated with the given GO term, just by chance. </li>
+<li><b>Count</b>
+is the number of genes in the module annotated with the given GO
+term. </li>
+<li><b>Size</b> is the total number of genes (in our universe)
+annotated with the GO term.</li>
+</ul>
+</p>
+
+<p>
+Clicking on the GO identifiers takes you to the Gene Ontology web
+pages.
+</p>
+
+<p class="note">
+&mdash; Click on the <i>Help</i> button again to close this help window.
+</p>
+</div>
+<div style="clear:both;height:2px;background:url(images/headerbg.png) repeat-x;"></div>
+</div>
+
+<div id="section.2" style="display:none;visibility:hidden;">
+<table border="0">
+<!-- tableGOCC -->
+<!-- /tableGOCC -->
+</table>
+</div>
+
+<h2 id="GOMF"><span class="hideshow">
+<span id="section.3.1" style="position:absolute;top:0;right:0;display:none;">
+<a href="#" onclick="togglestuff2('help.3'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.3'); return false;">Hide</a> |
+<a href="#">Top</a>
+</span>
+<span id="section.3.2" style="position:absolute;top:0;right:0;">
+<a href="#" onclick="togglestuff2('help.3'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.3'); return false;">Show</a> |
+<a href="#">Top</a>
+</span>
+</span>
+GO MF test for over-representation</h2>
+
+<div id="help.3" style="background:#eaeaea;display:none;visibility:hidden;width:100%;">
+<div style="width:800px;margin:10px 10px 10px 10px;">
+<h3>HELP</h3>
+<p>
+List of all enriched GO categories (molecular function), at the 0.05
+p-value level.
+</p>
+
+<p>
+The columns: 
+<ul><li><b>ECount</b> is the expected count of genes in the
+module annotated with the given GO term, just by chance. </li>
+<li><b>Count</b>
+is the number of genes in the module annotated with the given GO
+term. </li>
+<li><b>Size</b> is the total number of genes (in our universe)
+annotated with the GO term.</li>
+</ul>
+</p>
+
+<p>
+Clicking on the GO identifiers takes you to the Gene Ontology web
+pages.
+</p>
+
+<p class="note">
+&mdash; Click on the <i>Help</i> button again to close this help window.
+</p>
+</div>
+<div style="clear:both;height:2px;background:url(images/headerbg.png) repeat-x;"></div>
+</div>
+
+<div id="section.3" style="display:none;visibility:hidden;">
+<table border="0">
+<!-- tableGOMF -->
+<!-- /tableGOMF -->  
+</table>
+</div>
+
+<h2 id="KEGG"><span class="hideshow">
+<span id="section.4.1" style="position:absolute;top:0;right:0;">
+<a href="#" onclick="togglestuff2('help.4'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.4'); return false;">Hide</a> |
+<a href="#">Top</a>
+</span>
+<span id="section.4.2" style="position:absolute;top:0;right:0;display:none;">
+<a href="#" onclick="togglestuff2('help.4'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.4'); return false;">Show</a> |
+<a href="#">Top</a>
+</span>
+</span>
+KEGG Pathway test for over-representation</h2>
+
+<div id="help.4" style="background:#eaeaea;display:none;visibility:hidden;width:100%;">
+<div style="width:800px;margin:10px 10px 10px 10px;">
+<h3>HELP</h3>
+<p>
+List of all enriched KEGG pathways, at the 0.05
+p-value level.
+</p>
+
+<p>
+The columns: 
+<ul><li><b>ECount</b> is the expected count of genes in the
+module annotated with the given KEGG pathway, just by chance. </li>
+<li><b>Count</b>
+is the number of genes in the module annotated with the given KEGG
+pathway. </li>
+<li><b>Size</b> is the total number of genes (in our universe)
+annotated with the KEGG pathway.</li>
+</ul>
+</p>
+
+<p>
+Clicking on the KEGG identifiers takes you to the KEGG web site.
+</p>
+
+<p class="note">
+&mdash; Click on the <i>Help</i> button again to close this help window.
+</p>
+</div>
+<div style="clear:both;height:2px;background:url(images/headerbg.png) repeat-x;"></div>
+</div>
+
+<div id="section.4">
+<table border="0">
+<!-- tableKEGG -->
+<!-- /tableKEGG -->
+</table>
+</div>
+
+<h2 id="miRNA"><span class="hideshow">
+<span id="section.12.1" style="position:absolute;top:0;right:0;">
+<a href="#" onclick="togglestuff2('help.12'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.12'); return false;">Hide</a> |
+<a href="#">Top</a>
+</span>
+<span id="section.12.2" style="position:absolute;top:0;right:0;display:none;">
+<a href="#" onclick="togglestuff2('help.12'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.12'); return false;">Show</a> |
+<a href="#">Top</a>
+</span>
+</span>
+miRNA test for over-representation</h2>
+
+<div id="help.12" style="background:#eaeaea;display:none;visibility:hidden;width:100%;">
+<div style="width:800px;margin:10px 10px 10px 10px;">
+<h3>HELP</h3>
+<p>
+List of all enriched miRNA families, at the 0.05
+p-value level.
+</p>
+
+<p>
+The columns: 
+<ul><li><b>ECount</b> is the expected count of genes in the
+module regulated by the given miRNA family, just by chance. </li>
+<li><b>Count</b>
+is the number of genes in the module regulated by the given miRNA
+family.</li>
+<li><b>Size</b> is the total number of genes (in our universe)
+regulated with the given miRNA family.</li>
+</ul>
+</p>
+
+<p>
+The miRNA regulation data was taken from the <a
+href="http://targetscan.org">TargetScan</a> database.
+(Only the conserved sites were used for the current analysis.)
+Clicking on the miRNA names takes you to the TargetScan web site.
+</p>
+
+<p class="note">
+&mdash; Click on the <i>Help</i> button again to close this help window.
+</p>
+</div>
+<div style="clear:both;height:2px;background:url(images/headerbg.png) repeat-x;"></div>
+</div>
+
+<div id="section.12">
+<table border="0">
+<!-- tablemiRNA -->
+<!-- /tablemiRNA -->
+</table>
+</div>
+
+<h2 id="CHR"><span class="hideshow">
+<span id="section.14.1" style="position:absolute;top:0;right:0;">
+<a href="#" onclick="togglestuff2('help.14'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.14'); return false;">Hide</a> |
+<a href="#">Top</a>
+</span>
+<span id="section.14.2" style="position:absolute;top:0;right:0;display:none;">
+<a href="#" onclick="togglestuff2('help.14'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.14'); return false;">Show</a> |
+<a href="#">Top</a>
+</span>
+</span>
+Chromosome test for over-representation</h2>
+
+<div id="help.14" style="background:#eaeaea;display:none;visibility:hidden;width:100%;">
+<div style="width:800px;margin:10px 10px 10px 10px;">
+<h3>HELP</h3>
+<p>
+List of all enriched Chromosomes, at the 0.05
+p-value level.
+</p>
+
+<p>
+The columns: 
+<ul><li><b>ECount</b> is the expected number of genes in the
+module on the given chromosome, just by chance. </li>
+<li><b>Count</b>
+is the number of genes in the module on the given chromosome.</li>
+<li><b>Size</b> is the total number of genes (in our universe)
+on the given chromosome.</li>
+</ul>
+</p>
+
+<p class="note">
+&mdash; Click on the <i>Help</i> button again to close this help window.
+</p>
+</div>
+<div style="clear:both;height:2px;background:url(images/headerbg.png) repeat-x;"></div>
+</div>
+
+<div id="section.14">
+<table border="0">
+<!-- tableCHR -->
+<!-- /tableCHR -->
+</table>
+</div>
+
+<h2 id="genes"><span class="hideshow">
+<span id="section.8.1" style="position:absolute;top:0;right:0;">
+<a href="#" onclick="togglestuff2('help.8'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.8'); return false;">Hide</a> |
+<a href="#">Top</a>
+</span>
+<span id="section.8.2" style="position:absolute;top:0;right:0;display:none;">
+<a href="#" onclick="togglestuff2('help.8'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.8'); return false;">Show</a> |
+<a href="#">Top</a>
+</span>
+</span>
+Genes</h2>
+
+<div id="help.8" style="background:#eaeaea;display:none;visibility:hidden;width:100%;">
+<div style="width:800px;margin:10px 10px 10px 10px;">
+<h3>HELP</h3>
+<p>
+A list of all genes in the current module, in alphabetical order. The
+size of the text corresponds to the gene scores. 
+</p>
+
+<p>
+Note that some gene symbols may show up more than once, if many
+probes match the same Entrez gene.
+</p>
+
+<p>
+Genes with no Entrez mapping are given separately, with their
+Affymetrics probe ID.
+</p>
+
+<p class="note">
+&mdash; Click on the <i>Help</i> button again to close this help window.
+</p>
+</div>
+<div style="clear:both;height:2px;background:url(images/headerbg.png) repeat-x;"></div>
+</div>
+
+<div id="section.8" style="margin: 0px 200px 0px 0px;">
+<h3>Entrez genes</h3>
+<p>
+<!-- genecloud -->
+<!-- /genecloud -->
+</p>
+<h3>Non-Entrez genes</h3>
+<!-- genecloud-noname -->
+<!-- /genecloud-noname -->
+</div>
+
+<h2 id="conds"><span class="hideshow">
+<span id="section.9.1" style="position:absolute;top:0;right:0;">
+<a href="#" onclick="togglestuff2('help.9'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.9'); return false;">Hide</a> |
+<a href="#">Top</a>
+</span>
+<span id="section.9.2" style="position:absolute;top:0;right:0;display:none;">
+<a href="#" onclick="togglestuff2('help.9'); return false;">Help</a> |
+<a href="#" onclick="togglestuff('section.9'); return false;">Show</a> |
+<a href="#">Top</a>
+</span>
+</span>
+Conditions</h2>
+
+<div id="help.9" style="background:#eaeaea;display:none;visibility:hidden;width:100%;">
+<div style="width:800px;margin:10px 10px 10px 10px;">
+<h3>HELP</h3>
+<p>
+Conditions in the module, given in the same order as on the expression
+plot above. Red color means over-expression, green under-expression in
+the given condition.
+</p>
+
+<p class="note">
+&mdash; Click on the <i>Help</i> button again to close this help window.
+</p>
+</div>
+<div style="clear:both;height:2px;background:url(images/headerbg.png) repeat-x;"></div>
+</div>
+
+<div id="section.9">
+<table border="0">
+<!-- conditions -->
+<!-- /conditions -->
+</table>
+
+<img src="condplot-<!--no-->.png" />
+
+</div>
+
+<p></p>
+<div style="clear:both;height:2px;background:url(images/headerbg.png) repeat-x;"></div>
+
+<p style="float:right;">
+  <a href="http://validator.w3.org/check?uri=referer"><img
+  src="images/valid-xhtml11-blue.png" style="border:0;"
+  alt="Valid XHTML 1.1" height="31" width="88" /></a>
+
+  <a href="http://jigsaw.w3.org/css-validator/">
+    <img style="border:0;width:88px;height:31px"
+	 src="images/vcss-blue.png"
+	 alt="Valid CSS!" /></a>
+
+   <a href="http://www.spreadfirefox.com/node&amp;id=0&amp;t=210">
+   <img style="border:0px;" alt="Best viewed with Firefox" title="Firefox 2" 
+	src="images/firefox-spread-btn-1b.png"/></a>
+
+</p>
+<p>
+  <a href="http://serverdgm.unil.ch/bergmann/">
+   &copy; 2008 Computational Biology Group, Department of Medical Genetics,
+   University of Lausanne, Switzerland
+   </a>
+</p>
+
+<script type="text/javascript">
+  mapMaker.overlap=document.getElementById("overlap<!--no-->");
+</script>
+
+</body></html>

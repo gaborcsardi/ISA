@@ -1,0 +1,313 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>
+<!-- title -->
+</title>
+
+<link rel="stylesheet" type="text/css" href="style.css"></link>
+<script type="text/javascript" src="mapevents.js"></script>
+<script type="text/javascript" src="maintree.js"></script>
+
+</head>
+
+<body>
+
+<h1>
+<!-- title -->
+</h1>
+
+<div class="logo">
+<a href="http://serverdgm.unil.ch/bergmann/">
+<img src="images/CBG_clip_image001_small.jpg" alt="" style="border:0px;" />
+</a>
+</div>
+
+<form class="mainform" action="" >
+<p>
+<label class="label" for="cth.select">Condition threshold:</label>
+<select name="cth.select" id="cth.select" class="select"
+	onchange="MainUpdate();">
+  <option value="select" selected="1">Select</option>
+  <option value="1">1.0</option>
+  <option value="1.1">1.1</option>
+  <option value="1.2">1.2</option>
+  <option value="1.3">1.3</option>
+  <option value="1.4">1.4</option>
+  <option value="1.5">1.5</option>
+  <option value="1.6">1.6</option>
+  <option value="1.7">1.7</option>
+  <option value="1.8">1.8</option>
+  <option value="1.9">1.9</option>
+  <option value="2">2.0</option>
+  <option value="2.1">2.1</option>
+  <option value="2.2">2.2</option>
+  <option value="2.3">2.3</option>
+  <option value="2.4">2.4</option>
+  <option value="2.5">2.5</option>
+  <option value="2.6">2.6</option>
+  <option value="2.7">2.7</option>
+  <option value="2.8">2.8</option>
+  <option value="2.9">2.9</option>
+  <option value="3">3.0</option>
+</select>
+</p>
+</form>
+
+<form class="selectform" action="" >
+<p>
+<label class="label" for="quick.select">Annotation:</label>
+<select name="quick.select" id="quick.select" class="select"
+  onchange="QuickUpdate();" style="width:500px;">
+  <option value="GOBP">Gene Ontology, biological processes enrichment</option>
+  <option value="GOCC">Gene Ontology, cellular components enrichment</option>
+  <option value="GOMF">Gene Ontology, molecular function enrichment</option>
+  <option value="KEGG">KEGG pathways enrichment</option>
+  <option value="miRNA">miRNA families enrichment</option>
+  <option value="exps">Distinguished experiments</option>
+</select>
+<span class="note" style="margin:40px;">&mdash; See more options below the figure</span>
+</p>
+</form>
+
+<table border="0"><tr><td><span class="spanlabel">Color code:</span></td><td>
+<img src="images/colbar.png" alt="color bar"></img></td></tr></table>
+
+<div style="clear:both;height:2px;background:url(images/headerbg.png) repeat-x;"></div>
+
+<div id="loading">
+<p><strong>Loading...</strong></p>
+</div>
+
+<div class="map" id="mainmapdiv" style="display:none;">
+
+<div id="mainmainempty"></div>
+<div id="mainleftempty"></div>
+<div id="mainrightempty"></div>
+
+<div id="maincolorGOBP" style="display:none;">
+<!-- maincolorGOBP -->
+<!-- /maincolorGOBP -->
+</div>
+
+<div id="maincolorGOCC" style="display:none;">
+<!-- maincolorGOCC -->
+<!-- /maincolorGOCC -->
+</div>
+
+<div id="maincolorGOMF" style="display:none;">
+<!-- maincolorGOMF -->
+<!-- /maincolorGOMF -->
+</div>
+
+<div id="maincolorKEGG" style="display:none;">
+<!-- maincolorKEGG -->
+<!-- /maincolorKEGG -->
+</div>
+
+<div id="maincolormiRNA" style="display:none;">
+<!-- maincolormiRNA -->
+<!-- /maincolormiRNA -->
+</div>
+
+<div id="maincolorexps" style="display:none;">
+<!-- maincolorexps -->
+<!-- /maincolorexps -->
+</div>
+
+<div id="mainmainGOBP" style="display:none;">
+<!-- mainmainGOBP -->
+<!-- /mainmainGOBP -->
+</div>
+
+<div id="mainmainGOCC" style="display:none;">
+<!-- mainmainGOCC -->
+<!-- mainmainGOCC -->
+</div>
+
+<div id="mainmainGOMF" style="display:none;">
+<!-- mainmainGOMF -->
+<!-- /mainmainGOMF -->
+</div>
+
+<div id="mainmainKEGG" style="display:none;">
+<!-- mainmainKEGG -->
+<!-- /mainmainKEGG -->
+</div>
+
+<div id="mainmainmiRNA" style="display:none;">
+<!-- mainmainmiRNA -->
+<!-- /mainmainmiRNA -->
+</div>
+
+<div id="mainmainexps" style="display:none;">
+<!-- mainmainexps -->
+<!-- /mainmainexps -->
+</div>
+
+<div id="mainleftsize" style="display:none;">
+<!-- mainleftsize -->
+<!-- /mainleftsize -->
+</div>
+
+<div id="mainleftmono" style="display:none;">
+<!-- mainleftmono -->
+<!-- /mainleftmono -->
+</div>
+
+<div id="mainrightGOBP" style="display:none;">
+<!-- mainrightGOBP -->
+<!-- /mainrightGOBP -->
+</div>
+<!-- -->
+
+<div id="mainrightGOCC" style="display:none;">
+<!-- mainrightGOCC -->
+<!-- /mainrightGOCC -->
+</div>
+
+<div id="mainrightGOMF" style="display:none;">
+<!-- mainrightGOMF -->
+<!-- /mainrightGOMF -->
+</div>
+
+<div id="mainrightKEGG" style="display:none;">
+<!-- mainrightKEGG -->
+<!-- /mainrightKEGG -->
+</div>
+
+<div id="mainrightmiRNA" style="display:none;">
+<!-- mainrightmiRNA -->
+<!-- /mainrightmiRNA -->
+</div>
+
+<div id="mainrightexps" style="display:none;">
+<!-- mainrightexps -->
+<!-- /mainrightexps -->
+</div>
+
+<div id="maintooltipgenes"></div>
+<div id="maintooltipconds"></div>
+<div id="maintooltipGOBP"></div>
+<div id="maintooltipGOCC"></div>
+<div id="maintooltipGOMF"></div>
+<div id="maintooltipKEGG"></div>
+<div id="maintooltipmiRNA"></div>
+
+<dl class="map">
+
+<!-- tooltips -->
+<!-- /tooltips -->
+
+</dl>
+</div>
+
+<div style="clear:both;height:2px;background:url(images/headerbg.png) repeat-x;"></div>
+
+<form class="selectform" action="">
+
+<table border="0">
+
+<tr><td>
+<label class="label" for="tooltip.select">Tool tips:</label>
+</td><td>
+<select name="tooltip.select" id="tooltip.select" class="select"
+  onchange="MyUpdate('tooltip');" style="width:250px;">
+  <option value="genes">Genes</option>
+  <option value="conds">Conditions</option>
+  <option value="GOBP" selected="1">GO, biological process</option>
+  <option value="GOCC">GO, cellular components</option>
+  <option value="GOMF">GO, molecular function</option>
+  <option value="KEGG">KEGG enriched pathways</option>
+  <option value="miRNA">miRNA enrichment</option>
+</select>
+
+</td><td>
+<label class="label" for="color.select">Color code:</label>
+</td><td>
+<select name="color.select" id="color.select" class="select"
+  onchange="MyUpdate('color')" style="width:250px;">
+  <option value="GOBP">GO BP smallest p-value</option>
+  <option value="GOCC">GO CC smallest p-value</option>
+  <option value="GOMF">GO MF smallest p-value</option>
+  <option value="KEGG">KEGG smallest p-value</option>
+  <option value="miRNA">miRNA smallest p-value</option>
+  <option value="exps">Distinguished experiments</option>
+</select>
+
+</td></tr><tr><td>
+<label class="label" for="left.select">Top left:</label>
+</td><td>
+<select name="left.select" id="left.select" class="select"
+  onchange="MyUpdate('left')" style="width:250px;">
+  <option value="mono">Module number</option>
+  <option value="size" selected="1">Module size (genes and conditions)</option>
+  <option value="empty">Empty</option>
+</select>
+
+</td><td>
+<label class="label" for="main.select">Bottom:</label>
+</td><td>
+<select name="main.select" id="main.select" class="select"
+  onchange="MyUpdate('main');" style="width:250px;">
+  <option value="GOBP">GO BP, most significant</option>
+  <option value="GOCC">GO CC, most significant</option>
+  <option value="GOMF">GO MF, most significant</option>
+  <option value="KEGG">KEGG, most significant</option>
+  <option value="miRNA">miRNA, most significant</option>
+  <option value="exps">Experiments</option>
+  <option value="empty">Empty</option>
+</select>
+
+</td><td>
+<label class="label" for="right.select">Top right:</label>
+</td><td>
+<select name="right.select" id="right.select" class="select"
+  onchange="MyUpdate('right')" style="width:250px;">
+  <option value="GOBP">GO BP P-value</option>
+  <option value="GOCC">GO CC P-value</option>
+  <option value="GOMF">GO MF P-value</option>
+  <option value="KEGG">KEGG P-value</option>
+  <option value="miRNA">miRNA P-value</option>
+  <option value="exps">Distinguished experiments</option>
+  <option value="empty">Empty</option>
+</select>
+</td></tr>
+
+</table>
+</form>
+
+<p></p>
+<div style="clear:both;height:2px;background:url(images/headerbg.png) repeat-x;"></div>
+
+<div style="clear:both;"></div>
+
+<p style="float:right;">
+  <a href="http://validator.w3.org/check?uri=referer"><img
+  src="images/valid-xhtml11-blue.png" style="border:0;"
+  alt="Valid XHTML 1.1" height="31" width="88" /></a>
+
+  <a href="http://jigsaw.w3.org/css-validator/">
+    <img style="border:0;width:88px;height:31px"
+	 src="images/vcss-blue.png"
+	 alt="Valid CSS!" /></a>
+
+   <a href="http://www.spreadfirefox.com/node&amp;id=0&amp;t=210">
+   <img style="border:0px;" alt="Best viewed with Firefox" title="Firefox 2" 
+	src="images/firefox-spread-btn-1b.png"/></a>
+
+</p>
+<p>
+  <a href="http://serverdgm.unil.ch/bergmann/">
+   &copy; 2008 Computational Biology Group, Department of Medical Genetics,
+   University of Lausanne, Switzerland
+   </a>
+</p>
+
+<div style="clear:both;"></div>
+
+</body>
+</html>

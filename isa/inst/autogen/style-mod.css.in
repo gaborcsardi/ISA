@@ -1,0 +1,320 @@
+body {
+	text-align:center;
+	font-family:"Trebuchet ms",Arial,Helvetica,sans-serif;
+	font-size:.9em;
+	background:#f8f8f8;
+	color:#000;
+        text-align: left;
+	margin: 0px 20px 0px 20px;
+}
+h1 {
+    color: #fff;
+    margin: 0px 0px 10px 0px;
+    padding: 7px 0 7px 15px;
+    text-shadow: 0px 1px 2px #000;
+    background: #aeaeae url(images/headerbg.png) repeat-x;
+    border-bottom: 1px solid #1c477f;
+    font-size: large;
+}
+h2 {
+    color: #fff;
+    margin: 10px 0px 10px 0px;
+    padding: 7px 0 7px 15px;
+    text-shadow: 0px 1px 2px #000;
+    background: #aeaeae url(images/headerbg.png) repeat-x;
+    border-bottom: 1px solid #1c477f;
+    font-size: 1em;
+    text-align: left;
+}
+h3 {
+    font-size: 1em;
+    text-align: left;
+}
+h4 {
+    font-size: 0.8em;
+    text-align: left;
+}
+td {
+    padding-right: 2em;
+    padding-left: 1em;
+    border-left: 1px solid #AAA;
+}
+th { 
+    padding-right: 2em;
+    padding-left: 1em;
+    padding-bottom: 5px;
+    border-left: 1px solid #AAA;
+    border-bottom: 1px solid #AAA;
+}
+a { color: #00f; text-decoration: none }
+a:visited { color: #00c }
+a:hover { color: #00f; text-decoration: underline }
+h1 a, h1 a:visited, h1 a:hover { color: #fff; text-decoration: none }
+h2 a, h2 a:visited, h2 a:hover { color: #000; text-decoration: none }
+h3 a, h3 a:visited, h3 a:hover { color: #000; text-decoration: none }
+ul.menu {
+  font-size: 0.8em;
+  list-style-type: none;
+  padding: 0; margin: 0;
+}
+ul.menu li {
+  display: inline;
+}
+ul.menu li:before {
+  content: "\00BB \0020";
+}
+ul.menu li.first:before {
+  content: " ";
+}
+ul.menu2 {
+  font-size: 0.8em;
+  list-style-type: none;
+  padding: 0; margin: 0;
+}
+ul.menu2 li {
+  display: inline;
+}
+ul.menu2 li:before {
+  content: "\00AB \0020";
+}
+ul.menu2 li.first:before {
+  content: " ";
+}
+span.hideshow {
+  float: right;
+  font-size: 0.8em;
+  color: #FFF;
+  margin: 5px 10px;
+  clear: right;  
+  position: relative;
+  width: 300px;
+  text-align: right;
+}
+span.hideshow a, div.hideshow a:visited { color: #FFF }
+div.logo {
+  float: right;   
+}
+p.note {
+  color: darkgrey;
+  font-weight: bold;
+  font-size:0.8em;
+  margin: 0px 0px 10px 50px;
+}
+
+a.tag0 { font-size: 6px; color: #8BBD7A; }
+a.tag-1 { font-size: 7px; color: #80B26E; }
+a.tag-2 { font-size: 8px; color: #6FA15D; }
+a.tag-3 { font-size: 9px; color: #649651; }
+a.tag-4 { font-size: 10px; color: #53863E; }
+a.tag-5 { font-size: 11px; color: #487C31; }
+a.tag-6 { font-size: 12px; color: #386C1B; }
+a.tag-7 { font-size: 13px; color: #2C6202; }
+a.tag-8 { font-size: 14px; color: #195300; }
+a.tag-9 { font-size: 15px; color: #074A00; }
+a.tag-10 { font-size: 16px; color: #003C00; }
+a.tag1 { font-size: 7px; color: #E99AAA; }
+a.tag2 { font-size: 8px; color: #DD8F9E; }
+a.tag3 { font-size: 9px; color: #CC7E8E; }
+a.tag4 { font-size: 10px; color: #BB6E7E; }
+a.tag5 { font-size: 11px; color: #AA5D6E; }
+a.tag6 { font-size: 12px; color: #9F5364; }
+a.tag7 { font-size: 13px; color: #8F4254; }
+a.tag8 { font-size: 14px; color: #7F3246; }
+a.tag9 { font-size: 15px; color: #712037; }
+a.tag10 { font-size: 16px; color: #630929; }
+
+a span {
+	display: none;
+}
+
+a:hover {
+	position: relative;
+}
+
+a:hover span {
+	display: block;
+   	position: absolute;
+	width:200px;
+	padding:4px;
+	border:#222 2px solid;
+	background:#666;
+	color:#fff;
+	-moz-border-radius:8px;
+	border-radius:8px;
+	z-index:11;
+	font-size:small;
+}
+
+a:hover span {
+	top: 20px; left: 20px;
+}
+
+tr.under {
+  color: green;
+}
+tr.under a {
+  color: green;
+}
+tr.over {
+  color: red;
+}
+tr.over a {
+  color: red;
+}
+tr.even {
+  background-color: #EEE;
+}
+tr.head {
+  background-color: #CCC;
+}
+
+/* START OF CSS FOR MAP */
+dl#mapbp.map.on {
+	position:relative;
+	text-align:left;
+	margin:0px;
+	padding:0px;
+	width:/*mapbpwidth*/px;
+	height:/*mapbpheight*/px;
+	background:url(go-BP-/*no*/.png) no-repeat;
+}
+dl#mapcc.map.on {
+	position:relative;
+	text-align:left;
+	margin:0px;
+	padding:0px;
+	width:/*mapccwidth*/px;
+	height:/*mapccheight*/px;
+	background:url(go-CC-/*no*/.png) no-repeat;
+}
+dl#mapmf.map.on {
+	position:relative;
+	text-align:left;
+	margin:0px;
+	padding:0px;
+	width:/*mapmfwidth*/px;
+	height:/*mapmfheight*/px;
+	background:url(go-MF-/*no*/.png) no-repeat;
+}
+dl.map.on dt {
+	list-style:none;
+	display:inline;
+}
+dl.map.on dd {
+	position:absolute;
+	left:-9999px;
+	width:400px;
+	padding:4px;
+	border:#222 2px solid;
+	background:#666;
+	color:#fff;
+	-moz-border-radius:8px;
+	border-radius:8px;
+	z-index:11;
+	font-size:0.8em;
+}
+dl.map.on a.location {
+	display:block;
+	position:absolute;
+	text-indent:-9999px;
+	outline:none;
+	z-index:10;
+	text-decoration:none;
+}
+dl#mapbp.map.on a.location {
+	width:55px;
+	height:16px;
+}
+dl#mapcc.map.on a.location {
+	width:55px;
+	height:16px;
+}
+dl#mapmf.map.on a.location {
+	width:55px;
+	height:16px;
+}
+dl.map.on a.location:hover {
+	background:url(images/point-hover2.png) no-repeat 0px 0px;
+}
+dl.map.on dd a {
+	text-decoration:none;
+	color:#000;
+}
+
+dl#mapcloseupBP.map.on {
+	position:relative;
+	text-align:left;
+	margin:0px;
+	padding:0px;
+	width:1200px;
+	height:460px;
+	background:url(closeup-BP-123.png) no-repeat;
+}
+dl#mapcloseupCC.map.on {
+	position:relative;
+	text-align:left;
+	margin:0px;
+	padding:0px;
+	width:1200px;
+	height:460px;
+	background:url(closeup-CC-123.png) no-repeat;
+}
+dl#mapcloseupMF.map.on {
+	position:relative;
+	text-align:left;
+	margin:0px;
+	padding:0px;
+	width:1200px;
+	height:460px;
+	background:url(closeup-MF-123.png) no-repeat;
+}
+dl#mapcloseupBP.map.on a.location {
+	width:105px;
+	height:19px;
+}
+dl#mapcloseupCC.map.on a.location {
+	width:105px;
+	height:19px;
+}
+dl#mapcloseupMF.map.on a.location {
+	width:105px;
+	height:19px;
+}
+
+dl#mapover.map.on {
+	position:relative;
+	text-align:left;
+	margin:0px;
+	padding:0px;
+	width:1200px;
+	height:600px;
+	background:url(overlap-/*gth*/.png) no-repeat;
+}
+dl#mapover.map.on a.location {
+	width:32px;
+	height:15px;
+}
+
+
+/* START OF CSS FOR MAP POINTS */
+
+/* locationBP */
+/* /locationBP */
+
+/* locationCC */
+/* /locationCC */
+
+/* locationMF */
+/* /locationMF */
+
+/* locationCLOSEBP */
+/* /locationCLOSEBP */
+
+/* locationCLOSECC */
+/* /locationCLOSECC */
+
+/* locationCLOSEMF */
+/* /locationCLOSEMF */
+
+/* locationoverlap */
+/* /locationoverlap */
