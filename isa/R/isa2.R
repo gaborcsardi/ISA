@@ -33,9 +33,9 @@ normalize <- function (data, prenormalize = TRUE)
 }
 
 isa <- function(normeddata, g=NULL, c=NULL, tc, tg=tc, down=c(TRUE, FALSE),
-                convergence=c("loosy", "pos.genes", "eps", "no.pos.genes",
-                  "no.pos.genes.m3"),
-                eps=NULL,
+                convergence=c("cor", "loosy", "pos.genes", "eps",
+                  "no.pos.genes", "no.pos.genes.m3"),
+                eps=NULL, cor.limit=0.99,
                 oscillation=TRUE, maxiter=100, miniter=0,
                 dots=TRUE,
                 threshold.type=c("data", "predef"),
@@ -84,7 +84,7 @@ isa <- function(normeddata, g=NULL, c=NULL, tc, tg=tc, down=c(TRUE, FALSE),
                             normalization=normalization)
   }
   
-  rundata <- list(down=down, eps=eps, maxiter=maxiter,
+  rundata <- list(down=down, eps=eps, cor.limit=cor.limit, maxiter=maxiter,
                   N=max(ncol(g), 0), convergence=convergence,
                   normalization=normalization,
                   organism=organism, annotation=annotation,
@@ -147,7 +147,17 @@ isa <- function(normeddata, g=NULL, c=NULL, tc, tg=tc, down=c(TRUE, FALSE),
     check.convergence <- function() {
       no.pos[,iter-2] == no.pos[,iter+1]
     }
-  }
+  } else if (convergence=="cor") {
+    check.convergence <- function() {
+      g <- scale(g)
+      g2 <- scale(prev[[1]])
+      cond <- scale(cond)
+      cond2 <- scale(prev[[2]])
+      res <- (colSums(g*g2) / (nrow(g)-1) > cor.limit &
+              colSums(cond*cond2) / (nrow(cond)-1) > cor.limit)
+      res & !is.na(res)
+    }
+  }    
   
   ## 
   
