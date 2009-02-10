@@ -1,5 +1,6 @@
 
 autogen.table <- function(nm, isares, target.dir,
+                          modules=seq_len(ncol(isares$genes)),
                           template=system.file("autogen", package="isa"),
                           GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL,
                           htmltitle=NULL, notes=NULL, seed=NULL) {
@@ -8,8 +9,6 @@ autogen.table <- function(nm, isares, target.dir,
   library(paste(sep="", chip, ".db"), character.only=TRUE)
   organism <- get(paste(sep="", chip, "ORGANISM"))
   short.organism <- organism
-
-  modules <- seq_len(ncol(isares$genes))
 
   ################################################
   ## GO
@@ -109,9 +108,10 @@ autogen.table <- function(nm, isares, target.dir,
     tables.CHR <- ""
   }
 
-  thr <- paste(sep="", isares$seeddata$tg, "/", isares$seeddata$tc)
-  no.genes <- apply(isares$genes != 0, 2, sum)
-  no.conds <- apply(isares$conditions != 0, 2, sum)
+  thr <- paste(sep="", isares$seeddata$tg[modules], "/",
+               isares$seeddata$tc[modules])
+  no.genes <- apply(isares$genes[,modules] != 0, 2, sum)
+  no.conds <- apply(isares$conditions[,modules] != 0, 2, sum)
 
   #############
 
@@ -136,8 +136,8 @@ autogen.table <- function(nm, isares, target.dir,
   head <- paste(sep="", collapse="", "<td>", head, "</td>")
   head <- paste(collapse="", "<tr>", head, "</tr>")
   table <- paste(sep="",
-                 '<tr onclick="location.href=\'module-', seq(ncol(isares$genes)), '.html\'">',
-                 '<td><a href="module-', seq(ncol(isares$genes)), '.html">', seq(ncol(isares$genes)), "</a></td>",
+                 '<tr onclick="location.href=\'module-', modules, '.html\'">',
+                 '<td><a href="module-', modules, '.html">', modules, "</a></td>",
                  seed,
                  "<td>", thr, "</td>",
                  "<td>", no.genes, "</td>",
@@ -225,10 +225,10 @@ autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
               paste(sep="", target.dir, "/images/", f) )
   }
   
-  drive.BP <- geneIdsByCategory(GO[[1]])[modules]
-  drive.CC <- geneIdsByCategory(GO[[2]])[modules]
-  drive.MF <- geneIdsByCategory(GO[[3]])[modules]
-  drive.KEGG <- geneIdsByCategory(KEGG)[modules]
+  drive.BP <- geneIdsByCategory(GO[[1]])
+  drive.CC <- geneIdsByCategory(GO[[2]])
+  drive.MF <- geneIdsByCategory(GO[[3]])
+  drive.KEGG <- geneIdsByCategory(KEGG)
   
   ## Then generate modules
   sapply(modules, function(x) {
