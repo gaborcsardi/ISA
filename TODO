@@ -1,0 +1,10 @@
+- speed up enrichment calculation
+- speed up HTML generation
+- more flexible HTML generation, using some building blocks.
+- conditional GO enrichment calculation
+- CHR enrichment
+- miRNA enrichment (miRNA package is needed for this)
+- manual pages
+- split the package into two parts (analysis + visualization)
+- TRANSFAC enrichment
+- sweep tree generation
