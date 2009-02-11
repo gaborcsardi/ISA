@@ -231,15 +231,19 @@ autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
   drive.KEGG <- geneIdsByCategory(KEGG)
   
   ## Then generate modules
-  sapply(modules, function(x) {
+  for (i in seq_along(modules)) {
+    x <- modules[i]
+    nx <- if (i!=length(modules)) modules[i+1] else modules[1]
+    px <- if (i!=1) modules[i-1] else modules[length(modules)]
     isa.autogen.module(nm, isares, x, target.dir=target.dir, template=template,
                        GO=GO, KEGG=KEGG, miRNA=miRNA, CHR=CHR,
                        cond.to.include=cond.to.include,
                        markup=markup, markdown=markdown, sep=sep,
                        seed=seed, drive.BP=drive.BP, drive.CC=drive.CC,
-                       drive.MF=drive.MF, drive.KEGG=drive.KEGG)
-  })
-
+                       drive.MF=drive.MF, drive.KEGG=drive.KEGG,
+                       next.module=nx, prev.module=px)
+  }
+  
   invisible(NULL)
 }
 
@@ -247,7 +251,8 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
                                GO, KEGG, miRNA, CHR, cond.to.include,
                                markup, markdown, sep=NULL,
                                seed=NULL, drive.BP=NULL, drive.CC=NULL,
-                               drive.MF=NULL, drive.KEGG=NULL) {
+                               drive.MF=NULL, drive.KEGG=NULL,
+                               next.module=NULL, prev.module=NULL) {
 
   require(Cairo)
   require(isa)
@@ -654,12 +659,16 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   lines[to.sub] <- gsub("<!--no-->", as.character(m), lines[to.sub])
 
   to.sub <- grep("<!--prev.no-->", lines, fixed=TRUE)
-  pno <- if (m!=1) m-1 else ncol(isares$genes)
-  lines[to.sub] <- gsub("<!--prev.no-->", as.character(pno), lines[to.sub])
-
+  if (is.null(prev.module)) {
+    prev.module <- if (m!=1) m-1 else ncol(isares$genes)
+  }
+  lines[to.sub] <- gsub("<!--prev.no-->", as.character(prev.module), lines[to.sub])
+  
   to.sub <- grep("<!--next.no-->", lines, fixed=TRUE)
-  pno <- if (m!=ncol(isares$genes)) m+1 else 1
-  lines[to.sub] <- gsub("<!--next.no-->", as.character(pno), lines[to.sub])
+  if (is.null(next.module)) {
+    next.module <- if (m!=ncol(isares$genes)) m+1 else 1
+  }
+  lines[to.sub] <- gsub("<!--next.no-->", as.character(next.module), lines[to.sub])
 
   to.sub <- grep("/*no*/", clines, fixed=TRUE)
   clines[to.sub] <- gsub("/*no*/", as.character(m), clines[to.sub], fixed=TRUE)
