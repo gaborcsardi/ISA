@@ -9,7 +9,8 @@ export(robustness, isa.filter.robust, ROC, ROC.integral)
 export(isa.GO, isa.KEGG, isa.CHR, isa.miRNA)
 
 export(gograph, gograph.plot, exp.plot.create, exp.plot.colbar,
-       exp.plot, cond.plot, overlap, overlap.plot)
+       exp.plot, cond.plot, overlap, overlap.plot, mnplot, ISAmnplot,
+       ISA2heatmap)
        
 export(autogen.table, autogen.modules)
 

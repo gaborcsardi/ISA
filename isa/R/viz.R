@@ -483,3 +483,54 @@ overlap.plot <- function(graph, xsize=400, ysize=400, vertex.size=20, vertex.siz
   mode(coords) <- "integer"
   coords
 }
+
+mnplot <- function(x, eset, data, group, ...) {
+  if (is(eset, "ExpressionSet")) {
+    cont <- x %in% featureNames(eset)
+    if (any(!cont)) {
+      warning("Some features were dropped.")
+      x <- x[cont]
+    }
+    dataM <- exprs(eset)[x,]
+  } else {
+    cont <- x %in% rownames(eset)
+    if (!any(cont)) {
+      warning("Some features were dropped.")
+      x <- x[cont]
+    }
+    dataM <- eset[x != 0,]
+  }
+  tts = apply(dataM, 1, function(x) sapply(split(x, group), 
+    mean))
+  rn = row.names(tts)
+  if (length(levels(factor(group))) != 2) 
+    stop("only works for factors with two levels")
+  plot(tts[1, ], tts[2, ], xlab = rn[1], ylab = rn[2], ...)
+  abline(a = 0, b = 1)
+  invisible(tts)
+}
+
+ISAmnplot <- function(isares, module, eset, data, group, ...) {
+  x <- ures$rundata$features[ isares$genes[,module] != 0 ]
+  mnplot(x, eset, data, group, ...)
+}
+
+ISA2heatmap <- function(isares, module, eset, data, ...) {
+  x <- ures$rundata$features[ isares$genes[,module] != 0 ]
+  if (is(eset, "ExpressionSet")) {
+    cont <- x %in% featureNames(eset)
+    if (any(!cont)) {
+      warning("Some features were dropped.")
+      x <- x[cont]
+    }
+    dataM <- exprs(eset)[x,]
+  } else {
+    cont <- x %in% rownames(eset)
+    if (!any(cont)) {
+      warning("Some features were dropped.")
+      x <- x[cont]
+    }
+    dataM <- eset[x != 0,]
+  }
+  heatmap(dataM, ...)
+}
