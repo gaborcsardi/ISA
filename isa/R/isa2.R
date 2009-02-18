@@ -631,6 +631,8 @@ sweep.1d <- function(nm, isalist, method=c("round", "cor"),
     }
     
     ## We run the modules from i-1 using the thresholds from i
+    cat("Running ISA tc=", isalist[[i]]$rundata$tc,
+        "tg=", isalist[[i]]$rundata$tg, "\n")
     tmpres <- isa(nm, isalist[[i-1]]$genes,
                   tc=isalist[[i]]$rundata$tc, tg=isalist[[i]]$rundata$tg,
                   down=isalist[[i]]$rundata$down,
@@ -638,15 +640,15 @@ sweep.1d <- function(nm, isalist, method=c("round", "cor"),
                   eps=isalist[[i]]$rundata$eps,
                   oscillation=isalist[[i]]$rundata$oscillation,
                   maxiter=isalist[[i]]$rundata$maxiter)
-    if (tmpres$rundata$oscillation) {
-      tmpres <- isa.fix.oscillation(nma, tmpres)
-    }
+#    if (tmpres$rundata$oscillation) {
+#      tmpres <- isa.fix.oscillation(nm, tmpres)
+#    }
 
     ## Do something with non-convergent ones
     tmpres$genes[ is.na(tmpres$genes) ] <- 0
     tmpres$conditions[ is.na(tmpres$conditions) ] <- 0
     
-    ures <- isa.unique(normeddata, tmpres, method=method,
+    ures <- isa.unique(nm, tmpres, method=method,
                        ignore.div=TRUE, digits=digits,
                        cor.cut=cor.cut, drop.zero=TRUE)
 
@@ -671,15 +673,21 @@ sweep.1d <- function(nm, isalist, method=c("round", "cor"),
     } else if (method=="cor") {
       
       ## add the newly found genes, if any
-      if (ncol(ures$genes) != 0 && ncol(isalist[[i]]$genes) != 0) {
-        cm <- cor(isalist[[i]]$genes, ures$genes)
-        first <- apply(cm<cor.cut, 2, all)
-        isalist[[i]]$genes <- cbind(isalist[[i]]$genes,
-                                    ures$genes[,first,drop=FALSE])
-        isalist[[i]]$conditions <- cbind(isalist[[i]]$conditions,
-                                         ures$conditions[,first,drop=FALSE])
-        isalist[[i]]$seeddata <- rbind(isalist[[i]]$seeddata,
-                                       ures$seeddata[first,,drop=FALSE])
+      if (ncol(ures$genes) != 0) {
+        if (ncol(isalist[[i]]$genes) != 0) {
+          cm <- cor(isalist[[i]]$genes, ures$genes)
+          first <- apply(cm<cor.cut, 2, all)
+          isalist[[i]]$genes <- cbind(isalist[[i]]$genes,
+                                      ures$genes[,first,drop=FALSE])
+          isalist[[i]]$conditions <- cbind(isalist[[i]]$conditions,
+                                           ures$conditions[,first,drop=FALSE])
+          isalist[[i]]$seeddata <- rbind(isalist[[i]]$seeddata,
+                                         ures$seeddata[first,,drop=FALSE])
+        } else {
+          isalist[[i]]$genes <- ures$genes
+          isalist[[i]]$conditions <- ures$conditions
+          isalist[[i]]$seeddata <- ures$seeddata
+        }
       }
       
       ## check what converged to what
