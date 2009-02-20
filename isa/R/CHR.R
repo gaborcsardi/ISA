@@ -1,132 +1,284 @@
-#####################################
-## AllClasses.R
 
-setClass("CHRHyperGParams",
+
+##################################################
+## CHRListHyperGParams
+##################################################
+
+setClass("CHRListHyperGParams",
+         representation(conditional="logical"),
          contains="HyperGParams",
-         prototype=prototype(categoryName="CHR"))
+         prototype=prototype(categoryName=c("CHR", "List"),
+           conditional=FALSE))
 
-setClass("CHRHyperGResult",
-         contains="HyperGResult")
+##################
+## makeValidParams
+
+setMethod("makeValidParams", "CHRListHyperGParams",
+          function(object) {
+            ## TODO: proper checks
+            if (!is.list(object@geneIds)) {
+              object@geneIds <- list(object@geneIds)
+            }
+            if (object@conditional) {
+              stop("Conditional CHR test is not implemented yet")
+            }
+            if (object@testDirection != "over") {
+              stop("Only overrepresentation test is implemented yet")
+            }
+            object
+          })
+
+##################
+## conditional
+
+setMethod("conditional", "CHRListHyperGParams", function(r) r@conditional)
+
+##################
+## conditional<-
+
+setReplaceMethod("conditional", c("CHRListHyperGParams", "logical"),
+                 function(r, value) {
+                     if (is.na(value))
+                       stop("value must be TRUE or FALSE")
+                     r@conditional <- value
+                     r
+                 })
+
+##################
+## categoryToEntrezBuilder
+## Create a mapping from the categories to the Entrez ids
 
 setMethod("categoryToEntrezBuilder",
-          signature(p="CHRHyperGParams"),
+         signature(p="CHRListHyperGParams"),
+         function(p) {
+           keep.all <- switch(testDirection(p),
+                              over=FALSE,
+                              under=TRUE,
+                              stop("Bad testDirection slot"))
+
+           genes <- unique(unlist(geneIds(p)))
+
+           annotation <- p@annotation
+           org <- get(paste(sep="", annotation, "ORGANISM"))
+           org <- abbreviate(org, 2)
+           require(paste(sep="", "org.", org, ".eg.db"), character.only=TRUE)
+           CHR <- get(paste(sep="", "org.", org, ".egCHR"))
+           CHR <- as.matrix(toTable(CHR))
+
+           cat.eg <- tapply(as.character(CHR[,1]),
+                            as.character(CHR[,2]),
+                            c)
+           valid <- sapply(cat.eg, function(x) any(genes %in% x))           
+           res <- cat.eg[valid]
+           res
+         })
+
+######################
+## universeBuilder
+## It returns the Entrez ids from the supplied universe that
+## have at least one CHR annotation
+setMethod("universeBuilder", signature=(p="CHRListHyperGParams"),
           function(p) {
-              getCHRToEntrezMap(p)
+            entrezIds <- universeGeneIds(p)
+            annotation <- p@annotation
+            org <- get(paste(sep="", annotation, "ORGANISM"))
+            org <- abbreviate(org, 2)
+            require(paste(sep="", "org.", org, ".eg.db"), character.only=TRUE)
+            CHR <- get(paste(sep="", "org.", org, ".egCHR"))
+            CHR <- as.matrix(toTable(CHR))
+            entrez <- unique(CHR[,1])
+            entrezIds[ entrezIds %in% entrez ]
           })
 
-#####################################
-## categoryToEntrezBuilder-methods.R
+isa.CHRListHyperGTest <- function(p) {
+  p <- makeValidParams(p)
+  
+  ## Filter the universe to the genes that have at least one
+  ## annotation 
+  p@universeGeneIds <- universeBuilder(p)
 
-getCHRToEntrezMap <- function(p) {
-    keep.all <- switch(testDirection(p),
-                       over=FALSE,
-                       under=TRUE,
-                       stop("Bad testDirection slot"))
-    lib <- annotation(p)
-    CHR2allprobes <- getDataEnv("CHR2PROBE", lib)
-    probeAnnot <- getCHRToProbeMap(CHR2allprobes)
-    probeToEntrezMapHelper(probeAnnot, geneIds(p), p@datPkg, universeGeneIds(p),
-                           keep.all=keep.all)
+  ## We need the reverse mapping, the Entrez ids for all CHR
+  ## categories (in this subtree).
+  dbdcat.ent <- as.list(categoryToEntrezBuilder(p))
+  dbdcat.ent <- lapply(dbdcat.ent, intersect, p@universeGeneIds)  
+
+  ## Keep only genes that are in the universe
+  p@geneIds <- lapply(p@geneIds, intersect, p@universeGeneIds)
+
+  result <- lapply(p@geneIds, function(genes) {
+    count <- sapply(dbdcat.ent, function(x) sum(genes %in% x))
+    my.dbdcat.ent <- dbdcat.ent[ count != 0 ]
+    count <- count[ count != 0 ]
+    size <- sapply(my.dbdcat.ent, length)
+    res <- .doHyperGTest(p, my.dbdcat.ent, list(), genes)
+    res <- data.frame(Pvalue=res$p, OddsRatio=res$odds,
+                      ExpCount=res$expected, Count=count,
+                      Size=size, row.names=names(res$p))
+    res[ order(res$Pvalue), ]
+  })
+
+  new("CHRListHyperGResult",
+      reslist=result,
+      annotation=p@annotation,
+      geneIds=p@geneIds,
+      testName=c("CHR", "List"),
+      testDirection=p@testDirection,
+      pvalueCutoff=p@pvalueCutoff,
+      conditional=p@conditional,
+      universeGeneIds=p@universeGeneIds,
+      catToGeneId=dbdcat.ent)
 }
 
-getCHRToProbeMap <- function(CHR2allprobes, CHRIds) {
-    probeAnnot = as.list(CHR2allprobes)
-    if (!missing(CHRIds))
-      probeAnnot = probeAnnot[CHRIds]
-    removeLengthZeroAndMissing(probeAnnot)
-}
+#####################
+## hyperGTest
 
-####################################
-## hyperGTest-methods.R
+setMethod("hyperGTest",
+          signature(p="CHRListHyperGParams"), isa.CHRListHyperGTest)
 
-geneCHRHyperGeoTest <- function(entrezGeneIds, lib, universe=NULL)
-{
-    .Defunct("hyperGTest")
-    if (missing(universe) || is.null(universe))
-      universe <- character(0)
-    params <- new("CHRHyperGParams",
-                  geneIds=entrezGeneIds,
-                  universeGeneIds=universe,
-                  annotation=lib)
-    hyperGTest(params)
-}
-
-#####################################
-## summary-methods.R
-
-setMethod("summary", signature(object="CHRHyperGResult"),
-          function(object, pvalue=pvalueCutoff(object),
-                   categorySize=NULL, htmlLinks=FALSE){
-              CHR_URL <- "http://www.targetscan.org/cgi-bin/targetscan/vert_40/targetscan.cgi?species=%s&gid=&mir_c=%s&mir_sc=&mir_nc=&mirg="
-              annOrg <- get(paste(annotation(object), "ORGANISM", sep=""))
-              orgSpecifier <- switch(annOrg,
-                                     "Homo sapiens"="Human",
-                                     "Mus musculus"="Mouse",
-                                     "Rattus norvegicus"="Rat",
-                                     ## will need others in future
-                                     "Human")
-              df <- callNextMethod(object=object, pvalue=pvalue,
-                                   categorySize=categorySize)
-              if(nrow(df) == 0){
-                  df$Term <- character(0)
-                  return(df)
-              }
-##               CHRIds <- df[[1]]
-##               keggEnv <- getAnnMap("PATHID2NAME", "KEGG", load=TRUE)
-##               keggTerms <- unlist(mget(keggIds, keggEnv, ifnotfound=NA))
-##               if(htmlLinks){
-##                   keggIdUrls <- sapply(keggIds,
-##                                        function(x)
-##                                        sprintf(KEGG_URL, orgSpecifier, x))
-##                   keggTerms <- paste('<a href="', keggIdUrls, '">', keggTerms,
-##                                      '</a>', sep="")
-##               }
-##               df$Term <- keggTerms
-              df
+setMethod("show", signature(object="CHRListHyperGParams"),
+          function(object) {
+              cat("A", class(object), "instance\n")
+              cat("  category:", object@categoryName, "\n")
+              cat("annotation:", object@annotation, "\n")
           })
 
-setMethod("htmlReport", signature(r="CHRHyperGResult"),
-          function(r, file="", append=FALSE, label="",
-                   digits=3, summary.args=list(htmlLinks=TRUE)){
-              callNextMethod(r=r, file=file, append=append,
-                             label=label, digits=digits,
-                             summary.args=summary.args)
+##################################################
+## CHRListHyperGResult
+##################################################
+
+setClass("CHRListHyperGResult",
+         contains="HyperGResultBase",
+         representation=representation(
+           reslist="list",
+           conditional="logical",
+           universeGeneIds="character",
+           catToGeneId="list"),
+         prototype=prototype(
+           testName="CHR",
+           reslist=list(),
+           universeGeneIds=character(),
+           catToGeneId=list()))
+
+setMethod("show", signature(object="CHRListHyperGResult"),
+          function(object) {
+            no.sign <- sapply(object@reslist, function(x) {
+              sum(x$Pvalue < object@pvalueCutoff[1])
+            })
+            no.sign <- paste(min(no.sign), sep="-", max(no.sign))
+            tested <- sum(sapply(object@reslist, function(x) {
+              nrow(x)
+            }))
+
+            gs <- range(geneMappedCount(object))
+            gs <- paste(gs[1], sep="-", gs[2])
+            
+            cat(description(object), "\n")
+            cat(tested, testName(object), "ids tested ")
+            cat("(", no.sign, " have p < ", object@pvalueCutoff[1],
+                ")\n", sep="")
+            cat("Selected gene set sizes:", gs, "\n")
+            cat("     Gene universe size:", universeMappedCount(object), "\n")
+            cat("     Annotation package:", annotation(object), "\n")
           })
 
-####################################
-## universeBuilder-methods.R
+setMethod("summary", signature(object="CHRListHyperGResult"),
+          function(object, pvalue=pvalueCutoff(object), categorySize=NULL) {
 
-setMethod("universeBuilder", signature(p="CHRHyperGParams"),
-          function(p) {
-                getUniverseViaCHR(p)
+            if (! is.null(categorySize)) {
+              lapply(object@reslist, function(x) {
+                show <- x$Pvalue < pvalue & x$Size >= categorySize
+                x[show,]
+              })
+            } else {
+              lapply(object@reslist, function(x) {
+                show <- x$Pvalue < pvalue
+                x[show,]
+              })
+            }
           })
 
-getUniverseViaCHR <- function(p) {
-    entrezIds <- universeGeneIds(p)
-    probe2CHR <- as.list(getDataEnv("CHR", annotation(p)))
-    notNA <- sapply(probe2CHR, function(x) !(length(x) == 1 && is.na(x)))
-    probe2CHR <- probe2CHR[notNA]
-    probes <- names(probe2CHR)
-    getUniverseHelper(probes, p@datPkg, universeGeneIds(p))
-}
+setMethod("htmlReport", signature=(r="CHRListHyperGResult"),
+          function(r, file="", append=FALSE, label="", digits=3,
+                   summary.args=NULL) {
+            callNextMethod(r=r, file=file, append=append,
+                           label=label, digits=digits,
+                           summary.args=summary.args)            
+          })
+
+setMethod("pvalues", signature(r="CHRListHyperGResult"),
+          function(r) lapply(r@reslist, function(x) {
+            structure(x$Pvalue, names=rownames(x))
+          }))
+
+setMethod("geneCounts", signature(r="CHRListHyperGResult"),
+          function(r) lapply(r@reslist, function(x) {
+            structure(x$Count, names=rownames(x))
+          }))
+
+setMethod("oddsRatios", signature(r="CHRListHyperGResult"),
+          function(r) lapply(r@reslist, function(x) {
+            structure(x$OddsRatio, names=rownames(x))
+          }))
+
+setMethod("expectedCounts", signature(r="CHRListHyperGResult"),
+          function(r) lapply(r@reslist, function(x) {
+            structure(x$ExpCount, names=rownames(x))
+          }))
+
+setMethod("universeCounts", signature(r="CHRListHyperGResult"),
+          function(r) lapply(r@reslist, function(x) {
+            structure(x$Size, names=rownames(x))
+          }))
+
+setMethod("universeMappedCount", signature(r="CHRListHyperGResult"),
+          function(r) length(r@universeGeneIds))
+
+setMethod("geneMappedCount", signature(r="CHRListHyperGResult"),
+          function(r) sapply(r@geneIds, length))
+
+setMethod("geneIdUniverse", signature(r="CHRListHyperGResult"),
+          function(r, cond=FALSE) r@catToGeneId)
+
+setMethod("condGeneIdUniverse", signature(r="CHRListHyperGResult"),
+          function(r) geneIdUniverse(r, cond=TRUE))
+
+## This function gives all the hits for the tested categories.
+setMethod("geneIdsByCategory", signature(r="CHRListHyperGResult"),
+          function(r, catids=NULL) {
+            lapply(r@geneIds, function(genes) {
+              tmp <- lapply(r@catToGeneId, function(x) {
+                genes [ genes %in% x ]
+              })
+              tmp <- tmp[ sapply(tmp, length) != 0 ]
+              ord <- order(names(tmp))
+              tmp <- tmp[ord]
+            })
+          })
+
+setMethod("sigCategories", signature(r="CHRListHyperGResult"),
+          function(r, p) {
+            if (missing(p)) { p <- pvalueCutoff(r) }
+            lapply(r@reslist, function(x) {
+              rownames(x)[x$Pvalue < p]
+            })
+          })
 
 isa.CHR <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
-                    hgCutoff=0.001, correction=TRUE) {
+                     hgCutoff=0.001, correction=TRUE) {
 
   if (is.null(organism)) organism <- isaresult$rundata$organism
   if (is.null(annotation)) annotation <- isaresult$rundata$annotation
   if (is.null(features)) features <- isaresult$rundata$features  
   shortorganism <- abbreviate(organism, 2)
-  require(paste(sep=".", "org", shortorganism, "eg", "db"), character.only=TRUE)
-  
+
   require(paste(sep="", annotation, ".db"), character.only=TRUE)
-  require(annotate)
+  require(paste(sep=".", "org", shortorganism, "eg", "db"), character.only=TRUE)
   require(Category)
 
   ENTREZ <- get(paste(sep="", annotation, "ENTREZID"))
 
   cat(" -- Extracting Entrez genes\n")
-  
+
   selectedEntrezIds <- lapply(seq_len(ncol(isaresult$genes)),
                               function(x) features[isaresult$genes[,x] != 0])
   selectedEntrezIds <- lapply(selectedEntrezIds,
@@ -137,101 +289,13 @@ isa.CHR <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
   entrezUniverse <- unique(unlist(mget(features, ENTREZ)))
 
   params <-
-    try( new("CHRHyperGParams", geneIds=character(),
-             universeGeneIds = entrezUniverse, annotation=annotation,
+    try( new("CHRListHyperGParams", geneIds = selectedEntrezIds,
+             universeGeneIds = entrezUniverse, annotation = annotation,
              pvalueCutoff = hgCutoff, testDirection = "over") )
 
-  valid <- sapply(selectedEntrezIds, length) != 0
-  params@geneIds <- selectedEntrezIds[valid]
-
-  hgOver <- vector(mode="list", length=length(selectedEntrezIds))
-
   cat(" -- Doing test\n")
-  hgOver[valid] <- QhyperGTestCHR(params, correction=correction)
-  
+  hgOver <- hyperGTest(params)
+
   hgOver
 }
-
-QhyperGTestCHR <- function(params, correction) {
-
-  ## These are not yet implemented
-  if (params@testDirection == "under") {
-    stop("Under-representation is not implemented yet")
-  }
-
-  ## Check that we have the require Entrez <-> CHR mappings,
-  pkg <- sub(".db", "", params@datPkg@name, fixed=TRUE)
-  organism <- get(paste(sep="", pkg, "ORGANISM"))
-  organism <- abbreviate(organism, 2)
-  
-##   maps <- paste(sep=".", "org", organism,
-##                 c("egCHR", "egCHR2EG", "egCHRHAVE"))
-##   if (any(! sapply(maps, exists))) {
-##     stop("Some Entrez <-> CHR mappings do not exist: ", sapply(maps,exists))
-##   }
-  
-  ## Filter the gene universe to include genes that have at least one annotation
-  ## in the current ontology
-  havelist <- get(paste(sep="", "org.", organism, ".egCHRHAVE"))
-  if (length(params@universeGeneIds)==0) {
-    params@univerGeneIds <- havelist
-  } else { 
-    params@universeGeneIds <- intersect(havelist, params@universeGeneIds)
-  }
-  
-  ## Pre-generate the filtered list of probes, only include those that are
-  ## in the universe
-  if (!is.list(params@geneIds)) {
-    params@geneIds <-list(params@geneIds)
-  }
-  all.egs <- get(paste(sep=".", "org", organism, "egCHR2EG"))
-  if (length(params@geneIds) > 3) {
-    simplified <- TRUE
-    egCHR2EG.mine <- new.env()
-    all <- as.list(all.egs)
-    all <- lapply(all, function(x) intersect(x, params@universeGeneIds))
-    for (n in seq(all)) {
-      assign(names(all)[n], all[[n]], envir=egCHR2EG.mine)
-    }
-  } else {
-    simplified <- FALSE
-    egCHR2EG.mine <- all.egs
-  }
-
-  ## Ok, start testing
-  all.cc <- get(paste(sep="", "org.", organism, ".egCHR"))
-      
-  result <- lapply(params@geneIds, function(genes) {
-
-    genes <- as.character(genes[!is.na(genes)])
-    tmp <- mget(genes, all.cc, ifnotfound=NA)
-    tmp <- tmp[ !is.na(tmp) ]
-    
-    tmp2 <- unique(as.character(unlist(unname(tmp))))
-    tmp5 <- mget(tmp2, egCHR2EG.mine)
-    if (!simplified) {
-      tmp5 <- lapply(tmp5, function(x) intersect(x, params@universeGeneIds))
-    }
-
-    selected <- genes[ genes %in% params@universeGeneIds ]
-    res <- .doHyperGTest(params, tmp5, list(), selected)
-    res$size <- sapply(tmp5, length)
-    res$count <- sapply(tmp5, function(x) sum(selected %in% x))
-    drive <- lapply(tmp5, function(x) genes[which(genes %in% x)])
-    res$drive <- sapply(drive, paste, collapse=";")
-
-    if (correction && length(res$p) >0) {
-      res$p <- res$p * length(res$size)
-      res$p <- pmin(res$p, 1)
-    }
-    
-    res <- data.frame(Pvalue=res$p, OddsRatio=res$odds, ExpCount=res$expected,
-                      Count=res$count, Size=res$size, Drive=res$drive,
-                      row.names=names(res$p))
-    res[ order(res$Pvalue), ]
-  })
-
-  result
-}
-  
 

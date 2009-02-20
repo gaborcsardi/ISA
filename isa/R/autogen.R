@@ -123,7 +123,7 @@ autogen.table <- function(nm, isares, target.dir,
             "/", gc, "/", uc, ")</span>")
     }
     print("  -- CHR")
-    tables.CHR <- lapply(CHR[modules], chr, pvalue=0.05)
+    tables.CHR <- lapply(CHR@reslist[modules], chr, pvalue=0.05)
   } else {
     tables.CHR <- ""
   }
@@ -228,7 +228,7 @@ autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
                             markup=numeric(), markdown=numeric(),
                             sep=NULL, seed=NULL, drive.BP=NULL,
                             drive.CC=NULL, drive.MF=NULL, drive.KEGG=NULL,
-                            drive.miRNA=NULL, drive.DBD=NULL) {
+                            drive.miRNA=NULL, drive.DBD=NULL, drive.CHR=NULL) {
 
   if (!file.exists(target.dir)) {
     dir.create(target.dir)
@@ -258,6 +258,7 @@ autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
   if (is.null(drive.KEGG)) drive.KEGG <- geneIdsByCategory(KEGG)
   if (is.null(drive.miRNA)) drive.miRNA <- geneIdsByCategory(miRNA) 
   if (is.null(drive.DBD)) drive.DBD <- geneIdsByCategory(DBD) 
+  if (is.null(drive.CHR)) drive.CHR <- geneIdsByCategory(CHR) 
   
   ## Then generate modules
   for (i in seq_along(modules)) {
@@ -271,6 +272,7 @@ autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
                        seed=seed, drive.BP=drive.BP, drive.CC=drive.CC,
                        drive.MF=drive.MF, drive.KEGG=drive.KEGG,
                        drive.miRNA=drive.miRNA, drive.DBD=drive.DBD,
+                       drive.CHR=drive.CHR,
                        next.module=nx, prev.module=px)
   }
   
@@ -283,6 +285,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
                                seed=NULL, drive.BP=NULL, drive.CC=NULL,
                                drive.MF=NULL, drive.KEGG=NULL,
                                drive.miRNA=NULL, drive.DBD=NULL,
+                               drive.CHR=NULL,
                                next.module=NULL, prev.module=NULL) {
 
   require(Cairo)
@@ -637,16 +640,14 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
       rownames(df) <- ca
       
       cat <- "ch"
-      if (do.drive) {
-        drive <- strsplit(as.character(obj$Drive[v]), ";", fixed=TRUE)
-        drive <- lapply(drive, function(x) unname(unlist(mget(x, SYMBOL))))
-        drive <- lapply(drive, sort)
-        drive <- lapply(drive, paste, collapse=", ")
-        df$Count <- paste(sep="", '<a href="#" onclick="togglestuff2(\'d.', cat, '.', seq(along=df[,1]),
+      drive <- drive[rownames(obj)][v]
+      drive <- lapply(drive, function(x) unname(unlist(mget(x, SYMBOL))))
+      drive <- lapply(drive, sort)
+      drive <- lapply(drive, paste, collapse=", ")
+      df$Count <- paste(sep="", '<a href="#" onclick="togglestuff2(\'d.', cat, '.', seq(along=df[,1]),
                           '\'); return false;">', df$Count, '</a><br/><span id="d.', cat, '.', seq(along=df[,1]),
-                          '" class="d.', cat, '" style="font-size:0.8em;display:none;visibility:hidden;">', drive,
-                          '</span>')
-      }  
+                        '" class="d.', cat, '" style="font-size:0.8em;display:none;visibility:hidden;">', drive,
+                        '</span>')
       
       xdf <- xtable(df, display=c("s", "e", "g", "d", "d"),
                     digits=c(NA, 3, 4, 4, 4))
@@ -673,19 +674,18 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
                  paste(sep="", '\\1<a href="', link[1], short.organism, link[2],
                        '\\2', link[3], '"> ', '\\2 </a>'), foo)
       
-      if (do.drive) {
-        foo <- sub("<th> Count </th>",
-                   paste(sep="",
-                         '<th> <a href="#" onclick="togglestuff3(\'d.', cat,
-                         '\');return false;"> Count </a> </th>'),
-                   foo, fixed=TRUE)
-      }
+      foo <- sub("<th> Count </th>",
+                 paste(sep="",
+                       '<th> <a href="#" onclick="togglestuff3(\'d.', cat,
+                       '\');return false;"> Count </a> </th>'),
+                 foo, fixed=TRUE)
       
       foo <- color.table(foo)
       paste(foo, collapse="\n")
     }
   
-    tables.CHR <- chr(CHR[[module]], pvalue=0.05, maxlines=NA)
+    tables.CHR <- chr(CHR@reslist[[module]], pvalue=0.05, maxlines=NA,
+                      drive=drive.CHR[[module]])
   } else {
     tables.CHR <- "<p>Not tested.</p>"
   }
