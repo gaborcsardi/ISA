@@ -903,6 +903,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   nam <- isares$rundata$features[ isares$genes[,m] != 0]
   orig.val <- isares$genes[,m] [ isares$genes[,m] != 0 ]
   val <- round(orig.val*10)
+  entrezNums <- mget(nam, envir = get(paste(sep="", chip, "ENTREZID"))) 
   entrezIds <- mget(nam, envir = get(paste(sep="", chip, "SYMBOL")))
   longname <- mget(nam, envir = get(paste(sep="", chip, "GENENAME")))
   longname <- paste(sep="", longname, " (", nam, ")")
@@ -912,20 +913,28 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
     print("trouble");
   } else {
     entrezIds <- unlist(entrezIds)
+    entrezNums <- unlist(entrezNums)
   }
 
   ord <- order(entrezIds)
   entrezIds <- entrezIds[ ord ]
+  entrezNums <- entrezNums[ ord ]
   orig.val <- round(orig.val[ ord ], 2)
   val <- val[ ord ]
   seq <- seq[ ord ]
   longname <- longname[ ord ]
   
   valid <- !is.na(entrezIds)
-  
-  html <- paste(sep="", "<a href=\"http://www.genecards.org/cgi-bin/carddisp.pl?gene=", entrezIds[valid],
-                "\" class=\"tag", val[valid],
-                "\">", entrezIds[valid], "<span>", longname[valid], ", score: ", orig.val[valid], "</span></a>")
+
+  if (isares$rundata$organism == "Homo sapiens") {
+    html <- paste(sep="", "<a href=\"http://www.genecards.org/cgi-bin/carddisp.pl?gene=", entrezIds[valid],
+                  "\" class=\"tag", val[valid],
+                  "\">", entrezIds[valid], "<span>", longname[valid], ", score: ", orig.val[valid], "</span></a>")
+  } else {
+    html <- paste(sep="", "<a href=\"http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=Retrieve&dopt=full_report&list_uids=", entrezNums[valid],
+                  "\" class=\"tag", val[valid],
+                  "\">", entrezIds[valid], "<span>", longname[valid], ", score: ", orig.val[valid], "</span></a>")
+  }    
   html <- paste(html, collapse="\n") 
   
   html2 <- paste(sep="", "<a href=\"", 
