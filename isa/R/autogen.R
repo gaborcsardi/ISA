@@ -85,7 +85,7 @@ autogen.table <- function(nm, isares, target.dir,
     }
     
     print("  -- miRNA")
-    tables.miRNA <- lapply(miRNA[modules], h, pvalue=0.05)
+    tables.miRNA <- lapply(miRNA@reslist[modules], h, pvalue=0.05)
   } else {
     tables.miRNA <- ""
   }
@@ -229,6 +229,7 @@ autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
   drive.CC <- geneIdsByCategory(GO[[2]])
   drive.MF <- geneIdsByCategory(GO[[3]])
   drive.KEGG <- geneIdsByCategory(KEGG)
+  dribe.miRNA <- geneIdsByCategory(miRNA) 
   
   ## Then generate modules
   for (i in seq_along(modules)) {
@@ -241,6 +242,7 @@ autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
                        markup=markup, markdown=markdown, sep=sep,
                        seed=seed, drive.BP=drive.BP, drive.CC=drive.CC,
                        drive.MF=drive.MF, drive.KEGG=drive.KEGG,
+                       drive.miRNA=drive.miNRA,
                        next.module=nx, prev.module=px)
   }
   
@@ -252,6 +254,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
                                markup, markdown, sep=NULL,
                                seed=NULL, drive.BP=NULL, drive.CC=NULL,
                                drive.MF=NULL, drive.KEGG=NULL,
+                               drive.miRNA=NULL,
                                next.module=NULL, prev.module=NULL) {
 
   require(Cairo)
@@ -470,16 +473,14 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
       rownames(df) <- ca
       
       cat <- "mr"
-      if (do.drive) {
-        drive0 <- strsplit(as.character(obj$Drive[v]), ";", fixed=TRUE)
-        drive <- lapply(drive0, function(x) unname(unlist(mget(x, SYMBOL))))
-        drive <- lapply(drive, sort)
-        drive <- lapply(drive, paste, collapse=", ")
-        df$Count <- paste(sep="", '<a href="#" onclick="togglestuff2(\'d.', cat, '.', seq(along=df[,1]),
-                          '\'); return false;">', df$Count, '</a><br/><span id="d.', cat, '.', seq(along=df[,1]),
-                          '" class="d.', cat, '" style="font-size:0.8em;display:none;visibility:hidden;">', drive,
+      drive <- drive[rownames(obj)][v]      
+      drive <- lapply(drive, function(x) unname(unlist(mget(x, SYMBOL))))
+      drive <- lapply(drive, sort)
+      drive <- lapply(drive, paste, collapse=", ")
+      df$Count <- paste(sep="", '<a href="#" onclick="togglestuff2(\'d.', cat, '.', seq(along=df[,1]),
+                        '\'); return false;">', df$Count, '</a><br/><span id="d.', cat, '.', seq(along=df[,1]),
+                        '" class="d.', cat, '" style="font-size:0.8em;display:none;visibility:hidden;">', drive,
                           '</span>')
-      }
       
       xdf <- xtable(df, display=c("s", "e", "g", "d", "d"),
                     digits=c(NA, 3, 4, 4, 4))
@@ -506,19 +507,18 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
                  paste(sep="", '\\1<a href="', link[1], short.organism, link[2],
                        '\\2', link[3], '"> ', '\\2 </a>'), foo)
       
-      if (do.drive) {
-        foo <- sub("<th> Count </th>",
-                   paste(sep="",
-                         '<th> <a href="#" onclick="togglestuff3(\'d.', cat,
-                         '\');return false;"> Count </a> </th>'),
-                   foo, fixed=TRUE)
-      }
+      foo <- sub("<th> Count </th>",
+                 paste(sep="",
+                       '<th> <a href="#" onclick="togglestuff3(\'d.', cat,
+                       '\');return false;"> Count </a> </th>'),
+                 foo, fixed=TRUE)
       
       foo <- color.table(foo)
       paste(foo, collapse="\n")
     }
     
-    tables.miRNA <- h(miRNA[[module]], pvalue=0.05, maxlines=NA)
+    tables.miRNA <- h(miRNA@reslist[[module]], pvalue=0.05, maxlines=NA,
+                      drive=drive.KEGG[[module]])
   } else {
     tables.miRNA <- "<p>Not tested</p>"
   }
