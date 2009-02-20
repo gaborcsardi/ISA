@@ -201,7 +201,9 @@ autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
                             GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL,
                             cond.to.include=NULL,
                             markup=numeric(), markdown=numeric(),
-                            sep=NULL, seed=NULL) {
+                            sep=NULL, seed=NULL, drive.BP=NULL,
+                            drive.CC=NULL, drive.MF=NULL, drive.KEGG=NULL,
+                            drive.miRNA=NULL) {
 
   if (!file.exists(target.dir)) {
     dir.create(target.dir)
@@ -225,11 +227,11 @@ autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
               paste(sep="", target.dir, "/images/", f) )
   }
   
-  drive.BP <- geneIdsByCategory(GO[[1]])
-  drive.CC <- geneIdsByCategory(GO[[2]])
-  drive.MF <- geneIdsByCategory(GO[[3]])
-  drive.KEGG <- geneIdsByCategory(KEGG)
-  dribe.miRNA <- geneIdsByCategory(miRNA) 
+  if (is.null(drive.BP)) drive.BP <- geneIdsByCategory(GO[[1]])
+  if (is.null(drive.CC)) drive.CC <- geneIdsByCategory(GO[[2]])
+  if (is.null(drive.MF)) drive.MF <- geneIdsByCategory(GO[[3]])
+  if (is.null(drive.KEGG)) drive.KEGG <- geneIdsByCategory(KEGG)
+  if (is.null(drive.miRNA)) drive.miRNA <- geneIdsByCategory(miRNA) 
   
   ## Then generate modules
   for (i in seq_along(modules)) {
@@ -242,7 +244,7 @@ autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
                        markup=markup, markdown=markdown, sep=sep,
                        seed=seed, drive.BP=drive.BP, drive.CC=drive.CC,
                        drive.MF=drive.MF, drive.KEGG=drive.KEGG,
-                       drive.miRNA=drive.miNRA,
+                       drive.miRNA=drive.miRNA,
                        next.module=nx, prev.module=px)
   }
   
@@ -518,7 +520,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
     }
     
     tables.miRNA <- h(miRNA@reslist[[module]], pvalue=0.05, maxlines=NA,
-                      drive=drive.KEGG[[module]])
+                      drive=drive.miRNA[[module]])
   } else {
     tables.miRNA <- "<p>Not tested</p>"
   }
