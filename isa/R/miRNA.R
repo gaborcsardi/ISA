@@ -1,133 +1,274 @@
-#####################################
-## AllClasses.R
 
-setClass("miRNAHyperGParams",
+
+##################################################
+## miRNAListHyperGParams
+##################################################
+
+setClass("miRNAListHyperGParams",
+         representation(conditional="logical"),
          contains="HyperGParams",
-         prototype=prototype(categoryName="miRNA"))
+         prototype=prototype(categoryName=c("miRNA", "List"),
+           conditional=FALSE))
 
-setClass("miRNAHyperGResult",
-         contains="HyperGResult")
+##################
+## makeValidParams
+
+setMethod("makeValidParams", "miRNAListHyperGParams",
+          function(object) {
+            ## TODO: proper checks
+            if (!is.list(object@geneIds)) {
+              object@geneIds <- list(object@geneIds)
+            }
+            if (object@conditional) {
+              stop("Conditional miRNA test is not implemented yet")
+            }
+            if (object@testDirection != "over") {
+              stop("Only overrepresentation test is implemented yet")
+            }
+            object
+          })
+
+##################
+## conditional
+
+setMethod("conditional", "miRNAListHyperGParams", function(r) r@conditional)
+
+##################
+## conditional<-
+
+setReplaceMethod("conditional", c("miRNAListHyperGParams", "logical"),
+                 function(r, value) {
+                     if (is.na(value))
+                       stop("value must be TRUE or FALSE")
+                     r@conditional <- value
+                     r
+                 })
+
+##################
+## categoryToEntrezBuilder
+## Create a mapping from the categories to the Entrez ids
 
 setMethod("categoryToEntrezBuilder",
-          signature(p="miRNAHyperGParams"),
+         signature(p="miRNAListHyperGParams"),
+         function(p) {
+           keep.all <- switch(testDirection(p),
+                              over=FALSE,
+                              under=TRUE,
+                              stop("Bad testDirection slot"))
+
+           genes <- unique(unlist(geneIds(p)))
+           data(miRNA.mm, package="isa")
+           cat.eg <- tapply(as.character(miRNA.mm[,1]),
+                            as.character(miRNA.mm[,2]),
+                            c)
+           valid <- sapply(cat.eg, function(x) any(genes %in% x))           
+           res <- cat.eg[valid]
+           res
+         })
+
+######################
+## universeBuilder
+## It returns the Entrez ids from the supplied universe that
+## have at least one miRNA annotation
+setMethod("universeBuilder", signature=(p="miRNAListHyperGParams"),
           function(p) {
-              getmiRNAToEntrezMap(p)
+            entrezIds <- universeGeneIds(p)
+            data(miRNA.mm, package="isa")
+            entrez <- unique(miRNA.mm[,1])
+            entrezIds[ entrezIds %in% entrez ]
           })
 
-#####################################
-## categoryToEntrezBuilder-methods.R
+isa.miRNAListHyperGTest <- function(p) {
+  p <- makeValidParams(p)
+  
+  ## Filter the universe to the genes that have at least one
+  ## annotation 
+  p@universeGeneIds <- universeBuilder(p)
 
-getmiRNAToEntrezMap <- function(p) {
-    keep.all <- switch(testDirection(p),
-                       over=FALSE,
-                       under=TRUE,
-                       stop("Bad testDirection slot"))
-    lib <- annotation(p)
-    miRNA2allprobes <- getDataEnv("miRNA2PROBE", lib)
-    probeAnnot <- getmiRNAToProbeMap(miRNA2allprobes)
-    probeToEntrezMapHelper(probeAnnot, geneIds(p), p@datPkg, universeGeneIds(p),
-                           keep.all=keep.all)
+  ## We need the reverse mapping, the Entrez ids for all miRNA
+  ## categories (in this subtree).
+  dbdcat.ent <- as.list(categoryToEntrezBuilder(p))
+  dbdcat.ent <- lapply(dbdcat.ent, intersect, p@universeGeneIds)  
+
+  ## Keep only genes that are in the universe
+  p@geneIds <- lapply(p@geneIds, intersect, p@universeGeneIds)
+
+  result <- lapply(p@geneIds, function(genes) {
+    count <- sapply(dbdcat.ent, function(x) sum(genes %in% x))
+    my.dbdcat.ent <- dbdcat.ent[ count != 0 ]
+    count <- count[ count != 0 ]
+    size <- sapply(my.dbdcat.ent, length)
+    res <- .doHyperGTest(p, my.dbdcat.ent, list(), genes)
+    res <- data.frame(Pvalue=res$p, OddsRatio=res$odds,
+                      ExpCount=res$expected, Count=count,
+                      Size=size, row.names=names(res$p))
+    res[ order(res$Pvalue), ]
+  })
+
+  new("miRNAListHyperGResult",
+      reslist=result,
+      annotation=p@annotation,
+      geneIds=p@geneIds,
+      testName=c("miRNA", "List"),
+      testDirection=p@testDirection,
+      pvalueCutoff=p@pvalueCutoff,
+      conditional=p@conditional,
+      universeGeneIds=p@universeGeneIds,
+      catToGeneId=dbdcat.ent)
 }
 
-getmiRNAToProbeMap <- function(miRNA2allprobes, miRNAIds) {
-    probeAnnot = as.list(miRNA2allprobes)
-    if (!missing(miRNAIds))
-      probeAnnot = probeAnnot[miRNAIds]
-    removeLengthZeroAndMissing(probeAnnot)
-}
+#####################
+## hyperGTest
 
-####################################
-## hyperGTest-methods.R
+setMethod("hyperGTest",
+          signature(p="miRNAListHyperGParams"), isa.miRNAListHyperGTest)
 
-genemiRNAHyperGeoTest <- function(entrezGeneIds, lib, universe=NULL)
-{
-    .Defunct("hyperGTest")
-    if (missing(universe) || is.null(universe))
-      universe <- character(0)
-    params <- new("miRNAHyperGParams",
-                  geneIds=entrezGeneIds,
-                  universeGeneIds=universe,
-                  annotation=lib)
-    hyperGTest(params)
-}
-
-#####################################
-## summary-methods.R
-
-setMethod("summary", signature(object="miRNAHyperGResult"),
-          function(object, pvalue=pvalueCutoff(object),
-                   categorySize=NULL, htmlLinks=FALSE){
-              miRNA_URL <- "http://www.targetscan.org/cgi-bin/targetscan/vert_40/targetscan.cgi?species=%s&gid=&mir_c=%s&mir_sc=&mir_nc=&mirg="
-              annOrg <- get(paste(annotation(object), "ORGANISM", sep=""))
-              orgSpecifier <- switch(annOrg,
-                                     "Homo sapiens"="Human",
-                                     "Mus musculus"="Mouse",
-                                     "Rattus norvegicus"="Rat",
-                                     ## will need others in future
-                                     "Human")
-              df <- callNextMethod(object=object, pvalue=pvalue,
-                                   categorySize=categorySize)
-              if(nrow(df) == 0){
-                  df$Term <- character(0)
-                  return(df)
-              }
-##               miRNAIds <- df[[1]]
-##               keggEnv <- getAnnMap("PATHID2NAME", "KEGG", load=TRUE)
-##               keggTerms <- unlist(mget(keggIds, keggEnv, ifnotfound=NA))
-##               if(htmlLinks){
-##                   keggIdUrls <- sapply(keggIds,
-##                                        function(x)
-##                                        sprintf(KEGG_URL, orgSpecifier, x))
-##                   keggTerms <- paste('<a href="', keggIdUrls, '">', keggTerms,
-##                                      '</a>', sep="")
-##               }
-##               df$Term <- keggTerms
-              df
+setMethod("show", signature(object="miRNAListHyperGParams"),
+          function(object) {
+              cat("A", class(object), "instance\n")
+              cat("  category:", object@categoryName, "\n")
+              cat("annotation:", object@annotation, "\n")
           })
 
-setMethod("htmlReport", signature(r="miRNAHyperGResult"),
-          function(r, file="", append=FALSE, label="",
-                   digits=3, summary.args=list(htmlLinks=TRUE)){
-              callNextMethod(r=r, file=file, append=append,
-                             label=label, digits=digits,
-                             summary.args=summary.args)
+##################################################
+## miRNAListHyperGResult
+##################################################
+
+setClass("miRNAListHyperGResult",
+         contains="HyperGResultBase",
+         representation=representation(
+           reslist="list",
+           conditional="logical",
+           universeGeneIds="character",
+           catToGeneId="list"),
+         prototype=prototype(
+           testName="miRNA",
+           reslist=list(),
+           universeGeneIds=character(),
+           catToGeneId=list()))
+
+setMethod("show", signature(object="miRNAListHyperGResult"),
+          function(object) {
+            no.sign <- sapply(object@reslist, function(x) {
+              sum(x$Pvalue < object@pvalueCutoff[1])
+            })
+            no.sign <- paste(min(no.sign), sep="-", max(no.sign))
+            tested <- sum(sapply(object@reslist, function(x) {
+              nrow(x)
+            }))
+
+            gs <- range(geneMappedCount(object))
+            gs <- paste(gs[1], sep="-", gs[2])
+            
+            cat(description(object), "\n")
+            cat(tested, testName(object), "ids tested ")
+            cat("(", no.sign, " have p < ", object@pvalueCutoff[1],
+                ")\n", sep="")
+            cat("Selected gene set sizes:", gs, "\n")
+            cat("     Gene universe size:", universeMappedCount(object), "\n")
+            cat("     Annotation package:", annotation(object), "\n")
           })
 
-####################################
-## universeBuilder-methods.R
+setMethod("summary", signature(object="miRNAListHyperGResult"),
+          function(object, pvalue=pvalueCutoff(object), categorySize=NULL) {
 
-setMethod("universeBuilder", signature(p="miRNAHyperGParams"),
-          function(p) {
-                getUniverseViamiRNA(p)
+            if (! is.null(categorySize)) {
+              lapply(object@reslist, function(x) {
+                show <- x$Pvalue < pvalue & x$Size >= categorySize
+                x[show,]
+              })
+            } else {
+              lapply(object@reslist, function(x) {
+                show <- x$Pvalue < pvalue
+                x[show,]
+              })
+            }
           })
 
-getUniverseViamiRNA <- function(p) {
-    entrezIds <- universeGeneIds(p)
-    probe2miRNA <- as.list(getDataEnv("miRNA", annotation(p)))
-    notNA <- sapply(probe2miRNA, function(x) !(length(x) == 1 && is.na(x)))
-    probe2miRNA <- probe2miRNA[notNA]
-    probes <- names(probe2miRNA)
-    getUniverseHelper(probes, p@datPkg, universeGeneIds(p))
-}
+setMethod("htmlReport", signature=(r="miRNAListHyperGResult"),
+          function(r, file="", append=FALSE, label="", digits=3,
+                   summary.args=NULL) {
+            callNextMethod(r=r, file=file, append=append,
+                           label=label, digits=digits,
+                           summary.args=summary.args)            
+          })
 
+setMethod("pvalues", signature(r="miRNAListHyperGResult"),
+          function(r) lapply(r@reslist, function(x) {
+            structure(x$Pvalue, names=rownames(x))
+          }))
+
+setMethod("geneCounts", signature(r="miRNAListHyperGResult"),
+          function(r) lapply(r@reslist, function(x) {
+            structure(x$Count, names=rownames(x))
+          }))
+
+setMethod("oddsRatios", signature(r="miRNAListHyperGResult"),
+          function(r) lapply(r@reslist, function(x) {
+            structure(x$OddsRatio, names=rownames(x))
+          }))
+
+setMethod("expectedCounts", signature(r="miRNAListHyperGResult"),
+          function(r) lapply(r@reslist, function(x) {
+            structure(x$ExpCount, names=rownames(x))
+          }))
+
+setMethod("universeCounts", signature(r="miRNAListHyperGResult"),
+          function(r) lapply(r@reslist, function(x) {
+            structure(x$Size, names=rownames(x))
+          }))
+
+setMethod("universeMappedCount", signature(r="miRNAListHyperGResult"),
+          function(r) length(r@universeGeneIds))
+
+setMethod("geneMappedCount", signature(r="miRNAListHyperGResult"),
+          function(r) sapply(r@geneIds, length))
+
+setMethod("geneIdUniverse", signature(r="miRNAListHyperGResult"),
+          function(r, cond=FALSE) r@catToGeneId)
+
+setMethod("condGeneIdUniverse", signature(r="miRNAListHyperGResult"),
+          function(r) geneIdUniverse(r, cond=TRUE))
+
+## This function gives all the hits for the tested categories.
+setMethod("geneIdsByCategory", signature(r="miRNAListHyperGResult"),
+          function(r, catids=NULL) {
+            lapply(r@geneIds, function(genes) {
+              tmp <- lapply(r@catToGeneId, function(x) {
+                genes [ genes %in% x ]
+              })
+              tmp <- tmp[ sapply(tmp, length) != 0 ]
+              ord <- order(names(tmp))
+              tmp <- tmp[ord]
+            })
+          })
+
+setMethod("sigCategories", signature(r="miRNAListHyperGResult"),
+          function(r, p) {
+            if (missing(p)) { p <- pvalueCutoff(r) }
+            lapply(r@reslist, function(x) {
+              rownames(x)[x$Pvalue < p]
+            })
+          })
 
 isa.miRNA <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
-                    hgCutoff=0.001, correction=TRUE) {
+                     hgCutoff=0.001, correction=TRUE) {
 
   if (is.null(organism)) organism <- isaresult$rundata$organism
   if (is.null(annotation)) annotation <- isaresult$rundata$annotation
   if (is.null(features)) features <- isaresult$rundata$features  
-  shortorganism <- abbreviate(organism, 2)
-  require(paste(sep=".", "org", shortorganism, "eg", "db"), character.only=TRUE)
+
+  if (organism != "Mus musculus") {
+    stop("This method is only implemented for `Mus musculus'")
+  }
   
   require(paste(sep="", annotation, ".db"), character.only=TRUE)
-  require(annotate)
   require(Category)
 
   ENTREZ <- get(paste(sep="", annotation, "ENTREZID"))
 
-  cat(" -- Extracting Entrez genes")
-  
+  cat(" -- Extracting Entrez genes\n")
+
   selectedEntrezIds <- lapply(seq_len(ncol(isaresult$genes)),
                               function(x) features[isaresult$genes[,x] != 0])
   selectedEntrezIds <- lapply(selectedEntrezIds,
@@ -138,100 +279,28 @@ isa.miRNA <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
   entrezUniverse <- unique(unlist(mget(features, ENTREZ)))
 
   params <-
-    try( new("miRNAHyperGParams", geneIds=character(),
-             universeGeneIds = entrezUniverse, annotation=annotation,
+    try( new("miRNAListHyperGParams", geneIds = selectedEntrezIds,
+             universeGeneIds = entrezUniverse, annotation = annotation,
              pvalueCutoff = hgCutoff, testDirection = "over") )
 
-  valid <- sapply(selectedEntrezIds, length) != 0
-  params@geneIds <- selectedEntrezIds[valid]
-
-  hgOver <- vector(mode="list", length=length(selectedEntrezIds))
-
   cat(" -- Doing test\n")
-  hgOver[valid] <- QhyperGTestmiRNA(params, correction=correction)
-  
+  hgOver <- hyperGTest(params)
+
   hgOver
 }
+
+##########################################
+
+## Give it the Predicted_Targets_Info.txt file
+convert.miRNA <- function(file) {
   
-QhyperGTestmiRNA <- function(params, correction) {
-
-  ## These are not yet implemented
-  if (params@testDirection == "under") {
-    stop("Under-representation is not implemented yet")
-  }
-
-  ## Check that we have the require Entrez <-> miRNA mappings,
-  pkg <- sub(".db", "", params@datPkg@name, fixed=TRUE)
-  organism <- get(paste(sep="", pkg, "ORGANISM"))
-  organism <- abbreviate(organism, 2)
-  
-##   maps <- paste(sep=".", "org", organism,
-##                 c("egmiRNA", "egmiRNA2EG", "egmiRNAHAVE"))
-##   if (any(! sapply(maps, exists))) {
-##     stop("Some Entrez <-> miRNA mappings do not exist: ", sapply(maps,exists))
-##   }
-  
-  ## Filter the gene universe to include genes that have at least one annotation
-  ## in the current ontology
-  havelist <- get(paste(sep="", "org.", organism, ".egmiRNAHAVE"))
-  if (length(params@universeGeneIds)==0) {
-    params@univerGeneIds <- havelist
-  } else { 
-    params@universeGeneIds <- intersect(havelist, params@universeGeneIds)
-  }
-  
-  ## Pre-generate the filtered list of probes, only include those that are
-  ## in the universe
-  if (!is.list(params@geneIds)) {
-    params@geneIds <-list(params@geneIds)
-  }
-  all.egs <- get(paste(sep=".", "org", organism, "egmiRNA2EG"))
-  if (length(params@geneIds) > 3) {
-    simplified <- TRUE
-    egmiRNA2EG.mine <- new.env()
-    all <- as.list(all.egs)
-    all <- lapply(all, function(x) intersect(x, params@universeGeneIds))
-    for (n in seq(all)) {
-      assign(names(all)[n], all[[n]], envir=egmiRNA2EG.mine)
-    }
-  } else {
-    simplified <- FALSE
-    egmiRNA2EG.mine <- all.egs
-  }
-
-  ## Ok, start testing
-  all.cc <- get(paste(sep="", "org.", organism, ".egmiRNA"))
-      
-  result <- lapply(params@geneIds, function(genes) {
-
-    genes <- as.character(genes[!is.na(genes)])
-    tmp <- mget(genes, all.cc, ifnotfound=NA)
-    tmp <- tmp[ !is.na(tmp) ]
-    
-    tmp2 <- unique(as.character(unlist(unname(tmp))))
-    tmp5 <- mget(tmp2, egmiRNA2EG.mine)
-    if (!simplified) {
-      tmp5 <- lapply(tmp5, function(x) intersect(x, params@universeGeneIds))
-    }
-
-    selected <- genes[ genes %in% params@universeGeneIds ]
-    res <- .doHyperGTest(params, tmp5, list(), selected)
-    res$size <- sapply(tmp5, length)
-    res$count <- sapply(tmp5, function(x) sum(selected %in% x))
-    drive <- lapply(tmp5, function(x) genes[which(genes %in% x)])
-    res$drive <- sapply(drive, paste, collapse=";")
-
-    if (correction && length(res$p)>0) {
-      res$p <- res$p * length(res$size)
-      res$p <- pmin(res$p, 1)
-    }
-    
-    res <- data.frame(Pvalue=res$p, OddsRatio=res$odds, ExpCount=res$expected,
-                      Count=res$count, Size=res$size, Drive=res$drive,
-                      row.names=names(res$p))
-    res[ order(res$Pvalue), ]
-  })
-
-  result
+  tab <- read.delim(file, header=TRUE, comment.char="#")
+  tab <- tab[ tab$Species.ID=="10090", ]
+  tab <- tab[,2:1]
+  tab <- unique(tab)
+  tab <- as.matrix(tab)
+  tab[] <- sub("^[ ]+", "", tab)
+  tab[] <- sub("[ ]+$", "", tab)
+  tab
 }
-
+    
