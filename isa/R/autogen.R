@@ -2,7 +2,7 @@
 autogen.table <- function(nm, isares, target.dir,
                           modules=seq_len(ncol(isares$genes)),
                           template=system.file("autogen", package="isa"),
-                          GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL,
+                          GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL, DBD=NULL,
                           htmltitle=NULL, notes=NULL, seed=NULL) {
 
   chip <- isares$rundata$annotation
@@ -90,6 +90,26 @@ autogen.table <- function(nm, isares, target.dir,
     tables.miRNA <- ""
   }
 
+  if (!is.null(DBD)) {
+
+    dbd <- function(obj, pvalue=0.05) {
+      if (nrow(obj)==0) { return(""); }
+      pval <- obj$Pvalue[1]
+      if (pval > pvalue) { return("") }
+      uc <- obj$Size[1]
+      ec <- obj$ExpCount[1]
+      gc <- obj$Count[1]
+      ca <- rownames(obj)[1]
+      paste(sep="", ca, " <span class=\"pvalue\"><br/>(", format(pval), "/", format(ec),
+            "/", gc, "/", uc, ")</span>")
+    }
+    
+    print("  -- DBD")
+    tables.DBD <- lapply(DBD@reslist[modules], h, pvalue=0.05)
+  } else {
+    tables.DBD <- ""
+  }
+    
   if (!is.null(CHR)) {
     
     chr <- function(obj, pvalue=0.05) {
@@ -128,6 +148,10 @@ autogen.table <- function(nm, isares, target.dir,
     tables.miRNA <- paste(sep="", "<td>", tables.miRNA, "</td>")
     head <- c(head, "miRNA")
   }
+  if (length(tables.DBD) != 1 || tables.DBD != "") {
+    tables.DBD <- paste(sep="", "<td>", tables.DBD, "</td>")
+    head <- c(head, "DBD")
+  }
   if (length(tables.CHR) != 1 || tables.CHR != "") {
     tables.CHR <- paste(sep="", "<td>", tables.CHR, "</td>")
     head <- c(head, "CHR")
@@ -147,6 +171,7 @@ autogen.table <- function(nm, isares, target.dir,
                  "<td>", tables.MF, "</td>",
                  "<td>", tables.KEGG, "</td>",
                  tables.miRNA,
+                 tables.DBD,
                  tables.CHR,
                  "</tr>")
 
@@ -198,12 +223,12 @@ autogen.table <- function(nm, isares, target.dir,
 autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
                             target.dir,
                             template=system.file("autogen", package="isa"),
-                            GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL,
+                            GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL, DBD=NULL,
                             cond.to.include=NULL,
                             markup=numeric(), markdown=numeric(),
                             sep=NULL, seed=NULL, drive.BP=NULL,
                             drive.CC=NULL, drive.MF=NULL, drive.KEGG=NULL,
-                            drive.miRNA=NULL) {
+                            drive.miRNA=NULL, drive.DBD=NULL) {
 
   if (!file.exists(target.dir)) {
     dir.create(target.dir)
@@ -232,6 +257,7 @@ autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
   if (is.null(drive.MF)) drive.MF <- geneIdsByCategory(GO[[3]])
   if (is.null(drive.KEGG)) drive.KEGG <- geneIdsByCategory(KEGG)
   if (is.null(drive.miRNA)) drive.miRNA <- geneIdsByCategory(miRNA) 
+  if (is.null(drive.DBD)) drive.DBD <- geneIdsByCategory(DBD) 
   
   ## Then generate modules
   for (i in seq_along(modules)) {
@@ -239,12 +265,12 @@ autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
     nx <- if (i!=length(modules)) modules[i+1] else modules[1]
     px <- if (i!=1) modules[i-1] else modules[length(modules)]
     isa.autogen.module(nm, isares, x, target.dir=target.dir, template=template,
-                       GO=GO, KEGG=KEGG, miRNA=miRNA, CHR=CHR,
+                       GO=GO, KEGG=KEGG, miRNA=miRNA, DBD=DBD, CHR=CHR,
                        cond.to.include=cond.to.include,
                        markup=markup, markdown=markdown, sep=sep,
                        seed=seed, drive.BP=drive.BP, drive.CC=drive.CC,
                        drive.MF=drive.MF, drive.KEGG=drive.KEGG,
-                       drive.miRNA=drive.miRNA,
+                       drive.miRNA=drive.miRNA, drive.DBD=drive.DBD,
                        next.module=nx, prev.module=px)
   }
   
@@ -252,11 +278,11 @@ autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
 }
 
 isa.autogen.module <- function(nm, isares, module, target.dir, template,
-                               GO, KEGG, miRNA, CHR, cond.to.include,
+                               GO, KEGG, miRNA, CHR, DBD, cond.to.include,
                                markup, markdown, sep=NULL,
                                seed=NULL, drive.BP=NULL, drive.CC=NULL,
                                drive.MF=NULL, drive.KEGG=NULL,
-                               drive.miRNA=NULL,
+                               drive.miRNA=NULL, drive.DBD=NULL,
                                next.module=NULL, prev.module=NULL) {
 
   require(Cairo)
@@ -524,6 +550,73 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   } else {
     tables.miRNA <- "<p>Not tested</p>"
   }
+
+  if (!is.null(DBD)) {
+
+    h <- function(obj, pvalue=0.05, maxlines=NA, drive=NULL) {
+      if (nrow(obj)==0) { return("<tr><td>No enriched DBD TFs</td></tr>") } 
+      pval <- obj$Pvalue
+      v <- pval <= pvalue
+      if (sum(v)==0) { return("<tr><td>No enriched DBD TFs</td></tr>") }
+      if (is.na(maxlines) || maxlines>sum(v)) { maxlines <- sum(v) }
+      pval <- pval[v][1:maxlines]
+      uc <- unname(obj$Size)[v][1:maxlines]
+      ec <- unname(obj$ExpCount)[v][1:maxlines]
+      gc <- unname(obj$Count)[v][1:maxlines]
+      ca <- rownames(obj)[v][1:maxlines]
+      df <- data.frame(Pvalue=pval, ECount=round(ec, 2), Count=gc, Size=uc)
+      rownames(df) <- ca
+      
+      cat <- "mr"
+      drive <- drive[rownames(obj)][v]      
+      drive <- lapply(drive, function(x) unname(unlist(mget(x, SYMBOL))))
+      drive <- lapply(drive, sort)
+      drive <- lapply(drive, paste, collapse=", ")
+      df$Count <- paste(sep="", '<a href="#" onclick="togglestuff2(\'d.', cat, '.', seq(along=df[,1]),
+                        '\'); return false;">', df$Count, '</a><br/><span id="d.', cat, '.', seq(along=df[,1]),
+                        '" class="d.', cat, '" style="font-size:0.8em;display:none;visibility:hidden;">', drive,
+                          '</span>')
+      
+      xdf <- xtable(df, display=c("s", "e", "g", "d", "d"),
+                    digits=c(NA, 3, 4, 4, 4))
+      tfname <- tempfile()
+      zz <- file(tfname, "w")
+      sink(zz)
+      print(xdf, "html")
+      sink() 
+      close(zz)
+      foo <- readLines(tfname)
+      unlink(tfname)
+      foo <- foo[4:(length(foo)-1)]
+      
+      foo <- gsub("&lt ", "<", foo, fixed=TRUE)
+      foo <- gsub("&gt ", ">", foo, fixed=TRUE)
+      foo <- gsub("<TR>", "<tr>", foo)
+      foo <- gsub("</TR>", "</tr>", foo)
+      foo <- gsub("<TD", "<td", foo)
+      foo <- gsub("</TD>", "</td>", foo)
+      foo <- gsub("<TH", "<th", foo)
+      foo <- gsub("</TH>", "</th>", foo)
+      link <- c("http://dbd.mrc-lmb.cam.ac.uk/DBD/index.cgi?Search/Domain=")
+      foo <- sub("(<td[^>]*>[ ]*)([^< ]+)",
+                 paste(sep="", '\\1<a href="', link[1], short.organism, link[2],
+                       '\\2', link[3], '"> ', '\\2 </a>'), foo)
+      
+      foo <- sub("<th> Count </th>",
+                 paste(sep="",
+                       '<th> <a href="#" onclick="togglestuff3(\'d.', cat,
+                       '\');return false;"> Count </a> </th>'),
+                 foo, fixed=TRUE)
+      
+      foo <- color.table(foo)
+      paste(foo, collapse="\n")
+    }
+    
+    tables.DBD <- h(DBD@reslist[[module]], pvalue=0.05, maxlines=NA,
+                      drive=drive.DBD[[module]])
+  } else {
+    tables.DBD <- "<p>Not tested</p>"
+  }
   
   if (!is.null(CHR)) {
 
@@ -696,6 +789,9 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   if (!is.null(miRNA)) {
     t.miRNA <- paste(sep="\n","<!-- tablemiRNA -->", tables.miRNA)
   }
+  if (!is.null(DBD)) {
+    t.DBD <- paste(sep="\n","<!-- tableDBD -->", tables.DBD)
+  }
   if (!is.null(CHR)) {
     t.CHR <- paste(sep="\n","<!-- tableCHR -->", tables.CHR)
   }
@@ -705,6 +801,9 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   lines[ grep("<!-- tableKEGG -->", lines)[1] ] <- t.KEGG
   if (!is.null(miRNA)) {
     lines[ grep("<!-- tablemiRNA -->", lines)[1] ] <- t.miRNA
+  }
+  if (!is.null(DBD)) {
+    lines[ grep("<!-- tableDBD -->", lines)[1] ] <- t.DBD
   }
   if (!is.null(CHR)) {
     lines[ grep("<!-- tableCHR -->", lines)[1] ] <- t.CHR
