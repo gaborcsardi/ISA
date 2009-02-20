@@ -6,7 +6,7 @@ export(isa.in.silico, normalize, isa, isa.merge,
 
 export(robustness, isa.filter.robust, ROC, ROC.integral)
 
-export(isa.GO, isa.KEGG, isa.CHR, isa.miRNA)
+export(isa.GO, isa.KEGG, isa.CHR, isa.miRNA, isa.DBD)
 
 export(gograph, gograph.plot, exp.plot.create, exp.plot.colbar,
        exp.plot, cond.plot, overlap, overlap.plot, mnplot, ISAmnplot,
