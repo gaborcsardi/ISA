@@ -291,7 +291,6 @@ isa.miRNA <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
 
 ##########################################
 
-## Give it the Predicted_Targets_Info.txt file
 convert.miRNA <- function(file) {
   
   tab <- read.delim(file, header=TRUE, comment.char="#")
@@ -301,6 +300,7 @@ convert.miRNA <- function(file) {
   tab <- as.matrix(tab)
   tab[] <- sub("^[ ]+", "", tab)
   tab[] <- sub("[ ]+$", "", tab)
+
   tab
 }
     

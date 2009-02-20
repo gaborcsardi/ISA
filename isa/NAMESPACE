@@ -18,7 +18,4 @@ export(ppa.in.silico, ppa.normalize, ppa, ppa.step, ppa.unique)
 
 ##########
 
-exportClasses("miRNAHyperGParams", "CHRHyperGParams",
-              "miRNAHyperGResult", "CHRHyperGResult")
-
 useDynLib(isa)
