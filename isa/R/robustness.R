@@ -61,9 +61,9 @@ isa.filter.robust <- function(data, nm, isares, perms=1, g=NULL, dots=TRUE) {
   cat(sep="",
       "Eliminating ", sum(!keep), ", and keeping ", sum(keep), " modules.\n")
 
-  isares$genes <- isares$genes[, keep]
-  isares$conditions <- isares$conditions[, keep]
-  isares$seeddata <- isares$seeddata[ keep, ]
+  isares$genes <- isares$genes[, keep,drop=FALSE]
+  isares$conditions <- isares$conditions[, keep,drop=FALSE]
+  isares$seeddata <- isares$seeddata[ keep,,drop=FALSE ]
   isares$rundata$rob.limit <- rob2
   rob <- rob[ keep ]
   isares$seeddata$rob <- rob
