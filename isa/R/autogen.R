@@ -252,13 +252,13 @@ autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
               paste(sep="", target.dir, "/images/", f) )
   }
   
-  if (is.null(drive.BP)) drive.BP <- geneIdsByCategory(GO[[1]])
-  if (is.null(drive.CC)) drive.CC <- geneIdsByCategory(GO[[2]])
-  if (is.null(drive.MF)) drive.MF <- geneIdsByCategory(GO[[3]])
-  if (is.null(drive.KEGG)) drive.KEGG <- geneIdsByCategory(KEGG)
-  if (is.null(drive.miRNA)) drive.miRNA <- geneIdsByCategory(miRNA) 
-  if (is.null(drive.DBD)) drive.DBD <- geneIdsByCategory(DBD) 
-  if (is.null(drive.CHR)) drive.CHR <- geneIdsByCategory(CHR) 
+  if (is.null(drive.BP) && !is.null(GO)) drive.BP <- geneIdsByCategory(GO[[1]])
+  if (is.null(drive.CC) && !is.null(GO)) drive.CC <- geneIdsByCategory(GO[[2]])
+  if (is.null(drive.MF) && !is.null(GO)) drive.MF <- geneIdsByCategory(GO[[3]])
+  if (is.null(drive.KEGG) && !is.null(KEGG)) drive.KEGG <- geneIdsByCategory(KEGG)
+  if (is.null(drive.miRNA) && !is.null(miRNA)) drive.miRNA <- geneIdsByCategory(miRNA) 
+  if (is.null(drive.DBD) && !is.null(miRNA)) drive.DBD <- geneIdsByCategory(DBD) 
+  if (is.null(drive.CHR) && !is.null(CHR)) drive.CHR <- geneIdsByCategory(CHR) 
   
   ## Then generate modules
   for (i in seq_along(modules)) {
