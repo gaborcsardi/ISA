@@ -57,9 +57,22 @@ setMethod("categoryToEntrezBuilder",
                               stop("Bad testDirection slot"))
 
            genes <- unique(unlist(geneIds(p)))
-           data(miRNA.mm, package="isa")
-           cat.eg <- tapply(as.character(miRNA.mm[,1]),
-                            as.character(miRNA.mm[,2]),
+           
+           ann <- p@annotation
+           org <- get(paste(sep="", ann, "ORGANISM"))
+           short.org <- abbreviate(org, 2)
+           if (short.org == "Mm") {
+             data(miRNA.mm, package="isa")
+             miRNA <- miRNA.mm
+           } else if (short.org=="Hs") {
+             data(miRNA.hs, package="isa")
+             miRNA <- miRNA.hs
+           } else {
+             stop("Unknown organism in miRNA enrichment")
+           }
+           
+           cat.eg <- tapply(as.character(miRNA[,1]),
+                            as.character(miRNA[,2]),
                             c)
            valid <- sapply(cat.eg, function(x) any(genes %in% x))           
            res <- cat.eg[valid]
@@ -73,8 +86,21 @@ setMethod("categoryToEntrezBuilder",
 setMethod("universeBuilder", signature=(p="miRNAListHyperGParams"),
           function(p) {
             entrezIds <- universeGeneIds(p)
-            data(miRNA.mm, package="isa")
-            entrez <- unique(miRNA.mm[,1])
+
+            ann <- p@annotation
+            org <- get(paste(sep="", ann, "ORGANISM"))
+            short.org <- abbreviate(org, 2)
+            if (short.org == "Mm") {
+              data(miRNA.mm, package="isa")
+              miRNA <- miRNA.mm
+            } else if (short.org=="Hs") {
+              data(miRNA.hs, package="isa")
+              miRNA <- miRNA.hs
+            } else {
+              stop("Unknown organism in miRNA enrichment")
+            }
+
+            entrez <- unique(miRNA[,1])
             entrezIds[ entrezIds %in% entrez ]
           })
 
@@ -258,7 +284,7 @@ isa.miRNA <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
   if (is.null(annotation)) annotation <- isaresult$rundata$annotation
   if (is.null(features)) features <- isaresult$rundata$features  
 
-  if (organism != "Mus musculus") {
+  if (! organism %in% c("Mus musculus", "Homo sapiens")) {
     stop("This method is only implemented for `Mus musculus'")
   }
   
@@ -294,7 +320,7 @@ isa.miRNA <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
 convert.miRNA <- function(file) {
   
   tab <- read.delim(file, header=TRUE, comment.char="#")
-  tab <- tab[ tab$Species.ID=="10090", ]
+  tab <- tab[ tab$Species.ID=="9606", ]  # mouse: 10090
   tab <- tab[,2:1]
   tab <- unique(tab)
   tab <- as.matrix(tab)
