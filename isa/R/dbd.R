@@ -57,9 +57,22 @@ setMethod("categoryToEntrezBuilder",
                               stop("Bad testDirection slot"))
 
            genes <- unique(unlist(geneIds(p)))
-           data(dbd.mm, package="isa")
-           cat.eg <- tapply(as.character(dbd.mm[,1]),
-                            as.character(dbd.mm[,2]),
+
+           ann <- p@annotation
+           org <- get(paste(sep="", ann, "ORGANISM"))
+           short.org <- abbreviate(org, 2)
+           if (short.org == "Mm") {
+             data(dbd.mm, package="isa")
+             dbd <- dbd.mm
+           } else if (short.org=="Hs") {
+             data(dbd.hs, package="isa")
+             dbd <- dbd.hs
+           } else {
+             stop("Unknown organism in DBD enrichment")
+           }
+
+           cat.eg <- tapply(as.character(dbd[,1]),
+                            as.character(dbd[,2]),
                             c)
            valid <- sapply(cat.eg, function(x) any(genes %in% x))           
            res <- cat.eg[valid]
@@ -73,8 +86,21 @@ setMethod("categoryToEntrezBuilder",
 setMethod("universeBuilder", signature=(p="DBDListHyperGParams"),
           function(p) {
             entrezIds <- universeGeneIds(p)
-            data(dbd.mm, package="isa")
-            entrez <- unique(dbd.mm[,1])
+
+            ann <- p@annotation
+            org <- get(paste(sep="", ann, "ORGANISM"))
+            short.org <- abbreviate(org, 2)
+            if (short.org == "Mm") {
+              data(dbd.mm, package="isa")
+              dbd <- dbd.mm
+            } else if (short.org=="Hs") {
+              data(dbd.hs, package="isa")
+              dbd <- dbd.hs
+            } else {
+              stop("Unknown organism in DBD enrichment")
+            }
+            
+            entrez <- unique(dbd[,1])
             entrezIds[ entrezIds %in% entrez ]
           })
 
@@ -258,8 +284,8 @@ isa.DBD <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
   if (is.null(annotation)) annotation <- isaresult$rundata$annotation
   if (is.null(features)) features <- isaresult$rundata$features  
 
-  if (organism != "Mus musculus") {
-    stop("This method is only implemented for `Mus musculus'")
+  if (! organism %in% c("Mus musculus", "Homo sapiens")) {
+    stop("This method is only implemented for `Mus musculus' and 'Homo sapiens'")
   }
   
   require(paste(sep="", annotation, ".db"), character.only=TRUE)
@@ -291,15 +317,16 @@ isa.DBD <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
 
 #################
 
-convert.dbd <- function(file) {
+convert.dbd <- function(file, org="Mm") {  
   
   tab <- read.delim(file, header=FALSE, comment.char="#")
   tab <- tab[,c(2,4)]
   tab <- unique(tab)
 
-  library(org.Mm.eg.db)
+  library(paste("org.", org, ".eg.db", sep=""), character.only=TRUE)
+  DBI <- get(paste("org.",org,".egENSEMBLPROT2EG", sep=""))
 
-  map <- mget(unique(as.character(tab[,1])), org.Mm.egENSEMBLPROT2EG,
+  map <- mget(unique(as.character(tab[,1])), DBI,
               ifnotfound=NA)
 
   len <- map[as.character(tab[,1])]
