@@ -257,7 +257,7 @@ autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
   if (is.null(drive.MF) && !is.null(GO)) drive.MF <- geneIdsByCategory(GO[[3]])
   if (is.null(drive.KEGG) && !is.null(KEGG)) drive.KEGG <- geneIdsByCategory(KEGG)
   if (is.null(drive.miRNA) && !is.null(miRNA)) drive.miRNA <- geneIdsByCategory(miRNA) 
-  if (is.null(drive.DBD) && !is.null(miRNA)) drive.DBD <- geneIdsByCategory(DBD) 
+  if (is.null(drive.DBD) && !is.null(DBD)) drive.DBD <- geneIdsByCategory(DBD) 
   if (is.null(drive.CHR) && !is.null(CHR)) drive.CHR <- geneIdsByCategory(CHR) 
   
   ## Then generate modules
