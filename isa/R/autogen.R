@@ -113,6 +113,7 @@ autogen.table <- function(nm, isares, target.dir,
   if (!is.null(CHR)) {
     
     chr <- function(obj, pvalue=0.05) {
+      if (nrow(obj)==0) { return("") }
       pval <- obj$Pvalue[1]
       if (pval > pvalue) { return("") }
       uc <- obj$Size[1]
