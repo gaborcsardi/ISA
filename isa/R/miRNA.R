@@ -285,7 +285,7 @@ isa.miRNA <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
   if (is.null(features)) features <- isaresult$rundata$features  
 
   if (! organism %in% c("Mus musculus", "Homo sapiens")) {
-    stop("This method is only implemented for `Mus musculus'")
+    stop("This method is only implemented for `Mus musculus' and 'Homo sapiens'")
   }
   
   require(paste(sep="", annotation, ".db"), character.only=TRUE)
