@@ -9,13 +9,17 @@ isa.normalize <- function(data, prenormalize=TRUE, ...) {
   }
 
   ## Then normalize it
-  data@assayData$ec.exprs <- scale(t(exprs(data)))
+  ec.exprs <- scale(t(exprs(data)))
   if (prenormalize) {
-    data@assayData$eg.exprs <- scale(t(data@assayData$ec.exprs))
+    eg.exprs <- scale(t(ec.exprs))
   } else {
-    data@assayData$eg.exprs <- scale(exprs(data))
+    eg.exprs <- scale(exprs(data))
   }
 
+  data@assayData <- assayDataNew(exprs=exprs(data),
+                                 eg.exprs=eg.exprs,
+                                 ec.exprs=t(ec.exprs))
+  
   attr(data, "prenormalize") <- prenormalize
   attr(data, "hasNA") <- (any(is.na(data@assayData$eg.exprs)) |
                           any(is.na(data@assayData$ec.exprs)) )
@@ -71,23 +75,21 @@ isa <- function(eset, gene.seeds, cond.seeds,
   
   orig.tg <- thr.gene
   orig.tc <- thr.cond
-  if (length(thr.gene) != 1 && length(thr.gene) != noseeds) {
+  if (length(thr.gene) != 1 && length(thr.gene) != no.seeds) {
     stop("`thr.gene' does not have the right length")
   }
-  if (length(thr.cond) != 1 && length(thr.cond) != noseeds) {
+  if (length(thr.cond) != 1 && length(thr.cond) != no.seeds) {
     stop("`thr.cond' does not have the right length")
   }
-  thr.gene <- rep(thr.gene, noseeds)
-  thr.cond <- rep(thr.cond, noseeds)
+  thr.gene <- rep(thr.gene, no.seeds)
+  thr.cond <- rep(thr.cond, no.seeds)
 
   ## Put the seeds together
   all.seeds <- matrix(ncol=0, nrow=nrow(exprs(eset)))
   if (!missing(gene.seeds)) {
-    no.seeds <- no.seeds + ncol(gene.seeds)
     all.seeds <- cbind(all.seeds, gene.seeds)
   }
   if (!missing(cond.seeds)) {
-    no.seeds <- no.seeds + ncol(cond.seeds)
     cond.seeds <- isa.gene.from.cond(eset, cond.seeds=cond.seeds,
                                      thr.gene=tail(thr.gene, ncol(gene.seeds)),
                                      direction=direction[2])
@@ -145,7 +147,7 @@ isa <- function(eset, gene.seeds, cond.seeds,
 
     iter <- iter + 1
     one.step <- isa.step(eset, genes=gene.old, thr.gene=thr.gene,
-                         thr.cond=thr.cond)
+                         thr.cond=thr.cond, direction=direction)
 
     gene.new <- one.step[[2]]
     cond.new <- one.step[[1]]
@@ -159,15 +161,16 @@ isa <- function(eset, gene.seeds, cond.seeds,
     
     ## Mark oscillating ones, if requested
     if (oscillation && iter > 1) {
-      new.fire <- apply(g, 2, function(x) sum(round(x, 4)))
+      new.fire <- apply(gene.new, 2, function(x) sum(round(x, 4)))
       fire <- paste(sep=":", fire, new.fire)
-      osc <- logical(ncol(g))
+      osc <- logical(ncol(gene.new))
       osc[ (mat <- regexpr("(:.*:.*)\\1$", fire)) != -1] <- TRUE
       osc <- osc & !conv
       
       if (any(osc)) {
         mat <- cbind(mat[osc], attributes(mat, "match.length")[[1]][osc])
-        mat <- sapply(seq(length=nrow(mat)), function(x) substr(fire[osc][x], mat[x,1], mat[x,1]+mat[x,2]))
+        mat <- sapply(seq(length=nrow(mat)), function(x) substr(fire[osc][x],
+                            mat[x,1], mat[x,1]+mat[x,2]))
         mat <- sapply(mat, function(x) sum(utf8ToInt(x) == 58), USE.NAMES=FALSE )
         oscresult[index[osc]] <- mat/2
       }
@@ -192,6 +195,9 @@ isa <- function(eset, gene.seeds, cond.seeds,
     }
     
     if (ncol(gene.new)==0 || iter>maxiter) { break; }
+
+    gene.old <- gene.new
+    cond.old <- cond.new
     
   } ## End of main loop
 
@@ -214,7 +220,7 @@ na.multiply <- function(A, B) {
 isa.step <- function(eset, genes, thr.gene, thr.cond, direction) {
 
   Ec <- eset@assayData$ec.exprs
-  Eg <- eset@assayData$eg.exprs
+  Eg <- t(eset@assayData$eg.exprs)
 
   direction <- rep(direction, length=2)
   if (any(!direction %in% c("up", "updown", "down"))) {
@@ -232,11 +238,11 @@ isa.step <- function(eset, genes, thr.gene, thr.cond, direction) {
   }
 
   if ("hasNA" %in% names(attributes(eset)) && !attr(eset, "hasNA")) {
-    cond.new <- filter(Eg %*% genes,    tc, direction[1])
-    gene.new <- filter(Ec %*% cond.new, tg, direction[2])
+    cond.new <- filter(Eg %*% genes,    thr.cond, direction[1])
+    gene.new <- filter(Ec %*% cond.new, thr.gene, direction[2])
   } else {
-    cond.new <- filter(na.multiply(Eg, genes   ), tc, direction[1])
-    gene.new <- filter(na.multiply(Ec, cond.new), tg, direction[2])
+    cond.new <- filter(na.multiply(Eg, genes   ), thr.cond, direction[1])
+    gene.new <- filter(na.multiply(Ec, cond.new), thr.gene, direction[2])
   }
 
   list(cond.new, gene.new)
@@ -275,9 +281,9 @@ isa.gene.from.cond <- function(eset, cond.seeds, thr.cond, direction) {
   }
 
   if ("hasNA" %in% names(attributes(eset)) && !attr(eset, "hasNA")) {
-    gene.new <- filter(Ec %*% cond.seeds, tg, direction)
+    gene.new <- filter(Ec %*% cond.seeds, thr.gene, direction)
   } else {
-    gene.new <- filter(na.multiply(Ec, cond.seeds), tg, direction)
+    gene.new <- filter(na.multiply(Ec, cond.seeds), thr.gene, direction)
   }
 
   gene.new
