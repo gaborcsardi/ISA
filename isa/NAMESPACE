@@ -1,8 +1,8 @@
 import(Category)
 import(AnnotationDbi)
 
-export(isa.in.silico, normalize, isa, isa.merge,
-       isa.fix.oscillation, isa.step, isa.unique, generate.seeds)
+export(isa.in.silico, isa.normalize, isa, 
+       generate.seeds)
 
 export(robustness, isa.filter.robust, ROC, ROC.integral)
 

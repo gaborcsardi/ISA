@@ -1,0 +1,301 @@
+
+isa.normalize <- function(data, prenormalize=TRUE, ...) {
+  
+  require(Biobase)
+
+  ## Create an ExpressionSet first
+  if (!is(data, "ExpressionSet")) {
+    data <- new("ExpressionSet", exprs=data, ...)
+  }
+
+  ## Then normalize it
+  data@assayData$ec.exprs <- scale(t(exprs(data)))
+  if (prenormalize) {
+    data@assayData$eg.exprs <- scale(t(data@assayData$ec.exprs))
+  } else {
+    data@assayData$eg.exprs <- scale(exprs(data))
+  }
+
+  attr(data, "prenormalize") <- prenormalize
+  attr(data, "hasNA") <- (any(is.na(data@assayData$eg.exprs)) |
+                          any(is.na(data@assayData$ec.exprs)) )
+  
+  data
+}
+
+isa <- function(eset, gene.seeds, cond.seeds,
+                thr.gene, thr.cond=thr.gene,
+                direction=c("updown", "updown"),
+                convergence=c("cor", "loosy", "eps"),
+                cor.limit=0.99, eps=1e-4,
+                oscillation=TRUE, maxiter=100) {
+
+  if (( missing(gene.seeds) &&  missing(cond.seeds))) {
+    stop("No seeds, nothing to do")
+  }
+  if (!missing(gene.seeds) && nrow(gene.seeds) != nrow(exprs(eset))) {
+    stop("Invalid gene seed length")
+  }
+  if (!missing(cond.seeds) && nrow(cond.seeds) != ncol(exprs(eset))) {
+    stop("Invalud conditions seed length")
+  }
+  
+  if (thr.gene < 0 || thr.cond < 0) {
+    warning("Negative thresholds, are you sure about this?")
+  }
+  
+  direction <- rep(direction, length=2)
+  if (any(!direction %in% c("up", "down", "updown"))) {
+    stop("Invalid `direction' argument, should be `down', `up' or `updown'.")
+  }
+
+  convergence <- match.arg(convergence)
+  if (convergence == "cor") {
+    if (cor.limit <= 0) {
+      warning("Non-positive correlation limit for convergence.")
+    }
+  }
+  if (convergence == "eps") {
+    if (eps >= 1) {
+      warning("`eps' limit for convergence greater than one.")
+    }
+  }
+  
+  no.seeds <- 0
+  if (!missing(gene.seeds)) {
+    no.seeds <- no.seeds + ncol(gene.seeds)
+  }
+  if (!missing(cond.seeds)) {
+    no.seeds <- no.seeds + ncol(cond.seeds)
+  }
+  
+  orig.tg <- thr.gene
+  orig.tc <- thr.cond
+  if (length(thr.gene) != 1 && length(thr.gene) != noseeds) {
+    stop("`thr.gene' does not have the right length")
+  }
+  if (length(thr.cond) != 1 && length(thr.cond) != noseeds) {
+    stop("`thr.cond' does not have the right length")
+  }
+  thr.gene <- rep(thr.gene, noseeds)
+  thr.cond <- rep(thr.cond, noseeds)
+
+  ## Put the seeds together
+  all.seeds <- matrix(ncol=0, nrow=nrow(exprs(eset)))
+  if (!missing(gene.seeds)) {
+    no.seeds <- no.seeds + ncol(gene.seeds)
+    all.seeds <- cbind(all.seeds, gene.seeds)
+  }
+  if (!missing(cond.seeds)) {
+    no.seeds <- no.seeds + ncol(cond.seeds)
+    cond.seeds <- isa.gene.from.cond(eset, cond.seeds=cond.seeds,
+                                     thr.gene=tail(thr.gene, ncol(gene.seeds)),
+                                     direction=direction[2])
+    all.seeds <- cbind(all.seeds, cond.seeds)
+  }
+
+  ## All the data about this ISA run
+  rundata <- list(direction=direction, eps=eps, cor.limit=cor.limit,
+                  maxiter=maxiter, N=no.seeds, convergence=convergence,
+                  prenormalize=attr(eset, "prenormalize"),
+                  hasNA=attr(eset, "hasNA"),
+                  unique=FALSE, oscillation=oscillation,
+                  oscillation.fixed=FALSE)
+
+  ## All the seed data, this will be updated, of course
+  seeddata <- data.frame(iterations=NA, oscillation=FALSE,
+                         thr.gene=thr.gene, thr.cond=thr.cond,
+                         freq=rep(1, no.seeds), rob=rep(NA, no.seeds))
+  
+  if (length(all.seeds)==0) {
+    return(list(genes=all.seeds, conditions=matrix(ncol=0, nrow=ncol(eset)),
+                rundata=rundata, seeddata=seeddata))
+  }
+
+  ## Choose convergence checking function
+  if (convergence=="eps") {
+    check.convergence <- function(gene.old, gene.new, cond.old, cond.new) {
+      res <- (apply(gene.old-gene.new, 2, function(x) all(abs(x)<eps)) &
+              apply(cond.old-cond.new, 2, function(x) all(abs(x)<eps)))
+      res & !is.na(res)
+    }
+  } else if (convergence=="cor") {
+    check.convergence <- function(gene.old, gene.new, cond.old, cond.new) {
+      g.o <- scale(gene.old)
+      g.n <- scale(gene.new)
+      c.o <- scale(cond.old)
+      c.n <- scale(cond.new)
+      res <- (colSums(g.o * g.n) / (nrow(g.o)-1) > cor.limit &
+              colSums(c.o * c.n) / (nrow(c.o)-1) > cor.limit)
+      res & !is.na(res)
+    }
+  }
+
+  ## Initialize a couple of things
+  iter <- 0
+  index <- seq_len(ncol(all.seeds))
+  if (oscillation) { fire <- character(no.seeds) }
+  gene.old <- all.seeds
+  cond.old <- matrix(NA, nrow=ncol(eset), ncol=no.seeds)
+  gene.res <- matrix(NA, nrow=nrow(eset), ncol=no.seeds)
+  cond.res <- matrix(NA, nrow=ncol(eset), ncol=no.seeds)
+  
+  ## Main loop starts here
+  while (TRUE) {
+
+    iter <- iter + 1
+    one.step <- isa.step(eset, genes=gene.old, thr.gene=thr.gene,
+                         thr.cond=thr.cond)
+
+    gene.new <- one.step[[2]]
+    cond.new <- one.step[[1]]
+
+    ## Mark converged seeds
+    conv <- check.convergence(gene.old=gene.old, gene.new=gene.new,
+                              cond.old=cond.old, cond.new=cond.new)
+
+    ## Mark all zero seeds
+    zero <- apply(gene.new, 2, function(x) all(x==0))
+    
+    ## Mark oscillating ones, if requested
+    if (oscillation && iter > 1) {
+      new.fire <- apply(g, 2, function(x) sum(round(x, 4)))
+      fire <- paste(sep=":", fire, new.fire)
+      osc <- logical(ncol(g))
+      osc[ (mat <- regexpr("(:.*:.*)\\1$", fire)) != -1] <- TRUE
+      osc <- osc & !conv
+      
+      if (any(osc)) {
+        mat <- cbind(mat[osc], attributes(mat, "match.length")[[1]][osc])
+        mat <- sapply(seq(length=nrow(mat)), function(x) substr(fire[osc][x], mat[x,1], mat[x,1]+mat[x,2]))
+        mat <- sapply(mat, function(x) sum(utf8ToInt(x) == 58), USE.NAMES=FALSE )
+        oscresult[index[osc]] <- mat/2
+      }
+    } else {
+      osc <- FALSE
+    }
+    
+    ## These are all to throw out
+    drop <- which(conv | zero | osc)
+    
+    ## Drop the seeds to be dropped
+    if (length(drop) != 0) {
+      gene.res[,index[drop]] <- gene.new[,drop]
+      cond.res[,index[drop]] <- cond.new[,drop]
+      seeddata$iterations[index[drop]] <- iter
+      gene.new <- gene.new[,-drop,drop=FALSE]
+      cond.new <- cond.new[,-drop,drop=FALSE]
+      if (oscillation) { fire <- fire[-drop] }
+      thr.gene <- thr.gene[-drop]
+      thr.cond <- thr.cond[-drop]
+      index <- index[-drop]
+    }
+    
+    if (ncol(gene.new)==0 || iter>maxiter) { break; }
+    
+  } ## End of main loop
+
+  list(genes=gene.res, conditions=cond.res,
+       rundata=rundata, seeddata=seeddata)
+}
+
+na.multiply <- function(A, B) {
+  M <- !is.na(A)
+  modA <- A
+  modA[!M] <- 0
+  v <- modA %*% B
+  w <- sqrt(M %*% B^2)
+  w2 <- sqrt(apply(B^2, 2, sum))
+  ret <- v/w * rep(w2, each=nrow(v))
+  ret[ w==0 ] <- 0
+  ret
+}
+
+isa.step <- function(eset, genes, thr.gene, thr.cond, direction) {
+
+  Ec <- eset@assayData$ec.exprs
+  Eg <- eset@assayData$eg.exprs
+
+  direction <- rep(direction, length=2)
+  if (any(!direction %in% c("up", "updown", "down"))) {
+    stop("Invalid `direction' argument")
+  }
+
+  filter <- function(x, t, dir) {
+    if (dir=="updown") {
+      x <- .Call("beta_filter_updown_vart", x, as.double(t), PACKAGE="isa")
+    } else if (dir=="up") {
+      x <- .Call("beta_filter_up_vart", x, as.double(t), PACKAGE="isa")
+    } else { ## dir=="down"
+      x <- .Call("beta_filter_down_vart", x, as.double(t), PACKAGE="isa")
+    }
+  }
+
+  if ("hasNA" %in% names(attributes(eset)) && !attr(eset, "hasNA")) {
+    cond.new <- filter(Eg %*% genes,    tc, direction[1])
+    gene.new <- filter(Ec %*% cond.new, tg, direction[2])
+  } else {
+    cond.new <- filter(na.multiply(Eg, genes   ), tc, direction[1])
+    gene.new <- filter(na.multiply(Ec, cond.new), tg, direction[2])
+  }
+
+  list(cond.new, gene.new)
+}
+
+isa.merge <- function() {
+  ## TODO
+}
+
+isa.fix.oscillation <- function() {
+  ## TODO
+}
+
+isa.unique <- function() {
+  ## TODO
+}
+
+
+isa.gene.from.cond <- function(eset, cond.seeds, thr.cond, direction) {
+
+
+  Ec <- eset@assayData$ec.exprs
+
+  if (! direction %in% c("up", "updown", "down")) {
+    stop("Invalid `direction' argument")
+  }
+
+  filter <- function(x, t, dir) {
+    if (dir=="updown") {
+      x <- .Call("beta_filter_updown_vart", x, as.double(t), PACKAGE="isa")
+    } else if (dir=="up") {
+      x <- .Call("beta_filter_up_vart", x, as.double(t), PACKAGE="isa")
+    } else { ## dir=="down"
+      x <- .Call("beta_filter_down_vart", x, as.double(t), PACKAGE="isa")
+    }
+  }
+
+  if ("hasNA" %in% names(attributes(eset)) && !attr(eset, "hasNA")) {
+    gene.new <- filter(Ec %*% cond.seeds, tg, direction)
+  } else {
+    gene.new <- filter(na.multiply(Ec, cond.seeds), tg, direction)
+  }
+
+  gene.new
+}  
+
+generate.seeds <- function(length, count=100, method=c("uni"),
+                           gs, ...) {
+
+  if (method == "uni") {
+    if (missing(gs)) {
+      gs <- sample(1:length, count, replace=TRUE)
+    } else {
+      gs <- rep(round(gs*length), length=count)
+    }
+    g <- matrix(0, nrow=length, ncol=count)
+    for (i in 1:count) {
+      g[sample(length, gs[i]),i] <- 1
+    }
+  }
+  g
+}

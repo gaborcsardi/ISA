@@ -8,6 +8,7 @@ Description: The ISA is a biclustering algorithm that finds transscription
   modules in an expression matrix. A transscription module is a set of 
   genes and a set of conditions and the former are coherently over- or 
   underexpressed in the latter.
-Depends: Category, GOstats
+Depends: Biobase
+Suggests: Category, GOstats, igraph
 License: GPL
 Packaged: Mon Jul 28 09:19:47 2008; csardi
