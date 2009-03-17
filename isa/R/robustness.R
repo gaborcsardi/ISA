@@ -46,7 +46,7 @@ isa.filter.robust <- function(eset, isares, perms=1,
 
   rob.max <- 0
   
-  for (i in perms) {
+  for (i in seq_len(perms)) {
     eset.scrambled <- eset
     exprs(eset.scrambled)[] <- sample(exprs(eset.scrambled))
     eset.scrambled <- isa.normalize(eset.scrambled)
