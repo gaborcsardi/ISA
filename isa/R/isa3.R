@@ -105,7 +105,7 @@ isa <- function(eset, gene.seeds, cond.seeds,
                   oscillation.fixed=FALSE)
 
   ## All the seed data, this will be updated, of course
-  seeddata <- data.frame(iterations=NA, oscillation=FALSE,
+  seeddata <- data.frame(iterations=NA, oscillation=0,
                          thr.gene=thr.gene, thr.cond=thr.cond,
                          freq=rep(1, no.seeds), rob=rep(NA, no.seeds))
   
@@ -248,12 +248,38 @@ isa.step <- function(eset, genes, thr.gene, thr.cond, direction) {
   list(cond.new, gene.new)
 }
 
-isa.merge <- function() {
-  ## TODO
-}
+isa.fix.oscillation <- function(eset, isaresult) {
 
-isa.fix.oscillation <- function() {
-  ## TODO
+  if (!isaresult$rundata$oscillation) {
+    stop("No oscillating modules were searched")
+  }
+
+  if (all(isaresult$seeddata$oscillation == 0) ) {
+    return(isaresult)
+  }
+
+  rerun <- which(isaresult$seeddata$oscillation != 0)
+  len <- isaresult$seeddata$oscillation[rerun]
+
+  for (s in seq_along(rerun)) {
+    res <- list(matrix(0, nr=nrow(isaresult$genes), nc=len[s]),
+                matrix(0, nr=nrow(isaresult$conditions), nc=len[s]))
+    res[[1]][,1] <- isaresult$genes[,rerun[s]]
+    res[[2]][,1] <- isaresult$conditions[,rerun[s]]
+    for (i in 1:(len[s]-1)) {
+      tmp <- isa.step(eset, res[[1]][,i,drop=FALSE],
+                      thr.gene=isaresult$seeddata$thr.gene[rerun[s]],
+                      thr.cond=isaresult$seeddata$the.cond[rerun[s]],
+                      direction=isaresult$rundata$direction)
+      res[[1]][,i+1] <- tmp[[2]]
+      res[[2]][,i+1] <- tmp[[1]]
+    }
+    chosen <- which.min(apply(res[[1]], 2, sum))
+    isaresult$genes[,rerun[s]] <- res[[1]][,chosen]
+    isaresult$conditions[,rerun[s]] <- res[[2]][,chosen]
+  }
+
+  isaresult
 }
 
 isa.unique <- function(eset, isaresult, method=c("cor", "round"),
