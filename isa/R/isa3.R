@@ -256,8 +256,56 @@ isa.fix.oscillation <- function() {
   ## TODO
 }
 
-isa.unique <- function() {
-  ## TODO
+isa.unique <- function(eset, isaresult, method=c("cor", "round"),
+                       ignore.div=TRUE, cor.limit=0.99, neg.cor=TRUE,
+                       drop.zero=TRUE) {
+
+  method <- match.arg(method)
+
+  if (ncol(isaresult$genes) == 0) { return(isaresult) }
+
+  ## drop divergent seeds
+  if (ignore.div) {
+    invalid <- is.na(isaresult$seeddata$iterations)
+    if (any(invalid)) {
+      valid <- !invalid
+      isaresult$genes <- isaresult$genes[,valid,drop=FALSE]
+      isaresult$conditions <- isaresult$conditions[,valid,drop=FALSE]
+      isaresult$seeddata <- isaresult$seeddata[valid,,drop=FALSE]
+    }
+  }
+  if (ncol(isaresult$genes) == 0) { return(isaresult) }
+  
+  ## drop all zero seeds
+  if (drop.zero) {
+    valid <- apply(isaresult$genes, 2, function(x) any(x != 0))
+    if (!all(valid)) {
+      isaresult$genes <- isaresult$genes[,valid,drop=FALSE]
+      isaresult$conditions <- isaresult$conditions[,valid,drop=FALSE]
+      isaresult$seeddata <- isaresult$seeddata[valid,,drop=FALSE]
+    }
+  }
+  if (ncol(isaresult$genes) == 0) { return(isaresult) }
+
+  if (method=="cor") {
+    if (neg.cor) { ABS <- abs } else { ABS <- function(x) x }
+    cm <- pmin(ABS(cor(isaresult$genes)), ABS(cor(isaresult$conditions)))
+    cm[ lower.tri(cm, diag=TRUE) ] <- 0
+    uni <- apply(cm < cor.limit, 2, all)
+    freq <- apply(cm >= cor.limit, 1, sum)[uni] + 1
+  } else if (method=="round") {
+    ## TODO
+  }
+
+  isaresult$genes <- isaresult$genes[,uni,drop=FALSE]
+  isaresult$conditions <- isaresult$conditions[,uni,drop=FALSE]
+
+  isaresult$seeddata <- isaresult$seeddata[uni,,drop=FALSE]
+  isaresult$seeddata$freq <- freq
+
+  isaresult$rundata$unique <- TRUE
+
+  isaresult      
 }
 
 
