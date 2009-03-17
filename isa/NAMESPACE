@@ -4,7 +4,7 @@ import(AnnotationDbi)
 export(isa.in.silico, isa.normalize, isa, isa.unique,
        isa.fix.oscillation, generate.seeds)
 
-export(robustness, isa.filter.robust, ROC, ROC.integral)
+export(robustness, isa.filter.robust)
 
 export(isa.GO, isa.KEGG, isa.CHR, isa.miRNA, isa.DBD)
 
