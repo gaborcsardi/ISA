@@ -14,8 +14,6 @@ export(gograph, gograph.plot, exp.plot.create, exp.plot.colbar,
        
 export(autogen.table, autogen.modules)
 
-export(ppa.in.silico, ppa.normalize, ppa, ppa.step, ppa.unique)
-
 ##########
 
 useDynLib(isa)
