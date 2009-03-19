@@ -7,11 +7,11 @@ robustness <- function(normed.data, gs, cs) {
   gs <- apply(gs, 2, function(x) x/sqrt(sum(x^2)))
   cs <- apply(cs, 2, function(x) x/sqrt(sum(x^2)))
   if ("hasNA" %in% names(attributes(normed.data)) && !attr(normed.data, "hasNA")) {
-    rob1 <- apply(cs * na.multiply(Eg, gs), 2, sum)
-    rob2 <- apply(gs * na.multiply(Ec, cs), 2, sum)
+    rob1 <- colSums(cs * Eg %*% gs)
+    rob2 <- colSums(gs * Ec %*% cs)
   } else {
-    rob1 <- apply(cs * Eg %*% gs, 2, sum)
-    rob2 <- apply(gs * Ec %*% cs, 2, sum)
+    rob1 <- colSums(cs * na.multiply(Eg, gs))
+    rob2 <- colSums(gs * na.multiply(Ec, cs))
   }
 
   sqrt(rob1) * sqrt(rob2)
