@@ -1,50 +1,45 @@
 
-isa.normalize <- function(data, prenormalize=TRUE, ...) {
+isa.normalize <- function(data, prenormalize=FALSE) {
+
+  if (!is.matrix(data)) {
+    stop("`data' must be a matrix")
+  }
   
-  require(Biobase)
-
-  ## Create an ExpressionSet first
-  if (!is(data, "ExpressionSet")) {
-    data <- new("ExpressionSet", exprs=data, ...)
-  }
-
   ## Then normalize it
-  ec.exprs <- scale(t(exprs(data)))
+  Ec <- scale(t(data))
   if (prenormalize) {
-    eg.exprs <- scale(t(ec.exprs))
+    Eg <- scale(t(Ec))
   } else {
-    eg.exprs <- scale(exprs(data))
+    Eg <- scale(data)
   }
 
-  data@assayData <- assayDataNew(exprs=exprs(data),
-                                 eg.exprs=eg.exprs,
-                                 ec.exprs=t(ec.exprs))
+  data <- list(Eg=t(Eg), Ec=t(Ec))
   
   attr(data, "prenormalize") <- prenormalize
-  attr(data, "hasNA") <- (any(is.na(data@assayData$eg.exprs)) |
-                          any(is.na(data@assayData$ec.exprs)) )
+  attr(data, "hasNA") <- (any(is.na(Eg)) |
+                          any(is.na(Ec)) )
   
   data
 }
 
-isa <- function(eset, gene.seeds, cond.seeds,
-                thr.gene, thr.cond=thr.gene,
+isa <- function(normed.data, row.seeds, col.seeds,
+                thr.row, thr.col=thr.row,
                 direction=c("updown", "updown"),
                 convergence=c("cor", "loosy", "eps"),
                 cor.limit=0.99, eps=1e-4,
                 oscillation=TRUE, maxiter=100) {
 
-  if (( missing(gene.seeds) &&  missing(cond.seeds))) {
+  if (( missing(row.seeds) &&  missing(col.seeds))) {
     stop("No seeds, nothing to do")
   }
-  if (!missing(gene.seeds) && nrow(gene.seeds) != nrow(exprs(eset))) {
-    stop("Invalid gene seed length")
+  if (!missing(row.seeds) && nrow(row.seeds) != ncol(normed.data$Eg)) {
+    stop("Invalid row seed length")
   }
-  if (!missing(cond.seeds) && nrow(cond.seeds) != ncol(exprs(eset))) {
-    stop("Invalud conditions seed length")
+  if (!missing(col.seeds) && nrow(col.seeds) != ncol(normed.data$Ec)) {
+    stop("Invalid column seed length")
   }
   
-  if (thr.gene < 0 || thr.cond < 0) {
+  if (thr.row < 0 || thr.col < 0) {
     warning("Negative thresholds, are you sure about this?")
   }
   
@@ -66,67 +61,67 @@ isa <- function(eset, gene.seeds, cond.seeds,
   }
   
   no.seeds <- 0
-  if (!missing(gene.seeds)) {
-    no.seeds <- no.seeds + ncol(gene.seeds)
+  if (!missing(row.seeds)) {
+    no.seeds <- no.seeds + ncol(row.seeds)
   }
-  if (!missing(cond.seeds)) {
-    no.seeds <- no.seeds + ncol(cond.seeds)
+  if (!missing(col.seeds)) {
+    no.seeds <- no.seeds + ncol(col.seeds)
   }
   
-  orig.tg <- thr.gene
-  orig.tc <- thr.cond
-  if (length(thr.gene) != 1 && length(thr.gene) != no.seeds) {
-    stop("`thr.gene' does not have the right length")
+  orig.tg <- thr.row
+  orig.tc <- thr.col
+  if (length(thr.row) != 1 && length(thr.row) != no.seeds) {
+    stop("`thr.row' does not have the right length")
   }
-  if (length(thr.cond) != 1 && length(thr.cond) != no.seeds) {
-    stop("`thr.cond' does not have the right length")
+  if (length(thr.col) != 1 && length(thr.col) != no.seeds) {
+    stop("`thr.col' does not have the right length")
   }
-  thr.gene <- rep(thr.gene, no.seeds)
-  thr.cond <- rep(thr.cond, no.seeds)
+  thr.row <- rep(thr.row, no.seeds)
+  thr.col <- rep(thr.col, no.seeds)
 
   ## Put the seeds together
-  all.seeds <- matrix(ncol=0, nrow=nrow(exprs(eset)))
-  if (!missing(gene.seeds)) {
-    all.seeds <- cbind(all.seeds, gene.seeds)
+  all.seeds <- matrix(ncol=0, nrow=nrow(normed.data$Ec))
+  if (!missing(row.seeds)) {
+    all.seeds <- cbind(all.seeds, row.seeds)
   }
-  if (!missing(cond.seeds)) {
-    cond.seeds <- isa.gene.from.cond(eset, cond.seeds=cond.seeds,
-                                     thr.gene=tail(thr.gene, ncol(gene.seeds)),
-                                     direction=direction[2])
-    all.seeds <- cbind(all.seeds, cond.seeds)
+  if (!missing(col.seeds)) {
+    col.seeds <- isa.row.from.col(normed.data, col.seeds=col.seeds,
+                                  thr.row=tail(thr.row, ncol(row.seeds)),
+                                  direction=direction[2])
+    all.seeds <- cbind(all.seeds, col.seeds)
   }
 
   ## All the data about this ISA run
   rundata <- list(direction=direction, eps=eps, cor.limit=cor.limit,
                   maxiter=maxiter, N=no.seeds, convergence=convergence,
-                  prenormalize=attr(eset, "prenormalize"),
-                  hasNA=attr(eset, "hasNA"),
+                  prenormalize=attr(normed.data, "prenormalize"),
+                  hasNA=attr(normed.data, "hasNA"),
                   unique=FALSE, oscillation=oscillation,
                   oscillation.fixed=FALSE)
 
   ## All the seed data, this will be updated, of course
   seeddata <- data.frame(iterations=NA, oscillation=0,
-                         thr.gene=thr.gene, thr.cond=thr.cond,
+                         thr.row=thr.row, thr.col=thr.col,
                          freq=rep(1, no.seeds), rob=rep(NA, no.seeds))
   
   if (length(all.seeds)==0) {
-    return(list(genes=all.seeds, conditions=matrix(ncol=0, nrow=ncol(eset)),
+    return(list(rows=all.seeds, columns=matrix(ncol=0, nrow=ncol(normed.data$Ec)),
                 rundata=rundata, seeddata=seeddata))
   }
 
   ## Choose convergence checking function
   if (convergence=="eps") {
-    check.convergence <- function(gene.old, gene.new, cond.old, cond.new) {
-      res <- (apply(gene.old-gene.new, 2, function(x) all(abs(x)<eps)) &
-              apply(cond.old-cond.new, 2, function(x) all(abs(x)<eps)))
+    check.convergence <- function(row.old, row.new, col.old, col.new) {
+      res <- (apply(row.old-row.new, 2, function(x) all(abs(x)<eps)) &
+              apply(col.old-col.new, 2, function(x) all(abs(x)<eps)))
       res & !is.na(res)
     }
   } else if (convergence=="cor") {
-    check.convergence <- function(gene.old, gene.new, cond.old, cond.new) {
-      g.o <- scale(gene.old)
-      g.n <- scale(gene.new)
-      c.o <- scale(cond.old)
-      c.n <- scale(cond.new)
+    check.convergence <- function(row.old, row.new, col.old, col.new) {
+      g.o <- scale(row.old)
+      g.n <- scale(row.new)
+      c.o <- scale(col.old)
+      c.n <- scale(col.new)
       res <- (colSums(g.o * g.n) / (nrow(g.o)-1) > cor.limit &
               colSums(c.o * c.n) / (nrow(c.o)-1) > cor.limit)
       res & !is.na(res)
@@ -137,33 +132,33 @@ isa <- function(eset, gene.seeds, cond.seeds,
   iter <- 0
   index <- seq_len(ncol(all.seeds))
   if (oscillation) { fire <- character(no.seeds) }
-  gene.old <- all.seeds
-  cond.old <- matrix(NA, nrow=ncol(eset), ncol=no.seeds)
-  gene.res <- matrix(NA, nrow=nrow(eset), ncol=no.seeds)
-  cond.res <- matrix(NA, nrow=ncol(eset), ncol=no.seeds)
+  row.old <- all.seeds
+  col.old <- matrix(NA, nrow=ncol(normed.data$Ec), ncol=no.seeds)
+  row.res <- matrix(NA, nrow=nrow(normed.data$Ec), ncol=no.seeds)
+  col.res <- matrix(NA, nrow=ncol(normed.data$Ec), ncol=no.seeds)
   
   ## Main loop starts here
   while (TRUE) {
 
     iter <- iter + 1
-    one.step <- isa.step(eset, genes=gene.old, thr.gene=thr.gene,
-                         thr.cond=thr.cond, direction=direction)
+    one.step <- isa.step(normed.data, rows=row.old, thr.row=thr.row,
+                         thr.col=thr.col, direction=direction)
 
-    gene.new <- one.step[[2]]
-    cond.new <- one.step[[1]]
+    row.new <- one.step$rows
+    col.new <- one.step$columns
 
     ## Mark converged seeds
-    conv <- check.convergence(gene.old=gene.old, gene.new=gene.new,
-                              cond.old=cond.old, cond.new=cond.new)
+    conv <- check.convergence(row.old=row.old, row.new=row.new,
+                              col.old=col.old, col.new=col.new)
 
     ## Mark all zero seeds
-    zero <- apply(gene.new, 2, function(x) all(x==0))
+    zero <- apply(row.new, 2, function(x) all(x==0))
     
     ## Mark oscillating ones, if requested
     if (oscillation && iter > 1) {
-      new.fire <- apply(gene.new, 2, function(x) sum(round(x, 4)))
+      new.fire <- apply(row.new, 2, function(x) sum(round(x, 4)))
       fire <- paste(sep=":", fire, new.fire)
-      osc <- logical(ncol(gene.new))
+      osc <- logical(ncol(row.new))
       osc[ (mat <- regexpr("(:.*:.*)\\1$", fire)) != -1] <- TRUE
       osc <- osc & !conv
       
@@ -172,7 +167,7 @@ isa <- function(eset, gene.seeds, cond.seeds,
         mat <- sapply(seq(length=nrow(mat)), function(x) substr(fire[osc][x],
                             mat[x,1], mat[x,1]+mat[x,2]))
         mat <- sapply(mat, function(x) sum(utf8ToInt(x) == 58), USE.NAMES=FALSE )
-        oscresult[index[osc]] <- mat/2
+        seeddata$oscillation[index[osc]] <- mat/2
       }
     } else {
       osc <- FALSE
@@ -183,25 +178,25 @@ isa <- function(eset, gene.seeds, cond.seeds,
     
     ## Drop the seeds to be dropped
     if (length(drop) != 0) {
-      gene.res[,index[drop]] <- gene.new[,drop]
-      cond.res[,index[drop]] <- cond.new[,drop]
+      row.res[,index[drop]] <- row.new[,drop]
+      col.res[,index[drop]] <- col.new[,drop]
       seeddata$iterations[index[drop]] <- iter
-      gene.new <- gene.new[,-drop,drop=FALSE]
-      cond.new <- cond.new[,-drop,drop=FALSE]
+      row.new <- row.new[,-drop,drop=FALSE]
+      col.new <- col.new[,-drop,drop=FALSE]
       if (oscillation) { fire <- fire[-drop] }
-      thr.gene <- thr.gene[-drop]
-      thr.cond <- thr.cond[-drop]
+      thr.row <- thr.row[-drop]
+      thr.col <- thr.col[-drop]
       index <- index[-drop]
     }
     
-    if (ncol(gene.new)==0 || iter>maxiter) { break; }
+    if (ncol(row.new)==0 || iter>maxiter) { break; }
 
-    gene.old <- gene.new
-    cond.old <- cond.new
+    row.old <- row.new
+    col.old <- col.new
     
   } ## End of main loop
 
-  list(genes=gene.res, conditions=cond.res,
+  list(rows=row.res, columns=col.res,
        rundata=rundata, seeddata=seeddata)
 }
 
@@ -217,10 +212,10 @@ na.multiply <- function(A, B) {
   ret
 }
 
-isa.step <- function(eset, genes, thr.gene, thr.cond, direction) {
+isa.step <- function(normed.data, rows, thr.row, thr.col, direction) {
 
-  Ec <- eset@assayData$ec.exprs
-  Eg <- t(eset@assayData$eg.exprs)
+  Ec <- normed.data$Ec
+  Eg <- normed.data$Eg
 
   direction <- rep(direction, length=2)
   if (any(!direction %in% c("up", "updown", "down"))) {
@@ -237,18 +232,18 @@ isa.step <- function(eset, genes, thr.gene, thr.cond, direction) {
     }
   }
 
-  if ("hasNA" %in% names(attributes(eset)) && !attr(eset, "hasNA")) {
-    cond.new <- filter(Eg %*% genes,    thr.cond, direction[1])
-    gene.new <- filter(Ec %*% cond.new, thr.gene, direction[2])
+  if ("hasNA" %in% names(attributes(normed.data)) && !attr(normed.data, "hasNA")) {
+    col.new <- filter(Eg %*% rows,    thr.col, direction[1])
+    row.new <- filter(Ec %*% col.new, thr.row, direction[2])
   } else {
-    cond.new <- filter(na.multiply(Eg, genes   ), thr.cond, direction[1])
-    gene.new <- filter(na.multiply(Ec, cond.new), thr.gene, direction[2])
+    col.new <- filter(na.multiply(Eg, rows   ), thr.col, direction[1])
+    row.new <- filter(na.multiply(Ec, col.new), thr.row, direction[2])
   }
 
-  list(cond.new, gene.new)
+  list(columns=col.new, rows=row.new)
 }
 
-isa.fix.oscillation <- function(eset, isaresult) {
+isa.fix.oscillation <- function(normed.data, isaresult) {
 
   if (!isaresult$rundata$oscillation) {
     stop("No oscillating modules were searched")
@@ -262,60 +257,60 @@ isa.fix.oscillation <- function(eset, isaresult) {
   len <- isaresult$seeddata$oscillation[rerun]
 
   for (s in seq_along(rerun)) {
-    res <- list(matrix(0, nr=nrow(isaresult$genes), nc=len[s]),
-                matrix(0, nr=nrow(isaresult$conditions), nc=len[s]))
-    res[[1]][,1] <- isaresult$genes[,rerun[s]]
-    res[[2]][,1] <- isaresult$conditions[,rerun[s]]
+    res <- list(matrix(0, nr=nrow(isaresult$rows), nc=len[s]),
+                matrix(0, nr=nrow(isaresult$columns), nc=len[s]))
+    res[[1]][,1] <- isaresult$rows[,rerun[s]]
+    res[[2]][,1] <- isaresult$columns[,rerun[s]]
     for (i in 1:(len[s]-1)) {
-      tmp <- isa.step(eset, res[[1]][,i,drop=FALSE],
-                      thr.gene=isaresult$seeddata$thr.gene[rerun[s]],
-                      thr.cond=isaresult$seeddata$the.cond[rerun[s]],
+      tmp <- isa.step(normed.data, res[[1]][,i,drop=FALSE],
+                      thr.row=isaresult$seeddata$thr.row[rerun[s]],
+                      thr.col=isaresult$seeddata$thr.cond[rerun[s]],
                       direction=isaresult$rundata$direction)
       res[[1]][,i+1] <- tmp[[2]]
       res[[2]][,i+1] <- tmp[[1]]
     }
     chosen <- which.min(apply(res[[1]], 2, sum))
-    isaresult$genes[,rerun[s]] <- res[[1]][,chosen]
-    isaresult$conditions[,rerun[s]] <- res[[2]][,chosen]
+    isaresult$rows[,rerun[s]] <- res[[1]][,chosen]
+    isaresult$columns[,rerun[s]] <- res[[2]][,chosen]
   }
 
   isaresult
 }
 
-isa.unique <- function(eset, isaresult, method=c("cor", "round"),
+isa.unique <- function(normed.data, isaresult, method=c("cor", "round"),
                        ignore.div=TRUE, cor.limit=0.99, neg.cor=TRUE,
                        drop.zero=TRUE) {
 
   method <- match.arg(method)
 
-  if (ncol(isaresult$genes) == 0) { return(isaresult) }
+  if (ncol(isaresult$rows) == 0) { return(isaresult) }
 
   ## drop divergent seeds
   if (ignore.div) {
     invalid <- is.na(isaresult$seeddata$iterations)
     if (any(invalid)) {
       valid <- !invalid
-      isaresult$genes <- isaresult$genes[,valid,drop=FALSE]
-      isaresult$conditions <- isaresult$conditions[,valid,drop=FALSE]
+      isaresult$rows <- isaresult$rows[,valid,drop=FALSE]
+      isaresult$columns <- isaresult$columns[,valid,drop=FALSE]
       isaresult$seeddata <- isaresult$seeddata[valid,,drop=FALSE]
     }
   }
-  if (ncol(isaresult$genes) == 0) { return(isaresult) }
+  if (ncol(isaresult$rows) == 0) { return(isaresult) }
   
   ## drop all zero seeds
   if (drop.zero) {
-    valid <- apply(isaresult$genes, 2, function(x) any(x != 0))
+    valid <- apply(isaresult$rows, 2, function(x) any(x != 0))
     if (!all(valid)) {
-      isaresult$genes <- isaresult$genes[,valid,drop=FALSE]
-      isaresult$conditions <- isaresult$conditions[,valid,drop=FALSE]
+      isaresult$rows <- isaresult$rows[,valid,drop=FALSE]
+      isaresult$columns <- isaresult$columns[,valid,drop=FALSE]
       isaresult$seeddata <- isaresult$seeddata[valid,,drop=FALSE]
     }
   }
-  if (ncol(isaresult$genes) == 0) { return(isaresult) }
+  if (ncol(isaresult$rows) == 0) { return(isaresult) }
 
   if (method=="cor") {
     if (neg.cor) { ABS <- abs } else { ABS <- function(x) x }
-    cm <- pmin(ABS(cor(isaresult$genes)), ABS(cor(isaresult$conditions)))
+    cm <- pmin(ABS(cor(isaresult$rows)), ABS(cor(isaresult$columns)))
     cm[ lower.tri(cm, diag=TRUE) ] <- 0
     uni <- apply(cm < cor.limit, 2, all)
     freq <- apply(cm >= cor.limit, 1, sum)[uni] + 1
@@ -323,8 +318,8 @@ isa.unique <- function(eset, isaresult, method=c("cor", "round"),
     ## TODO
   }
 
-  isaresult$genes <- isaresult$genes[,uni,drop=FALSE]
-  isaresult$conditions <- isaresult$conditions[,uni,drop=FALSE]
+  isaresult$rows <- isaresult$rows[,uni,drop=FALSE]
+  isaresult$columns <- isaresult$columns[,uni,drop=FALSE]
 
   isaresult$seeddata <- isaresult$seeddata[uni,,drop=FALSE]
   isaresult$seeddata$freq <- freq
@@ -335,10 +330,10 @@ isa.unique <- function(eset, isaresult, method=c("cor", "round"),
 }
 
 
-isa.gene.from.cond <- function(eset, cond.seeds, thr.cond, direction) {
+isa.row.from.col <- function(normed.data, col.seeds, thr.col, direction) {
 
 
-  Ec <- eset@assayData$ec.exprs
+  Ec <- normed.data$Ec
 
   if (! direction %in% c("up", "updown", "down")) {
     stop("Invalid `direction' argument")
@@ -354,27 +349,27 @@ isa.gene.from.cond <- function(eset, cond.seeds, thr.cond, direction) {
     }
   }
 
-  if ("hasNA" %in% names(attributes(eset)) && !attr(eset, "hasNA")) {
-    gene.new <- filter(Ec %*% cond.seeds, thr.gene, direction)
+  if ("hasNA" %in% names(attributes(normed.data)) && !attr(normed.data, "hasNA")) {
+    row.new <- filter(Ec %*% col.seeds, thr.row, direction)
   } else {
-    gene.new <- filter(na.multiply(Ec, cond.seeds), thr.gene, direction)
+    row.new <- filter(na.multiply(Ec, col.seeds), thr.row, direction)
   }
 
-  gene.new
+  row.new
 }  
 
 generate.seeds <- function(length, count=100, method=c("uni"),
-                           gs, ...) {
+                           sparsity, ...) {
 
   if (method == "uni") {
-    if (missing(gs)) {
-      gs <- sample(1:length, count, replace=TRUE)
+    if (missing(sparsity)) {
+      sparsity <- sample(1:length, count, replace=TRUE)
     } else {
-      gs <- rep(round(gs*length), length=count)
+      sparsity <- rep(round(sparsity*length), length=count)
     }
     g <- matrix(0, nrow=length, ncol=count)
     for (i in 1:count) {
-      g[sample(length, gs[i]),i] <- 1
+      g[sample(length, sparsity[i]),i] <- 1
     }
   }
   g

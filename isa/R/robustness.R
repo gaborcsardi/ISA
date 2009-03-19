@@ -1,12 +1,12 @@
 
-robustness <- function(eset, gs, cs) {
+robustness <- function(normed.data, gs, cs) {
 
-  Ec <- eset@assayData$ec.exprs
-  Eg <- t(eset@assayData$eg.exprs)
+  Ec <- normed.data$Ec
+  Eg <- normed.data$Eg
   
   gs <- apply(gs, 2, function(x) x/sqrt(sum(x^2)))
   cs <- apply(cs, 2, function(x) x/sqrt(sum(x^2)))
-  if ("hasNA" %in% names(attributes(eset)) && !attr(eset, "hasNA")) {
+  if ("hasNA" %in% names(attributes(normed.data)) && !attr(normed.data, "hasNA")) {
     rob1 <- apply(cs * na.multiply(Eg, gs), 2, sum)
     rob2 <- apply(gs * na.multiply(Ec, cs), 2, sum)
   } else {
@@ -17,43 +17,39 @@ robustness <- function(eset, gs, cs) {
   sqrt(rob1) * sqrt(rob2)
 }
 
-isa.filter.robust <- function(eset, isares, perms=1,
-                              gene.seeds, cond.seeds) {
-
-  if (!is(eset, "ExpressionSet")) {
-    stop("Not an ExpressionSet")
-  }
+isa.filter.robust <- function(data, normed.data, isares, perms=1,
+                              row.seeds, col.seeds) {
 
   if (perms <= 0) {
     stop("Number of permutations must be non-negative")
   }
 
-  if (length(unique(isares$seeddata$thr.gene)) != 1) {
-    warning("Different gene thresholds, using only the first one.")
+  if (length(unique(isares$seeddata$thr.row)) != 1) {
+    warning("Different row thresholds, using only the first one.")
   }
   
-  if (length(unique(isares$seeddata$thr.cond)) != 1) {
-    warning("Different condition thresholds, using only the first one.")
+  if (length(unique(isares$seeddata$thr.col)) != 1) {
+    warning("Different column thresholds, using only the first one.")
   }
   
-  isares$seeddata$rob <- robustness(eset, isares$genes, isares$conditions)
+  isares$seeddata$rob <- robustness(normed.data, isares$rows, isares$columns)
 
-  if (missing(gene.seeds) && missing(cond.seeds)) {
-    gene.seeds <- generate.seeds(count=isares$rundata$N,
-                                 length=nrow(isares$genes),
-                                 gs=2/nrow(isares$genes))
+  if (missing(row.seeds) && missing(col.seeds)) {
+    row.seeds <- generate.seeds(count=isares$rundata$N,
+                                 length=nrow(isares$rows),
+                                 gs=2/nrow(isares$rows))
   }
 
   rob.max <- 0
   
   for (i in seq_len(perms)) {
-    eset.scrambled <- eset
-    exprs(eset.scrambled)[] <- sample(exprs(eset.scrambled))
-    eset.scrambled <- isa.normalize(eset.scrambled)
+    data.scrambled <- data
+    data.scrambled[] <- sample(data.scrambled)
+    normed.data.scrambled <- isa.normalize(data.scrambled)
     
-    permres <- isa(eset.scrambled, gene.seeds=gene.seeds,
-                   thr.gene=isares$seeddata$thr.gene[1],
-                   thr.cond=isares$seeddata$thr.cond[1],
+    permres <- isa(normed.data.scrambled, row.seeds=row.seeds,
+                   thr.row=isares$seeddata$thr.row[1],
+                   thr.col=isares$seeddata$thr.col[1],
                    direction=isares$rundata$direction,
                    convergence=isares$rundata$convergence,
                    cor.limit=isares$rundata$cor.limit,
@@ -61,14 +57,14 @@ isa.filter.robust <- function(eset, isares, perms=1,
                    oscillation=isares$rundata$oscillation,
                    maxiter=isares$rundata$maxiter)
     
-    rob2 <- robustness(eset.scrambled, permres$genes, permres$conditions)
+    rob2 <- robustness(normed.data.scrambled, permres$rows, permres$columns)
     rob.max <- max(rob2, rob.max)
   }
 
   keep <- isares$seeddata$rob > rob.max
 
-  isares$genes <- isares$genes[, keep,drop=FALSE]
-  isares$conditions <- isares$conditions[, keep,drop=FALSE]
+  isares$rows <- isares$rows[, keep,drop=FALSE]
+  isares$columns <- isares$columns[, keep,drop=FALSE]
   isares$seeddata <- isares$seeddata[ keep,,drop=FALSE ]
   isares$rundata$rob.limit <- rob.max
 
