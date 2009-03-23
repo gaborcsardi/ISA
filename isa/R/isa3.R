@@ -278,7 +278,7 @@ isa.fix.oscillation <- function(normed.data, isaresult) {
 }
 
 isa.unique <- function(normed.data, isaresult, method=c("cor", "round"),
-                       ignore.div=TRUE, cor.limit=0.99, neg.cor=TRUE,
+                       ignore.div=TRUE, cor.limit=0.9, neg.cor=TRUE,
                        drop.zero=TRUE) {
 
   method <- match.arg(method)
@@ -364,7 +364,7 @@ generate.seeds <- function(length, count=100, method=c("uni"),
 
   if (method == "uni") {
     if (missing(sparsity)) {
-      sparsity <- sample(1:length, count, replace=TRUE)
+      sparsity <- rep(2, length=count)
     } else {
       sparsity <- rep(round(sparsity*length), length=count)
     }
@@ -377,7 +377,7 @@ generate.seeds <- function(length, count=100, method=c("uni"),
 }
 
 isa.sweep <- function(data, normed.data, isaresult, method=c("cor"),
-                      neg.cor=TRUE, cor.limit=0.99) {
+                      neg.cor=TRUE, cor.limit=0.9) {
   
   method <- match.arg(method)
 
@@ -518,3 +518,55 @@ sweep.graph <- function(sweep.result) {
   graph( rbind(from, to), n=nnodes )
 }
 
+isa <- function(data) {
+
+  if (!is.matrix(data)) {
+    stop("`data must be a matrix")
+  }
+
+  ## Normalize the matrix
+  normed.data <- isa.normalize(data)
+  
+  ## Generate seeds
+  row.seeds <- generate.seeds(length=nrow(data))
+
+  ## Determine thresholds
+  thr <- seq(1,3,by=0.5)
+  thr.list <- expand.grid(thr.row=thr, thr.col=thr)
+  thr.list <- unlist(apply(thr.list, 1, list), rec=FALSE)
+  
+  ## Do the ISA, for all thresholds
+  isaresults <- lapply(thr.list, function(x) isa.iterate(normed.data,
+                                                         row.seeds=row.seeds,
+                                                         thr.row=x["thr.row"],
+                                                         thr.col=x["thr.col"]))
+
+  ## Fix the oscillation
+  isaresults <- lapply(isaresults, function(x)
+                       isa.fix.oscillation(normed.data, x))
+
+  ## Make it unique for every threshold combination
+  isaresults <- lapply(isaresults, function(x)
+                       isa.unique(normed.data, x))
+
+  ## Filter according to robustness
+  isaresults <- lapply(isaresults, function(x)
+                       isa.filter.robust(data=data,
+                                         normed.data=normed.data,
+                                         isares=x,
+                                         row.seeds=row.seeds))
+  
+  ## Merge them
+  result <- list()
+  result$rows <- do.call(cbind, lapply(isaresults, "[[", "rows"))
+  result$columns <- do.call(cbind, lapply(isaresults, "[[", "columns"))
+  result$seeddata <- do.call(rbind, lapply(isaresults, "[[", "seeddata"))
+  result$rundata <- isaresults[[1]]$rundata
+  result$rundata$N <- sum(sapply(isaresults, function(x) x$rundata$N))
+
+  ## Another filtering
+  result <- isa.unique(normed.data, result)
+
+  ## We are done
+  result
+}
