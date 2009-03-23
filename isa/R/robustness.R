@@ -66,7 +66,7 @@ isa.filter.robust <- function(data, normed.data, isares, perms=1,
   isares$rows <- isares$rows[, keep,drop=FALSE]
   isares$columns <- isares$columns[, keep,drop=FALSE]
   isares$seeddata <- isares$seeddata[ keep,,drop=FALSE ]
-  isares$rundata$rob.limit <- rob.max
+  isares$seeddata$rob.limit <- rob.max
   isares$rundata$rob.perms <- perms
 
   isares
