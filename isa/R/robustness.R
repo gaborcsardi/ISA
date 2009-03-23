@@ -14,6 +14,8 @@ robustness <- function(normed.data, gs, cs) {
     rob2 <- colSums(gs * na.multiply(Ec, cs))
   }
 
+  rob1[ rob1 < 0 ] <- 0
+  rob2[ rob2 < 0 ] <- 0
   sqrt(rob1) * sqrt(rob2)
 }
 
@@ -56,9 +58,17 @@ isa.filter.robust <- function(data, normed.data, isares, perms=1,
                            eps=isares$rundata$eps,
                            oscillation=isares$rundata$oscillation,
                            maxiter=isares$rundata$maxiter)
-    
+
+    valid <- apply(permres$rows != 0, 2, any)
+    valid <- valid & apply(permres$columns !=0, 2, any)
+
+    permres$rows <- permres$rows[,valid,drop=FALSE]
+    permres$columns <- permres$columns[,valid,drop=FALSE]
+    permres$seeddata <- permres$seeddata[valid,,drop=FALSE]
+
     rob2 <- robustness(normed.data.scrambled, permres$rows, permres$columns)
-    rob.max <- max(rob2, rob.max)
+    if (any(is.na(rob2))) { browser() }
+    rob.max <- max(rob2, rob.max, na.rm=TRUE)
   }
 
   keep <- isares$seeddata$rob > rob.max
@@ -66,7 +76,7 @@ isa.filter.robust <- function(data, normed.data, isares, perms=1,
   isares$rows <- isares$rows[, keep,drop=FALSE]
   isares$columns <- isares$columns[, keep,drop=FALSE]
   isares$seeddata <- isares$seeddata[ keep,,drop=FALSE ]
-  isares$seeddata$rob.limit <- rob.max
+  if (nrow(isares$seeddata)>0) { isares$seeddata$rob.limit <- rob.max }
   isares$rundata$rob.perms <- perms
 
   isares
