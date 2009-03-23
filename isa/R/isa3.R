@@ -316,6 +316,7 @@ isa.unique <- function(normed.data, isaresult, method=c("cor", "round"),
     freq <- apply(cm >= cor.limit, 1, sum)[uni] + 1
   } else if (method=="round") {
     ## TODO
+    stop("The `round' method is currently not implemented")
   }
 
   isaresult$rows <- isaresult$rows[,uni,drop=FALSE]
@@ -374,3 +375,146 @@ generate.seeds <- function(length, count=100, method=c("uni"),
   }
   g
 }
+
+isa.sweep <- function(data, normed.data, isaresult, method=c("cor"),
+                      neg.cor=TRUE, cor.limit=0.99) {
+  
+  method <- match.arg(method)
+
+  if (any(isaresult$seeddata$thr.row != isaresult$seeddata$thr.row[1]) &&
+      any(isaresult$seeddata$thr.col != isaresult$seeddata$thr.col[1])) {
+    stop(paste("Either the row or the column threshold",
+               "must be constant in `isaresult'"))
+  }
+
+  if (all(isaresult$seeddata$thr.row==isaresult$seeddata$thr.row[1])) {
+    key <- isaresult$seeddata$thr.col
+  } else {
+    key <- isaresult$seeddata$thr.row
+  }
+
+  isalist <- tapply(seq_along(key), key, list)
+  isalist.value <- as.numeric(names(isalist))
+  ord <- order(isalist.value, decreasing=TRUE)
+  isalist <- isalist[ord]
+  isalist.value <- isalist.value[ord]
+
+  isalist.row <- lapply(isalist, function(x) isaresult$rows[,x,drop=FALSE])
+  isalist.col <- lapply(isalist, function(x) isaresult$columns[,x,drop=FALSE])
+  isalist.seed <- lapply(isalist, function(x) isaresult$seeddata[x,,drop=FALSE])
+
+  thr.row <- sapply(isalist, function(x) isaresult$seeddata$thr.row[x[1]])
+  thr.col <- sapply(isalist, function(x) isaresult$seeddata$thr.col[x[1]])
+
+  NN <- isaresult$rundata$N
+  
+  conv.to <- list(numeric())
+  for (i in seq_along(isalist)[-1]) {
+
+    ## Are there any seeds at all?
+    if (ncol(isalist.row[[i-1]]) == 0) {
+      conv.to[[i]] <- numeric()
+      next
+    }
+
+    ## Run ISA on the modules from step i-1 with threshold from step i
+    NN <- NN + ncol(isalist.row[[i-1]])
+    tmpres <- isa(normed.data, row.seeds=isalist.row[[i-1]],
+                  thr.row=thr.row[i], thr.col=thr.col[i],
+                  direction=isaresult$rundata$direction,
+                  convergence=isaresult$rundata$convergence,
+                  eps=isaresult$rundata$eps,
+                  cor.limit=isaresult$rundata$cor.limit,
+                  maxiter=isaresult$rundata$maxiter,
+                  oscillation=isaresult$rundata$oscillation)
+    if (any(tmpres$rundata$oscillation != 0)) {
+      tmpres<- isa.fix.oscillation(normed.data, tmpres)
+    }
+
+    tmpures <- isa.unique(normed.data, tmpres, method=method,
+                         cor.limit=cor.limit, drop.zero=TRUE,
+                         ignore.div=TRUE)
+
+    ## instead of doing permutations, we just calculate the robustness
+    ## and use the included robustsness limit
+    if (!is.null(isaresult$seeddata$rob.limit)) {
+      rob <- robustness(normed.data, tmpures$rows, tmpures$columns)
+      keep <- rob > max(isalist.seed[[i]]$rob.limit)
+      tmpures$rows <- tmpures$rows[,keep,drop=FALSE]
+      tmpures$columns <- tmpures$columns[,keep,drop=FALSE]
+      tmpures$seeddata <- tmpures$seeddata[keep,,drop=FALSE]
+      tmpures$seeddata$rob <- rob[keep]
+      tmpures$seeddata$rob.limit <- max(isalist.seed[[i]]$rob.limit)
+    }
+
+    if (neg.cor) { ABS <- abs } else { ABS <- function(x) x }
+
+    if (method=="cor") {
+      ## Add the newly found modules
+      if (ncol(tmpures$rows) != 0) {
+        if (ncol(isalist.row[[i]]) != 0) {
+          cm <- pmin(ABS(cor(isalist.row[[i]], tmpures$rows)),
+                     ABS(cor(isalist.col[[i]], tmpures$columns)))
+          first <- apply(cm < cor.limit, 2, all)
+          isalist.row[[i]] <- cbind(isalist.row[[i]],
+                                    tmpures$rows[,first,drop=FALSE])
+          isalist.col[[i]] <- cbind(isalist.col[[i]],
+                                    tmpures$columns[,first,drop=FALSE])
+          isalist.seed[[i]] <- rbind(isalist.seed[[i]],
+                                     tmpures$seeddata[first,,drop=FALSE])
+        } else {
+          isalist.row[[i]] <- tmpures$rows
+          isalist.col[[i]] <- tmpures$columns
+          isalist.seed[[i]] <- tmpures$seeddata
+        }
+      }
+      
+      ## Check what converged to what
+      if (ncol(isalist.row[[i]]) != 0 && ncol(tmpres$rows) != 0) {
+        cm <- pmin(ABS(cor(isalist.row[[i]], tmpres$rows)),
+                   ABS(cor(isalist.col[[i]], tmpres$columns)))
+        conv.to[[i]] <- apply(cm, 2, function(x) which(x >= cor.limit)[1])          
+      } else {
+        conv.to[[i]] <- numeric()
+      }
+    }
+  } ## for
+
+  v <- 0; for (i in seq_along(conv.to)) {
+    v <- v + length(conv.to[[i]])
+    conv.to[[i]] <- conv.to[[i]] + v
+  }
+  
+  result <- list()
+  result$rows <- do.call(cbind, isalist.row)
+  result$columns <- do.call(cbind, isalist.col)
+  result$seeddata <- do.call(rbind, isalist.seed)
+  result$seeddata$father <- c(unlist(conv.to),
+                              rep(NA, ncol(isalist.row[[i]])))
+
+  result$rundata <- isaresult$rundata
+  result$rundata$N <- NN
+
+  result
+}
+  
+sweep.graph <- function(sweep.result) {
+
+  if (is.null(sweep.result$seeddata$father)) {
+    stop("Not a sweep result")
+  }
+
+  require(igraph)
+
+  nnodes <- nrow(sweep.result$seeddata)
+
+  from <- seq_len(nnodes)
+  to <- sweep.result$seeddata$father
+
+  valid <- !is.na(to)
+  from <- from[valid]
+  to <- to[valid]
+
+  graph( rbind(from, to), n=nnodes )
+}
+

@@ -3,6 +3,8 @@ export(isa.in.silico, isa.normalize, isa, isa.unique,
 
 export(robustness, isa.filter.robust)
 
+export(isa.sweep, sweep.graph)
+
 ##########
 
 useDynLib(isa)
