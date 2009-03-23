@@ -47,15 +47,15 @@ isa.filter.robust <- function(data, normed.data, isares, perms=1,
     data.scrambled[] <- sample(data.scrambled)
     normed.data.scrambled <- isa.normalize(data.scrambled)
     
-    permres <- isa(normed.data.scrambled, row.seeds=row.seeds,
-                   thr.row=isares$seeddata$thr.row[1],
-                   thr.col=isares$seeddata$thr.col[1],
-                   direction=isares$rundata$direction,
-                   convergence=isares$rundata$convergence,
-                   cor.limit=isares$rundata$cor.limit,
-                   eps=isares$rundata$eps,
-                   oscillation=isares$rundata$oscillation,
-                   maxiter=isares$rundata$maxiter)
+    permres <- isa.iterate(normed.data.scrambled, row.seeds=row.seeds,
+                           thr.row=isares$seeddata$thr.row[1],
+                           thr.col=isares$seeddata$thr.col[1],
+                           direction=isares$rundata$direction,
+                           convergence=isares$rundata$convergence,
+                           cor.limit=isares$rundata$cor.limit,
+                           eps=isares$rundata$eps,
+                           oscillation=isares$rundata$oscillation,
+                           maxiter=isares$rundata$maxiter)
     
     rob2 <- robustness(normed.data.scrambled, permres$rows, permres$columns)
     rob.max <- max(rob2, rob.max)

@@ -22,12 +22,12 @@ isa.normalize <- function(data, prenormalize=FALSE) {
   data
 }
 
-isa <- function(normed.data, row.seeds, col.seeds,
-                thr.row, thr.col=thr.row,
-                direction=c("updown", "updown"),
-                convergence=c("cor", "loosy", "eps"),
-                cor.limit=0.99, eps=1e-4,
-                oscillation=TRUE, maxiter=100) {
+isa.iterate <- function(normed.data, row.seeds, col.seeds,
+                        thr.row, thr.col=thr.row,
+                        direction=c("updown", "updown"),
+                        convergence=c("cor", "loosy", "eps"),
+                        cor.limit=0.99, eps=1e-4,
+                        oscillation=TRUE, maxiter=100) {
 
   if (( missing(row.seeds) &&  missing(col.seeds))) {
     stop("No seeds, nothing to do")
@@ -419,14 +419,14 @@ isa.sweep <- function(data, normed.data, isaresult, method=c("cor"),
 
     ## Run ISA on the modules from step i-1 with threshold from step i
     NN <- NN + ncol(isalist.row[[i-1]])
-    tmpres <- isa(normed.data, row.seeds=isalist.row[[i-1]],
-                  thr.row=thr.row[i], thr.col=thr.col[i],
-                  direction=isaresult$rundata$direction,
-                  convergence=isaresult$rundata$convergence,
-                  eps=isaresult$rundata$eps,
-                  cor.limit=isaresult$rundata$cor.limit,
-                  maxiter=isaresult$rundata$maxiter,
-                  oscillation=isaresult$rundata$oscillation)
+    tmpres <- isa.iterate(normed.data, row.seeds=isalist.row[[i-1]],
+                          thr.row=thr.row[i], thr.col=thr.col[i],
+                          direction=isaresult$rundata$direction,
+                          convergence=isaresult$rundata$convergence,
+                          eps=isaresult$rundata$eps,
+                          cor.limit=isaresult$rundata$cor.limit,
+                          maxiter=isaresult$rundata$maxiter,
+                          oscillation=isaresult$rundata$oscillation)
     if (any(tmpres$rundata$oscillation != 0)) {
       tmpres<- isa.fix.oscillation(normed.data, tmpres)
     }

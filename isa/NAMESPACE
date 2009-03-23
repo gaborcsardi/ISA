@@ -1,4 +1,4 @@
-export(isa.in.silico, isa.normalize, isa, isa.unique,
+export(isa.in.silico, isa.normalize, isa.iterate, isa.unique,
        isa.fix.oscillation, generate.seeds)
 
 export(robustness, isa.filter.robust)
