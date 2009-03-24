@@ -249,6 +249,8 @@ isa.fix.oscillation <- function(normed.data, isaresult) {
     stop("No oscillating modules were searched")
   }
 
+  isaresult$rundata$oscillation.fixed <- TRUE
+  
   if (all(isaresult$seeddata$oscillation == 0) ) {
     return(isaresult)
   }
