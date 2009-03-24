@@ -362,7 +362,7 @@ isa.row.from.col <- function(normed.data, col.seeds, thr.col, direction) {
 }  
 
 generate.seeds <- function(length, count=100, method=c("uni"),
-                           sparsity, ...) {
+                           sparsity) {
 
   if (method == "uni") {
     if (missing(sparsity)) {
