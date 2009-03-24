@@ -1,17 +1,17 @@
 
-robustness <- function(normed.data, gs, cs) {
+robustness <- function(normed.data, row.scores, col.scores) {
 
   Ec <- normed.data$Ec
   Eg <- normed.data$Eg
   
-  gs <- apply(gs, 2, function(x) x/sqrt(sum(x^2)))
-  cs <- apply(cs, 2, function(x) x/sqrt(sum(x^2)))
+  row.scores <- apply(row.scores, 2, function(x) x/sqrt(sum(x^2)))
+  col.scores <- apply(col.scores, 2, function(x) x/sqrt(sum(x^2)))
   if ("hasNA" %in% names(attributes(normed.data)) && !attr(normed.data, "hasNA")) {
-    rob1 <- colSums(cs * Eg %*% gs)
-    rob2 <- colSums(gs * Ec %*% cs)
+    rob1 <- colSums(col.scores * Eg %*% row.scores)
+    rob2 <- colSums(row.scores * Ec %*% col.scores)
   } else {
-    rob1 <- colSums(cs * na.multiply(Eg, gs))
-    rob2 <- colSums(gs * na.multiply(Ec, cs))
+    rob1 <- colSums(col.scores * na.multiply(Eg, row.scores))
+    rob2 <- colSums(row.scores * na.multiply(Ec, col.scores))
   }
 
   rob1[ rob1 < 0 ] <- 0
