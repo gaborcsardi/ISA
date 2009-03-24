@@ -362,14 +362,10 @@ isa.row.from.col <- function(normed.data, col.seeds, thr.col, direction) {
 }  
 
 generate.seeds <- function(length, count=100, method=c("uni"),
-                           sparsity) {
+                           sparsity=2) {
 
   if (method == "uni") {
-    if (missing(sparsity)) {
-      sparsity <- rep(2, length=count)
-    } else {
-      sparsity <- rep(round(sparsity*length), length=count)
-    }
+    sparsity <- rep(sparsity, length=count)
     g <- matrix(0, nrow=length, ncol=count)
     for (i in 1:count) {
       g[sample(length, sparsity[i]),i] <- 1
