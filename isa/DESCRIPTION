@@ -1,7 +1,7 @@
 Package: isa
 Version: 0.1
 Date: Jan 8, 2008
-Title: Iterative signature analysis.
+Title: The Iterative Signature Algorithm
 Author: Gabor Csardi <Gabor.Csardi@unil.ch>
 Maintainer: Gabor Csardi <Gabor.Csardi@unil.ch>
 Description: The ISA is a biclustering algorithm that finds modules 
