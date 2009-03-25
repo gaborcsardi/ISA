@@ -8,15 +8,15 @@ isa.normalize <- function(data, prenormalize=FALSE) {
   ## Then normalize it
   Ec <- scale(t(data))
   if (prenormalize) {
-    Eg <- scale(t(Ec))
+    Er <- scale(t(Ec))
   } else {
-    Eg <- scale(data)
+    Er <- scale(data)
   }
 
-  data <- list(Eg=t(Eg), Ec=t(Ec))
+  data <- list(Er=t(Er), Ec=t(Ec))
   
   attr(data, "prenormalize") <- prenormalize
-  attr(data, "hasNA") <- (any(is.na(Eg)) |
+  attr(data, "hasNA") <- (any(is.na(Er)) |
                           any(is.na(Ec)) )
   
   data
@@ -32,7 +32,7 @@ isa.iterate <- function(normed.data, row.seeds, col.seeds,
   if (( missing(row.seeds) &&  missing(col.seeds))) {
     stop("No seeds, nothing to do")
   }
-  if (!missing(row.seeds) && nrow(row.seeds) != ncol(normed.data$Eg)) {
+  if (!missing(row.seeds) && nrow(row.seeds) != ncol(normed.data$Er)) {
     stop("Invalid row seed length")
   }
   if (!missing(col.seeds) && nrow(col.seeds) != ncol(normed.data$Ec)) {
@@ -215,7 +215,7 @@ na.multiply <- function(A, B) {
 isa.step <- function(normed.data, rows, thr.row, thr.col, direction) {
 
   Ec <- normed.data$Ec
-  Eg <- normed.data$Eg
+  Er <- normed.data$Er
 
   direction <- rep(direction, length=2)
   if (any(!direction %in% c("up", "updown", "down"))) {
@@ -233,10 +233,10 @@ isa.step <- function(normed.data, rows, thr.row, thr.col, direction) {
   }
 
   if ("hasNA" %in% names(attributes(normed.data)) && !attr(normed.data, "hasNA")) {
-    col.new <- filter(Eg %*% rows,    thr.col, direction[1])
+    col.new <- filter(Er %*% rows,    thr.col, direction[1])
     row.new <- filter(Ec %*% col.new, thr.row, direction[2])
   } else {
-    col.new <- filter(na.multiply(Eg, rows   ), thr.col, direction[1])
+    col.new <- filter(na.multiply(Er, rows   ), thr.col, direction[1])
     row.new <- filter(na.multiply(Ec, col.new), thr.row, direction[2])
   }
 

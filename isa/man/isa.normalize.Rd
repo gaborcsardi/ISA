@@ -5,9 +5,14 @@
 \usage{
 isa.normalize (data, prenormalize = FALSE)
 }
-\arguments{}
+\arguments{
+  \item{data}{}
+  \item{prenormalize}{}
+}
 \details{}
-\value{}
+\value{
+  A list of two normalized matrices, the first one is transposed.
+}
 \author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
 \references{
   Bergmann S, Ihmels J, Barkai N: Iterative signature algorithm for the
@@ -23,8 +28,8 @@ isa.normalize (data, prenormalize = FALSE)
   \emph{Bioinformatics} 2004 Sep 1;20(13):1993-2003. Epub 2004 Mar 25.
 }
 \seealso{ \link{isa-package} for a short introduction on the Iterative
-  Signature Algorithm. See the functions mentioned above if you want to
-  change the default ISA parameters.
+  Signature Algorithm. See \code{\link{isa}} for an easy way of running
+  ISA.
 }
 \examples{}
 \keyword{cluster,classif,array,optimize}
