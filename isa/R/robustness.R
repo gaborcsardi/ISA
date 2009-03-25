@@ -2,15 +2,15 @@
 robustness <- function(normed.data, row.scores, col.scores) {
 
   Ec <- normed.data$Ec
-  Eg <- normed.data$Eg
+  Er <- normed.data$Er
   
   row.scores <- apply(row.scores, 2, function(x) x/sqrt(sum(x^2)))
   col.scores <- apply(col.scores, 2, function(x) x/sqrt(sum(x^2)))
   if ("hasNA" %in% names(attributes(normed.data)) && !attr(normed.data, "hasNA")) {
-    rob1 <- colSums(col.scores * Eg %*% row.scores)
+    rob1 <- colSums(col.scores * Er %*% row.scores)
     rob2 <- colSums(row.scores * Ec %*% col.scores)
   } else {
-    rob1 <- colSums(col.scores * na.multiply(Eg, row.scores))
+    rob1 <- colSums(col.scores * na.multiply(Er, row.scores))
     rob2 <- colSums(row.scores * na.multiply(Ec, col.scores))
   }
 
@@ -39,7 +39,7 @@ isa.filter.robust <- function(data, normed.data, isares, perms=1,
   if (missing(row.seeds) && missing(col.seeds)) {
     row.seeds <- generate.seeds(count=isares$rundata$N,
                                  length=nrow(isares$rows),
-                                 gs=2/nrow(isares$rows))
+                                 sparsity=)
   }
 
   rob.max <- 0
