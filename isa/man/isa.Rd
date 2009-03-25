@@ -32,11 +32,11 @@ isa(data)
       \code{\link{isa.fix.oscillation}}.}
     \item{5}{Merging similar modules, separately for each threshold
       combination, by calling \code{\link{isa.unique}}.}
-    \item{6}{Filter the modules separately for each threshold combination,
+    \item{6}{Filtering the modules separately for each threshold combination,
       by calling \code{\link{isa.filter.robust}}.}
-    \item{7}{Put all modules from the runs with different thresholds into
+    \item{7}{Putting all modules from the runs with different thresholds into
       a single object.}
-    \item{8}{Merge similar modules, across all threshold combinations, if
+    \item{8}{Merging similar modules, across all threshold combinations, if
       two modules are similar, then the larger one, the one with the
       milder thresholds is kept.}
   }
@@ -154,6 +154,5 @@ if (interactive()) {
                                        isa.result$columns[,b]),
                                  main=paste("Module", b)))  
 }
-
 }
 \keyword{cluster,classif,array,optimize}
