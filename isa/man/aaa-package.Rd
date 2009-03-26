@@ -54,22 +54,22 @@
   only elements that are further than a given number of standard
   deviations from the mean. Based on the \code{direction} parameter,
   this means 1) keeping values that are significantly higher than the
-  mean (\code{direction=\dQuote{up}}), significantly lower
-  (\code{direction=\dQuote{down}}) or both
-  (\code{direction=\dQuote{updown}}).
+  mean (\code{direction="up"}), significantly lower
+  (\code{direction="down"}) or both
+  (\code{direction="updown"}).
   
-  The thresholded vector is the (column) \sQuote{signature} of
-  \eqn{r_0}{r(0)}: \eqn{c_0}{c(0)}. Then the signature of \eqn{c_0}{c(0)} is
-  calculated, \eqn{E} is multiplied by  \eqn{c_0}{c(0)} and then
-  thresholded to calculate \eqn{r_1}{r(1)}.
+  The thresholded vector \eqn{c_0}{c(0)} is the (column)
+  \sQuote{signature} of \eqn{r_0}{r(0)}. Then the (row) signature of
+  \eqn{c_0}{c(0)} is calculated, \eqn{E} is multiplied by
+  \eqn{c_0}{c(0)} and then thresholded to get \eqn{r_1}{r(1)}. 
 
-  The iteration is performed until it converges, i.e. \eqn{r_i}{r(i)}
-  and \eqn{r_{i-1}} are \dQuote{close}, and \eqn{c_i}{c(i)} and
+  This iteration is performed until it converges, i.e. \eqn{r_i}{r(i)}
+  and \eqn{r_{i-1}}{r(i-1)} are \dQuote{close}, and \eqn{c_i}{c(i)} and
   \eqn{c_{i-1}}{c(i-1)} are also close. The convergence criteria,
   i.e. what \dQuote{close} means is by default defined by high Pearson
   correlation.
 
-  It is very possible that the ISA finds the same modules more than one,
+  It is very possible that the ISA finds the same modules more than once;
   two or more seeds might converge to the same module. The function
   \code{\link{isa.unique}} eliminates every module from the result of 
   \code{\link{isa.iterate}} that is very similar (in terms of

@@ -1,29 +1,43 @@
 \name{isa.in.silico}
 \alias{isa.in.silico}
 \title{Generate in-silico input data for biclustering algorithms}
-\description{}
+\description{This function generates a test data set for ISA, containing
+  modules of prescribed number, size, signal level, internal noise and
+  background noise. 
+}
 \usage{
-isa.in.silico (num.rows = 300, num.cols = 50, num.fact = 3, fact.per.row = 1,
-     fact.per.col = fact.per.row, mod.row.size = round(0.5 * num.rows/num.fact), 
+isa.in.silico (num.rows = 300, num.cols = 50, num.fact = 3,
+     mod.row.size = round(0.5 * num.rows/num.fact), 
      mod.col.size = round(0.5 * num.cols/num.fact), noise = 0.1,                 
      mod.signal = rep(1, num.fact), mod.noise = rep(0, num.fact),                
-     OL = 0)
+     overlap.row = 0, overlap.col = overlap.row)
 }
 \arguments{
-  \item{num.rows}{}
-  \item{num.cols}{}
-  \item{num.fact}{}
-  \item{fact.per.row}{}
-  \item{fact.per.col}{}
-  \item{mod.row.size}{}
-  \item{mod.col.size}{}
-  \item{noise}{}
-  \item{mod.signal}{}
-  \item{mod.noise}{}
-  \item{OL}
+  \item{num.rows}{The number of rows in the data matrix.}
+  \item{num.cols}{The number of columns in the data matrix.}
+  \item{num.fact}{The number of modules to put into the data.}
+  \item{mod.row.size}{The size of the modules, the number of rows per
+    module. It can be a scalar or a vector and it is recycled.}
+  \item{mod.col.size}{The size of the modules, the number of columns per
+    module. It can be a scalar or a vector and it is recycled.}
+  \item{noise}{The level of the background noise to be added to the data
+    matrix. It gives the standard deviation of the normal distribution
+    from which the noise is generated.}
+  \item{mod.signal}{The signal level of the modules.}
+  \item{mod.noise}{The noise levels of the different modules. Normally
+    distributed noise with standard deviation \code{mod.noise} is added
+    to the data. This is in addition to the background noise.}
+  \item{OL}{The overlap of the modules. Zero means no overlap, one means
+    one overlapping row and column, etc.}
 }
-\details{}
-\value{}
+\details{
+  
+}
+\value{
+  A list with three matrices. The first matrix is the in silico data,
+  the second contains the rows of the correct modules, the third the
+  columns.
+}
 \author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
 \references{
   Bergmann S, Ihmels J, Barkai N: Iterative signature algorithm for the

@@ -1,17 +1,27 @@
 \name{generate.seeds}
 \alias{generate.seeds}
 \title{Generate seed vectors for the Iterative Signature Algorithm}
-\description{}
+\description{Generate random input seeds for the ISA.}
 \usage{
 generate.seeds (length, count = 100, method = c("uni"), sparsity=2)
 }
 \arguments{
-  \item{length}{}
-  \item{count}{}
-  \item{method}{}
-  \item{sparsity}{}
+  \item{length}{The length of the seeds, should be the number of rows in
+    your input data for row seeds and the number of columns for column
+    seeds.}
+  \item{count}{The number of seeds to gnerate.}
+  \item{method}{The method for generating the seeds. Currently only
+    \code{"uni"} is supported, that picks the 1 elements in each seed
+    uniformly randomly.}
+  \item{sparsity}{A numeric scalar, an integer number giving the number
+    of non-zero values in each seed vector. It will be recycled to have
+    the same length as the number of seeds.}
 }
-\details{}
+\details{
+  This function can generate a 0/1 matrix whose columns are the seeds of
+  the ISA. The result can be use as the \code{row.seeds} (or
+  \code{col.seeds}) argument of the \code{\link{isa.iterate}} function.
+}
 \value{
   A numeric matrix with 0/1 values.
 }
@@ -33,5 +43,33 @@ generate.seeds (length, count = 100, method = c("uni"), sparsity=2)
   Signature Algorithm. See \code{\link{isa}} for an easy way of running
   ISA.
 }
-\examples{}
+\examples{
+## Just to get always the same result
+set.seed(24)
+
+## Create some random seeds with different sparseness
+data <- isa.in.silico()
+sparsity <- rep( c(1,5,25,125), length=100)
+row.seeds <- generate.seeds(length=nrow(data[[1]]), count=100,
+                            sparsity=sparsity)
+
+## Do ISA with the seeds
+normed.data <- isa.normalize(data[[1]])
+isaresult <- isa.iterate(normed.data, thr.row=1, thr.col=1,
+                         row.seeds=row.seeds)
+
+## Add the sparsity to the seed data
+isaresult$seeddata$sparsity <- sparsity
+
+## Check which ones leed to higher robustness scores
+rob <- robustness(normed.data, isaresult$rows, isaresult$columns)
+tapply(rob, sparsity, mean)
+## About the same
+
+## How many unique modules did we find for the different sparsity
+isaresult.unique <- isa.unique(normed.data, isaresult)
+tapply(seq_len(ncol(isaresult.unique$rows)),
+       isaresult.unique$seeddata$sparsity, length)
+## We usually find more modules with sparser seeds
+}
 \keyword{cluster,classif,array,optimize}

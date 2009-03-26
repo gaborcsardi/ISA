@@ -1,6 +1,5 @@
 \name{isa}
 \alias{isa}
-\alias{ISA}
 \concept{Iterative Signature Algorithm}
 \title{Iterative Signature Algorithm}
 \description{Run ISA with the default parameters}
@@ -23,22 +22,22 @@ isa(data)
 
   This involves:
   \enumerate{
-    \item{1}{Normalizing the data by calling \code{\link{isa.normalize}}.}
-    \item{2}{Generating random input seeds via
-      \code{\link{generate.seeds}}.}
-    \item{3}{Running ISA with all combinations of row and column thresholds
-      1, 1.5, 2, 2.5, 3; by calling \code{\link{isa.iterate}}.}
-    \item{4}{Fixing oscillating biclusters by calling
-      \code{\link{isa.fix.oscillation}}.}
-    \item{5}{Merging similar modules, separately for each threshold
-      combination, by calling \code{\link{isa.unique}}.}
-    \item{6}{Filtering the modules separately for each threshold combination,
-      by calling \code{\link{isa.filter.robust}}.}
-    \item{7}{Putting all modules from the runs with different thresholds into
-      a single object.}
-    \item{8}{Merging similar modules, across all threshold combinations, if
+    \item Normalizing the data by calling \code{\link{isa.normalize}}.
+    \item Generating random input seeds via
+    \code{\link{generate.seeds}}.
+    \item Running ISA with all combinations of row and column thresholds
+    1, 1.5, 2, 2.5, 3; by calling \code{\link{isa.iterate}}.
+    \item Fixing oscillating biclusters by calling
+    \code{\link{isa.fix.oscillation}}.
+    \item Merging similar modules, separately for each threshold
+      combination, by calling \code{\link{isa.unique}}.
+    \item Filtering the modules separately for each threshold combination,
+      by calling \code{\link{isa.filter.robust}}.
+    \item Putting all modules from the runs with different thresholds into
+      a single object.
+    \item Merging similar modules, across all threshold combinations, if
       two modules are similar, then the larger one, the one with the
-      milder thresholds is kept.}
+      milder thresholds is kept.
   }
   Please see the manual pages of these functions for the details or if
   you want to change their default parameters.
@@ -59,52 +58,52 @@ isa(data)
   \item{seeddata}{A data frame containing information about the
     biclusters. There is one row for each bicluster. The data frame has
     the following columns:
-    \itemize{
-      \item{iterations}{The number of iterations needed to converge to
-	the bicluster.}
-      \item{oscillation}{The oscillation period for oscillating
+    \describe{
+      \item{\code{iterations}}{The number of iterations needed to
+	converge to the bicluster.}
+      \item{\code{oscillation}}{The oscillation period for oscillating
 	biclusters. It is zero for non-oscillating ones.}
-      \item{thr.row}{The row threshold that was used for find the
+      \item{\code{thr.row}}{The row threshold that was used for find the
 	bicluster.}
-      \item{thr.col}{The column threshold that was used for finding the
+      \item{\code{thr.col}}{The column threshold that was used for finding the
 	bicluster.}
-      \item{freq}{The number of times the bicluster was found.}
-      \item{rob}{The robustness score of the bicluster, see
+      \item{\code{freq}}{The number of times the bicluster was found.}
+      \item{\code{rob}}{The robustness score of the bicluster, see
 	\code{\link{robustness}} for details.}
-      \item{rob.limit}{The robustness limit that was used to filter the
+      \item{\code{rob.limit}}{The robustness limit that was used to filter the
 	module. See \code{\link{isa.filter.robust}} for details.}
     }
   }
   \item{rundata}{A named list with information about the ISA runs. It
     has the following entries:
-    \itemize{
-      \item{direction}{Character vector of length two.
+    \describe{
+      \item{\code{direction}}{Character vector of length two.
 	Specifies which side(s) of the score distribution
 	were kept in each ISA step. See the \code{direction} argument
 	of \code{\link{isa.iterate}} for details.}
-      \item{convergence}{Character scalar. The convergence criteria for
+      \item{\code{convergence}}{Character scalar. The convergence criteria for
 	the iteration. See the \code{convergence} argument of
 	\code{\link{isa.iterate}} for details.}
-      \item{eps}{Numeric scalar. The threshold for convergence, if the
+      \item{\code{eps}}{Numeric scalar. The threshold for convergence, if the
 	\sQuote{eps} convergence criteria was used.}
-      \item{cor.limit}{Numeric scalar. The threshold for convergence, if
+      \item{\code{cor.limit}}{Numeric scalar. The threshold for convergence, if
 	the \sQuote{cor} convergence criteria was used.}
-      \item{maxiter}{Numeric scalar. The maximum number of iterations
+      \item{\code{maxiter}}{Numeric scalar. The maximum number of iterations
 	that were allowed for an input seed.}
-      \item{N}{Numeric scalar. The total number of seeds that were used
+      \item{\code{N}}{Numeric scalar. The total number of seeds that were used
 	for all the thresholds.}
-      \item{prenormalize}{Logical scalar. Whether the data was
+      \item{\code{prenormalize}}{Logical scalar. Whether the data was
 	pre-normalized.} 
-      \item{hasNA}{Logical scalar. Whether the (normalized) data had
+      \item{\code{hasNA}}{Logical scalar. Whether the (normalized) data had
 	\code{NA} or \code{NaN} values.}
-      \item{unique}{Logical scalar. Whether the similar biclusters were
+      \item{\code{unique}}{Logical scalar. Whether the similar biclusters were
 	merged by calling \code{\link{isa.unique}}.}
-      \item{oscillation}{Logical scalar. Whether the algorithm looked
+      \item{\code{oscillation}}{Logical scalar. Whether the algorithm looked
 	for oscillating modules as well.} 
-      \item{oscillation.fixed}{Logical scalar, whether oscillating
+      \item{\code{oscillation.fixed}}{Logical scalar, whether oscillating
 	modules were fixed. See \code{\link{isa.fix.oscillation}} for
 	details.}
-      \item{rob.perms}{Numeric scalar, the number of permutations that
+      \item{\code{rob.perms}}{Numeric scalar, the number of permutations that
 	were used to calculate the baseline robustness for
 	filtering. See the \code{perms} argument of the
 	\code{\link{isa.filter.robust}} function for details.}
