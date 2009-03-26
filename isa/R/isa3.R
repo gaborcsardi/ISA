@@ -27,7 +27,7 @@ isa.iterate <- function(normed.data, row.seeds, col.seeds,
                         direction=c("updown", "updown"),
                         convergence=c("cor", "loosy", "eps"),
                         cor.limit=0.99, eps=1e-4,
-                        oscillation=TRUE, maxiter=100) {
+                        oscillation=FALSE, maxiter=100) {
 
   if (( missing(row.seeds) &&  missing(col.seeds))) {
     stop("No seeds, nothing to do")
@@ -96,8 +96,7 @@ isa.iterate <- function(normed.data, row.seeds, col.seeds,
                   maxiter=maxiter, N=no.seeds, convergence=convergence,
                   prenormalize=attr(normed.data, "prenormalize"),
                   hasNA=attr(normed.data, "hasNA"),
-                  unique=FALSE, oscillation=oscillation,
-                  oscillation.fixed=FALSE)
+                  unique=FALSE, oscillation=oscillation)
 
   ## All the seed data, this will be updated, of course
   seeddata <- data.frame(iterations=NA, oscillation=0,
@@ -241,42 +240,6 @@ isa.step <- function(normed.data, rows, thr.row, thr.col, direction) {
   }
 
   list(columns=col.new, rows=row.new)
-}
-
-isa.fix.oscillation <- function(normed.data, isaresult) {
-
-  if (!isaresult$rundata$oscillation) {
-    stop("No oscillating modules were searched")
-  }
-
-  isaresult$rundata$oscillation.fixed <- TRUE
-  
-  if (all(isaresult$seeddata$oscillation == 0) ) {
-    return(isaresult)
-  }
-
-  rerun <- which(isaresult$seeddata$oscillation != 0)
-  len <- isaresult$seeddata$oscillation[rerun]
-
-  for (s in seq_along(rerun)) {
-    res <- list(matrix(0, nr=nrow(isaresult$rows), nc=len[s]),
-                matrix(0, nr=nrow(isaresult$columns), nc=len[s]))
-    res[[1]][,1] <- isaresult$rows[,rerun[s]]
-    res[[2]][,1] <- isaresult$columns[,rerun[s]]
-    for (i in 1:(len[s]-1)) {
-      tmp <- isa.step(normed.data, res[[1]][,i,drop=FALSE],
-                      thr.row=isaresult$seeddata$thr.row[rerun[s]],
-                      thr.col=isaresult$seeddata$thr.cond[rerun[s]],
-                      direction=isaresult$rundata$direction)
-      res[[1]][,i+1] <- tmp[[2]]
-      res[[2]][,i+1] <- tmp[[1]]
-    }
-    chosen <- which.min(apply(res[[1]], 2, sum))
-    isaresult$rows[,rerun[s]] <- res[[1]][,chosen]
-    isaresult$columns[,rerun[s]] <- res[[2]][,chosen]
-  }
-
-  isaresult
 }
 
 isa.unique <- function(normed.data, isaresult, method=c("cor", "round"),
@@ -425,9 +388,6 @@ isa.sweep <- function(data, normed.data, isaresult, method=c("cor"),
                           cor.limit=isaresult$rundata$cor.limit,
                           maxiter=isaresult$rundata$maxiter,
                           oscillation=isaresult$rundata$oscillation)
-    if (any(tmpres$rundata$oscillation != 0)) {
-      tmpres<- isa.fix.oscillation(normed.data, tmpres)
-    }
 
     tmpures <- isa.unique(normed.data, tmpres, method=method,
                          cor.limit=cor.limit, drop.zero=TRUE,
@@ -538,10 +498,6 @@ isa <- function(data) {
                                                          row.seeds=row.seeds,
                                                          thr.row=x["thr.row"],
                                                          thr.col=x["thr.col"]))
-
-  ## Fix the oscillation
-  isaresults <- lapply(isaresults, function(x)
-                       isa.fix.oscillation(normed.data, x))
 
   ## Make it unique for every threshold combination
   isaresults <- lapply(isaresults, function(x)

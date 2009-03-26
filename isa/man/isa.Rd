@@ -27,8 +27,6 @@ isa(data)
     \code{\link{generate.seeds}}.
     \item Running ISA with all combinations of row and column thresholds
     1, 1.5, 2, 2.5, 3; by calling \code{\link{isa.iterate}}.
-    \item Fixing oscillating biclusters by calling
-    \code{\link{isa.fix.oscillation}}.
     \item Merging similar modules, separately for each threshold
       combination, by calling \code{\link{isa.unique}}.
     \item Filtering the modules separately for each threshold combination,
@@ -100,9 +98,6 @@ isa(data)
 	merged by calling \code{\link{isa.unique}}.}
       \item{\code{oscillation}}{Logical scalar. Whether the algorithm looked
 	for oscillating modules as well.} 
-      \item{\code{oscillation.fixed}}{Logical scalar, whether oscillating
-	modules were fixed. See \code{\link{isa.fix.oscillation}} for
-	details.}
       \item{\code{rob.perms}}{Numeric scalar, the number of permutations that
 	were used to calculate the baseline robustness for
 	filtering. See the \code{perms} argument of the
