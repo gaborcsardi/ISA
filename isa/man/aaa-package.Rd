@@ -38,7 +38,13 @@
   rows, columns or even both. It is also possible that some rows and/or
   columns of the input matrix are not found to be part of any ISA
   biclusters. Depending on the stringency parameters, it might even
-  happen that ISA does not find any biclusters.
+  happen that ISA does not find any biclusters.  
+}
+\section{ISA row and column scores}{
+  ISA biclusters are not only soft, but every row and column in a given
+  bicluster has a score, a number between minus one and one. The further
+  this number is from zero, then stronger is the association of the
+  given row or column to the bicluster.
 }
 \section{How ISA works}{
   ISA works in an iterative way. For an \eqn{E (m\times n)}{E (m x n)}

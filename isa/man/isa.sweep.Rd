@@ -2,22 +2,63 @@
 \alias{isa.sweep}
 \alias{sweep.graph}
 \title{Create a hierarchical structure of ISA biclusters}
-\description{}
+\description{
+  Relate the biclusters found in many ISA runs on the same input data.
+}
 \usage{
 isa.sweep (data, normed.data, isaresult, method = c("cor"), neg.cor = TRUE,  
      cor.limit = 0.9)
 sweep.graph (sweep.result)
 }
 \arguments{
-  \item{data}{}
-  \item{normed.data}{}
-  \item{isaresult}{}
-  \item{method}{}
-  \item{neg.cor}{}
-  \item{cor.limit}{}
+  \item{data}{The input matrix.}
+  \item{normed.data}{The normalized input matrix, usually the output of
+    the \code{\link{isa.normalize}} function.}
+  \item{isaresult}{An object containing the biclusters, the result of
+    \code{\link{isa}} or \code{\link{isa.iterate}}.}
+  \item{method}{Character scalar giving the method to determine which
+    seed converged which bicluster. Right now only \sQuote{\code{cor}}
+    is supported, this is based on Pearson correlation.}
+  \item{neg.cor}{Logical scalar, whether to consider negative
+    correlation as convergence.}
+  \item{cor.limit}{Numeric scalar giving the minimum correlation for
+    convergence.}
+  \item{sweep.graph}{An ISA result with hierarchy information in the
+    seed data, typically calculated by the \code{isa.sweep} function.}
 }
-\details{}
-\value{}
+\details{
+  Many ISA runs with different thresholds typically create a bunch of
+  biclusters and it is useful to visualize how these are related.
+
+  From a set of biclusters for which of the \code{thr.row} and
+  \code{thr.col} parameters was the same, but the other was not,
+  \code{isa.sweep} creates a hierarchy of modules.
+
+  The hierarchy is a directed graph of modules in which every node has
+  an out degree at most one. An edge pointing from module \eqn{m} to
+  module \eqn{n} means that module \eqn{n} is \dQuote{part of} module
+  \eqn{m}; in the sense that an ISA isa iteration started from module
+  \eqn{n} converges to module \eqn{m} at the (milder) thresholds of
+  module \eqn{m}.
+
+  The information about the module relationships is stored in a column
+  of the seed data.
+
+  \code{sweep.graph} takes the output of \code{isa.sweep} and creates a
+  graph object of it. For this the \sQuote{igraph} package is required
+  to be installed on the system.
+}
+\value{
+  \code{isa.sweep} returns a named list with the same components as in
+  the input (\code{isaresult}), but the \sQuote{\code{father}} column is
+  added to the \sQuote{\code{seeddata}} member. This contains the edges
+  of the sweep graph: if bicluster \eqn{m} is the father of bicluster
+  \eqn{n} that means that bicluster \eqn{n} converges to bicluster
+  \eqn{m} at the same threshold parameters that were used to find
+  biclusters \eqn{m}.
+
+  \code{sweep.graph} returns and igraph graph.
+}
 \author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
 \references{
   Bergmann S, Ihmels J, Barkai N: Iterative signature algorithm for the

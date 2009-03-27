@@ -31,7 +31,13 @@ isa.in.silico (num.rows = 300, num.cols = 50, num.fact = 3,
     one overlapping row and column, etc.}
 }
 \details{
-  
+  \code{isa.in.silico} creates an artificial data set to test the ISA or
+  any other biclustering algorithm. It creates a data matrix with a
+  checkerboard matrix. In other words, potentially overlapping blocks
+  are planted into a noisy background matrix.
+
+  These blocks may have different signal and noise levels and they might
+  also overlap. See the parameters above.
 }
 \value{
   A list with three matrices. The first matrix is the in silico data,

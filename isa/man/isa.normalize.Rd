@@ -1,15 +1,30 @@
 \name{isa.normalize}
 \alias{isa.normalize}
 \title{Normalize input data for use with ISA}
-\description{}
+\description{
+  Normalize a matrix and create a form that can be effectively used for
+  ISA runs.
+}
 \usage{
 isa.normalize (data, prenormalize = FALSE)
 }
 \arguments{
-  \item{data}{}
-  \item{prenormalize}{}
+  \item{data}{A numeric matrix, the input data. It might contains
+    \code{NA} and/or \code{NaN} values.}
+  \item{prenormalize}{Logical scalar, see details below.}
 }
-\details{}
+\details{
+  It was observed that the ISA works better if the input matrix is
+  scaled and its rows have mean zero and standard deviation one.
+
+  An ISA step consists of two sub-steps, and this implies two different
+  normalizations, in the first the rows, in the second the columns of
+  the input matrix will be scaled.
+
+  If the \code{prenormalize} argument is set to \code{TRUE}, then
+  row-wise scaling is calculated on the column-wise scaled matrix and
+  not on the input matrix directly.
+}
 \value{
   A list of two normalized matrices, the first one is transposed.
 }

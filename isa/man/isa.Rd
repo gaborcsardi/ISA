@@ -50,9 +50,17 @@ isa(data)
     between -1 and 1. If the scores of two rows have the same (nonzero)
     sign, that means that the two corresponding rows \dQuote{behave} the
     same way. If they have opposite sign, that means that they behave
-    the opposite way.}
+    the opposite way.
+
+    If the corresponding seed has not converged during the allowed
+    number of iterations, then that column of \code{rows} contains
+    \code{NA} values.}
   \item{columns}{The column components of the biclusters, in the same
-    format as the rows.}
+    format as the rows.
+    
+    If the corresponding seed has not converged during the allowed
+    number of iterations, then that column of \code{columns} contains
+    \code{NA} values.}
   \item{seeddata}{A data frame containing information about the
     biclusters. There is one row for each bicluster. The data frame has
     the following columns:
