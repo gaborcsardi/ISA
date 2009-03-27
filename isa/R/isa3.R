@@ -25,7 +25,7 @@ isa.normalize <- function(data, prenormalize=FALSE) {
 isa.iterate <- function(normed.data, row.seeds, col.seeds,
                         thr.row, thr.col=thr.row,
                         direction=c("updown", "updown"),
-                        convergence=c("cor", "loosy", "eps"),
+                        convergence=c("cor", "eps"),
                         cor.limit=0.99, eps=1e-4,
                         oscillation=FALSE, maxiter=100) {
 
@@ -242,7 +242,7 @@ isa.step <- function(normed.data, rows, thr.row, thr.col, direction) {
   list(columns=col.new, rows=row.new)
 }
 
-isa.unique <- function(normed.data, isaresult, method=c("cor", "round"),
+isa.unique <- function(normed.data, isaresult, method=c("cor"),
                        ignore.div=TRUE, cor.limit=0.9, neg.cor=TRUE,
                        drop.zero=TRUE) {
 
