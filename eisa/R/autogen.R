@@ -1,7 +1,7 @@
 
 autogen.table <- function(nm, isares, target.dir,
                           modules=seq_len(ncol(isares$genes)),
-                          template=system.file("autogen", package="isa"),
+                          template=system.file("autogen", package="eisa"),
                           GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL, DBD=NULL,
                           htmltitle=NULL, notes=NULL, seed=NULL) {
 
@@ -129,8 +129,8 @@ autogen.table <- function(nm, isares, target.dir,
     tables.CHR <- ""
   }
 
-  thr <- paste(sep="", isares$seeddata$tg[modules], "/",
-               isares$seeddata$tc[modules])
+  thr <- paste(sep="", isares$seeddata$thr.row[modules], "/",
+               isares$seeddata$thr.col[modules])
   no.genes <- apply(isares$genes[,modules] != 0, 2, sum)
   no.conds <- apply(isares$conditions[,modules] != 0, 2, sum)
 
@@ -223,7 +223,7 @@ autogen.table <- function(nm, isares, target.dir,
 
 autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
                             target.dir,
-                            template=system.file("autogen", package="isa"),
+                            template=system.file("autogen", package="eisa"),
                             GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL, DBD=NULL,
                             cond.to.include=NULL,
                             markup=numeric(), markdown=numeric(),
@@ -301,6 +301,8 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   library(paste(sep="", chip, ".db"),  character.only=TRUE)
   organism <- get(paste(sep="", chip, "ORGANISM"))
   short.organism <- organism
+  require(paste(sep="", "org.", abbreviate(organism, 2), ".eg.db"),
+          character.only=TRUE)
   SYMBOL <- get( paste(sep="", "org.", abbreviate(organism, 2), ".egSYMBOL") )
   ENTREZ <- get( paste(sep="", chip, "ENTREZID") )
 
@@ -699,7 +701,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
 
   print(paste("Module", m, "expression graph"))
 
-  ep <- exp.plot.create(t(nexp), isares$genes[,m],
+  ep <- exp.plot.create(nexp, isares$genes[,m],
                         isares$conditions[,m], normalize=FALSE)
   CairoPNG(file=paste(sep="", target.dir, "/expression-", m, ".png"),
            width=ep$width, height=ep$height)
@@ -721,8 +723,8 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   clines <- clines.orig
   jlines <- jlines.orig
 
-  my.gth <- isares$seeddata$tg[m]
-  my.cth <- isares$seeddata$tc[m]
+  my.gth <- isares$seeddata$thr.row[m]
+  my.cth <- isares$seeddata$thr.col[m]
 
   ## Write the coordinates to the javascript file, to have
   ## the cross

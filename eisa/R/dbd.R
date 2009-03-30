@@ -62,10 +62,10 @@ setMethod("categoryToEntrezBuilder",
            org <- get(paste(sep="", ann, "ORGANISM"))
            short.org <- abbreviate(org, 2)
            if (short.org == "Mm") {
-             data(dbd.mm, package="isa")
+             data(dbd.mm, package="eisa")
              dbd <- dbd.mm
            } else if (short.org=="Hs") {
-             data(dbd.hs, package="isa")
+             data(dbd.hs, package="eisa")
              dbd <- dbd.hs
            } else {
              stop("Unknown organism in DBD enrichment")
@@ -91,10 +91,10 @@ setMethod("universeBuilder", signature=(p="DBDListHyperGParams"),
             org <- get(paste(sep="", ann, "ORGANISM"))
             short.org <- abbreviate(org, 2)
             if (short.org == "Mm") {
-              data(dbd.mm, package="isa")
+              data(dbd.mm, package="eisa")
               dbd <- dbd.mm
             } else if (short.org=="Hs") {
-              data(dbd.hs, package="isa")
+              data(dbd.hs, package="eisa")
               dbd <- dbd.hs
             } else {
               stop("Unknown organism in DBD enrichment")

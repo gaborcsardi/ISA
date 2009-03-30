@@ -346,11 +346,11 @@ exp.plot <- function(epo, scores=TRUE) {
 cond.plot <- function(nm, genes, thr, markup, markdown, ylim=c(-1.2,1.5), all=TRUE,
                       sep=NULL, sepcol=NULL, val=TRUE, srt=90,
                       adj.above=c(0,0.5), adj.below=c(1,0.5),
-                      plot.only=seq_len(ncol(nm[[1]])), ...) {
+                      plot.only=seq_len(nrow(nm[[1]])), ...) {
   
   ## Calculate all condition scores, might not be correct for
   ## oscillating modules
-  scores <- as.vector(nm[[2]] %*% genes)
+  scores <- as.vector(nm[[1]] %*% genes)
   if (any(scores != 0)) scores <- scores / max(abs(scores))
   thr1 <- mean(scores) + thr * sd(scores)
   thr2 <- mean(scores) - thr * sd(scores)

@@ -62,10 +62,10 @@ setMethod("categoryToEntrezBuilder",
            org <- get(paste(sep="", ann, "ORGANISM"))
            short.org <- abbreviate(org, 2)
            if (short.org == "Mm") {
-             data(miRNA.mm, package="isa")
+             data(miRNA.mm, package="eisa")
              miRNA <- miRNA.mm
            } else if (short.org=="Hs") {
-             data(miRNA.hs, package="isa")
+             data(miRNA.hs, package="eisa")
              miRNA <- miRNA.hs
            } else {
              stop("Unknown organism in miRNA enrichment")
@@ -91,10 +91,10 @@ setMethod("universeBuilder", signature=(p="miRNAListHyperGParams"),
             org <- get(paste(sep="", ann, "ORGANISM"))
             short.org <- abbreviate(org, 2)
             if (short.org == "Mm") {
-              data(miRNA.mm, package="isa")
+              data(miRNA.mm, package="eisa")
               miRNA <- miRNA.mm
             } else if (short.org=="Hs") {
-              data(miRNA.hs, package="isa")
+              data(miRNA.hs, package="eisa")
               miRNA <- miRNA.hs
             } else {
               stop("Unknown organism in miRNA enrichment")
