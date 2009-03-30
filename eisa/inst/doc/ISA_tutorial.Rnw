@@ -1,0 +1,93 @@
+\documentclass{article}
+\usepackage{ragged2e}
+
+\newcommand{\Rfunction}[1]{\texttt{#1}}
+\newcommand{\Rpackage}[1]{\texttt{#1}}
+\newcommand{\Rclass}[1]{\texttt{#1}}
+\newcommand{\filename}[1]{\texttt{#1}}
+
+\begin{document}
+
+\title{The Iterative Signature Algorithm}
+\author{G\'abor Cs\'ardi}
+\maketitle
+
+\RaggedRight
+
+\section{Introduction}
+
+The Iterative Signature Algorithm (ISA) is biclustering method. The
+input of a biclustering method a matrix and its output is a set of
+biclusters that fulfill some criteria; a bicluster is a block of the
+potentially reordered input matrix.
+
+Most commonly, this algorithm is used on microarray expression data,
+to find gene sets that are coexpressed across a subset of the original
+samples. In the original ISA paper the biclusters are called
+transription modules (TM), we will often refer them under this name in
+the following.
+
+In this tutorial we will use the data in the \Rpackage{ALL}
+package. This is a data set from a clinical trial in acute
+lymphoblastic leukemia and it contains 128 samples altogether.
+
+\section{Preparing the data}
+
+\subsection{Loading the data}
+
+First, we load the required packages and the data to analyze.
+<<>>=
+library(isa)
+library(ALL)
+library(hgu95av2.db)
+data(ALL)
+@
+
+\subsection{Filtering the genes}
+
+<<>>=
+library(genefilter)
+f1 <- pOverA(0.25, log2(100))
+f2 <- function(x) (IQR(x) > 0.5)
+ff <- filterfun(f1, f2)
+selected <- genefilter(ALL, ff)
+ALL2 <- ALL[selected,]
+@ 
+
+\subsection{Generating seeds for the ISA}
+
+<<>>=
+g <- generate.seeds(count=100, length=nrow(ALL2), gs=2/nrow(ALL2))
+@ 
+
+\subsection{Normalize the data}
+
+<<>>=
+ALL2.normed <- isa.normalize(ALL2)
+@ 
+
+\section{Running the ISA}
+
+<<>>=
+thr.gene <- 2.7
+thr.cond <- 1.4
+@ 
+
+<<>>=
+biclusts <- isa(ALL2.normed, thr.gene=thr.gene, thr.cond=thr.cond)
+@ 
+
+\section{Visualizing the results}
+
+\section{Session information}
+
+The version number of R and packages loaded for generating this
+vignette were:
+
+<<results=tex,echo=FALSE>>=
+gsub(";", "; ", gsub("_", "\\\\_", sub("Locale:[ ]*\\\\verb\\|(.*)\\|", 
+                                       "\\\\texttt\\{\\1\\}", 
+                                       toLatex(sessionInfo()))))
+@ 
+
+\end{document}
