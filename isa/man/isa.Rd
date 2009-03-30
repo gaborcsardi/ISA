@@ -4,13 +4,21 @@
 \title{Iterative Signature Algorithm}
 \description{Run ISA with the default parameters}
 \usage{
-isa(data)
+isa(data, thr.row=seq(1,3,by=0.5), thr.col=seq(1,3,by=0.5), no.seeds=100)
 }
 \arguments{
   \item{data}{The input. It must be a numeric matrix. It may contain
     \code{NA} and/or \code{NaN} values, but then the algorithm might be a
     bit slower, as R matrix multiplication might be slower for these
     matrices, depending on your platform.}
+  \item{thr.row}{Numeric vector.
+    The row threshold parameters for which the ISA will be
+    run. We use all possible combinations of \code{thr.row} and
+    \code{thr.col}.}
+  \item{thr.col}{Numeric vector.
+    The column threshold parameters for which the ISA will be run. We
+    use all possible combinations of \code{thr.row} and \code{thr.col}.
+  }
 }
 \details{
   Please read the \link{isa-package} manual page for an introduction on

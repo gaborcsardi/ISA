@@ -476,7 +476,8 @@ sweep.graph <- function(sweep.result) {
   graph( rbind(from, to), n=nnodes )
 }
 
-isa <- function(data) {
+isa <- function(data, thr.row=seq(1,3,by=0.5), thr.col=seq(1,3,by=0.5),
+                no.seeds=100) {
 
   if (!is.matrix(data)) {
     stop("`data must be a matrix")
@@ -486,11 +487,10 @@ isa <- function(data) {
   normed.data <- isa.normalize(data)
   
   ## Generate seeds
-  row.seeds <- generate.seeds(length=nrow(data))
+  row.seeds <- generate.seeds(length=nrow(data), count=no.seeds)
 
   ## Determine thresholds
-  thr <- seq(1,3,by=0.5)
-  thr.list <- expand.grid(thr.row=thr, thr.col=thr)
+  thr.list <- expand.grid(thr.row=thr.row, thr.col=thr.col)
   thr.list <- unlist(apply(thr.list, 1, list), rec=FALSE)
   
   ## Do the ISA, for all thresholds
