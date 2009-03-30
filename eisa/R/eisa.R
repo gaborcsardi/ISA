@@ -1,11 +1,13 @@
 
-eisa <- function(exp.set) {
+eisa <- function(exp.set, thr.gene=seq(2,4,by=0.5), thr.cond=seq(1,3,by=0.5),
+                 no.seeds=100) {
 
   if (!is(exp.set, "ExpressionSet")) {
     stop("Please supply an ExpressionSet object")
   }
 
-  isares <- isa(exprs(exp.set))
+  isares <- isa(exprs(exp.set), thr.row=thr.gene, thr.col=thr.cond,
+                no.seeds=no.seeds)
 
   isares <- list(genes=isares$rows, conditions=isares$columns,
                  rundata=isares$rundata, seeddata=isares$seeddata)
