@@ -33,8 +33,9 @@ isa(data, thr.row=seq(1,3,by=0.5), thr.col=seq(1,3,by=0.5), no.seeds=100)
     \item Normalizing the data by calling \code{\link{isa.normalize}}.
     \item Generating random input seeds via
     \code{\link{generate.seeds}}.
-    \item Running ISA with all combinations of row and column thresholds
-    1, 1.5, 2, 2.5, 3; by calling \code{\link{isa.iterate}}.
+    \item Running ISA with all combinations of given row and column
+    thresholds, (by default 1, 1.5, 2, 2.5, 3); by calling
+    \code{\link{isa.iterate}}. 
     \item Merging similar modules, separately for each threshold
       combination, by calling \code{\link{isa.unique}}.
     \item Filtering the modules separately for each threshold combination,
