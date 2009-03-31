@@ -360,9 +360,10 @@ setMethod("sigCategories", signature(r="GOListHyperGResult"),
           })
 
 isa.GO <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
-                   hgCutoff=0.001, correction=TRUE,
-                   verbose=isa.option("verbose")) {
+                   hgCutoff=0.001, correction=TRUE) {
 
+  isa.status("Calculating GO enrichment", "in")
+  
   if (is.null(organism)) organism <- isaresult$rundata$organism
   if (is.null(annotation)) annotation <- isaresult$rundata$annotation
   if (is.null(features)) features <- isaresult$rundata$features  
@@ -406,5 +407,9 @@ isa.GO <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
   cat(" -- Doing MF test\n")
   hgOverMF <- hyperGTest(paramsMF)
   
-  list(hgOverBP, hgOverCC, hgOverMF)
+  res <- list(hgOverBP, hgOverCC, hgOverMF)
+
+  isa.status("DONE", "out")
+
+  res
 }

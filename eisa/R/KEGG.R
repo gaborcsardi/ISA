@@ -264,9 +264,10 @@ setMethod("sigCategories", signature(r="KEGGListHyperGResult"),
           })
 
 isa.KEGG <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
-                     hgCutoff=0.001, correction=TRUE,
-                     verbose=isa.option("verbose")) {
+                     hgCutoff=0.001, correction=TRUE) {
 
+  isa.status("Calculating KEGG enrichment", "in")
+  
   if (is.null(organism)) organism <- isaresult$rundata$organism
   if (is.null(annotation)) annotation <- isaresult$rundata$annotation
   if (is.null(features)) features <- isaresult$rundata$features  
@@ -299,5 +300,7 @@ isa.KEGG <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
   cat(" -- Doing test\n")
   hgOver <- hyperGTest(params)
 
+  isa.status("DONE", "out")
+  
   hgOver
 }

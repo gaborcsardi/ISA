@@ -282,8 +282,9 @@ setMethod("sigCategories", signature(r="miRNAListHyperGResult"),
           })
 
 isa.miRNA <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
-                      hgCutoff=0.001, correction=TRUE,
-                      verbose=isa.option("verbose")) {
+                      hgCutoff=0.001, correction=TRUE) {
+
+  isa.status("Calculating miRNA enrichment", "in")
 
   if (is.null(organism)) organism <- isaresult$rundata$organism
   if (is.null(annotation)) annotation <- isaresult$rundata$annotation
@@ -317,6 +318,8 @@ isa.miRNA <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
   cat(" -- Doing test\n")
   hgOver <- hyperGTest(params)
 
+  isa.status("DONE", "out")
+  
   hgOver
 }
 

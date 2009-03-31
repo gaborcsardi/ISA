@@ -3,9 +3,10 @@ autogen.table <- function(nm, isares, target.dir,
                           modules=seq_len(ncol(isares$genes)),
                           template=system.file("autogen", package="eisa"),
                           GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL, DBD=NULL,
-                          htmltitle=NULL, notes=NULL, seed=NULL,
-                          verbose=isa.option("verbose")) {
+                          htmltitle=NULL, notes=NULL, seed=NULL) {
 
+  isa.status("Creating HTML module table", "in")
+  
   chip <- isares$rundata$annotation
   library(paste(sep="", chip, ".db"), character.only=TRUE)
   organism <- get(paste(sep="", chip, "ORGANISM"))
@@ -217,6 +218,8 @@ autogen.table <- function(nm, isares, target.dir,
   if (!file.exists(paste(sep="", target.dir, "/maintree.html"))) {
     file.symlink("maintable.html", paste(sep="", target.dir, "/maintree.html"))
   }
+
+  isa.status("DONE", "out")
   
   invisible(NULL)
 }  
@@ -230,9 +233,10 @@ autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
                             markup=numeric(), markdown=numeric(),
                             sep=NULL, seed=NULL, drive.BP=NULL,
                             drive.CC=NULL, drive.MF=NULL, drive.KEGG=NULL,
-                            drive.miRNA=NULL, drive.DBD=NULL, drive.CHR=NULL,
-                            verbose=isa.option("verbose")) {
+                            drive.miRNA=NULL, drive.DBD=NULL, drive.CHR=NULL) {
 
+  isa.status("Generating module pages", "in")
+  
   if (!file.exists(target.dir)) {
     dir.create(target.dir)
   }  
@@ -278,6 +282,8 @@ autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
                        drive.CHR=drive.CHR,
                        next.module=nx, prev.module=px)
   }
+
+  isa.status("DONE", "out")
   
   invisible(NULL)
 }
@@ -289,8 +295,9 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
                                drive.MF=NULL, drive.KEGG=NULL,
                                drive.miRNA=NULL, drive.DBD=NULL,
                                drive.CHR=NULL,
-                               next.module=NULL, prev.module=NULL,
-                               verbose=isa.option("verbose")) {
+                               next.module=NULL, prev.module=NULL) {
+
+  isa.status(paste("Generating HTML page for module", module), "in")
 
   require(Cairo)
   require(isa)
@@ -1057,5 +1064,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
 
   jfname <- paste(sep="", target.dir, "/module-", m, ".js")
   cat(jlines, file=jfname, sep="\n")
+
+  isa.status("DONE", "out")
 }
 

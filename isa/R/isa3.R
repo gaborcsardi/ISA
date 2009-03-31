@@ -1,6 +1,7 @@
 
-isa.normalize <- function(data, prenormalize=FALSE,
-                          verbose=isa.option("verbose")) {
+isa.normalize <- function(data, prenormalize=FALSE) {
+
+  isa.status("ISA normalization", "in")
 
   if (!is.matrix(data)) {
     stop("`data' must be a matrix")
@@ -19,6 +20,8 @@ isa.normalize <- function(data, prenormalize=FALSE,
   attr(data, "prenormalize") <- prenormalize
   attr(data, "hasNA") <- (any(is.na(Er)) |
                           any(is.na(Ec)) )
+
+  isa.status("DONE", "out")
   
   data
 }
@@ -28,8 +31,9 @@ isa.iterate <- function(normed.data, row.seeds, col.seeds,
                         direction=c("updown", "updown"),
                         convergence=c("cor", "eps"),
                         cor.limit=0.99, eps=1e-4,
-                        oscillation=FALSE, maxiter=100,
-                        verbose=isa.option("verbose")) {
+                        oscillation=FALSE, maxiter=100) {
+
+  isa.status("Doing ISA iteration", "in")
 
   if (( missing(row.seeds) &&  missing(col.seeds))) {
     stop("No seeds, nothing to do")
@@ -197,6 +201,8 @@ isa.iterate <- function(normed.data, row.seeds, col.seeds,
     
   } ## End of main loop
 
+  isa.status("DONE", "out")
+  
   list(rows=row.res, columns=col.res,
        rundata=rundata, seeddata=seeddata)
 }
@@ -246,8 +252,10 @@ isa.step <- function(normed.data, rows, thr.row, thr.col, direction) {
 
 isa.unique <- function(normed.data, isaresult, method=c("cor"),
                        ignore.div=TRUE, cor.limit=0.9, neg.cor=TRUE,
-                       drop.zero=TRUE, verbose=isa.option("verbose")) {
+                       drop.zero=TRUE) {
 
+  isa.status("Creating unique module set", "in")
+  
   method <- match.arg(method)
 
   if (ncol(isaresult$rows) == 0) { return(isaresult) }
@@ -294,6 +302,8 @@ isa.unique <- function(normed.data, isaresult, method=c("cor"),
 
   isaresult$rundata$unique <- TRUE
 
+  isa.status("DONE", "out")
+  
   isaresult      
 }
 
@@ -327,7 +337,9 @@ isa.row.from.col <- function(normed.data, col.seeds, thr.col, direction) {
 }  
 
 generate.seeds <- function(length, count=100, method=c("uni"),
-                           sparsity=2, verbose=isa.option("verbose")) {
+                           sparsity=2) {
+
+  isa.status("Generating seeds", "in")
 
   if (method == "uni") {
     sparsity <- rep(sparsity, length=count)
@@ -336,12 +348,16 @@ generate.seeds <- function(length, count=100, method=c("uni"),
       g[sample(length, sparsity[i]),i] <- 1
     }
   }
+
+  isa.status("DONE", "out")
+  
   g
 }
 
 isa.sweep <- function(data, normed.data, isaresult, method=c("cor"),
-                      neg.cor=TRUE, cor.limit=0.9,
-                      verbose=isa.option("verbose")) {
+                      neg.cor=TRUE, cor.limit=0.9) {
+  
+  isa.status("Performing an ISA sweep", "in")
   
   method <- match.arg(method)
 
@@ -456,10 +472,12 @@ isa.sweep <- function(data, normed.data, isaresult, method=c("cor"),
   result$rundata <- isaresult$rundata
   result$rundata$N <- NN
 
+  isa.status("DONE", "out")
+  
   result
 }
   
-sweep.graph <- function(sweep.result, verbose=isa.option("verbose")) {
+sweep.graph <- function(sweep.result) {
 
   if (is.null(sweep.result$seeddata$father)) {
     stop("Not a sweep result")
@@ -480,8 +498,10 @@ sweep.graph <- function(sweep.result, verbose=isa.option("verbose")) {
 }
 
 isa <- function(data, thr.row=seq(1,3,by=0.5), thr.col=seq(1,3,by=0.5),
-                no.seeds=100, verbose=isa.option("verbose")) {
+                no.seeds=100) {
 
+  isa.status("Performing complete ISA work flow", "in")
+  
   if (!is.matrix(data)) {
     stop("`data must be a matrix")
   }
@@ -524,6 +544,8 @@ isa <- function(data, thr.row=seq(1,3,by=0.5), thr.col=seq(1,3,by=0.5),
   ## Another filtering
   result <- isa.unique(normed.data, result)
 
+  isa.status("DONE", "out")
+  
   ## We are done
   result
 }

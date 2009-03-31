@@ -1,7 +1,8 @@
 
-robustness <- function(normed.data, row.scores, col.scores,
-                       verbose=isa.option("verbose")) {
+robustness <- function(normed.data, row.scores, col.scores) {
 
+  isa.status("Calculating robustness", "in")
+  
   Ec <- normed.data$Ec
   Er <- normed.data$Er
   
@@ -17,13 +18,18 @@ robustness <- function(normed.data, row.scores, col.scores,
 
   rob1[ rob1 < 0 ] <- 0
   rob2[ rob2 < 0 ] <- 0
-  sqrt(rob1) * sqrt(rob2)
+  res <- sqrt(rob1) * sqrt(rob2)
+
+  isa.status("DONE", "out")
+
+  res
 }
 
 isa.filter.robust <- function(data, normed.data, isares, perms=1,
-                              row.seeds, col.seeds,
-                              verbose=isa.option("verbose")) {
-
+                              row.seeds, col.seeds) {
+  
+  isa.status("Filtering for robustness...", "in")
+  
   if (perms <= 0) {
     stop("Number of permutations must be non-negative")
   }
@@ -80,5 +86,7 @@ isa.filter.robust <- function(data, normed.data, isares, perms=1,
   if (nrow(isares$seeddata)>0) { isares$seeddata$rob.limit <- rob.max }
   isares$rundata$rob.perms <- perms
 
+  isa.status("DONE.", "out")
+  
   isares
 }

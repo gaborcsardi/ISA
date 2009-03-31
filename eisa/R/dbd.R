@@ -282,9 +282,10 @@ setMethod("sigCategories", signature(r="DBDListHyperGResult"),
           })
 
 isa.DBD <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
-                    hgCutoff=0.001, correction=TRUE,
-                    verbose=isa.option("verbose")) {
+                    hgCutoff=0.001, correction=TRUE) {
 
+  isa.status("Calculating DBD enrichment", "in")
+  
   if (is.null(organism)) organism <- isaresult$rundata$organism
   if (is.null(annotation)) annotation <- isaresult$rundata$annotation
   if (is.null(features)) features <- isaresult$rundata$features  
@@ -317,6 +318,8 @@ isa.DBD <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
   cat(" -- Doing test\n")
   hgOver <- hyperGTest(params)
 
+  isa.status("DONE", "out")
+  
   hgOver
 }
 

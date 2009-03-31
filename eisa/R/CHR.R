@@ -268,9 +268,10 @@ setMethod("sigCategories", signature(r="CHRListHyperGResult"),
           })
 
 isa.CHR <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
-                    hgCutoff=0.001, correction=TRUE,
-                    verbose=isa.option("verbose")) {
+                    hgCutoff=0.001, correction=TRUE) {
 
+  isa.status("Calculating chromosome enrichment", "in")
+  
   if (is.null(organism)) organism <- isaresult$rundata$organism
   if (is.null(annotation)) annotation <- isaresult$rundata$annotation
   if (is.null(features)) features <- isaresult$rundata$features  
@@ -301,6 +302,8 @@ isa.CHR <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
   cat(" -- Doing test\n")
   hgOver <- hyperGTest(params)
 
+  isa.status("DONE", "out")
+  
   hgOver
 }
 

@@ -1,7 +1,9 @@
 
 gograph <- function(table, colbar.length=30, label.cex=1, GOGRAPHS=NULL,
-                    go.terms=NULL, verbose=isa.option("verbose")) {
+                    go.terms=NULL) {
 
+  isa.status("Creating a GO graph", "in")
+  
   require(GO.db)
   require(igraph)
 
@@ -167,10 +169,12 @@ gograph <- function(table, colbar.length=30, label.cex=1, GOGRAPHS=NULL,
   V(g2)$label.cex <- label.cex
   V(g2)$frame.color <- "grey"
 
+  isa.status("DONE", "out")
+  
   g2
 }
 
-gograph.plot <- function(graph, verbose=isa.option("verbose")) {
+gograph.plot <- function(graph) {
 
   require(TeachingDemos)
   
@@ -196,8 +200,9 @@ gograph.plot <- function(graph, verbose=isa.option("verbose")) {
 
 
 exp.plot.create <- function(exp.matrix, genes, conditions,
-                            normalize=FALSE,
-                            verbose=isa.option("verbose")) {
+                            normalize=FALSE) {
+
+  isa.status("Creating an expression plot", "in")
   
   require(affy)
 
@@ -239,6 +244,8 @@ exp.plot.create <- function(exp.matrix, genes, conditions,
   full.width <- 50 + exp.width + 100
   full.height <- 50 + exp.height + 70
 
+  isa.status("DONE", "out")
+  
   list(exp=em, width=full.width, height=full.height,
        exp.width=exp.width, exp.height=exp.height, colbar=colbar,
        zlim=zlim, gene.score=genes[gg][g.order],
@@ -246,7 +253,7 @@ exp.plot.create <- function(exp.matrix, genes, conditions,
        gene.width.px=gene.width.px, cond.height.px=cond.height.px)
 }
 
-exp.plot.colbar <- function(epo, verbose=isa.option("verbose")) {
+exp.plot.colbar <- function(epo) {
   par(mar=c(1,1,2,1))
   image( matrix((-30):30, nc=1), col=epo$colbar, axes=FALSE)
   at <- seq(0, 60, length=13)/60
@@ -256,7 +263,7 @@ exp.plot.colbar <- function(epo, verbose=isa.option("verbose")) {
   abline(h=c(-1,1))
 }
 
-exp.plot <- function(epo, scores=TRUE, verbose=isa.option("verbose")) {
+exp.plot <- function(epo, scores=TRUE) {
 
   if (scores) {
   
@@ -347,8 +354,9 @@ exp.plot <- function(epo, scores=TRUE, verbose=isa.option("verbose")) {
 cond.plot <- function(nm, genes, thr, markup, markdown, ylim=c(-1.2,1.5), all=TRUE,
                       sep=NULL, sepcol=NULL, val=TRUE, srt=90,
                       adj.above=c(0,0.5), adj.below=c(1,0.5),
-                      plot.only=seq_len(nrow(nm[[1]])), ...,
-                      verbose=isa.option("verbose")) {
+                      plot.only=seq_len(nrow(nm[[1]])), ...) {
+
+  isa.status("Creating a condition plot", "in")
   
   ## Calculate all condition scores, might not be correct for
   ## oscillating modules
@@ -405,11 +413,13 @@ cond.plot <- function(nm, genes, thr, markup, markdown, ylim=c(-1.2,1.5), all=TR
     par(xpd=FALSE)
   }
 
+  isa.status("DONE", "out")
 }
 
-overlap <- function(isares, algorithm=c("mds", "fr", "drl"), edge.limit=0.5,
-                    verbose=isa.option("verbose")) {
+overlap <- function(isares, algorithm=c("mds", "fr", "drl"), edge.limit=0.5) {
 
+  isa.status("Creating an overlap plot", "in")
+  
   algorithm <- match.arg(algorithm)
 
   genes <- isares$genes
@@ -466,12 +476,14 @@ overlap <- function(isares, algorithm=c("mds", "fr", "drl"), edge.limit=0.5,
     E(g)$color <- ifelse( E(g)$weight > 0, "grey", "red" )
     E(g)$width <- abs(E(g)$weight) * 3
   }
+
+  isa.status("DONE", "out")
+  
   g
 }
 
 overlap.plot <- function(graph, xsize=400, ysize=400,
-                         vertex.size=20, vertex.size2=10, ...,
-                         verbose=isa.option("verbose")) {
+                         vertex.size=20, vertex.size2=10, ...) {
 
   require(TeachingDemos)
 
