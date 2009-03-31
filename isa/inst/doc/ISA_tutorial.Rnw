@@ -1,3 +1,4 @@
+% \VignetteIndexEntry{The Iterative Signature Algorithm}
 \documentclass{article}
 \usepackage{ragged2e}
 
