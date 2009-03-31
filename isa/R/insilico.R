@@ -5,7 +5,8 @@ isa.in.silico <- function(num.rows=300, num.cols=50, num.fact=3, fact.per.row=1,
                           noise=0.1,
                           mod.signal=rep(1, num.fact),
                           mod.noise=rep(0, num.fact),
-                          overlap.row=0, overlap.col=overlap.row) {
+                          overlap.row=0, overlap.col=overlap.row,
+                          verbose=isa.option("verbose")) {
 
   if (max(mod.row.size) > num.rows || max(mod.col.size) > num.cols) {
     stop("Inconsistent data configuration")

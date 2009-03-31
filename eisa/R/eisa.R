@@ -2,7 +2,8 @@
 eisa <- function(exp.set, flist=filterfun(function(x) IQR(x) > 0.5),
                  uniqueEntrez=TRUE,
                  thr.gene=seq(2,4,by=0.5), thr.cond=seq(1,3,by=0.5),
-                 no.seeds=100) {
+                 no.seeds=100,
+                 verbose=isa.option("verbose")) {
   
   if (!is(exp.set, "ExpressionSet")) {
     stop("Please supply an ExpressionSet object")

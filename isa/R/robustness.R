@@ -1,5 +1,6 @@
 
-robustness <- function(normed.data, row.scores, col.scores) {
+robustness <- function(normed.data, row.scores, col.scores,
+                       verbose=isa.option("verbose")) {
 
   Ec <- normed.data$Ec
   Er <- normed.data$Er
@@ -20,7 +21,8 @@ robustness <- function(normed.data, row.scores, col.scores) {
 }
 
 isa.filter.robust <- function(data, normed.data, isares, perms=1,
-                              row.seeds, col.seeds) {
+                              row.seeds, col.seeds,
+                              verbose=isa.option("verbose")) {
 
   if (perms <= 0) {
     stop("Number of permutations must be non-negative")

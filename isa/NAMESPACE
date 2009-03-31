@@ -7,6 +7,8 @@ export(isa.sweep, sweep.graph)
 
 export(isa)
 
+export(isa.option)
+
 ##########
 
 useDynLib(isa)

@@ -282,7 +282,8 @@ setMethod("sigCategories", signature(r="miRNAListHyperGResult"),
           })
 
 isa.miRNA <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
-                     hgCutoff=0.001, correction=TRUE) {
+                      hgCutoff=0.001, correction=TRUE,
+                      verbose=isa.option("verbose")) {
 
   if (is.null(organism)) organism <- isaresult$rundata$organism
   if (is.null(annotation)) annotation <- isaresult$rundata$annotation

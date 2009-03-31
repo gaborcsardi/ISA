@@ -3,7 +3,8 @@ autogen.table <- function(nm, isares, target.dir,
                           modules=seq_len(ncol(isares$genes)),
                           template=system.file("autogen", package="eisa"),
                           GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL, DBD=NULL,
-                          htmltitle=NULL, notes=NULL, seed=NULL) {
+                          htmltitle=NULL, notes=NULL, seed=NULL,
+                          verbose=isa.option("verbose")) {
 
   chip <- isares$rundata$annotation
   library(paste(sep="", chip, ".db"), character.only=TRUE)
@@ -229,7 +230,8 @@ autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
                             markup=numeric(), markdown=numeric(),
                             sep=NULL, seed=NULL, drive.BP=NULL,
                             drive.CC=NULL, drive.MF=NULL, drive.KEGG=NULL,
-                            drive.miRNA=NULL, drive.DBD=NULL, drive.CHR=NULL) {
+                            drive.miRNA=NULL, drive.DBD=NULL, drive.CHR=NULL,
+                            verbose=isa.option("verbose")) {
 
   if (!file.exists(target.dir)) {
     dir.create(target.dir)
@@ -287,7 +289,8 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
                                drive.MF=NULL, drive.KEGG=NULL,
                                drive.miRNA=NULL, drive.DBD=NULL,
                                drive.CHR=NULL,
-                               next.module=NULL, prev.module=NULL) {
+                               next.module=NULL, prev.module=NULL,
+                               verbose=isa.option("verbose")) {
 
   require(Cairo)
   require(isa)

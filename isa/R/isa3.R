@@ -1,5 +1,6 @@
 
-isa.normalize <- function(data, prenormalize=FALSE) {
+isa.normalize <- function(data, prenormalize=FALSE,
+                          verbose=isa.option("verbose")) {
 
   if (!is.matrix(data)) {
     stop("`data' must be a matrix")
@@ -27,7 +28,8 @@ isa.iterate <- function(normed.data, row.seeds, col.seeds,
                         direction=c("updown", "updown"),
                         convergence=c("cor", "eps"),
                         cor.limit=0.99, eps=1e-4,
-                        oscillation=FALSE, maxiter=100) {
+                        oscillation=FALSE, maxiter=100,
+                        verbose=isa.option("verbose")) {
 
   if (( missing(row.seeds) &&  missing(col.seeds))) {
     stop("No seeds, nothing to do")
@@ -244,7 +246,7 @@ isa.step <- function(normed.data, rows, thr.row, thr.col, direction) {
 
 isa.unique <- function(normed.data, isaresult, method=c("cor"),
                        ignore.div=TRUE, cor.limit=0.9, neg.cor=TRUE,
-                       drop.zero=TRUE) {
+                       drop.zero=TRUE, verbose=isa.option("verbose")) {
 
   method <- match.arg(method)
 
@@ -325,7 +327,7 @@ isa.row.from.col <- function(normed.data, col.seeds, thr.col, direction) {
 }  
 
 generate.seeds <- function(length, count=100, method=c("uni"),
-                           sparsity=2) {
+                           sparsity=2, verbose=isa.option("verbose")) {
 
   if (method == "uni") {
     sparsity <- rep(sparsity, length=count)
@@ -338,7 +340,8 @@ generate.seeds <- function(length, count=100, method=c("uni"),
 }
 
 isa.sweep <- function(data, normed.data, isaresult, method=c("cor"),
-                      neg.cor=TRUE, cor.limit=0.9) {
+                      neg.cor=TRUE, cor.limit=0.9,
+                      verbose=isa.option("verbose")) {
   
   method <- match.arg(method)
 
@@ -456,7 +459,7 @@ isa.sweep <- function(data, normed.data, isaresult, method=c("cor"),
   result
 }
   
-sweep.graph <- function(sweep.result) {
+sweep.graph <- function(sweep.result, verbose=isa.option("verbose")) {
 
   if (is.null(sweep.result$seeddata$father)) {
     stop("Not a sweep result")
@@ -477,7 +480,7 @@ sweep.graph <- function(sweep.result) {
 }
 
 isa <- function(data, thr.row=seq(1,3,by=0.5), thr.col=seq(1,3,by=0.5),
-                no.seeds=100) {
+                no.seeds=100, verbose=isa.option("verbose")) {
 
   if (!is.matrix(data)) {
     stop("`data must be a matrix")

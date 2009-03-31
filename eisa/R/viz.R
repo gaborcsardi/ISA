@@ -1,6 +1,6 @@
 
 gograph <- function(table, colbar.length=30, label.cex=1, GOGRAPHS=NULL,
-                    go.terms=NULL) {
+                    go.terms=NULL, verbose=isa.option("verbose")) {
 
   require(GO.db)
   require(igraph)
@@ -170,7 +170,7 @@ gograph <- function(table, colbar.length=30, label.cex=1, GOGRAPHS=NULL,
   g2
 }
 
-gograph.plot <- function(graph) {
+gograph.plot <- function(graph, verbose=isa.option("verbose")) {
 
   require(TeachingDemos)
   
@@ -196,7 +196,8 @@ gograph.plot <- function(graph) {
 
 
 exp.plot.create <- function(exp.matrix, genes, conditions,
-                            normalize=FALSE) {
+                            normalize=FALSE,
+                            verbose=isa.option("verbose")) {
   
   require(affy)
 
@@ -245,7 +246,7 @@ exp.plot.create <- function(exp.matrix, genes, conditions,
        gene.width.px=gene.width.px, cond.height.px=cond.height.px)
 }
 
-exp.plot.colbar <- function(epo) {
+exp.plot.colbar <- function(epo, verbose=isa.option("verbose")) {
   par(mar=c(1,1,2,1))
   image( matrix((-30):30, nc=1), col=epo$colbar, axes=FALSE)
   at <- seq(0, 60, length=13)/60
@@ -255,7 +256,7 @@ exp.plot.colbar <- function(epo) {
   abline(h=c(-1,1))
 }
 
-exp.plot <- function(epo, scores=TRUE) {
+exp.plot <- function(epo, scores=TRUE, verbose=isa.option("verbose")) {
 
   if (scores) {
   
@@ -346,7 +347,8 @@ exp.plot <- function(epo, scores=TRUE) {
 cond.plot <- function(nm, genes, thr, markup, markdown, ylim=c(-1.2,1.5), all=TRUE,
                       sep=NULL, sepcol=NULL, val=TRUE, srt=90,
                       adj.above=c(0,0.5), adj.below=c(1,0.5),
-                      plot.only=seq_len(nrow(nm[[1]])), ...) {
+                      plot.only=seq_len(nrow(nm[[1]])), ...,
+                      verbose=isa.option("verbose")) {
   
   ## Calculate all condition scores, might not be correct for
   ## oscillating modules
@@ -405,7 +407,8 @@ cond.plot <- function(nm, genes, thr, markup, markdown, ylim=c(-1.2,1.5), all=TR
 
 }
 
-overlap <- function(isares, algorithm=c("mds", "fr", "drl"), edge.limit=0.5) {
+overlap <- function(isares, algorithm=c("mds", "fr", "drl"), edge.limit=0.5,
+                    verbose=isa.option("verbose")) {
 
   algorithm <- match.arg(algorithm)
 
@@ -466,7 +469,9 @@ overlap <- function(isares, algorithm=c("mds", "fr", "drl"), edge.limit=0.5) {
   g
 }
 
-overlap.plot <- function(graph, xsize=400, ysize=400, vertex.size=20, vertex.size2=10, ...) {
+overlap.plot <- function(graph, xsize=400, ysize=400,
+                         vertex.size=20, vertex.size2=10, ...,
+                         verbose=isa.option("verbose")) {
 
   require(TeachingDemos)
 
