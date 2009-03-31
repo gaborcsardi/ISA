@@ -1,5 +1,5 @@
 
-isa.in.silico <- function(num.rows=300, num.cols=50, num.fact=3, fact.per.row=1,
+isa.in.silico <- function(num.rows=300, num.cols=50, num.fact=3,
                           mod.row.size=round(.5*num.rows/num.fact),
                           mod.col.size=round(.5*num.cols/num.fact),
                           noise=0.1,
