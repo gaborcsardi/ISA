@@ -308,7 +308,7 @@ isa.unique <- function(normed.data, isaresult, method=c("cor"),
 }
 
 
-isa.row.from.col <- function(normed.data, col.seeds, thr.col, direction) {
+isa.row.from.col <- function(normed.data, col.seeds, thr.row, direction) {
 
 
   Ec <- normed.data$Ec
