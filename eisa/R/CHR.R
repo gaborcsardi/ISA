@@ -5,10 +5,9 @@
 ##################################################
 
 setClass("CHRListHyperGParams",
-         representation(conditional="logical"),
+         representation(),
          contains="HyperGParams",
-         prototype=prototype(categoryName=c("CHR", "List"),
-           conditional=FALSE))
+         prototype=prototype(categoryName=c("CHR", "List")))
 
 ##################
 ## makeValidParams
@@ -19,30 +18,11 @@ setMethod("makeValidParams", "CHRListHyperGParams",
             if (!is.list(object@geneIds)) {
               object@geneIds <- list(object@geneIds)
             }
-            if (object@conditional) {
-              stop("Conditional CHR test is not implemented yet")
-            }
             if (object@testDirection != "over") {
               stop("Only overrepresentation test is implemented yet")
             }
             object
           })
-
-##################
-## conditional
-
-setMethod("conditional", "CHRListHyperGParams", function(r) r@conditional)
-
-##################
-## conditional<-
-
-setReplaceMethod("conditional", c("CHRListHyperGParams", "logical"),
-                 function(r, value) {
-                     if (is.na(value))
-                       stop("value must be TRUE or FALSE")
-                     r@conditional <- value
-                     r
-                 })
 
 ##################
 ## categoryToEntrezBuilder
@@ -124,7 +104,6 @@ isa.CHRListHyperGTest <- function(p) {
       testName=c("CHR", "List"),
       testDirection=p@testDirection,
       pvalueCutoff=p@pvalueCutoff,
-      conditional=p@conditional,
       universeGeneIds=p@universeGeneIds,
       catToGeneId=dbdcat.ent)
 }
@@ -150,7 +129,6 @@ setClass("CHRListHyperGResult",
          contains="HyperGResultBase",
          representation=representation(
            reslist="list",
-           conditional="logical",
            universeGeneIds="character",
            catToGeneId="list"),
          prototype=prototype(

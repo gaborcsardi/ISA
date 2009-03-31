@@ -5,10 +5,9 @@
 ##################################################
 
 setClass("DBDListHyperGParams",
-         representation(conditional="logical"),
+         representation(),
          contains="HyperGParams",
-         prototype=prototype(categoryName=c("DBD", "List"),
-           conditional=FALSE))
+         prototype=prototype(categoryName=c("DBD", "List")))
 
 ##################
 ## makeValidParams
@@ -19,30 +18,11 @@ setMethod("makeValidParams", "DBDListHyperGParams",
             if (!is.list(object@geneIds)) {
               object@geneIds <- list(object@geneIds)
             }
-            if (object@conditional) {
-              stop("Conditional DBD test is not implemented yet")
-            }
             if (object@testDirection != "over") {
               stop("Only overrepresentation test is implemented yet")
             }
             object
           })
-
-##################
-## conditional
-
-setMethod("conditional", "DBDListHyperGParams", function(r) r@conditional)
-
-##################
-## conditional<-
-
-setReplaceMethod("conditional", c("DBDListHyperGParams", "logical"),
-                 function(r, value) {
-                     if (is.na(value))
-                       stop("value must be TRUE or FALSE")
-                     r@conditional <- value
-                     r
-                 })
 
 ##################
 ## categoryToEntrezBuilder
@@ -138,7 +118,6 @@ isa.DBDListHyperGTest <- function(p) {
       testName=c("DBD", "List"),
       testDirection=p@testDirection,
       pvalueCutoff=p@pvalueCutoff,
-      conditional=p@conditional,
       universeGeneIds=p@universeGeneIds,
       catToGeneId=dbdcat.ent)
 }
@@ -164,7 +143,6 @@ setClass("DBDListHyperGResult",
          contains="HyperGResultBase",
          representation=representation(
            reslist="list",
-           conditional="logical",
            universeGeneIds="character",
            catToGeneId="list"),
          prototype=prototype(

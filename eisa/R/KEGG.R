@@ -4,10 +4,9 @@
 ##################################################
 
 setClass("KEGGListHyperGParams",
-         representation(conditional="logical"),
+         representation(),
          contains="HyperGParams",
-         prototype=prototype(categoryName=c("KEGG", "List"),
-           conditional=FALSE))
+         prototype=prototype(categoryName=c("KEGG", "List")))
 
 ##################
 ## makeValidParams
@@ -18,30 +17,11 @@ setMethod("makeValidParams", "KEGGListHyperGParams",
             if (!is.list(object@geneIds)) {
               object@geneIds <- list(object@geneIds)
             }
-            if (object@conditional) {
-              stop("Conditional KEGG test is not implemented yet")
-            }
             if (object@testDirection != "over") {
               stop("Only overrepresentation test is implemented yet")
             }
             object
           })
-
-##################
-## conditional
-
-setMethod("conditional", "KEGGListHyperGParams", function(r) r@conditional)
-
-##################
-## conditional<-
-
-setReplaceMethod("conditional", c("KEGGListHyperGParams", "logical"),
-                 function(r, value) {
-                     if (is.na(value))
-                       stop("value must be TRUE or FALSE")
-                     r@conditional <- value
-                     r
-                 })
 
 ##################
 ## categoryToEntrezBuilder
@@ -119,7 +99,6 @@ isa.KEGGListHyperGTest <- function(p) {
       testName=c("KEGG", "List"),
       testDirection=p@testDirection,
       pvalueCutoff=p@pvalueCutoff,
-      conditional=p@conditional,
       universeGeneIds=p@universeGeneIds,
       catToGeneId=keggcat.ent)
 }
@@ -145,7 +124,6 @@ setClass("KEGGListHyperGResult",
          contains="HyperGResultBase",
          representation=representation(
            reslist="list",
-           conditional="logical",
            universeGeneIds="character",
            catToGeneId="list"),
          prototype=prototype(
