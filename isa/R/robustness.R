@@ -40,8 +40,7 @@ isa.filter.robust <- function(data, normed.data, isares, perms=1,
 
   if (missing(row.seeds) && missing(col.seeds)) {
     row.seeds <- generate.seeds(count=isares$rundata$N,
-                                 length=nrow(isares$rows),
-                                 sparsity=)
+                                 length=nrow(isares$rows))
   }
 
   rob.max <- 0
