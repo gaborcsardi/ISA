@@ -46,5 +46,26 @@ isa.normalize (data, prenormalize = FALSE)
   Signature Algorithm. See \code{\link{isa}} for an easy way of running
   ISA.
 }
-\examples{}
+\examples{
+## In-silico data
+set.seed(1)
+insili <- isa.in.silico()
+nm <- isa.normalize(insili[[1]])
+
+## Check it
+max(abs(rowSums(nm[[1]])))
+max(abs(rowSums(nm[[2]])))
+
+max(abs(sd(t(nm[[1]])) - 1))
+max(abs(sd(t(nm[[2]])) - 1))
+
+## Plot them
+if (interactive()) {
+  layout(rbind(1:2,3:4))
+  image(insili[[1]], main="Original data")
+  image(t(nm[[1]]), main="Row normalized")
+  image(nm[[2]], main="Column normalized")
+}
+
+}
 \keyword{cluster}

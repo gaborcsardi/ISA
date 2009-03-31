@@ -77,5 +77,51 @@ sweep.graph (sweep.result)
   Signature Algorithm. See \code{\link{isa}} for an easy way of running
   ISA.
 }
-\examples{}
+\examples{
+## In-silico data
+set.seed(1)
+insili <- isa.in.silico()
+
+## Do ISA with a bunch of row thresholds while keeping the column
+## threshold fixed
+isares <- isa(insili[[1]], thr.row=c(0.5,1,2), thr.col=0)
+
+## Create a nice tree from the modules, we need the normed data for this
+nm <- isa.normalize(insili[[1]])
+isa.tree <- isa.sweep(insili[[1]], nm, isares)
+network <- sweep.graph(isa.tree)
+
+## Plot the network of modules
+if (interactive()) {
+  lab <- paste(sep="", seq_len(ncol(isa.tree$rows)), ": ",
+               colSums(isa.tree$rows!=0), ",",
+               colSums(isa.tree$columns!=0))
+  par(mar=c(1,1,1,1))
+  plot(network, layout=layout.reingold.tilford,
+       vertex.shape="rectangle", vertex.color="green",
+       vertex.label=lab, vertex.size=30, vertex.size2=10)
+}
+
+## Plot the modules themselves as well
+if (interactive()) {
+  layout( matrix(1:16, byrow=TRUE, nc=4) )
+  for (i in seq(ncol(isa.tree$rows))) {
+    par(mar=c(1,2,2,1))
+    image( outer(isa.tree$rows[,i], isa.tree$columns[,i]) )
+    text(1, 1, cex=2, paste(sep="", "#", i), adj=c(1,1))
+  }
+}
+
+## Yet another plot, the scores for the rows within the modules
+if (interactive()) {
+  layout(matrix( 1:15, nc=3 ))
+  for (i in seq(ncol(isa.tree$rows))) {
+    par(mar=c(2,2,1,1))
+    plot(isa.tree$rows[,i], axes=FALSE, ylim=c(-1,1))
+    axis(1); axis(2)
+    text(nrow(isa.tree$rows), 1, adj=c(1,1), paste(sep="", "#", i), cex=2)
+  }
+}
+    
+}
 \keyword{cluster}
