@@ -284,6 +284,14 @@ isa.unique <- function(normed.data, isaresult, method=c("cor"),
   if (ncol(isaresult$rows) == 0) { return(isaresult) }
 
   if (method=="cor") {
+    ## We reorder the results a bit, because we want to keep modules
+    ## with higher (row,column) thresholds
+    ord <- order(isaresult$seeddata$thr.row, isaresult$seeddata$thr.col,
+                 decreasing=TRUE)
+    isaresult$rows <- isaresult$rows[,ord,drop=FALSE]
+    isaresult$columns <- isaresult$columns[,ord,drop=FALSE]
+    isaresult$seeddata <- isaresult$seeddata[ord,,drop=FALSE]
+    
     if (neg.cor) { ABS <- abs } else { ABS <- function(x) x }
     cm <- pmin(ABS(cor(isaresult$rows)), ABS(cor(isaresult$columns)))
     cm[ lower.tri(cm, diag=TRUE) ] <- 0
