@@ -89,4 +89,4 @@ isa.filter.robust (data, normed.data, isares, perms = 1, row.seeds, col.seeds)
   ISA.
 }
 \examples{}
-\keyword{cluster,classif,array,optimize}
+\keyword{cluster}

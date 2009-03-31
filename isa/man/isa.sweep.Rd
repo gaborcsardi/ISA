@@ -78,4 +78,4 @@ sweep.graph (sweep.result)
   ISA.
 }
 \examples{}
-\keyword{cluster,classif,array,optimize}
+\keyword{cluster}

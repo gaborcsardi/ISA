@@ -75,4 +75,4 @@ isa.iterate (normed.data, row.seeds, col.seeds, thr.row, thr.col = thr.row,
   ISA.
 }
 \examples{}
-\keyword{cluster,classif,array,optimize}
+\keyword{cluster}

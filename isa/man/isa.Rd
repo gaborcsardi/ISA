@@ -166,4 +166,4 @@ if (interactive()) {
                                  main=paste("Module", b)))  
 }
 }
-\keyword{cluster,classif,array,optimize}
+\keyword{cluster}

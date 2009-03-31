@@ -63,4 +63,4 @@ isa.in.silico (num.rows = 300, num.cols = 50, num.fact = 3,
   ISA.
 }
 \examples{}
-\keyword{cluster,classif,array,optimize}
+\keyword{cluster}

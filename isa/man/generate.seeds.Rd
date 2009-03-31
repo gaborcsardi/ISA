@@ -72,4 +72,4 @@ tapply(seq_len(ncol(isaresult.unique$rows)),
        isaresult.unique$seeddata$sparsity, length)
 ## We usually find more modules with sparser seeds
 }
-\keyword{cluster,classif,array,optimize}
+\keyword{cluster}

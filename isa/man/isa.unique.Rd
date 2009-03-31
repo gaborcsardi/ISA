@@ -62,4 +62,4 @@ isa.unique (normed.data, isaresult, method = c("cor"),
   ISA.
 }
 \examples{}
-\keyword{cluster,classif,array,optimize}
+\keyword{cluster}

@@ -47,4 +47,4 @@ isa.normalize (data, prenormalize = FALSE)
   ISA.
 }
 \examples{}
-\keyword{cluster,classif,array,optimize}
+\keyword{cluster}
