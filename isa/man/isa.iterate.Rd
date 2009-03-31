@@ -7,7 +7,7 @@
 \usage{
 isa.iterate (normed.data, row.seeds, col.seeds, thr.row, thr.col = thr.row,    
      direction = c("updown", "updown"), convergence = c("cor",               
-         "eps"), cor.limit = 0.99, eps = 1e-04, oscillation = TRUE, 
+         "eps"), cor.limit = 0.99, eps = 1e-04, oscillation = FALSE, 
      maxiter = 100)
 }
 \arguments{

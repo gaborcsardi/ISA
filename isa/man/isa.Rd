@@ -19,6 +19,7 @@ isa(data, thr.row=seq(1,3,by=0.5), thr.col=seq(1,3,by=0.5), no.seeds=100)
     The column threshold parameters for which the ISA will be run. We
     use all possible combinations of \code{thr.row} and \code{thr.col}.
   }
+  \item{no.seeds}{Integer scalar, the number of seeds to use.}
 }
 \details{
   Please read the \link{isa-package} manual page for an introduction on

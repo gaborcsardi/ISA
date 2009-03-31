@@ -27,8 +27,10 @@ isa.in.silico (num.rows = 300, num.cols = 50, num.fact = 3,
   \item{mod.noise}{The noise levels of the different modules. Normally
     distributed noise with standard deviation \code{mod.noise} is added
     to the data. This is in addition to the background noise.}
-  \item{OL}{The overlap of the modules. Zero means no overlap, one means
-    one overlapping row and column, etc.}
+  \item{overlap.row}{The overlap of the modules, for the rows.
+    Zero means no overlap, one means one overlapping row, etc.} 
+  \item{overlap.col}{The overlap of the modules, for the columns.
+    Zero means no overlap, one means one overlapping column, etc.} 
 }
 \details{
   \code{isa.in.silico} creates an artificial data set to test the ISA or

@@ -23,7 +23,7 @@ sweep.graph (sweep.result)
     correlation as convergence.}
   \item{cor.limit}{Numeric scalar giving the minimum correlation for
     convergence.}
-  \item{sweep.graph}{An ISA result with hierarchy information in the
+  \item{sweep.result}{An ISA result with hierarchy information in the
     seed data, typically calculated by the \code{isa.sweep} function.}
 }
 \details{
