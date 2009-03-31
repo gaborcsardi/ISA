@@ -5,10 +5,11 @@
 
 setClass("GOListHyperGParams",
          representation(ontology="character",
-                        conditional="logical"),
+                        conditional="logical",
+                        drive="logical"),
          contains="HyperGParams",
          prototype=prototype(categoryName=c("GO", "List"),
-           conditional=FALSE))
+           conditional=FALSE, drive=FALSE))
 
 ##################
 ## makeValidParams
@@ -31,7 +32,7 @@ setMethod("makeValidParams", "GOListHyperGParams",
 ##################
 ## ontology
 
-setMethod("ontology", "GOListHyperGParams", function(r) r@ontology)
+setMethod("ontology", "GOListHyperGParams", function(object) object@ontology)
 
 ##################
 ## ontology<-
@@ -50,6 +51,11 @@ setReplaceMethod("ontology", c("GOListHyperGParams", "character"),
 setMethod("conditional", "GOListHyperGParams", function(r) r@conditional)
 
 ##################
+## drive
+
+setMethod("drive", signature("GOListHyperGParams"), function(r) { r@drive })
+
+##################
 ## conditional<-
 
 setReplaceMethod("conditional", c("GOListHyperGParams", "logical"),
@@ -57,6 +63,17 @@ setReplaceMethod("conditional", c("GOListHyperGParams", "logical"),
                      if (is.na(value))
                        stop("value must be TRUE or FALSE")
                      r@conditional <- value
+                     r
+                 })
+
+##################
+## drive<-
+
+setReplaceMethod("drive", c("GOListHyperGParams", "logical"),
+                 function(r, value) {
+                     if (is.na(value))
+                       stop("value must be TRUE or FALSE")
+                     r@drive <- value
                      r
                  })
 
@@ -179,6 +196,11 @@ isa.GOListHyperGTest <- function(p) {
     res <- data.frame(Pvalue=res$p, OddsRatio=res$odds,
                       ExpCount=res$expected, Count=count,
                       Size=size, row.names=names(res$p))
+    if (p@drive) {
+      drive <- lapply(my.gocat.ent, intersect, genes)
+      drive <- lapply(drive, paste, collapse=";")
+      res$drive <- drive
+    }
     res[ order(res$Pvalue), ]
   })
 
@@ -190,6 +212,7 @@ isa.GOListHyperGTest <- function(p) {
       testDirection=p@testDirection,
       pvalueCutoff=p@pvalueCutoff,
       conditional=p@conditional,
+      drive=p@drive,
       universeGeneIds=p@universeGeneIds,
       catToGeneId=gocat.ent)
 }
@@ -217,6 +240,7 @@ setClass("GOListHyperGResult",
          representation=representation(
            reslist="list",
            conditional="logical",
+           drive="logical",
            universeGeneIds="character",
            catToGeneId="list"),
          prototype=prototype(
@@ -311,13 +335,19 @@ setMethod("condGeneIdUniverse", signature(r="GOListHyperGResult"),
 ## This function gives all the hits for the tested categories.
 setMethod("geneIdsByCategory", signature(r="GOListHyperGResult"),
           function(r, catids=NULL) {
-            lapply(r@geneIds, function(genes) {
-              tmp <- lapply(r@catToGeneId, function(x) {
-                genes [ genes %in% x ]
-              })
-              tmp <- tmp[ sapply(tmp, length) != 0 ]
-              ord <- order(names(tmp))
-              tmp <- tmp[ord]
+            lapply(seq_along(r@geneIds), function(x) {
+              if ("drive" %in% names(r@reslist[[x]])) {
+                drive <- as.character(r@reslist[[x]]$drive)
+                strsplit(drive, ";")
+              } else {
+                genes <- r@geneIds[[x]]
+                tmp <- lapply(r@catToGeneId, function(y) {
+                  genes [ genes %in% y ]
+                })
+                tmp <- tmp[ sapply(tmp, length) != 0 ]
+                ord <- order(names(tmp))
+                tmp[ord]
+              }
             })
           })
 
@@ -360,7 +390,7 @@ isa.GO <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
     new("GOListHyperGParams", geneIds = selectedEntrezIds,
         universeGeneIds = entrezUniverse, annotation = annotation,
         ontology = "BP", pvalueCutoff = hgCutoff, conditional = FALSE,
-        testDirection = "over")
+        testDirection = "over", drive = TRUE)
 
   ontology(paramsCC) <- "CC"
   ontology(paramsMF) <- "MF"

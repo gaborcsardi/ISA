@@ -5,9 +5,10 @@
 ##################################################
 
 setClass("CHRListHyperGParams",
-         representation(),
+         representation(drive="logical"),
          contains="HyperGParams",
-         prototype=prototype(categoryName=c("CHR", "List")))
+         prototype=prototype(categoryName=c("CHR", "List"),
+           drive=FALSE))
 
 ##################
 ## makeValidParams
@@ -23,6 +24,18 @@ setMethod("makeValidParams", "CHRListHyperGParams",
             }
             object
           })
+
+##################
+## drive
+
+setMethod("drive", signature("CHRListHyperGParams"), function(r) { r@drive })
+setReplaceMethod("drive", c("CHRListHyperGParams", "logical"),
+                 function(r, value) {
+                     if (is.na(value))
+                       stop("value must be TRUE or FALSE")
+                     r@drive <- value
+                     r
+                 })
 
 ##################
 ## categoryToEntrezBuilder
@@ -94,6 +107,11 @@ isa.CHRListHyperGTest <- function(p) {
     res <- data.frame(Pvalue=res$p, OddsRatio=res$odds,
                       ExpCount=res$expected, Count=count,
                       Size=size, row.names=names(res$p))
+    if (p@drive) {
+      drive <- lapply(my.dbdcat.ent, intersect, genes)
+      drive <- lapply(drive, paste, collapse=";")
+      res$drive <- drive
+    }
     res[ order(res$Pvalue), ]
   })
 
@@ -104,6 +122,7 @@ isa.CHRListHyperGTest <- function(p) {
       testName=c("CHR", "List"),
       testDirection=p@testDirection,
       pvalueCutoff=p@pvalueCutoff,
+      drive=p@drive,
       universeGeneIds=p@universeGeneIds,
       catToGeneId=dbdcat.ent)
 }
@@ -129,6 +148,7 @@ setClass("CHRListHyperGResult",
          contains="HyperGResultBase",
          representation=representation(
            reslist="list",
+           drive="logical",
            universeGeneIds="character",
            catToGeneId="list"),
          prototype=prototype(
@@ -223,13 +243,19 @@ setMethod("condGeneIdUniverse", signature(r="CHRListHyperGResult"),
 ## This function gives all the hits for the tested categories.
 setMethod("geneIdsByCategory", signature(r="CHRListHyperGResult"),
           function(r, catids=NULL) {
-            lapply(r@geneIds, function(genes) {
-              tmp <- lapply(r@catToGeneId, function(x) {
-                genes [ genes %in% x ]
-              })
-              tmp <- tmp[ sapply(tmp, length) != 0 ]
-              ord <- order(names(tmp))
-              tmp <- tmp[ord]
+            lapply(seq_along(r@geneIds), function(x) {
+              if ("drive" %in% names(r@reslist[[x]])) {
+                drive <- as.character(r@reslist[[x]]$drive)
+                strsplit(drive, ";")
+              } else {
+                genes <- r@geneIds[[x]]
+                tmp <- lapply(r@catToGeneId, function(y) {
+                  genes [ genes %in% y ]
+                })
+                tmp <- tmp[ sapply(tmp, length) != 0 ]
+                ord <- order(names(tmp))
+                tmp[ord]
+              }
             })
           })
 
@@ -269,7 +295,7 @@ isa.CHR <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
   params <-
     try( new("CHRListHyperGParams", geneIds = selectedEntrezIds,
              universeGeneIds = entrezUniverse, annotation = annotation,
-             pvalueCutoff = hgCutoff, testDirection = "over") )
+             pvalueCutoff = hgCutoff, testDirection = "over", drive=TRUE ) )
 
   cat(" -- Doing test\n")
   hgOver <- hyperGTest(params)

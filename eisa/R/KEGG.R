@@ -4,9 +4,10 @@
 ##################################################
 
 setClass("KEGGListHyperGParams",
-         representation(),
+         representation(drive="logical"),
          contains="HyperGParams",
-         prototype=prototype(categoryName=c("KEGG", "List")))
+         prototype=prototype(categoryName=c("KEGG", "List"),
+           drive=FALSE))
 
 ##################
 ## makeValidParams
@@ -22,6 +23,18 @@ setMethod("makeValidParams", "KEGGListHyperGParams",
             }
             object
           })
+
+##################
+## drive
+
+setMethod("drive", signature("KEGGListHyperGParams"), function(r) { r@drive })
+setReplaceMethod("drive", c("KEGGListHyperGParams", "logical"),
+                 function(r, value) {
+                     if (is.na(value))
+                       stop("value must be TRUE or FALSE")
+                     r@drive <- value
+                     r
+                 })
 
 ##################
 ## categoryToEntrezBuilder
@@ -89,6 +102,12 @@ isa.KEGGListHyperGTest <- function(p) {
     res <- data.frame(Pvalue=res$p, OddsRatio=res$odds,
                       ExpCount=res$expected, Count=count,
                       Size=size, row.names=names(res$p))
+    if (p@drive) {
+      drive <- lapply(my.keggcat.ent, intersect, genes)
+      drive <- lapply(drive, paste, collapse=";")
+      res$drive <- drive
+    }
+    
     res[ order(res$Pvalue), ]
   })
 
@@ -99,6 +118,7 @@ isa.KEGGListHyperGTest <- function(p) {
       testName=c("KEGG", "List"),
       testDirection=p@testDirection,
       pvalueCutoff=p@pvalueCutoff,
+      drive=p@drive,
       universeGeneIds=p@universeGeneIds,
       catToGeneId=keggcat.ent)
 }
@@ -124,6 +144,7 @@ setClass("KEGGListHyperGResult",
          contains="HyperGResultBase",
          representation=representation(
            reslist="list",
+           drive="logical",
            universeGeneIds="character",
            catToGeneId="list"),
          prototype=prototype(
@@ -218,13 +239,19 @@ setMethod("condGeneIdUniverse", signature(r="KEGGListHyperGResult"),
 ## This function gives all the hits for the tested categories.
 setMethod("geneIdsByCategory", signature(r="KEGGListHyperGResult"),
           function(r, catids=NULL) {
-            lapply(r@geneIds, function(genes) {
-              tmp <- lapply(r@catToGeneId, function(x) {
-                genes [ genes %in% x ]
-              })
-              tmp <- tmp[ sapply(tmp, length) != 0 ]
-              ord <- order(names(tmp))
-              tmp <- tmp[ord]
+            lapply(seq_along(r@geneIds), function(x) {
+              if ("drive" %in% names(r@reslist[[x]])) {
+                drive <- as.character(r@reslist[[x]]$drive)
+                strsplit(drive, ";")
+              } else {
+                genes <- r@geneIds[[x]]
+                tmp <- lapply(r@catToGeneId, function(y) {
+                  genes [ genes %in% y ]
+                })
+                tmp <- tmp[ sapply(tmp, length) != 0 ]
+                ord <- order(names(tmp))
+                tmp[ord]
+              }
             })
           })
 
@@ -266,7 +293,7 @@ isa.KEGG <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
   params <-
     try( new("KEGGListHyperGParams", geneIds = selectedEntrezIds,
              universeGeneIds = entrezUniverse, annotation = annotation,
-             pvalueCutoff = hgCutoff, testDirection = "over") )
+             pvalueCutoff = hgCutoff, testDirection = "over", drive=TRUE) )
 
   cat(" -- Doing test\n")
   hgOver <- hyperGTest(params)

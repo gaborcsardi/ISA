@@ -5,9 +5,10 @@
 ##################################################
 
 setClass("DBDListHyperGParams",
-         representation(),
+         representation(drive="logical"),
          contains="HyperGParams",
-         prototype=prototype(categoryName=c("DBD", "List")))
+         prototype=prototype(categoryName=c("DBD", "List"),
+           drive=FALSE))
 
 ##################
 ## makeValidParams
@@ -23,6 +24,18 @@ setMethod("makeValidParams", "DBDListHyperGParams",
             }
             object
           })
+
+##################
+## drive
+
+setMethod("drive", signature("DBDListHyperGParams"), function(r) { r@drive })
+setReplaceMethod("drive", c("DBDListHyperGParams", "logical"),
+                 function(r, value) {
+                     if (is.na(value))
+                       stop("value must be TRUE or FALSE")
+                     r@drive <- value
+                     r
+                 })
 
 ##################
 ## categoryToEntrezBuilder
@@ -108,6 +121,11 @@ isa.DBDListHyperGTest <- function(p) {
     res <- data.frame(Pvalue=res$p, OddsRatio=res$odds,
                       ExpCount=res$expected, Count=count,
                       Size=size, row.names=names(res$p))
+    if (p@drive) {
+      drive <- lapply(my.dbdcat.ent, intersect, genes)
+      drive <- lapply(drive, paste, collapse=";")
+      res$drive <- drive
+    }
     res[ order(res$Pvalue), ]
   })
 
@@ -118,6 +136,7 @@ isa.DBDListHyperGTest <- function(p) {
       testName=c("DBD", "List"),
       testDirection=p@testDirection,
       pvalueCutoff=p@pvalueCutoff,
+      drive=p@drive,
       universeGeneIds=p@universeGeneIds,
       catToGeneId=dbdcat.ent)
 }
@@ -143,6 +162,7 @@ setClass("DBDListHyperGResult",
          contains="HyperGResultBase",
          representation=representation(
            reslist="list",
+           drive="logical",
            universeGeneIds="character",
            catToGeneId="list"),
          prototype=prototype(
@@ -237,13 +257,19 @@ setMethod("condGeneIdUniverse", signature(r="DBDListHyperGResult"),
 ## This function gives all the hits for the tested categories.
 setMethod("geneIdsByCategory", signature(r="DBDListHyperGResult"),
           function(r, catids=NULL) {
-            lapply(r@geneIds, function(genes) {
-              tmp <- lapply(r@catToGeneId, function(x) {
-                genes [ genes %in% x ]
-              })
-              tmp <- tmp[ sapply(tmp, length) != 0 ]
-              ord <- order(names(tmp))
-              tmp <- tmp[ord]
+            lapply(seq_along(r@geneIds), function(x) {
+              if ("drive" %in% names(r@reslist[[x]])) {
+                drive <- as.character(r@reslist[[x]]$drive)
+                strsplit(drive, ";")
+              } else {
+                genes <- r@geneIds[[x]]
+                tmp <- lapply(r@catToGeneId, function(y) {
+                  genes [ genes %in% y ]
+                })
+                tmp <- tmp[ sapply(tmp, length) != 0 ]
+                ord <- order(names(tmp))
+                tmp[ord]
+              }
             })
           })
 
@@ -285,7 +311,7 @@ isa.DBD <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
   params <-
     try( new("DBDListHyperGParams", geneIds = selectedEntrezIds,
              universeGeneIds = entrezUniverse, annotation = annotation,
-             pvalueCutoff = hgCutoff, testDirection = "over") )
+             pvalueCutoff = hgCutoff, testDirection = "over", drive=TRUE ))
 
   cat(" -- Doing test\n")
   hgOver <- hyperGTest(params)

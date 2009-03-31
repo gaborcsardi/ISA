@@ -10,3 +10,5 @@ export(gograph, gograph.plot, exp.plot.create, exp.plot.colbar,
        ISA2heatmap)
        
 export(autogen.table, autogen.modules)
+
+exportMethods("drive", "drive<-")
