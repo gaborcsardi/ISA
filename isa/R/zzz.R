@@ -1,14 +1,10 @@
 .onLoad <- function(dir, package) {
   library.dynam("isa", package, dir, local=FALSE);
-  if (!exists(".isa.options", envir=.GlobalEnv)) {
-    env <- new.env()
-    
-    assign("verbose", FALSE, envir=env)
-    assign("status.function", function(...) { isa.status.default(...) },
-           envir=env)
-    
-    assign(".isa.options", env, envir=.GlobalEnv)    
-  }
+
+  ## Default ISA options
+  isa.options[["verbose"]] <-  FALSE
+  isa.options[["status.function"]] <- function(...) isa.status.default(...)
+  
 }
 
 .onUnload <- function(libpath) {
