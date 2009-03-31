@@ -168,7 +168,7 @@ isa.iterate <- function(normed.data, row.seeds, col.seeds,
       osc <- osc & !conv
       
       if (any(osc)) {
-        mat <- cbind(mat[osc], attributes(mat, "match.length")[[1]][osc])
+        mat <- cbind(mat[osc], attr(mat, "match.length")[[1]][osc])
         mat <- sapply(seq(length=nrow(mat)), function(x) substr(fire[osc][x],
                             mat[x,1], mat[x,1]+mat[x,2]))
         mat <- sapply(mat, function(x) sum(utf8ToInt(x) == 58), USE.NAMES=FALSE )
