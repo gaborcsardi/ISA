@@ -147,15 +147,15 @@ data <- isa.in.silico(noise=0.1)
 isa.result <- isa(data[[1]])
 
 ## Find the best bicluster for each block in the input
-best <- apply(cor(isa.result$rows, data[[3]]), 2, which.max)
+best <- apply(cor(isa.result$rows, data[[2]]), 2, which.max)
 
 ## Check correlation
 sapply(seq_along(best),
-       function(x) cor(isa.result$rows[,best[x]], data[[3]][,x]))
+       function(x) cor(isa.result$rows[,best[x]], data[[2]][,x]))
 
 ## The same for the columns
 sapply(seq_along(best),
-       function(x) cor(isa.result$columns[,best[x]], data[[2]][,x]))
+       function(x) cor(isa.result$columns[,best[x]], data[[3]][,x]))
 
 ## Plot the data and the modules found
 if (interactive()) {
