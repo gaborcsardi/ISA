@@ -48,7 +48,7 @@
 }
 \section{How ISA works}{
   ISA works in an iterative way. For an \eqn{E (m\times n)}{E (m x n)}
-  input matrix It starts from seed vector \eqn{r_0}{r(0)}, which is
+  input matrix it starts from seed vector \eqn{r_0}{r(0)}, which is
   typically a sparse 0/1 vector of length \eqn{m}. This defines a set of
   rows in \eqn{E}. Then \eqn{E'} is multiplied by \eqn{r_0}{r(0)} and the
   result is thresholded. (Please see also \sQuote{Normalization} below.)
