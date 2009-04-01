@@ -189,23 +189,39 @@ scrambled data.
 
 \section{A simple work flow}
 
-
+TODO
 
 \section{A detailed work flow}
 
+TODO
+
 \subsection{Preparing the data}
+
+TODO
 
 \subsection{Running the ISA}
 
+TODO
+
 \subsection{Robustness of biclusters, filtering the results}
+
+TODO
 
 \subsection{Visualize the results}
 
+TODO
+
 \section{Features of ISA}
+
+TODO
 
 \subsection{Resilience to noise}
 
+TODO
+
 \subsection{Finding overlapping biclusters}
+
+TODO
 
 \section{Session information}
 
@@ -217,5 +233,35 @@ gsub(";", "; ", gsub("_", "\\\\_", sub("Locale:[ ]*\\\\verb\\|(.*)\\|",
                                        "\\\\texttt\\{\\1\\}", 
                                        toLatex(sessionInfo()))))
 @ 
+
+\bibliographystyle{apalike}
+
+\begin{thebibliography}{}
+
+\bibitem[Bergmann et~al., 2003]{isa}
+Bergmann, S., Ihmels, J., and Barkai, N. (2003).
+\newblock Iterative signature algorithm for the analysis of large-scale gene
+  expression data.
+\newblock {\em Phys Rev E Nonlin Soft Matter Phys}, page 031902.
+
+\bibitem[Cs\'ardi, 2009]{isapackage}
+Cs\'ardi, G. (Apr 1, 2009).
+\newblock {\em isa: The Iterative Signature Algorithm}.
+\newblock R package version 0.1.
+
+\bibitem[Ihmels, 2002]{sa}
+Ihmels, J., Friedlander, G., Bergmann, S., Sarig, O., Ziv, Y., 
+Barkai, N. (2002).
+\newblock Revealing modular organization in the yeast transcriptional
+  network.
+\newblock { \em Nat Genet }, page 370--7.
+
+\bibitem[Ihmels, 2004]{isamod}
+Ihmels, J., Bergmann, S., Barkai, N. (2004).
+\newblock Defining transcription modules using large-scale gene
+  expression data.
+\newblock { \em Bioinformatics}, page 1993--2003.
+
+\end{thebibliography}
 
 \end{document}
