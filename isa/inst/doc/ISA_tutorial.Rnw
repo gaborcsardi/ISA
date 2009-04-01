@@ -5,38 +5,207 @@
 \newcommand{\Rfunction}[1]{\texttt{#1}}
 \newcommand{\Rpackage}[1]{\texttt{#1}}
 \newcommand{\Rclass}[1]{\texttt{#1}}
+\newcommand{\Rargument}[1]{\textsl{#1}}
 \newcommand{\filename}[1]{\texttt{#1}}
 
 \begin{document}
+
+\setkeys{Gin}{width=\textwidth}
 
 \title{The Iterative Signature Algorithm}
 \author{G\'abor Cs\'ardi}
 \maketitle
 
-\RaggedRight
+% \RaggedRight
+
+\tableofcontents
+
+\section{For the impatient}
+
+To run the typical ISA work flow with default parameters on your data
+matrix, just load the \Rpackage{isa} package and call the
+\Rfunction{isa} function with your matrix as the single argument. The
+return value of \Rfunction{isa} is a named list, the members
+\texttt{rows} and \texttt{columns} contain the biclusters ISA have
+found. Every bicluster is given by a pair of columns from
+\texttt{rows} and \texttt{columns} (i.e. the first columns define the
+first bicluster, etc.) and the elements the biclusters are the
+non-zero elements in the columns of \texttt{rows} and
+\texttt{columns}.
+
+Please continue reading for a less dense tutorial.
 
 \section{Introduction}
 
-The Iterative Signature Algorithm (ISA) is biclustering method. The
-input of a biclustering method a matrix and its output is a set of
-biclusters that fulfill some criteria; a bicluster is a block of the
-potentially reordered input matrix.
+The Iterative Signature Algorithm (ISA) is biclustering method. Its 
+input is a matrix and its output is a set of biclusters: blocks of the
+potentially reordered input matrix, that fulfill some predefined
+criteria. A biclustering algorithm tries to find
+blocks that are different from the rest of the matrix, e.g. the values
+covered by the bicluster are all above or below the background.
 
-Most commonly, this algorithm is used on microarray expression data,
-to find gene sets that are coexpressed across a subset of the original
-samples. In the original ISA paper the biclusters are called
-transription modules (TM), we will often refer them under this name in
-the following.
+The ISA is developed to find biclusters (or modules as most of the ISA
+papers call them) that have correlated rows and columns. More
+precisely, the rows in the bicluster need to be only correlated across
+the columns of the bicluster and vice versa.
 
-In this tutorial we will use the data in the \Rpackage{ALL}
-package. This is a data set from a clinical trial in acute
-lymphoblastic leukemia and it contains 128 samples altogether.
+Fig.~\ref{fig:twoclusters} shows possibly the simplest
+example of a (rather artificial) data matrix with very strong modular
+structure. It is a $20\times 20$ matrix and has two correlated blocks,
+each of them of size $10\times 10$.
+\begin{figure}
+<<echo=FALSE,fig=TRUE,width=6,height=3>>=
+library(isa)
+library(Matrix)
+data <- data2 <- isa.in.silico(20,20,2,10,10)[[1]]
+perm1 <- sample(seq_len(nrow(data)))
+data2 <- data2[perm1,]
+perm2 <- sample(seq_len(ncol(data)))
+data2 <- data2[,perm2]
 
-\section{Preparing the data}
+alldata <- structure(c(data2, data), dim=c(nrow(data),ncol(data),2), 
+                     dimnames=list(NULL,NULL,c("Original matrix",
+                     "Reordered matrix")))
 
-\subsection{Loading the data}
+rx <- range(alldata, finite = TRUE)
+nn <- 100
+n0 <- min(nn, max(0, round((0 - rx[1])/(rx[2] - rx[1]) * nn)))
+col.regions <- c(colorRampPalette(c("blue3", "gray80"))(n0), 
+                 colorRampPalette(c("gray75", "red3"))(nn - n0))
 
-\section{Visualizing the results}
+lp <- levelplot(alldata, xlab="", ylab="", 
+                scale=list(y=list(draw=FALSE),
+                  x=list(draw=FALSE)),
+                col.regions=col.regions, between=list(x=0.5))
+print(lp)
+@ 
+\caption{An artificial data matrix, on the left. On the right the
+  reordered data matrix with two blocks.}
+\label{fig:twoclusters}
+\end{figure}
+
+\section{How ISA works}
+
+Before showing an actual ISA tool chain, a few words about how the
+algorithm works are in order.
+
+\subsection{ISA iteration}
+
+ISA works in an iterative way. For an $E (m\times n)$
+input matrix it starts from seed vector $r_0$, which is
+typically a sparse 0/1 vector of length $m$. This defines a set of
+rows in $E$. Then $E'$ is multiplied by $r_0$ and the
+result is thresholded.
+
+The thresholding is an important step of the ISA, without thresholding
+ISA would be equivalent to a (not too effective) numerical singular
+value decomposition (SVD). Currently thresholding is done by
+calculating the mean and standard deviation of the vector and keeping
+only elements that are further than a given number of standard
+deviations from the mean. Based on the \Rargument{direction} parameter,
+this means 1) keeping values that are significantly higher than the
+mean (``\emph{up}''), significantly lower (``\emph{down}'') or both
+(``\emph{updown}'').
+
+The thresholded vector $c_0$ is the (column)
+\emph{signature} of $r_0$. Then the (row) signature of
+$c_0$ is calculated, $E$ is multiplied by $c_0$ and then thresholded
+to get $r_1$.
+
+This iteration is performed until it converges, i.e. $r_i$
+and $r_{i-1}$ are \emph{close}, and $c_i$ and
+$c_{i-1}$ are also close. The convergence criteria,
+i.e. what \emph{close} means is by default defined by high Pearson
+correlation.
+
+It is very possible that the ISA finds the same modules more than once;
+two or more seeds might converge to the same module. The function
+\Rfunction{isa.unique} eliminates every module from the result of 
+\Rfunction{isa.iterate} that is very similar (in terms of
+Pearson correlation) to the one that was already found before it.
+
+It might be also apparent from the description of ISA, that the
+biclusters are soft, i.e. they might have an overlap in their rows,
+columns, or both. It is also possible that some rows and/or
+columns of the input matrix are not found to be part of any ISA
+biclusters. Depending on the stringency parameters in the
+thresholding, it might even happen that ISA does not find any
+biclusters.
+
+\subsection{Parameters}
+
+The two main parameters of ISA are the two thresholds (one for the
+rows and one for the columns). They basically define the stringency of
+the modules. If the row threshold is high, then the modules will have
+very similar rows. If it is mild, then modules will be bigger, with
+less similar rows than in the first case.
+
+\subsection{Random seeding and smart seeding}
+
+By default (i.e. if the \Rfunction{isa} function is used) the ISA is
+performed from random sparse starting seeds, generated by the
+\Rfunction{generate.seeds} function. This way the algorithm is 
+completely unsupervised, but also stochastic: it might give different
+results for different runs.
+
+It is possible to use non-random seeds as well, if you have some
+knowledge about the data or are interested in a particular subset of
+rows/columns, then you can feed in your seeds into the
+\Rfunction{isa.iterate} function directly. In this case the
+algorithm is deterministic, for the same seed you will always get the
+same results. This can be considered as a semi-supervised approach.
+
+\subsection{Normalization}
+
+On in silico data we observed that ISA has the best performance if the
+input matrix is normalized (see \Rfunction{isa.normalize}). The
+normalization produces two matrices: $E_r$ and
+$E_c$. $E_r$ is calculated by transposing $E$ and
+centering and scaling its rows (see \Rfunction{scale}). $E_c$ is
+calculated by centering and scaling the rows of $E$. $E_r$ is
+used to calculate the column signature of rows and $E_c$ is used
+to calculate the signature of the columns.
+
+It is possible to use another normalization, then the user is
+requested to supply the normalized input data in a named list,
+including the two matrices of appropriate
+dimensions. \texttt{Er} will be used for calculating the
+signature of the rows, \texttt{Ec} the signature of the
+columns. If you want to use the same matrix in both steps, then supply
+it twice, the first one transposed.
+
+\subsection{Robustness}
+As ISA is an unsupervised algorithm, it may very well find some
+modules, even if you feed in noise as an input matrix. To avoid these
+spurious modules we defined a robustness measure, a single number for
+a modules that gives how well the rows and the columns are
+correlated.
+
+It recommended that the user uses \Rfunction{isa.filter.robust} to
+run ISA on the scrambled input matrix with the same threshold
+parameters and then drop every module, which has a robustness score
+lower than the highest robustness score among modules found in the
+scrambled data.
+
+\section{A simple work flow}
+
+
+
+\section{A detailed work flow}
+
+\subsection{Preparing the data}
+
+\subsection{Running the ISA}
+
+\subsection{Robustness of biclusters, filtering the results}
+
+\subsection{Visualize the results}
+
+\section{Features of ISA}
+
+\subsection{Resilience to noise}
+
+\subsection{Finding overlapping biclusters}
 
 \section{Session information}
 
