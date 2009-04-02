@@ -5,7 +5,7 @@ export(robustness, isa.filter.robust)
 
 export(isa.sweep, sweep.graph)
 
-export(isa)
+exportMethods("isa")
 
 export(isa.option)
 

@@ -1,8 +1,6 @@
 import(Category)
 import(AnnotationDbi)
 
-export(eisa)
-
 export(isa.GO, isa.KEGG, isa.CHR, isa.miRNA, isa.DBD)
 
 export(gograph, gograph.plot, exp.plot.create, exp.plot.colbar,
@@ -12,3 +10,5 @@ export(gograph, gograph.plot, exp.plot.create, exp.plot.colbar,
 export(autogen.table, autogen.modules)
 
 exportMethods("drive", "drive<-")
+
+exportMethods("isa")

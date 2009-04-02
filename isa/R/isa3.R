@@ -505,8 +505,11 @@ sweep.graph <- function(sweep.result) {
   graph( rbind(from, to), n=nnodes )
 }
 
-isa <- function(data, thr.row=seq(1,3,by=0.5), thr.col=seq(1,3,by=0.5),
-                no.seeds=100) {
+setMethod("isa", signature(data="matrix"),
+          function(data, ...) isa.default(data, ...))
+
+isa.default <- function(data, thr.row=seq(1,3,by=0.5), thr.col=seq(1,3,by=0.5),
+                        no.seeds=100) {
 
   isa.status("Performing complete ISA work flow", "in")
   
