@@ -5,7 +5,7 @@ setGeneric("isa.normalize",
 setGeneric("isa.iterate",
            function(normed.data, ...) standardGeneric("isa.iterate"))
 setGeneric("isa.unique",
-           function(normed.data, ...) standardGeneric("isa.unique"))
+           function(normed.data, isaresult, ...) standardGeneric("isa.unique"))
 
 setGeneric("robustness",
            function(normed.data, ...) standardGeneric("robustness"))
