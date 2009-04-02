@@ -1,14 +1,12 @@
 \name{isa.iterate}
 \alias{isa.iterate}
+\alias{isa.iterate,list-method}
 \title{The Iterative Signature Algorithm}
 \description{
   Perform ISA on the (normalized) input matrix.
 }
-\synopsis{
-isa.iterate(normed.data, ...)
-}
 \usage{
-isa.iterate (normed.data, row.seeds, col.seeds, thr.row, thr.col = thr.row,    
+\S4method{isa.iterate}{list}(normed.data, row.seeds, col.seeds, thr.row, thr.col = thr.row,    
      direction = c("updown", "updown"), convergence = c("cor",               
          "eps"), cor.limit = 0.99, eps = 1e-04, oscillation = FALSE, 
      maxiter = 100)

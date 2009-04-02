@@ -1,19 +1,17 @@
 \name{robustness}
 \alias{robustness}
 \alias{isa.filter.robust}
+\alias{robustness,list-method}
+\alias{isa.filter.robust,matrix-method}
 \title{Robustness of ISA biclusters}
 \description{
   Robustness of ISA biclusters. The more robust biclusters are more
   significant in the sense that it is less likely to see them in random
   data.
 }
-\synopsis{
-robustness (normed.data, ...)
-isa.filter.robust (data, ...)
-}
 \usage{
-robustness (normed.data, row.scores, col.scores)
-isa.filter.robust (data, normed.data, isares, perms = 1, row.seeds, col.seeds)
+\S4method{robustness}{list}(normed.data, row.scores, col.scores)
+\S4method{isa.filter.robust}{matrix}(data, normed.data, isares, perms = 1, row.seeds, col.seeds)
 }
 \arguments{
   \item{normed.data}{The normalized input data, usually calculated with

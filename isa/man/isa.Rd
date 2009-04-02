@@ -1,13 +1,12 @@
 \name{isa}
 \alias{isa}
+\alias{isa,matrix-method}
 \concept{Iterative Signature Algorithm}
 \title{Iterative Signature Algorithm}
 \description{Run ISA with the default parameters}
-\synopsis{
-isa(data, ...)
-}
 \usage{
-isa(data, thr.row=seq(1,3,by=0.5), thr.col=seq(1,3,by=0.5), no.seeds=100)
+\S4method{isa}{matrix}(data, thr.row=seq(1,3,by=0.5),
+          thr.col=seq(1,3,by=0.5), no.seeds=100)
 }
 \arguments{
   \item{data}{The input. It must be a numeric matrix. It may contain

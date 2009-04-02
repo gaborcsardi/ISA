@@ -1,15 +1,13 @@
 \name{isa.normalize}
 \alias{isa.normalize}
+\alias{isa.normalize,matrix-method}
 \title{Normalize input data for use with ISA}
 \description{
   Normalize a matrix and create a form that can be effectively used for
   ISA runs.
 }
-\synopsis{
-isa.normalize (data, ...)
-}
 \usage{
-isa.normalize (data, prenormalize = FALSE)
+\S4method{isa.normalize}{matrix}(data, prenormalize = FALSE)
 }
 \arguments{
   \item{data}{A numeric matrix, the input data. It might contains
