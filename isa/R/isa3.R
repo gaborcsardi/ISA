@@ -1,5 +1,8 @@
 
-isa.normalize <- function(data, prenormalize=FALSE) {
+setMethod("isa.normalize", signature(data="matrix"),
+          function(data, ...) isa.normalize.default(data, ...))
+
+isa.normalize.default <- function(data, prenormalize=FALSE) {
 
   isa.status("ISA normalization", "in")
 
@@ -26,12 +29,15 @@ isa.normalize <- function(data, prenormalize=FALSE) {
   data
 }
 
-isa.iterate <- function(normed.data, row.seeds, col.seeds,
-                        thr.row, thr.col=thr.row,
-                        direction=c("updown", "updown"),
-                        convergence=c("cor", "eps"),
-                        cor.limit=0.99, eps=1e-4,
-                        oscillation=FALSE, maxiter=100) {
+setMethod("isa.iterate", signature(normed.data="list"),
+          function(normed.data, ...) isa.iterate.default(normed.data, ...))
+
+isa.iterate.default <- function(normed.data, row.seeds, col.seeds,
+                                thr.row, thr.col=thr.row,
+                                direction=c("updown", "updown"),
+                                convergence=c("cor", "eps"),
+                                cor.limit=0.99, eps=1e-4,
+                                oscillation=FALSE, maxiter=100) {
 
   isa.status("Doing ISA iteration", "in")
 
@@ -250,9 +256,12 @@ isa.step <- function(normed.data, rows, thr.row, thr.col, direction) {
   list(columns=col.new, rows=row.new)
 }
 
-isa.unique <- function(normed.data, isaresult, method=c("cor"),
-                       ignore.div=TRUE, cor.limit=0.9, neg.cor=TRUE,
-                       drop.zero=TRUE) {
+setMethod("isa.unique", signature(normed.data="list"),
+          function(normed.data, ...) isa.unique.default(normed.data, ...))
+
+isa.unique.default <- function(normed.data, isaresult, method=c("cor"),
+                               ignore.div=TRUE, cor.limit=0.9, neg.cor=TRUE,
+                               drop.zero=TRUE) {
 
   isa.status("Creating unique module set", "in")
   
@@ -362,8 +371,11 @@ generate.seeds <- function(length, count=100, method=c("uni"),
   g
 }
 
-isa.sweep <- function(data, normed.data, isaresult, method=c("cor"),
-                      neg.cor=TRUE, cor.limit=0.9) {
+setMethod("isa.sweep", signature(data="matrix"),
+          function(data, ...) isa.sweep.default(data, ...))
+
+isa.sweep.default <- function(data, normed.data, isaresult, method=c("cor"),
+                              neg.cor=TRUE, cor.limit=0.9) {
   
   isa.status("Performing an ISA sweep", "in")
   
@@ -484,8 +496,11 @@ isa.sweep <- function(data, normed.data, isaresult, method=c("cor"),
   
   result
 }
-  
-sweep.graph <- function(sweep.result) {
+
+setMethod("sweep.graph", signature(sweep.result="list"),
+          function(sweep.result, ...) sweep.graph.default(sweep.result, ...))
+
+sweep.graph.default <- function(sweep.result) {
 
   if (is.null(sweep.result$seeddata$father)) {
     stop("Not a sweep result")

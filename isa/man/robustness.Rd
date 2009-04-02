@@ -7,6 +7,10 @@
   significant in the sense that it is less likely to see them in random
   data.
 }
+\synopsis{
+robustness (normed.data, ...)
+isa.filter.robust (data, ...)
+}
 \usage{
 robustness (normed.data, row.scores, col.scores)
 isa.filter.robust (data, normed.data, isares, perms = 1, row.seeds, col.seeds)

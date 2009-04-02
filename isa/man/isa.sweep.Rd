@@ -5,6 +5,9 @@
 \description{
   Relate the biclusters found in many ISA runs on the same input data.
 }
+\synopsis{
+isa.sweep (data, ...)
+}
 \usage{
 isa.sweep (data, normed.data, isaresult, method = c("cor"), neg.cor = TRUE,  
      cor.limit = 0.9)

@@ -1,11 +1,13 @@
-export(isa.in.silico, isa.normalize, isa.iterate, isa.unique,
-       generate.seeds)
+export(isa.in.silico, generate.seeds)
 
-export(robustness, isa.filter.robust)
-
-export(isa.sweep, sweep.graph)
-
-exportMethods("isa")
+exportMethods("isa",
+              "isa.normalize",
+              "isa.iterate",
+              "isa.unique",
+              "robustness",
+              "isa.filter.robust",
+              "isa.sweep",
+              "sweep.graph")
 
 export(isa.option)
 

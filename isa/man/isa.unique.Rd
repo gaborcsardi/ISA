@@ -5,6 +5,9 @@
   From a potentially non-unique set of ISA biclusters, create a unique
   set by removing all biclusters that are similar to others.
 }
+\synopsis{
+isa.unique (normed.data, ...)
+}
 \usage{
 isa.unique (normed.data, isaresult, method = c("cor"),
      ignore.div = TRUE, cor.limit = 0.9, neg.cor = TRUE, drop.zero = TRUE) 

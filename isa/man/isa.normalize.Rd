@@ -5,6 +5,9 @@
   Normalize a matrix and create a form that can be effectively used for
   ISA runs.
 }
+\synopsis{
+isa.normalize (data, ...)
+}
 \usage{
 isa.normalize (data, prenormalize = FALSE)
 }

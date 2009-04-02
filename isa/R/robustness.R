@@ -1,5 +1,8 @@
 
-robustness <- function(normed.data, row.scores, col.scores) {
+setMethod("robustness", signature(normed.data="list"),
+          function(normed.data, ...) robustness.default(normed.data, ...))
+
+robustness.default <- function(normed.data, row.scores, col.scores) {
 
   isa.status("Calculating robustness", "in")
   
@@ -25,8 +28,11 @@ robustness <- function(normed.data, row.scores, col.scores) {
   res
 }
 
-isa.filter.robust <- function(data, normed.data, isares, perms=1,
-                              row.seeds, col.seeds) {
+setMethod("isa.filter.robust", signature(data="matrix"),
+          function(data, ...) isa.filter.robust.default(data, ...))
+
+isa.filter.robust.default <- function(data, normed.data, isares, perms=1,
+                                      row.seeds, col.seeds) {
   
   isa.status("Filtering for robustness...", "in")
   

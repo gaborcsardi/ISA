@@ -4,6 +4,9 @@
 \description{
   Perform ISA on the (normalized) input matrix.
 }
+\synopsis{
+isa.iterate(normed.data, ...)
+}
 \usage{
 isa.iterate (normed.data, row.seeds, col.seeds, thr.row, thr.col = thr.row,    
      direction = c("updown", "updown"), convergence = c("cor",               

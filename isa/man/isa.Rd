@@ -3,6 +3,9 @@
 \concept{Iterative Signature Algorithm}
 \title{Iterative Signature Algorithm}
 \description{Run ISA with the default parameters}
+\synopsis{
+isa(data, ...)
+}
 \usage{
 isa(data, thr.row=seq(1,3,by=0.5), thr.col=seq(1,3,by=0.5), no.seeds=100)
 }
