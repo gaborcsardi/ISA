@@ -256,8 +256,9 @@ isa.step <- function(normed.data, rows, thr.row, thr.col, direction) {
   list(columns=col.new, rows=row.new)
 }
 
-setMethod("isa.unique", signature(normed.data="list"),
-          function(normed.data, ...) isa.unique.default(normed.data, ...))
+setMethod("isa.unique", signature(normed.data="list", isaresult="list"),
+          function(normed.data, isaresult, ...)
+          isa.unique.default(normed.data, isaresult, ...))
 
 isa.unique.default <- function(normed.data, isaresult, method=c("cor"),
                                ignore.div=TRUE, cor.limit=0.9, neg.cor=TRUE,

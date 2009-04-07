@@ -1,13 +1,13 @@
 \name{isa.unique}
 \alias{isa.unique}
-\alias{isa.unique,list-method}
+\alias{isa.unique,list,list-method}
 \title{Filter out biclusters that are very similar to each other}
 \description{
   From a potentially non-unique set of ISA biclusters, create a unique
   set by removing all biclusters that are similar to others.
 }
 \usage{
-\S4method{isa.unique}{list} (normed.data, isaresult, method = c("cor"),
+\S4method{isa.unique}{list,list} (normed.data, isaresult, method = c("cor"),
      ignore.div = TRUE, cor.limit = 0.9, neg.cor = TRUE, drop.zero = TRUE) 
 
 }
