@@ -101,8 +101,8 @@ isa.iterate.ExpressionSet <- function(normed.data, ...) {
 
   isa:::isa.status("Starting ISA iteration on an ExpressionSet", "in")
 
-  nm <- list(normed.data@assayData$exprs,
-             normed.data@assayData$ec.exprs)
+  nm <- list(Er=t(normed.data@assayData$exprs),
+             Ec=normed.data@assayData$ec.exprs)
 
   attr(nm, "prenormalize") <- attr(normed.data, "prenormalize")
   attr(nm, "hasNA") <- attr(normed.data, "hasNA")
@@ -124,14 +124,14 @@ isa.unique.ExpressionSet <- function(normed.data, isaresult, ...) {
 
   isa:::isa.status("Creating unique ISA module set for expression data", "in")
   
-  nm <- list(normed.data@assayData$exprs,
-             normed.data@assayData$ec.exprs)
+  nm <- list(Er=t(normed.data@assayData$exprs),
+             Ec=normed.data@assayData$ec.exprs)
 
   res <- ISAModules.to.isa.result(isaresult)
 
   res <- isa::isa.unique(nm, res, ...)
 
-  modules <- isa.result.to.ISAModules(modules, normed.data)
+  modules <- isa.result.to.ISAModules(res, normed.data)
 
   isa:::isa.status("DONE", "out")
   
@@ -141,35 +141,74 @@ isa.unique.ExpressionSet <- function(normed.data, isaresult, ...) {
 setMethod("isa.sweep", signature(data="ExpressionSet"),
           function(data, ...) isa.sweep.ExpressionSet(data, ...))
 
-isa.sweep.ExpressionSset <- function(data, ...) {
+isa.sweep.ExpressionSet <- function(data, normed.data, isaresult, ...) {
 
-  ## TODO
+  isa:::isa.status("Sweeping an ExpressionSet")
 
+  mat.data <- exprs(data)
+  nm <- list(Er=t(normed.data@assayData$exprs),
+             Ec=normed.data@assayData$ec.exprs)
+  res <- ISAModules.to.isa.result(isaresult)
+
+  res <- isa.sweep(mat.data, nm, res, ...)
+
+  modules <- isa.result.to.ISAModules(res, normed.data)
+
+  isa:::isa.status("DONE", "out")
+
+  modules
 }
 
 setMethod("sweep.graph", signature(sweep.result="ISAModules"),
           function(sweep.result, ...)
-          sweep.ExpressionSet.default(sweep.result, ...))
+          sweep.graph.ExpressionSet(sweep.result, ...))
 
 sweep.graph.ExpressionSet <- function(sweep.result) {
-
-  ## TODO
-
+  res <- ISAModules.to.isa.result(sweep.result)
+  sweep.graph(res)
 }
 
 setMethod("robustness", signature(normed.data="ExpressionSet"),
           function(normed.data, ...) robustness.ExpressionSet(normed.data, ...))
 
-robustness.ExpressionSet <- function(normed.data, ...) {
+robustness.ExpressionSet <- function(normed.data, isaresult) {
 
-  ## TODO
-  
+  isa:::isa.status("Calculating robustness for ExpressionSet", "in")
+
+  if (!is(isaresult, "ISAModules")) {
+    stop("Second argument should be the ISA modules")
+  }
+
+  nm <- list(Er=t(normed.data@assayData$exprs),
+             Ec=normed.data@assayData$ec.exprs)
+
+  print(dim(nm[[1]]))
+  print(dim(nm[[2]]))        
+  res <- isa::robustness(nm, isaresult@genes, isaresult@conditions)
+
+  isa:::isa.status("DONE", "out")
+
+  res
 }
 
 setMethod("isa.filter.robust", signature(data="ExpressionSet"),
           function(data, ...) isa.filter.robust.ExpressionSet(data, ...))
 
-isa.filter.robust.ExpressionSet <- function(data, ...) {
-  ## TODO
-}
+isa.filter.robust.ExpressionSet <- function(data, normed.data,
+                                            isaresult, ...) {
 
+  isa:::isa.status("Filtering ExpressionSet for robustness", "in")
+
+  mat.data <- exprs(data)
+  nm <- list(Er=t(normed.data@assayData$exprs),
+             Ec=normed.data@assayData$ec.exprs)
+  res <- ISAModules.to.isa.result(isaresult)
+
+  res <- isa.filter.robust(mat.data, nm, res, ...)
+
+  modules <- isa.result.to.ISAModules(res, normed.data)
+
+  isa:::isa.status("DONE", "out")
+
+  modules
+}
