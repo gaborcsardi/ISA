@@ -15,6 +15,9 @@ isa.result.to.ISAModules <- function(modules, data) {
   new.modules@rundata$features <- featureNames(data)
   new.modules@rundata$pData <- pData(data)
 
+  rownames(new.modules@genes) <- featureNames(data)
+  rownames(new.modules@conditions) <- sampleNames(data)
+  
   new.modules
 }
 
