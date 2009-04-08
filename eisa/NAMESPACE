@@ -9,6 +9,10 @@ export(gograph, gograph.plot, exp.plot.create, exp.plot.colbar,
        
 export(autogen.table, autogen.modules)
 
-exportMethods("drive", "drive<-")
+exportMethods("drive", "drive<-",
+              "seedData", "runData", "getGenes", "getConditions",
+              "getGeneScores", "getConditionScores",
+              "getNoGenes", "getNoConditions",
+              "geneThreshold", "conditionThreshold")
 
 exportMethods("isa")
