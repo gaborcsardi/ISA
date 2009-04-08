@@ -272,7 +272,8 @@ isa.CHR <- function(modules,
                     shortorg=abbreviate(org,2),
                     ann=annotation(modules),
                     features=featureNames(modules),
-                    hgCutoff=0.001, correction=TRUE) {
+                    hgCutoff=0.001,
+                    correction=TRUE, correction.method="holm") {
 
   isa:::isa.status("Calculating chromosome enrichment", "in")
   
@@ -299,8 +300,14 @@ isa.CHR <- function(modules,
   cat(" -- Doing test\n")
   hgOver <- hyperGTest(params)
 
+  if (correction) {
+    for (i in seq_along(hgOver@reslist)) {
+      hgOver@reslist[[i]]$Pvalue <- p.adjust(hgOver@reslist[[i]]$Pvalue,
+                                             method=correction.method)
+    }
+  }
+
   isa:::isa.status("DONE", "out")
   
   hgOver
 }
-

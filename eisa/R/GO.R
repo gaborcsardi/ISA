@@ -364,7 +364,8 @@ isa.GO <- function(modules,
                    shortorg=abbreviate(org, 2),
                    ann=annotation(modules),
                    features=featureNames(modules),
-                   hgCutoff=0.001, correction=TRUE) {
+                   hgCutoff=0.001,
+                   correction=TRUE, correction.method="holm") {
 
   isa:::isa.status("Calculating GO enrichment", "in")
   
@@ -401,9 +402,19 @@ isa.GO <- function(modules,
   hgOverCC <- hyperGTest(paramsCC)
   cat(" -- Doing MF test\n")
   hgOverMF <- hyperGTest(paramsMF)
-  
+
   res <- list(hgOverBP, hgOverCC, hgOverMF)
 
+  if (correction) {
+    for (j in seq_along(res)) {
+      for (i in seq_along(res[[j]]@reslist)) {
+        res[[j]]@reslist[[i]]$Pvalue <-
+          p.adjust(res[[j]]@reslist[[i]]$Pvalue,
+                   method=correction.method)
+      }
+    }
+  }
+  
   isa:::isa.status("DONE", "out")
 
   res
