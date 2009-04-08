@@ -359,28 +359,23 @@ setMethod("sigCategories", signature(r="GOListHyperGResult"),
             })
           })
 
-isa.GO <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
+isa.GO <- function(modules,
+                   org=organism(modules),
+                   shortorg=abbreviate(org, 2),
+                   ann=annotation(modules),
+                   features=featureNames(modules),
                    hgCutoff=0.001, correction=TRUE) {
 
-  isa.status("Calculating GO enrichment", "in")
+  isa:::isa.status("Calculating GO enrichment", "in")
   
-  if (is.null(organism)) organism <- isaresult$rundata$organism
-  if (is.null(annotation)) annotation <- isaresult$rundata$annotation
-  if (is.null(features)) features <- isaresult$rundata$features  
-  shortorganism <- abbreviate(organism, 2)
+  require(paste(sep="", ann, ".db"), character.only=TRUE)
+  require(paste(sep=".", "org", shortorg, "eg", "db"), character.only=TRUE)
   
-  require(paste(sep="", annotation, ".db"), character.only=TRUE)
-  require(GO.db)
-  require(annotate)
-  require(GOstats)
-  require(paste(sep=".", "org", shortorganism, "eg", "db"), character.only=TRUE)
-  
-  ENTREZ <- get(paste(sep="", annotation, "ENTREZID"))
+  ENTREZ <- get(paste(sep="", ann, "ENTREZID"))
 
   cat(" -- Extracting Entrez genes\n")
 
-  selectedEntrezIds <- lapply(seq_len(ncol(isaresult$genes)),
-                              function(x) features[isaresult$genes[,x] != 0])
+  selectedEntrezIds <- getGenes(modules)
   selectedEntrezIds <- lapply(selectedEntrezIds,
                               function(x) unlist(mget(x, ENTREZ)))
   selectedEntrezIds <- lapply(selectedEntrezIds, unique)
@@ -390,7 +385,7 @@ isa.GO <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
   
   paramsBP <- paramsCC <- paramsMF <-
     new("GOListHyperGParams", geneIds = selectedEntrezIds,
-        universeGeneIds = entrezUniverse, annotation = annotation,
+        universeGeneIds = entrezUniverse, annotation = ann,
         ontology = "BP", pvalueCutoff = hgCutoff, conditional = FALSE,
         testDirection = "over", drive = TRUE)
 
@@ -409,7 +404,7 @@ isa.GO <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
   
   res <- list(hgOverBP, hgOverCC, hgOverMF)
 
-  isa.status("DONE", "out")
+  isa:::isa.status("DONE", "out")
 
   res
 }

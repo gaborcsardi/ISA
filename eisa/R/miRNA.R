@@ -281,28 +281,27 @@ setMethod("sigCategories", signature(r="miRNAListHyperGResult"),
             })
           })
 
-isa.miRNA <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
+isa.miRNA <- function(modules,
+                      org=organism(modules),
+                      shortorg=abbreviate(org, 2),
+                      ann=annotation(modules),
+                      features=featureNames(modules),
                       hgCutoff=0.001, correction=TRUE) {
 
-  isa.status("Calculating miRNA enrichment", "in")
+  isa:::isa.status("Calculating miRNA enrichment", "in")
 
-  if (is.null(organism)) organism <- isaresult$rundata$organism
-  if (is.null(annotation)) annotation <- isaresult$rundata$annotation
-  if (is.null(features)) features <- isaresult$rundata$features  
-
-  if (! organism %in% c("Mus musculus", "Homo sapiens")) {
+  if (! org %in% c("Mus musculus", "Homo sapiens")) {
     stop("This method is only implemented for `Mus musculus' and 'Homo sapiens'")
   }
   
-  require(paste(sep="", annotation, ".db"), character.only=TRUE)
+  require(paste(sep="", ann, ".db"), character.only=TRUE)
   require(Category)
 
-  ENTREZ <- get(paste(sep="", annotation, "ENTREZID"))
+  ENTREZ <- get(paste(sep="", ann, "ENTREZID"))
 
   cat(" -- Extracting Entrez genes\n")
 
-  selectedEntrezIds <- lapply(seq_len(ncol(isaresult$genes)),
-                              function(x) features[isaresult$genes[,x] != 0])
+  selectedEntrezIds <- getGenes(modules)
   selectedEntrezIds <- lapply(selectedEntrezIds,
                               function(x) unlist(mget(x, ENTREZ)))
   selectedEntrezIds <- lapply(selectedEntrezIds, unique)
@@ -312,13 +311,13 @@ isa.miRNA <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
 
   params <-
     try( new("miRNAListHyperGParams", geneIds = selectedEntrezIds,
-             universeGeneIds = entrezUniverse, annotation = annotation,
+             universeGeneIds = entrezUniverse, annotation = ann,
              pvalueCutoff = hgCutoff, testDirection = "over", drive=TRUE ))
 
   cat(" -- Doing test\n")
   hgOver <- hyperGTest(params)
 
-  isa.status("DONE", "out")
+  isa:::isa.status("DONE", "out")
   
   hgOver
 }

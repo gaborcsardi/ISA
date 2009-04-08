@@ -263,28 +263,26 @@ setMethod("sigCategories", signature(r="KEGGListHyperGResult"),
             })
           })
 
-isa.KEGG <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
+isa.KEGG <- function(isaresult,
+                     org=organism(modules),
+                     shortorg=abbreviate(org, 2),
+                     ann=annotation(modules),
+                     features=featureNames(modules),
                      hgCutoff=0.001, correction=TRUE) {
 
-  isa.status("Calculating KEGG enrichment", "in")
+  isa:::isa.status("Calculating KEGG enrichment", "in")
   
-  if (is.null(organism)) organism <- isaresult$rundata$organism
-  if (is.null(annotation)) annotation <- isaresult$rundata$annotation
-  if (is.null(features)) features <- isaresult$rundata$features  
-  shortorganism <- abbreviate(organism, 2)
-  require(paste(sep=".", "org", shortorganism, "eg", "db"), character.only=TRUE)
-  
-  require(paste(sep="", annotation, ".db"), character.only=TRUE)
+  require(paste(sep=".", "org", shortorg, "eg", "db"), character.only=TRUE)
+  require(paste(sep="", ann, ".db"), character.only=TRUE)
   require(annotate)
   require(Category)
   require(KEGG.db)
 
-  ENTREZ <- get(paste(sep="", annotation, "ENTREZID"))
+  ENTREZ <- get(paste(sep="", ann, "ENTREZID"))
 
   cat(" -- Extracting Entrez genes\n")
 
-  selectedEntrezIds <- lapply(seq_len(ncol(isaresult$genes)),
-                              function(x) features[isaresult$genes[,x] != 0])
+  selectedEntrezIds <- getGenes(modules)
   selectedEntrezIds <- lapply(selectedEntrezIds,
                               function(x) unlist(mget(x, ENTREZ)))
   selectedEntrezIds <- lapply(selectedEntrezIds, unique)
@@ -294,13 +292,13 @@ isa.KEGG <- function(isaresult, organism=NULL, annotation=NULL, features=NULL,
 
   params <-
     try( new("KEGGListHyperGParams", geneIds = selectedEntrezIds,
-             universeGeneIds = entrezUniverse, annotation = annotation,
+             universeGeneIds = entrezUniverse, annotation = ann,
              pvalueCutoff = hgCutoff, testDirection = "over", drive=TRUE) )
 
   cat(" -- Doing test\n")
   hgOver <- hyperGTest(params)
 
-  isa.status("DONE", "out")
+  isa:::isa.status("DONE", "out")
   
   hgOver
 }
