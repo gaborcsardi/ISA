@@ -12,6 +12,9 @@ setGeneric("getConditions", function(object, ...) standardGeneric("getConditions
 setGeneric("getGeneScores", function(object, ...) standardGeneric("getGeneScores"))
 setGeneric("getConditionScores", function(object, ...) standardGeneric("getConditionScores"))
 
+setGeneric("getAllGeneScores", function(object, ...) standardGeneric("getAllGeneScores"))
+setGeneric("getAllConditionScores", function(object, ...) standardGeneric("getAllConditionScores"))
+
 setGeneric("getNoGenes", function(object, ...) standardGeneric("getNoGenes"))
 setGeneric("getNoConditions", function(object, ...) standardGeneric("getNoConditions"))
 

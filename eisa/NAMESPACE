@@ -12,6 +12,7 @@ export(autogen.table, autogen.modules)
 exportMethods("drive", "drive<-",
               "seedData", "runData", "getGenes", "getConditions",
               "getGeneScores", "getConditionScores",
+              "getAllGeneScores", "getAllConditionScores",
               "getNoGenes", "getNoConditions",
               "geneThreshold", "conditionThreshold")
 

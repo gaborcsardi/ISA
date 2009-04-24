@@ -88,6 +88,21 @@ setMethod("getConditionScores", signature(object="ISAModules"),
                    object@conditions[,x][ object@conditions[,x] != 0 ])
           })
 
+setMethod("getAllGeneScores", signature(object="ISAModules"),
+          function(object, mods) {
+            if (missing(mods)) { mods <- seq_len(ncol(object@genes)) }
+            lapply(mods, function(x)
+                   object@genes[,x,drop=FALSE])
+          })
+
+
+setMethod("getAllConditionScores", signature(object="ISAModules"),
+          function(object, mods) {
+            if (missing(mods)) { mods <- seq_len(ncol(object@genes)) }
+            lapply(mods, function(x)
+                   object@conditions[,x,drop=FALSE])
+          })
+
 setMethod("getNoGenes", signature(object="ISAModules"),
           function(object, mods) {
             if (missing(mods)) { mods <- seq_len(ncol(object@genes)) }
