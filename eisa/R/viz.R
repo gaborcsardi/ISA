@@ -2,7 +2,7 @@
 gograph <- function(table, colbar.length=30, label.cex=1, GOGRAPHS=NULL,
                     go.terms=NULL) {
 
-  isa.status("Creating a GO graph", "in")
+  isa:::isa.status("Creating a GO graph", "in")
   
   require(GO.db)
   require(igraph)
@@ -169,7 +169,7 @@ gograph <- function(table, colbar.length=30, label.cex=1, GOGRAPHS=NULL,
   V(g2)$label.cex <- label.cex
   V(g2)$frame.color <- "grey"
 
-  isa.status("DONE", "out")
+  isa:::isa.status("DONE", "out")
   
   g2
 }
@@ -200,20 +200,20 @@ gograph.plot <- function(graph) {
 
 
 exp.plot.create <- function(exp.matrix, genes, conditions,
-                            normalize=FALSE) {
+                            normalize) {
 
-  isa.status("Creating an expression plot", "in")
+  isa:::isa.status("Creating an expression plot", "in")
   
   require(affy)
 
   if (is(exp.matrix, "ExpressionSet")) {
     exp.matrix <- exprs(exp.matrix)
   }
-  
+
   if (normalize) {
     exp.matrix <- t(isa::normalize(exp.matrix)[[1]])
   }
-
+  
   gg <- which(genes != 0)
   cc <- which(conditions != 0)
   g.order <- order(genes[gg], decreasing=TRUE)
@@ -244,7 +244,7 @@ exp.plot.create <- function(exp.matrix, genes, conditions,
   full.width <- 50 + exp.width + 100
   full.height <- 50 + exp.height + 70
 
-  isa.status("DONE", "out")
+  isa:::isa.status("DONE", "out")
   
   list(exp=em, width=full.width, height=full.height,
        exp.width=exp.width, exp.height=exp.height, colbar=colbar,
@@ -354,13 +354,13 @@ exp.plot <- function(epo, scores=TRUE) {
 cond.plot <- function(nm, genes, thr, markup, markdown, ylim=c(-1.2,1.5), all=TRUE,
                       sep=NULL, sepcol=NULL, val=TRUE, srt=90,
                       adj.above=c(0,0.5), adj.below=c(1,0.5),
-                      plot.only=seq_len(nrow(nm[[1]])), ...) {
+                      plot.only=seq_len(dim(nm)[2]), ...) {
 
-  isa.status("Creating a condition plot", "in")
+  isa:::isa.status("Creating a condition plot", "in")
   
   ## Calculate all condition scores, might not be correct for
   ## oscillating modules
-  scores <- as.vector(nm[[1]] %*% genes)
+  scores <- as.vector(t(exprs(nm)) %*% genes)
   if (any(scores != 0)) scores <- scores / max(abs(scores))
   thr1 <- mean(scores) + thr * sd(scores)
   thr2 <- mean(scores) - thr * sd(scores)
@@ -413,12 +413,12 @@ cond.plot <- function(nm, genes, thr, markup, markdown, ylim=c(-1.2,1.5), all=TR
     par(xpd=FALSE)
   }
 
-  isa.status("DONE", "out")
+  isa:::isa.status("DONE", "out")
 }
 
 overlap <- function(isares, algorithm=c("mds", "fr", "drl"), edge.limit=0.5) {
 
-  isa.status("Creating an overlap plot", "in")
+  isa:::isa.status("Creating an overlap plot", "in")
   
   algorithm <- match.arg(algorithm)
 
@@ -477,7 +477,7 @@ overlap <- function(isares, algorithm=c("mds", "fr", "drl"), edge.limit=0.5) {
     E(g)$width <- abs(E(g)$weight) * 3
   }
 
-  isa.status("DONE", "out")
+  isa:::isa.status("DONE", "out")
   
   g
 }

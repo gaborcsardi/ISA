@@ -225,7 +225,7 @@ autogen.table <- function(nm, isares, target.dir,
 }  
                           
 
-autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
+autogen.modules <- function(nm, isares, modules=seq_len(length(isares)),
                             target.dir,
                             template=system.file("autogen", package="eisa"),
                             GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL, DBD=NULL,
@@ -305,11 +305,11 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   require(TeachingDemos)
   require(igraph)
 
-  nexp <- nm[[2]]
+  nexp <- nm@assayData$ec.exprs
 
-  chip <- isares$rundata$annotation
+  chip <- annotation(isares)
   library(paste(sep="", chip, ".db"),  character.only=TRUE)
-  organism <- get(paste(sep="", chip, "ORGANISM"))
+  organism <- organism(isares)
   short.organism <- organism
   require(paste(sep="", "org.", abbreviate(organism, 2), ".eg.db"),
           character.only=TRUE)
@@ -376,7 +376,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
     df <- data.frame(Pvalue=pval, ECount=round(ec, 2), Count=gc, Size=uc,
                      Term=nn)
 
-    drive <- drive[rownames(obj)][v]
+    drive <- drive[v]
     drive <- lapply(drive, function(x) unname(unlist(mget(x, SYMBOL))))
     drive <- lapply(drive, sort)
     drive <- lapply(drive, paste, collapse=", ")
@@ -445,7 +445,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
                      Term=nn)
     cat <- "ke"
 
-    drive0 <- drive[rownames(obj)][v]
+    drive0 <- drive[v]
     drive <- lapply(drive0, function(x) unname(unlist(mget(x, SYMBOL))))
     drive <- lapply(drive, sort)
     drive2 <- lapply(drive, paste, collapse=", ")
@@ -499,7 +499,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   require(KEGG.db)
   tables.KEGG <- g(KEGG@reslist[[module]], pvalue=0.05, maxlines=NA,
                    drive=drive.KEGG[[module]])
-
+  
   if (!is.null(miRNA)) {
 
     h <- function(obj, pvalue=0.05, maxlines=NA, drive=NULL) {
@@ -517,7 +517,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
       rownames(df) <- ca
       
       cat <- "mr"
-      drive <- drive[rownames(obj)][v]      
+      drive <- drive[v]      
       drive <- lapply(drive, function(x) unname(unlist(mget(x, SYMBOL))))
       drive <- lapply(drive, sort)
       drive <- lapply(drive, paste, collapse=", ")
@@ -584,7 +584,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
       rownames(df) <- ca
       
       cat <- "mr"
-      drive <- drive[rownames(obj)][v]      
+      drive <- drive[v]      
       drive <- lapply(drive, function(x) unname(unlist(mget(x, SYMBOL))))
       drive <- lapply(drive, sort)
       drive <- lapply(drive, paste, collapse=", ")
@@ -653,7 +653,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
       rownames(df) <- ca
       
       cat <- "ch"
-      drive <- drive[rownames(obj)][v]
+      drive <- drive[v]
       drive <- lapply(drive, function(x) unname(unlist(mget(x, SYMBOL))))
       drive <- lapply(drive, sort)
       drive <- lapply(drive, paste, collapse=", ")
@@ -711,8 +711,8 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
 
   print(paste("Module", m, "expression graph"))
 
-  ep <- exp.plot.create(nexp, isares$genes[,m],
-                        isares$conditions[,m], normalize=FALSE)
+  ep <- exp.plot.create(nexp, getAllGeneScores(isares, m)[[1]],
+                        getAllConditionScores(isares, m)[[1]], normalize=FALSE)
   CairoPNG(file=paste(sep="", target.dir, "/expression-", m, ".png"),
            width=ep$width, height=ep$height)
   ## returns the box coordinates of the expression image
@@ -733,8 +733,8 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   clines <- clines.orig
   jlines <- jlines.orig
 
-  my.gth <- isares$seeddata$thr.row[m]
-  my.cth <- isares$seeddata$thr.col[m]
+  my.gth <- seedData(isares)$thr.row[m]
+  my.cth <- seedData(isares)$thr.col[m]
 
   ## Write the coordinates to the javascript file, to have
   ## the cross
@@ -746,13 +746,12 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   
   ## title
   print("  -- title")
-  entr <- unique(unlist(mget(isares$rundata$features[isares$genes[,m]!=0],
-                             ENTREZ)))
+  entr <- unique(unlist(mget(getGenes(isares, m)[[1]], ENTREZ)))
   entr <- entr[!is.na(entr)]
   title <- paste(sep="", "Module #", m, ", TG: ", my.gth,
-                 ", TC: ", my.cth, ", ", sum(isares$genes[,m]!=0), " probes, ",
+                 ", TC: ", my.cth, ", ", getNoGenes(isares,m), " probes, ",
                  length(entr), " Entrez genes, ",
-                 sum(isares$conditions[,m]!=0), " conditions")
+                 getNoConditions(isares, m), " conditions")
   lines[ grep("<!-- title -->", lines) ] <- title
 
   ## gth
@@ -768,13 +767,13 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
 
   to.sub <- grep("<!--prev.no-->", lines, fixed=TRUE)
   if (is.null(prev.module)) {
-    prev.module <- if (m!=1) m-1 else ncol(isares$genes)
+    prev.module <- if (m!=1) m-1 else dim(isares)[1]
   }
   lines[to.sub] <- gsub("<!--prev.no-->", as.character(prev.module), lines[to.sub])
   
   to.sub <- grep("<!--next.no-->", lines, fixed=TRUE)
   if (is.null(next.module)) {
-    next.module <- if (m!=ncol(isares$genes)) m+1 else 1
+    next.module <- if (m!=length(isares)) m+1 else 1
   }
   lines[to.sub] <- gsub("<!--next.no-->", as.character(next.module), lines[to.sub])
 
@@ -909,12 +908,11 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
                  clines, fixed=TRUE)
   clines <- gsub("/*mapmfheight*/", as.character(floor(c.MF$graph$height*4)),
                  clines, fixed=TRUE)
-
+  
   # Gene cloud
   print("  -- Gene cloud")
-  seq <- which(isares$genes[,m] != 0)
-  nam <- isares$rundata$features[ isares$genes[,m] != 0]
-  orig.val <- isares$genes[,m] [ isares$genes[,m] != 0 ]
+  nam <- getGenes(isares, m)[[1]]
+  orig.val <- getGeneScores(isares, m)[[1]]
   val <- round(orig.val*10)
   entrezNums <- mget(nam, envir = get(paste(sep="", chip, "ENTREZID"))) 
   entrezIds <- mget(nam, envir = get(paste(sep="", chip, "SYMBOL")))
@@ -934,12 +932,11 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   entrezNums <- entrezNums[ ord ]
   orig.val <- round(orig.val[ ord ], 2)
   val <- val[ ord ]
-  seq <- seq[ ord ]
   longname <- longname[ ord ]
   
   valid <- !is.na(entrezIds)
 
-  if (isares$rundata$organism == "Homo sapiens") {
+  if (organism(isares) == "Homo sapiens") {
     html <- paste(sep="", "<a href=\"http://www.genecards.org/cgi-bin/carddisp.pl?gene=", entrezIds[valid],
                   "\" class=\"tag", val[valid],
                   "\">", entrezIds[valid], "<span>", longname[valid], ", score: ", orig.val[valid], "</span></a>")
@@ -966,11 +963,10 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
     cond.to.include <- 1:6
   }
 
-  score <- isares$conditions[,m]
-  score <- round(score[ score != 0 ], 2)
-  seq <- which(isares$conditions[,m] != 0)
-  ord <- order(isares$conditions[seq,m], decreasing=TRUE)
-  pd <- isares$rundata$pData[seq,,drop=FALSE][ ord,,drop=FALSE]
+  score <- round(getAllConditionScores(isares, m)[[1]], 2)
+  seq <- which(score != 0)
+  ord <- order(getConditionScores(isares, m)[[1]], decreasing=TRUE)
+  pd <- pData(isares)[seq,,drop=FALSE][ ord,,drop=FALSE]
   pd <- pd[, cond.to.include,drop=FALSE]
 
   ## workaround for NAs
@@ -1000,7 +996,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   foo <- foo[-1]
   
   # mark under- and over-expression
-  under <- sort(isares$conditions[seq,m], decreasing=TRUE) < 0
+  under <- score[seq][ord] < 0
   if (any(under)) {
     foo[under] <- gsub('<tr>', '<tr class="under">', foo[under])
   }
@@ -1018,14 +1014,13 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   
   CairoPNG(file=paste(sep="", target.dir, "/condplot-", m, ".png"),
            width=1200, height=400)
-  cond.plot(nm, genes=isares$genes[,m], thr=my.cth,
+  cond.plot(nm, genes=getAllGeneScores(isares, m)[[1]], thr=my.cth,
             markup=markup, markdown=markdown, sep=sep)
   dev.off()
   
   ## Gene names for expression matrix cross
   print("  -- Gene names for cross")
-  seq <- which(isares$genes[,m] != 0)
-  nam <- isares$rundata$features[ isares$genes[,m] != 0]
+  nam <- getGenes(isares, m)[[1]]
   entrezIds <- mget(nam, envir = get(paste(sep="", chip, "SYMBOL")))
 #  longname <- mget(nam, envir = get(paste(sep="", chip, "GENENAME")))
   haveEntrezId <- names(entrezIds)[sapply(entrezIds, function(x) !is.na(x))]
@@ -1036,7 +1031,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
     entrezIds <- unlist(entrezIds)
   }
 
-  ord <- order(isares$genes[seq,m], decreasing=TRUE)
+  ord <- order(getGeneScores(isares, m)[[1]], decreasing=TRUE)
   nam <- nam[ ord ]
   entrezIds <- unname(entrezIds[ ord ])
 #  longname <- longname[ ord ]
