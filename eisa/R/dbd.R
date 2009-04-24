@@ -281,7 +281,7 @@ setMethod("sigCategories", signature(r="DBDListHyperGResult"),
             })
           })
 
-isa.DBD <- function(isaresult,
+isa.DBD <- function(modules,
                     org=organism(modules),
                     shortorg=abbreviate(org, 2),
                     ann=annotation(modules),
