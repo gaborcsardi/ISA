@@ -1,20 +1,20 @@
 
 autogen.table <- function(nm, isares, target.dir,
-                          modules=seq_len(ncol(isares$genes)),
+                          modules=seq_len(length(isares)),
                           template=system.file("autogen", package="eisa"),
                           GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL, DBD=NULL,
                           htmltitle=NULL, notes=NULL, seed=NULL) {
 
-  isa.status("Creating HTML module table", "in")
+  isa:::isa.status("Creating HTML module table", "in")
   
-  chip <- isares$rundata$annotation
+  chip <- annotation(isares)
   library(paste(sep="", chip, ".db"), character.only=TRUE)
-  organism <- get(paste(sep="", chip, "ORGANISM"))
-  short.organism <- organism
+  organism <- organism(isares)
 
   ################################################
   ## GO
 
+  library(GO.db)
   db <- GO_dbconn()
   query <- "SELECT go_id, term, definition FROM go_term"
   go.terms <- dbGetQuery(db, query)
@@ -131,10 +131,10 @@ autogen.table <- function(nm, isares, target.dir,
     tables.CHR <- ""
   }
 
-  thr <- paste(sep="", isares$seeddata$thr.row[modules], "/",
-               isares$seeddata$thr.col[modules])
-  no.genes <- apply(isares$genes[,modules] != 0, 2, sum)
-  no.conds <- apply(isares$conditions[,modules] != 0, 2, sum)
+  thr <- paste(sep="", seedData(isares)$thr.row[modules], "/",
+               seedData(isares)$thr.col[modules])
+  no.genes <- getNoGenes(isares)
+  no.conds <- getNoConditions(isares)
 
   #############
 
@@ -219,7 +219,7 @@ autogen.table <- function(nm, isares, target.dir,
     file.symlink("maintable.html", paste(sep="", target.dir, "/maintree.html"))
   }
 
-  isa.status("DONE", "out")
+  isa:::isa.status("DONE", "out")
   
   invisible(NULL)
 }  
@@ -235,7 +235,7 @@ autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
                             drive.CC=NULL, drive.MF=NULL, drive.KEGG=NULL,
                             drive.miRNA=NULL, drive.DBD=NULL, drive.CHR=NULL) {
 
-  isa.status("Generating module pages", "in")
+  isa:::isa.status("Generating module pages", "in")
   
   if (!file.exists(target.dir)) {
     dir.create(target.dir)
@@ -283,7 +283,7 @@ autogen.modules <- function(nm, isares, modules=seq_len(ncol(isares$genes)),
                        next.module=nx, prev.module=px)
   }
 
-  isa.status("DONE", "out")
+  isa:::isa.status("DONE", "out")
   
   invisible(NULL)
 }
@@ -297,7 +297,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
                                drive.CHR=NULL,
                                next.module=NULL, prev.module=NULL) {
 
-  isa.status(paste("Generating HTML page for module", module), "in")
+  isa:::isa.status(paste("Generating HTML page for module", module), "in")
 
   require(Cairo)
   require(isa)
@@ -1065,6 +1065,6 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   jfname <- paste(sep="", target.dir, "/module-", m, ".js")
   cat(jlines, file=jfname, sep="\n")
 
-  isa.status("DONE", "out")
+  isa:::isa.status("DONE", "out")
 }
 
