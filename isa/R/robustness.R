@@ -40,6 +40,10 @@ isa.filter.robust.default <- function(data, normed.data, isares, perms=1,
     stop("Number of permutations must be non-negative")
   }
 
+  if (length(isares$rows) == 0) {
+    return(isares)
+  }
+  
   if (length(unique(isares$seeddata$thr.row)) != 1) {
     warning("Different row thresholds, using only the first one.")
   }
