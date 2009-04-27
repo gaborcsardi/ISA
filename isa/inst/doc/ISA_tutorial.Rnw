@@ -7,6 +7,7 @@
 \newcommand{\Rclass}[1]{\texttt{#1}}
 \newcommand{\Rargument}[1]{\textsl{#1}}
 \newcommand{\filename}[1]{\texttt{#1}}
+\newcommand{\listentry}[1]{\texttt{#1}}
 
 \begin{document}
 
@@ -19,6 +20,11 @@
 % \RaggedRight
 
 \tableofcontents
+
+<<Roptions,echo=FALSE,results=hide>>=
+## Some options for R
+options(width=60)
+@ 
 
 \section{For the impatient}
 
@@ -54,7 +60,7 @@ example of a (rather artificial) data matrix with very strong modular
 structure. It is a $20\times 20$ matrix and has two correlated blocks,
 each of them of size $10\times 10$.
 \begin{figure}
-<<echo=FALSE,fig=TRUE,width=6,height=3>>=
+<<toymatrix,echo=FALSE,fig=TRUE,width=6,height=3>>=
 library(isa)
 library(Matrix)
 data <- data2 <- isa.in.silico(20,20,2,10,10)[[1]]
@@ -92,19 +98,20 @@ algorithm works are in order.
 \subsection{ISA iteration}
 
 ISA works in an iterative way. For an $E (m\times n)$
-input matrix it starts from seed vector $r_0$, which is
-typically a sparse 0/1 vector of length $m$. This defines a set of
-rows in $E$. Then $E'$ is multiplied by $r_0$ and the
-result is thresholded.
+input matrix it starts from a seed vector $r_0$, which is
+typically a sparse 0/1 vector of length $m$. The non-zero elements in
+the seed vector define a set of rows in $E$. Then the transposed of
+$E$, $E'$ is multiplied by $r_0$ and the result is thresholded.
 
 The thresholding is an important step of the ISA, without thresholding
 ISA would be equivalent to a (not too effective) numerical singular
-value decomposition (SVD). Currently thresholding is done by
+value decomposition (SVD) algorithm. Currently thresholding is done by
 calculating the mean and standard deviation of the vector and keeping
 only elements that are further than a given number of standard
 deviations from the mean. Based on the \Rargument{direction} parameter,
-this means 1) keeping values that are significantly higher than the
-mean (``\emph{up}''), significantly lower (``\emph{down}'') or both
+this means keeping values that are significantly higher than the
+mean (``\emph{up}''), or keeping the ones that are significantly lower
+than the mean (``\emph{down}''); or keeping both
 (``\emph{updown}'').
 
 The thresholded vector $c_0$ is the (column)
@@ -112,9 +119,9 @@ The thresholded vector $c_0$ is the (column)
 $c_0$ is calculated, $E$ is multiplied by $c_0$ and then thresholded
 to get $r_1$.
 
-This iteration is performed until it converges, i.e. $r_i$
-and $r_{i-1}$ are \emph{close}, and $c_i$ and
-$c_{i-1}$ are also close. The convergence criteria,
+This iteration is performed until it converges, i.e. $r_{i-1}$
+and $r_i$ are \emph{close}, and $c_{i-1}$ and
+$c_i$ are also close. The convergence criteria,
 i.e. what \emph{close} means is by default defined by high Pearson
 correlation.
 
@@ -122,15 +129,15 @@ It is very possible that the ISA finds the same modules more than once;
 two or more seeds might converge to the same module. The function
 \Rfunction{isa.unique} eliminates every module from the result of 
 \Rfunction{isa.iterate} that is very similar (in terms of
-Pearson correlation) to the one that was already found before it.
+Pearson correlation) to the one that was already found before.
 
 It might be also apparent from the description of ISA, that the
 biclusters are soft, i.e. they might have an overlap in their rows,
 columns, or both. It is also possible that some rows and/or
 columns of the input matrix are not found to be part of any ISA
 biclusters. Depending on the stringency parameters in the
-thresholding, it might even happen that ISA does not find any
-biclusters.
+thresholding (i.e. how far the values should be from the mean), it
+might even happen that ISA does not find any biclusters.
 
 \subsection{Parameters}
 
@@ -138,7 +145,8 @@ The two main parameters of ISA are the two thresholds (one for the
 rows and one for the columns). They basically define the stringency of
 the modules. If the row threshold is high, then the modules will have
 very similar rows. If it is mild, then modules will be bigger, with
-less similar rows than in the first case.
+less similar rows than in the first case. The same applied to the
+column threshold and the columns of the modules.
 
 \subsection{Random seeding and smart seeding}
 
@@ -166,20 +174,37 @@ calculated by centering and scaling the rows of $E$. $E_r$ is
 used to calculate the column signature of rows and $E_c$ is used
 to calculate the signature of the columns.
 
-It is possible to use another normalization, then the user is
+It is possible to use another normalization. In this case the user is
 requested to supply the normalized input data in a named list,
 including the two matrices of appropriate
-dimensions. \texttt{Er} will be used for calculating the
-signature of the rows, \texttt{Ec} the signature of the
+dimensions to the \Rfunction{isa.iterate} function.
+
+The \texttt{Er} entry of the list will be used for calculating the
+signature of the rows, \texttt{Ec} will be used for the signature of the
 columns. If you want to use the same matrix in both steps, then supply
 it twice, the first one transposed.
+
+\subsection{Row and column scores}
+
+In addition to finding biclusters in the input matrix, the ISA also
+assigns scores to the rows and columns, separately for each
+module. The scores are between minus one and one and they are by
+definition zero for the rows/columns that are not included in the
+module. For the non-zero entries, the further the score of a
+row/columns is from zero, the stronger the association between the
+row/column and the module. If the sign of two rows/columns are the
+same, then they are correlated, if they have opposite signs, then they
+are anti-correlated. 
 
 \subsection{Robustness}
 As ISA is an unsupervised algorithm, it may very well find some
 modules, even if you feed in noise as an input matrix. To avoid these
 spurious modules we defined a robustness measure, a single number for
-a modules that gives how well the rows and the columns are
-correlated.
+a module that measures how well the rows and the columns are
+correlated. The robustness score is a generalization of the first
+singular value of the matrix. If there would be no thresholding, then
+the ISA would (almost always) converge to the leading SVD vector and
+the robustness score would be the corresponding singular value.
 
 It recommended that the user uses \Rfunction{isa.filter.robust} to
 run ISA on the scrambled input matrix with the same threshold
@@ -189,23 +214,398 @@ scrambled data.
 
 \section{A simple work flow}
 
-TODO
+The simplest way to use ISA on your data is by calling the
+\Rfunction{isa} function with your input matrix as the single
+arguments. This function uses random seeding and has three optional
+arguments: 
+\begin{description}
+  \item[\Rargument{thr.row}] A numeric vector, the row thresholds to
+    use. By default this is $1,1.5,2,2.5,3$. 
+  \item[\Rargument{thr.col}] A numeric vector, the column thresholds
+    to use. By default this is $1,1.5,2,2.5,3$.
+  \item[\Rargument{no.seeds}] The number of random seed vectors to
+    generate. By default 100 seeds are generated.
+\end{description}
+
+The \Rfunction{isa} function runs the ISA algorithm for all threshold
+combinations of the supplied row and column thresholds. For every
+single run the same set of random seeds are used.
+
+Let us see an example. We load the \Rpackage{isa} generate some in
+silico data with the \Rfunction{isa.in.silico} function first:
+<<insilico,cache=TRUE>>=
+data <- isa.in.silico(200,200,2,50,50)[[1]]
+@
+The function call above generates the data matrix in
+Fig.~\ref{fig:twoclusters}. The first two arguments define the size of
+the data matrix ($200\times 200$), the third the number of modules (two)
+and the fourth and fifth give the size of the modules, both are
+$50\times 50$ submatrices in this case. By default
+\Rfunction{isa.in.silico} creates non-overlapping modules with some
+background noise.
+
+\Rfunction{isa.in.silico} returns a list with a list with three
+elements, we are most interested in the first now, that is the actual
+artificial data matrix. The second and the entries in the list give
+the correct module memberships of the elements, see the manual page of
+\Rfunction{isa.in.silico} for the details. Let's take a look at the
+input data, see Fig.~\ref{fig:block}.
+<<blockplot,include=FALSE,results=hide,cache=TRUE>>=
+print(image(Matrix(data)))
+@ 
+
+\begin{figure}
+\centering
+\setkeys{Gin}{width=0.7\textwidth}
+<<blockplot2,fig=TRUE,echo=FALSE,results=hide,cache=TRUE,width=8,height=6>>=
+<<blockplot>>
+@
+\caption{Another artificial data matrix with two modules and a lot of
+  noisy elements.}
+\label{fig:block}
+\end{figure}
+
+All we have to do now is calling the \Rfunction{isa} function on the
+data matrix. 
+<<seed,echo=FALSE>>=
+## Just to get the same results
+set.seed(10)
+@ 
+<<isa1,cache=TRUE>>=
+modules <- isa(data)
+names(modules)
+@ 
+
+The \Rfunction{isa} function returns a list with four
+elements. \listentry{rows} and \listentry{columns} define the
+modules. The non-zero elements in the first column of both define the
+first module, the second columns define the second module, etc.
+The number of columns in \listentry{rows} (and \listentry{columns})
+correspond to the number of modules.
+<<no.mods.>>=
+ncol(modules$rows)
+@
+ISA has found \Sexpr{ncol(modules$rows)} %$
+modules in the artificial data. This seem a bit surprising, as we
+expected only two modules, so let us take a look at the modules. We
+simply plot the row scores of the individual modules
+(Fig.~\ref{fig:simpleplot}). The first two modules corresponds to the
+two blocks in the input matrix. The third module is the union of them,
+with opposite score signs. The \Rfunction{isa} function finds modules
+containing anticorrelated rows/columns, as long as the
+anti-correlation is coordinated. I.e. in the third module, the first
+50 rows \emph{always} behave in an opposite way compared to the second
+50 rows. This is why they are collected into a single module.
+
+<<simpleplot,results=hide,include=FALSE>>=
+layout(cbind(seq(ncol(modules$rows))))
+sapply(seq(ncol(modules$rows)), function(x) {
+  par(mar=c(3,5,1,1))
+  plot(modules$rows[,x], ylim=c(-1,1), 
+       ylab="scores", xlab=NA, 
+       cex.lab=2, cex.axis=1.5)
+})
+@
+
+\begin{figure}
+\centering
+\setkeys{Gin}{width=0.7\textwidth}
+<<simpleplot2,fig=TRUE,echo=FALSE,results=hide,width=8,height=6>>=
+<<simpleplot>>
+@ 
+\caption{The row scores of the three modules found in the two-block
+  artificial data matrix. A score of zero means that the row is not
+  included in the module. Notice that in the third module the first
+  50 and the second 50 rows have opposite score signs, i.e. they are
+  anti-correlated.}
+\label{fig:simpleplot}
+\end{figure}
+
+The \listentry{rundata} entry of the return value of \Rfunction{isa}
+contains data about the ISA run, all the parameters (the default
+values in our case) are included here. It has the following members:
+<<isaresult.rundata>>=
+names(modules$rundata)
+@ 
+See the documentation of \Rfunction{isa} for more about these.
+
+Finally, the listentry{seeddata} entry is a data frame, it contains
+various data about the individual modules or the seeds that were used
+to find the module. There is one row for each module. It has the
+following columns:
+<<seedcols>>=
+colnames(modules$seeddata)
+@ 
+The columns \listentry{thr.row} and \listentry{thr.col} contain the
+row and columns thresholds that were used to find the module, while
+the \listentry{rob} column contains its robustness score:
+<<seeddata>>=
+modules$seeddata
+@ 
+
+Finally, let us show how to transform the result of the
+\Rfunction{isa} function to a list of biclusters. Each entry of the
+list will have two sublists, the first -- named \listentry{rows} --
+will contain the rows indices of the module, the second -- named
+\listentry{columns} -- the column indices:
+<<mymodules>>=
+mymodules <- lapply(seq(ncol(modules$rows)), function(x) {
+  list(rows=which(modules$rows[,x] != 0),
+       columns=which(modules$columns[,x] != 0))
+})
+length(mymodules)
+mymodules[[1]]$rows
+mymodules[[1]]$columns
+@
 
 \section{A detailed work flow}
 
-TODO
+In this section we will perform each steps of the ISA analysis
+individually. This makes sense only if the user wants to adjust the
+parameters of some steps. 
+
+Let us create some in-silico data to be analyzed:
+<<insilico10>>=
+data <- isa.in.silico(500, 200, 10)
+@ 
+This will be a $500\times 200$ matrix, with 10 modules. By default
+``half'' of the matrix is filled with noise, so each module will be
+$25\times 10$ submatrix. See the input matrix on
+Fig.~\ref{fig:tenmodules}.
+
+<<tenmods,include=FALSE,results=hide,cache=TRUE>>=
+print(image(Matrix(data[[1]])))
+@ 
+
+\begin{figure}
+\centering
+\setkeys{Gin}{width=0.7\textwidth}
+<<tenmods2,fig=TRUE,echo=FALSE,results=hide,cache=TRUE>>=
+<<tenmods>>
+@
+\caption{In-silico data with ten non-overlapping modules.}
+\label{fig:tenmodules}
+\end{figure}
 
 \subsection{Preparing the data}
 
-TODO
+One ISA iteration consists of two thresholded matrix
+multiplications. The data preparation step means producing these two
+matrices, $E_r$ and $E_c$ from the input matrix, $E$. The default
+behavior (i.e. what the \Rfunction{isa} function does) is to
+row-wise scale and center the transposed of $E$ to get $E_r$; and to
+row-wise scale and center $E$ to get $E_c$. The
+\Rfunction{isa.normalize} function performs the appropriate scaling
+and returns $E_r$ and $E_c$ in a list:
+<<normalize>>=
+normed.data <- isa.normalize(data[[1]])
+names(normed.data)
+dim(normed.data$Er)
+dim(normed.data$Ec)
+@ 
+
+Let us do a quick check that the rows of the matrices are indeed
+centered and scaled.
+<<checkscalecenter>>=
+max(abs(rowSums(normed.data$Er)))
+max(abs(rowSums(normed.data$Ec)))
+max(abs(apply(normed.data$Er, 1, sd)-1))
+max(abs(apply(normed.data$Ec, 1, sd)-1))
+@ 
 
 \subsection{Running the ISA}
 
-TODO
+To run the ISA, we need to create the starting seeds first. The
+\Rfunction{isa} function uses sparse random seeds, generated by
+\Rfunction{generate.seeds}. We also have the choice of using
+non-random seeds, e.g. if you have a matrix with gene expression data
+measured on many samples you can use ``gene'' seeds that correspond to
+biological pathways; in this case ISA does a biased search to find
+modules related to the input pathways. Or, in a case/control
+experiment one can use seed vectors that correspond to cases and look
+for modules that are differentially regulated in the control and the
+case samples.
+
+For now, we will use thousand random seeds, with different sparseness:
+<<generate.seeds>>=
+row.seeds <- generate.seeds(length=nrow(data[[1]]), count=1000, 
+                            sparsity=c(2,5,10,100))
+@ 
+Note, that vector giving the sparsity is recycled, thus we will have
+four kind of seeds, some with 2, 5, 10 and 100 rows; 250 of each of
+them.
+
+We are ready to run the ISA now. Let us assume that we only want to
+find modules that are ``above'' the background. (In this artificial
+case we actually know that there are no modules below the background.)
+The \Rargument{direction} argument is thus set to \verb+"up"+. 
+<<isa.iterate>>=
+modules <- isa.iterate(normed.data, row.seeds=row.seeds, 
+                       thr.row=2, thr.col=2, direction="up")
+@ 
+
+Unlike \Rfunction{isa}, \Rfunction{isa.iterate} does not merge or
+filter the modules the input seeds converge to. Consequently, the
+\verb+modules+ object contains 1000 modules, but these are not
+necessarily unique:
+<<isa.iterate.res>>=
+ncol(modules$rows)
+@
+
+It is also possibly that some seeds converge to an all-zero vector, we
+have \Sexpr{sum(apply(modules$rows==0, 2, all))} such module: % $
+<<all.zero.modules>>=
+sum(apply(modules$rows==0, 2, all))
+@ 
+
+The \Rfunction{isa.unique} function finds duplicate or very similar
+modules in a list returned by \Rfunction{isa.iterate} and keeps only a
+single one of them. It also eliminates all-zero modules and seeds
+that did not converge, the latter result all \verb+NA+
+columns in the \listentry{rows} and \listentry{columns} matrix:
+<<unique>>=
+modules2 <- isa.unique(normed.data, modules, cor.limit=0.9)
+@
+The \Rargument{cor.limit} argument specifies the correlation limit
+above which two modules are considered to be the same. Let us see how
+many modules are left:
+<<isa.unique.res>>=
+ncol(modules2$rows)
+@ 
+
+We still have \Sexpr{ncol(modules2$rows)} modules. Let us check %$
+whether each real module was find by the ISA. Remember that
+\Rfunction{isa.in.silico} stores the correct modules in the second and
+third entry of its return value.
+<<correctness>>=
+found.rows <- cor(data[[2]], modules2$rows!=0)
+found.cols <- cor(data[[3]], modules2$columns!=0)
+found <- pmin(found.rows,found.cols)
+apply(found, 1, max)
+@ 
+Out of the ten modules, \Sexpr{sum(apply(found, 1, max)-1<1e-14)} were
+correctly identified by the ISA.
 
 \subsection{Robustness of biclusters, filtering the results}
 
-TODO
+There are two features that we expect from a good biclustering
+algorithm. The first is sensitivity: it is able to find all
+biclusters in the input data. The second is specificity: it should not
+generate spurious biclusters, or in other words biclusters that are
+correlated just by chance.
+
+To address this problem, we have developed a robustness measure, a
+single scalar number that gives how correlated the rows and columns of
+a given module are. This measure is a simple generalization of the
+singular value decomposition (SVD) singular value, and can be
+calculated with the \Rfunction{robustness} function:
+<<robustness>>=
+rob <- robustness(normed.data, modules2$rows, modules2$columns)
+summary(rob)
+@ 
+As the user can see, the robustness of the \Sexpr{ncol(modules2$rows)} %$
+modules varies considerably, from \Sexpr{round(min(rob),2)} to
+\Sexpr{round(max(rob), 2)}. For more insight we create a boxplot for
+the robustness scores (Fig.~\ref{fig:robbox}).
+
+<<robbox,include=FALSE,results=hide,cache=TRUE>>=
+par(cex.lab=1.5, cex.axis=1.5)
+boxplot(rob, ylab="Robustness")
+@ 
+
+\begin{figure}
+\centering
+\setkeys{Gin}{width=0.7\textwidth}
+<<robbox2,fig=TRUE,echo=FALSE,results=hide,cache=TRUE>>=
+<<robbox>>
+@
+\caption{}
+\label{fig:robbox}
+\end{figure}
+
+One can use the robustness measure to filter out list of modules, in
+the following way. We permute the input matrix and run the same
+module finding procedure that we did for the original matrix. Then we
+calculate the robustness scores for both the real and the scrambled
+modules and eliminate the ``real'' modules having a robustness score
+that is less than the score of at least one scrambled module. Note,
+that this filtering can be done only if both sets of modules were
+found using the same threshold parameters. The procedure is
+implemented in the \Rfunction{isa.filter.robust} function:
+<<filter.robust>>=
+modules3 <- isa.filter.robust(data[[1]], normed.data, modules2, 
+                              perms=1, row.seeds=row.seeds)
+@
+We use the very same row seeds, as for the original matrix; this is
+not strictly requires. The \Rargument{perms} argument sets the number
+of permutations to perform.
+
+Note that the ISA run on the scrambled matrix usually takes longer,
+than on the real data, because it takes more steps for the ISA to
+converge.
+
+After the robustness filtering we have \Sexpr{ncol(modules3$rows)} %$
+modules left. This is still more than the ten correct modules, so let
+us take a closer look. First, let us create another plot with the 
+robustness scores of the remaining modules. 
+\Rfunction{isa.filter.robust} places the robustness scores in the seed
+data, so we don't need to calculate them again. See Fig.~\ref{fig:robbox2}. 
+
+<<robbox3,include=FALSE,results=hide,cache=TRUE>>=
+plot(modules3$seeddata$rob, ylab="Robustness", cex.lab=1.5)
+@ 
+
+\begin{figure}
+\centering
+\setkeys{Gin}{width=0.7\textwidth}
+<<robbox4,fig=TRUE,echo=FALSE,results=hide,cache=TRUE>>=
+<<robbox3>>
+@
+\caption{}
+\label{fig:robbox2}
+\end{figure}
+
+The scatterplot shows that ten modules have in fact higher
+robustness scores than the rest. Let us check that these are indeed the
+ten ``real'' modules of the data.
+<<bestmods>>=
+bestmods <- which(modules3$seeddata$rob > 61)
+mod.cor <- pmin(cor(modules3$rows[,bestmods]!=0, data[[2]]),
+                cor(modules3$columns[,bestmods]!=0, data[[3]]))
+apply(mod.cor, 1, max)
+apply(mod.cor, 2, max)
+@ 
+
+Indeed, we have found the ten real modules, the ISA is both specific
+and sensitive. Of course for the analysis of real data it is much more
+difficult to filter the modules found by the biclustering algorithm,
+but the robustness based filtering still helps getting rid of spurious
+modules.
+
+Finally, let us take a look at some of the other modules, that were
+also kept after the robustness-based filtering. Here we plot nine of
+them.
+<<othermods,include=FALSE,results=hide,cache=TRUE>>=
+othermods <- which(modules3$seeddata$rob < 61)[1:3]
+layout(matrix(seq(length(othermods)+1), 2, byrow=TRUE))
+idx <- seq(ncol(data[[1]]), 1)
+par(mar=c(1,1,4,1))
+image(1-data[[1]][,idx], main="Input matrix", 
+      axes=FALSE, frame=TRUE)
+for (i in othermods) { 
+  par(mar=c(1,1,4,1))
+  image(1-outer(modules3$rows[,i], modules3$columns[,i])[,idx],
+        main=paste("Module", i), axes=FALSE, frame=TRUE)
+}
+@ 
+
+\begin{figure}
+\centering
+\setkeys{Gin}{width=0.7\textwidth}
+<<othermods2,fig=TRUE,echo=FALSE,results=hide,cache=TRUE>>=
+<<othermods>>
+@ 
+\end{figure}
 
 \subsection{Visualize the results}
 
@@ -228,7 +628,7 @@ TODO
 The version number of R and packages loaded for generating this
 vignette were:
 
-<<results=tex,echo=FALSE>>=
+<<sessioninfo,results=tex,echo=FALSE>>=
 gsub(";", "; ", gsub("_", "\\\\_", sub("Locale:[ ]*\\\\verb\\|(.*)\\|", 
                                        "\\\\texttt\\{\\1\\}", 
                                        toLatex(sessionInfo()))))
