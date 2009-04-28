@@ -613,15 +613,220 @@ TODO
 
 \section{Features of ISA}
 
-TODO
+In this section we show some examples that highlight some key features
+of the ISA: its resilience to noise and its ability to find
+overlapping modules.
 
 \subsection{Resilience to noise}
 
-TODO
+To test the behavior of ISA with noisy inputs we generate a number of
+in-silico data sets with different noise levels
+(Fig.~\ref{fig:noise}).
+<<noisegen,cache=TRUE>>=
+noise <- seq(0.1,1,by=0.1)
+data <- lapply(noise, function(x) isa.in.silico(500,200,10,noise=x))
+@ 
+
+<<noiseplot1,echo=FALSE,results=hide>>=
+png("noise.png", width=800, height=320)
+@ 
+<<noiseplot2>>=
+layout( matrix(1:10, nr=2, byrow=TRUE) )
+for (i in seq_along(data)) {
+  par(mar=c(1,1,1,1))
+  image(1-data[[i]][[1]], axes=FALSE, frame=TRUE)
+}
+@ 
+<<noiseplot3,echo=FALSE,results=hide>>=
+dev.off()
+@ 
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{noise}
+  \caption{}
+  \label{fig:noise}
+\end{figure}
+
+Next, we run ISA with the default parameters on all the data
+sets. This might take a while.
+<<noise.isa,cache=TRUE>>=
+modules <- lapply(data, function(x) isa(x[[1]]))
+@
+
+Let us check the sensitivity of ISA, for every real module, we pick
+one from the ones ISA has found, the one that is the most correlated
+to it.
+<<sensitivity.noise>>=
+best <- lapply(seq_along(modules), function(i) {
+  cc <- pmin(cor(modules[[i]]$rows!=0, data[[i]][[2]]),
+             cor(modules[[i]]$columns!=0, data[[i]][[3]]))
+  apply(cc, 2, max)
+})
+best.mean <- sapply(best, mean)
+@ 
+
+Let's create boxplots for the different noise levels.
+
+<<sensbox,include=FALSE,results=hide>>=
+boxplot(best, names=noise, xlab="Noise level", ylab="Sensitivity",
+        cex.lab=1.5)
+@
+\begin{figure}
+\centering
+<<sensbox2,fig=TRUE,echo=FALSE,results=hide,width=10,height=5>>=
+<<sensbox>>
+@ 
+\caption{}
+\label{fig:sensbox}
+\end{figure}
+
+To test the specificity, we create boxplots for the correlation
+coefficients of all modules found by ISA and their closest real
+module.
+<<spec>>=
+spec <- lapply(seq_along(modules), function(i) {
+  cc <- pmin(cor(modules[[i]]$rows != 0, data[[i]][[2]]),
+             cor(modules[[i]]$columns != 0, data[[i]][[3]]))
+  apply(cc, 1, max)
+})
+@ 
+<<specbox,include=FALSE,results=hide>>=
+boxplot(spec, names=noise, xlab="Noise level", ylab="Specificity",
+        cex.lab=1.5)
+@
+\begin{figure}
+\centering
+<<specbox2,fig=TRUE,echo=FALSE,results=hide,width=10,height=5>>=
+<<specbox>>
+@
+\caption{}
+\label{fig:specbox}
+\end{figure}
 
 \subsection{Finding overlapping biclusters}
 
-TODO
+ISA biclusters might overlap in their rows, columns, or both. To
+illustrate this, we create an artificial data set with two overlapping
+blocks.
+
+<<set.seed.overlap>>=
+set.seed(1)
+@ 
+<<overlap>>=
+two.over <- isa.in.silico(100,100,2,40,40,overlap.row=10)
+@ 
+
+We run ISA on this input matrix, with two threshold parameters, the
+first thresholds are very mild, they are both zero.
+In other words, in each iteration step all rows/columns are kept in each
+that have a higher score than the average. The second set of
+thresholds are stricter, the scores have to be at least one standard
+deviation away from the mean to keep them.
+
+<<overlap.isa>>=
+ov.normed <- isa.normalize(two.over[[1]])
+ov.seeds <- generate.seeds(count=100, length=100)
+ov.modules.1 <- isa.iterate(ov.normed, ov.seeds, 
+                            thr.row=0, thr.col=0, direction="up")
+ov.modules.1 <- isa.unique(ov.normed, ov.modules.1)
+ov.modules.1 <- isa.filter.robust(two.over[[1]], ov.normed, ov.modules.1)
+ov.modules.2 <- isa.iterate(ov.normed, ov.seeds, 
+                            thr.row=1, thr.col=1, direction="up")
+ov.modules.2 <- isa.unique(ov.normed, ov.modules.2)
+ov.modules.2 <- isa.filter.robust(two.over[[1]], ov.normed, ov.modules.2)
+ncol(ov.modules.1$rows)
+ncol(ov.modules.2$rows)
+@ 
+
+ISA found \Sexpr{ncol(ov.modules.1$rows)} %$
+modules with the mild thresholds and \Sexpr{ncol(ov.modules.2$rows)} %$
+modules with the strict ones. Let us plot the original data and the
+modules found by ISA (Fig.~\ref{fig:overlapplot}).
+
+<<overlapplot,include=FALSE,results=hide,cache=TRUE>>=
+layout( rbind(1:4, c(8,5,6,7)) )
+par(mar=c(1,1,3,1))
+image(2-two.over[[1]], axes=FALSE, frame=TRUE, main="Input matrix")
+for (i in 1:3) {
+  par(mar=c(1,1,3,1))
+  image(1-outer(ov.modules.1$rows[,i]!=0, ov.modules.1$columns[,i]!=0),
+        axes=FALSE, frame=TRUE, main=paste("Module", i))
+}
+for (i in 1:3) { 
+  par(mar=c(1,1,3,1))
+  image( 1-outer(ov.modules.2$rows[,i]!=0, ov.modules.2$columns[,i]!=0),
+        axes=FALSE, frame=TRUE, main=paste("Module", i+3))
+}
+@ 
+
+\begin{figure}
+\centering
+<<overlapplot2,fig=TRUE,echo=FALSE,results=hide,cache=TRUE,width=8,height=5>>=
+<<overlapplot>>
+@ 
+\caption{}
+\label{fig:overlapplot}
+\end{figure}
+
+As expected the ISA modules are in general bigger with the mild
+thresholds. ISA correctly identifies the two overlapping modules and
+also the union of them. With the stricter thresholds it find the
+non-overlapping parts of the two modules, plus their overlap as a
+separate module.
+
+\section{Running ISA in parallel}
+
+Since a typical ISA analysis consists of using a range of row/column
+and these runs are independent of each other; it is trivial to
+parallelize the task by performing the iterations for different
+threshold parameters on different processors or computers. Here we
+show and example on how to do this easily with the \Rpackage{snow} and
+the \Rpackage{Rmpi} packages:
+<<parallelloadpackage>>=
+library(snow)
+library(Rmpi)
+@ 
+
+We generate some simple in-silico data.
+<<paralleldata>>=
+pdata <- isa.in.silico()
+@
+
+Create the MPI cluster, with eight working nodes. You need to have a
+working MPI installation for this. See more in the documentation of
+the \Rpackage{Rmpi} and \Rpackage{snow} packages.
+<<createcluster>>=
+clu <- makeMPIcluster(8)
+invisible(clusterEvalQ(clu, library(isa)))
+clusterExport(clu, "pdata")
+@ 
+
+Create a big matrix in which each row is a combination of the
+threshold parameters.
+<<parthr>>=
+thr <- seq(1,3,by=0.2)
+thr.list <- expand.grid(thr, thr)
+@ 
+
+First we run the ISA on a single processor only, and measure the
+running time.
+<<seqrun,cache=TRUE>>=
+system.time(modules <- isa(pdata[[1]], thr.row=thr, thr.col=thr))
+@ 
+
+Let us now do a parallel run, again, with measuring the running
+time. If you are really running this on multiple CPUs, then it is much
+faster.
+<<parrun,cache=TRUE>>=
+system.time(modules.par <- parApply(clu, thr.list, 1, function(x) {
+  isa(pdata[[1]], thr.row=x[1], thr.col=x[2])
+}))
+@
+
+Finally, stop the cluster.
+<<closecluster>>=
+stopCluster(clu)
+@ 
 
 \section{Session information}
 
