@@ -88,8 +88,8 @@ isa.iterate.default <- function(normed.data, row.seeds, col.seeds,
   if (length(thr.col) != 1 && length(thr.col) != no.seeds) {
     stop("`thr.col' does not have the right length")
   }
-  thr.row <- rep(thr.row, no.seeds)
-  thr.col <- rep(thr.col, no.seeds)
+  thr.row <- rep(thr.row, length=no.seeds)
+  thr.col <- rep(thr.col, length=no.seeds)
 
   ## Put the seeds together
   all.seeds <- matrix(ncol=0, nrow=nrow(normed.data$Ec))
