@@ -1,11 +1,12 @@
 \name{plot.modules}
 \alias{plot.modules}
+\alias{plot.modules,list-method}
 \concept{Bicluster}
 \title{Image plots of biclusters}
 \description{Make several image plots, one for each bicluster, and
   optionally one for the original data as well.}
 \usage{
-plot.modules(modules, to.plot=seq_len(ncol(modules$rows)),
+\S4method{plot.modules}{list} (modules, to.plot=seq_len(ncol(modules$rows)),
      data, binary=TRUE, names=NULL, xlab="", ylab="", ...)
 }
 \arguments{

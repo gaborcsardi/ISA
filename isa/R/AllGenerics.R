@@ -17,3 +17,5 @@ setGeneric("isa.sweep",
 setGeneric("sweep.graph",
            function(sweep.result, ...) standardGeneric("sweep.graph"))
 
+setGeneric("plot.modules",
+           function(modules, ...) standardGeneric("plot.modules"))

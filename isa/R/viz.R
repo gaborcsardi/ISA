@@ -1,7 +1,12 @@
 
-plot.modules <- function(modules, to.plot=seq_len(ncol(modules$rows)),
-                         data, binary=TRUE, names=NULL, xlab="", ylab="",
-                         ...) {
+setMethod("plot.modules", signature(modules="list"),
+          function(modules, ...)
+          plot.modules.default(modules, ...))
+
+plot.modules.default <- function(modules, to.plot=seq_len(ncol(modules$rows)),
+                                 data, binary=TRUE, names=NULL,
+                                 xlab="", ylab="",
+                                 ...) {
 
   require(lattice)
   
