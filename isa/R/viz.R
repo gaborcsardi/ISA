@@ -1,4 +1,28 @@
 
+images <- function(matrices, names=NULL, ...) {
+
+  no.rows <- nrow(matrices[[1]])
+  no.cols <- ncol(matrices[[1]])
+  no.mods <- length(matrices)
+
+  if (no.mods==0) {
+    stop("No matrices to plot")
+  }
+
+  alldata <- structure(unlist(matrices), dim=c(no.rows, no.cols, no.mods),
+                       dimnames=list(NULL, NULL, names))
+
+  rx <- range(alldata, finite=TRUE)
+  nn <- 100
+  n0 <- min(nn, max(0, round((0-rx[1])/(rx[2]-rx[1])*nn)))
+  col.regions <- c(colorRampPalette(c("blue3", "gray80"))(n0),
+                   colorRampPalette(c("gray75", "red3"))(nn-n0))
+
+  levelplot(alldata, scale=list(y=list(draw=FALSE), x=list(draw=FALSE)),
+            col.regions=col.regions, between=list(x=0.5,y=0.5),
+            ...)
+} 
+
 setMethod("plot.modules", signature(modules="list"),
           function(modules, ...)
           plot.modules.default(modules, ...))
@@ -37,18 +61,7 @@ plot.modules.default <- function(modules, to.plot=seq_len(ncol(modules$rows)),
     M <- c(list(data), M)
   }
 
-  alldata <- structure(unlist(M), dim=c(no.rows, no.cols, no.mods),
-                       dimnames=list(NULL, NULL, names))
-
-  rx <- range(alldata, finite=TRUE)
-  nn <- 100
-  n0 <- min(nn, max(0, round((0-rx[1])/(rx[2]-rx[1])*nn)))
-  col.regions <- c(colorRampPalette(c("blue3", "gray80"))(n0),
-                   colorRampPalette(c("gray75", "red3"))(nn-n0))
-
-  levelplot(alldata, scale=list(y=list(draw=FALSE), x=list(draw=FALSE)),
-            col.regions=col.regions, between=list(x=0.5,y=0.5),
-            xlab=xlab, ylab=ylab, ...)
+  images(M, names=names, xlab=xlab, ylab=ylab, ...)
 }
 
                        
