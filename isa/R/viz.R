@@ -10,7 +10,7 @@ plot.modules.default <- function(modules, to.plot=seq_len(ncol(modules$rows)),
 
   require(lattice)
   
-  no.mods <- ncol(modules$rows)
+  no.mods <- length(to.plot)
   no.rows <- nrow(modules$rows)
   no.cols <- nrow(modules$columns)
   
@@ -24,7 +24,7 @@ plot.modules.default <- function(modules, to.plot=seq_len(ncol(modules$rows)),
     }
   }
   
-  M <- lapply(seq_len(no.mods), function(x) {
+  M <- lapply(to.plot, function(x) {
     if (binary) {
       outer(modules$rows[,x]!=0, modules$columns[,x]!=0)
     } else {
