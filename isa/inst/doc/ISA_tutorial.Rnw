@@ -250,16 +250,20 @@ artificial data matrix. The second and the entries in the list give
 the correct module memberships of the elements, see the manual page of
 \Rfunction{isa.in.silico} for the details. Let's take a look at the
 input data, see Fig.~\ref{fig:block}.
-<<blockplot,include=FALSE,results=hide,cache=TRUE>>=
+
+<<blockplot.pre,echo=FALSE,results=hide>>=
+png("blockplot.png", 800, 600)
+@ 
+<<blockplot>>=
 print(image(Matrix(data)))
+@ 
+<<blockplot.post,echo=FALSE,results=hide>>=
+dev.off()
 @ 
 
 \begin{figure}
 \centering
-\setkeys{Gin}{width=0.7\textwidth}
-<<blockplot2,fig=TRUE,echo=FALSE,results=hide,cache=TRUE,width=8,height=6>>=
-<<blockplot>>
-@
+\includegraphics[width=\textwidth]{blockplot}
 \caption{Another artificial data matrix with two modules and a lot of
   noisy elements.}
 \label{fig:block}
@@ -366,23 +370,28 @@ parameters of some steps.
 
 Let us create some in-silico data to be analyzed:
 <<insilico10>>=
-data <- isa.in.silico(500, 200, 10)
+data <- isa.in.silico(200, 100, 10)
 @ 
-This will be a $500\times 200$ matrix, with 10 modules. By default
-``half'' of the matrix is filled with noise, so each module will be
-$25\times 10$ submatrix. See the input matrix on
-Fig.~\ref{fig:tenmodules}.
+This will be a $\Sexpr{nrow(data[[1]])}\times \Sexpr{ncol(data[[1]])}$
+matrix, with \Sexpr{ncol(data[[2]])} modules. By default ``half'' of
+the matrix is filled with noise, so each module will be a 
+$\Sexpr{round(nrow(data[[1]])/2/10)}\times 
+\Sexpr{round(ncol(data[[1]])/2/10)}$ submatrix. See the
+input matrix on Fig.~\ref{fig:tenmodules}.
 
-<<tenmods,include=FALSE,results=hide,cache=TRUE>>=
+<<tenmods.pre,echo=FALSE,results=hide>>=
+png("tenmods.png", 600, 800)
+@ 
+<<tenmods>>=
 print(image(Matrix(data[[1]])))
+@ 
+<<tenmods.post,echo=FALSE,results=hide>>=
+dev.off()
 @ 
 
 \begin{figure}
 \centering
-\setkeys{Gin}{width=0.7\textwidth}
-<<tenmods2,fig=TRUE,echo=FALSE,results=hide,cache=TRUE>>=
-<<tenmods>>
-@
+\includegraphics{tenmods}
 \caption{In-silico data with ten non-overlapping modules.}
 \label{fig:tenmodules}
 \end{figure}
@@ -519,7 +528,8 @@ boxplot(rob, ylab="Robustness")
 <<robbox2,fig=TRUE,echo=FALSE,results=hide,cache=TRUE>>=
 <<robbox>>
 @
-\caption{}
+\caption{Box-plot for the robustness scores of the modules found by
+  the ISA. Some modules have a much higher score than the rest.}
 \label{fig:robbox}
 \end{figure}
 
@@ -561,7 +571,9 @@ plot(modules3$seeddata$rob, ylab="Robustness", cex.lab=1.5)
 <<robbox4,fig=TRUE,echo=FALSE,results=hide,cache=TRUE>>=
 <<robbox3>>
 @
-\caption{}
+\caption{The robustness scores of ISA modules after filtering out some
+  modules with low robustness. It is still obvious that ten modules
+  have a significantly higher score than the rest.}
 \label{fig:robbox2}
 \end{figure}
 
@@ -569,7 +581,7 @@ The scatterplot shows that ten modules have in fact higher
 robustness scores than the rest. Let us check that these are indeed the
 ten ``real'' modules of the data.
 <<bestmods>>=
-bestmods <- which(modules3$seeddata$rob > 61)
+bestmods <- which(modules3$seeddata$rob > 27.5)
 mod.cor <- pmin(cor(modules3$rows[,bestmods]!=0, data[[2]]),
                 cor(modules3$columns[,bestmods]!=0, data[[3]]))
 apply(mod.cor, 1, max)
@@ -585,26 +597,24 @@ modules.
 Finally, let us take a look at some of the other modules, that were
 also kept after the robustness-based filtering. Here we plot nine of
 them.
-<<othermods,include=FALSE,results=hide,cache=TRUE>>=
-othermods <- which(modules3$seeddata$rob < 61)[1:3]
-layout(matrix(seq(length(othermods)+1), 2, byrow=TRUE))
-idx <- seq(ncol(data[[1]]), 1)
-par(mar=c(1,1,4,1))
-image(1-data[[1]][,idx], main="Input matrix", 
-      axes=FALSE, frame=TRUE)
-for (i in othermods) { 
-  par(mar=c(1,1,4,1))
-  image(1-outer(modules3$rows[,i], modules3$columns[,i])[,idx],
-        main=paste("Module", i), axes=FALSE, frame=TRUE)
-}
+<<othermods.pre>>=
+png("othermods.png", 800, 800)
+@ 
+<<othermods>>=
+othermods <- which(modules3$seeddata$rob < 27.5)[1:5]
+print(plot.modules(modules3, othermods, data=data[[1]]))
+@ 
+<<othermods.post>>=
+dev.off()
 @ 
 
 \begin{figure}
 \centering
-\setkeys{Gin}{width=0.7\textwidth}
-<<othermods2,fig=TRUE,echo=FALSE,results=hide,cache=TRUE>>=
-<<othermods>>
-@ 
+\includegraphics{othermods}
+\caption{The input matrix and five modules with relatively low
+  robustness scores. As it turns out, each of these modules contains
+  in fact two blocks of the input matrix.}
+\label{fig:othermods}
 \end{figure}
 
 \subsection{Visualize the results}
@@ -627,23 +637,22 @@ noise <- seq(0.1,1,by=0.1)
 data <- lapply(noise, function(x) isa.in.silico(500,200,10,noise=x))
 @ 
 
-<<noiseplot1,echo=FALSE,results=hide>>=
-png("noise.png", width=800, height=320)
+<<noiseplot.pre,echo=FALSE,results=hide>>=
+png("noise.png", width=800, height=600)
 @ 
-<<noiseplot2>>=
-layout( matrix(1:10, nr=2, byrow=TRUE) )
-for (i in seq_along(data)) {
-  par(mar=c(1,1,1,1))
-  image(1-data[[i]][[1]], axes=FALSE, frame=TRUE)
-}
+<<noiseplot>>=
+images(lapply(data, "[[", 1), names=as.character(noise), 
+       xlab="", ylab="")
 @ 
-<<noiseplot3,echo=FALSE,results=hide>>=
+<<noiseplot.post,echo=FALSE,results=hide>>=
 dev.off()
 @ 
 \begin{figure}
   \centering
   \includegraphics[width=\textwidth]{noise}
-  \caption{}
+  \caption{Modular data sets with different levels of noise. The data
+  sets are generated by adding normally distributed background noise
+  with given variance to the checkerboard matrix.}
   \label{fig:noise}
 \end{figure}
 
@@ -676,7 +685,12 @@ boxplot(best, names=noise, xlab="Noise level", ylab="Sensitivity",
 <<sensbox2,fig=TRUE,echo=FALSE,results=hide,width=10,height=5>>=
 <<sensbox>>
 @ 
-\caption{}
+\caption{The sensitivity of the ISA in the function of noise. The
+  sensitivity score is calculated by finding the best (in terms of
+  Pearson correlation) ISA module for each block in the input matrix.
+  
+  ISA is very sensitive to relatively large noise levels.
+}
 \label{fig:sensbox}
 \end{figure}
 
@@ -699,7 +713,15 @@ boxplot(spec, names=noise, xlab="Noise level", ylab="Specificity",
 <<specbox2,fig=TRUE,echo=FALSE,results=hide,width=10,height=5>>=
 <<specbox>>
 @
-\caption{}
+\caption{Specificity of the ISA modules, in the function of
+  noise. Specificity was calculated by finding the best -- again,
+  by highest Pearson correlation -- matching block in the input matrix
+  for each ISA module. These correlation coefficients are plotted in a
+  boxplot for each noise level.
+
+  Specificity for ISA decreases approximately linearly with the
+  increase of noise.
+}
 \label{fig:specbox}
 \end{figure}
 
@@ -743,28 +765,29 @@ modules with the mild thresholds and \Sexpr{ncol(ov.modules.2$rows)} %$
 modules with the strict ones. Let us plot the original data and the
 modules found by ISA (Fig.~\ref{fig:overlapplot}).
 
-<<overlapplot,include=FALSE,results=hide,cache=TRUE>>=
-layout( rbind(1:4, c(8,5,6,7)) )
-par(mar=c(1,1,3,1))
-image(2-two.over[[1]], axes=FALSE, frame=TRUE, main="Input matrix")
-for (i in 1:3) {
-  par(mar=c(1,1,3,1))
-  image(1-outer(ov.modules.1$rows[,i]!=0, ov.modules.1$columns[,i]!=0),
-        axes=FALSE, frame=TRUE, main=paste("Module", i))
-}
-for (i in 1:3) { 
-  par(mar=c(1,1,3,1))
-  image( 1-outer(ov.modules.2$rows[,i]!=0, ov.modules.2$columns[,i]!=0),
-        axes=FALSE, frame=TRUE, main=paste("Module", i+3))
-}
+<<overlapplot.pre,echo=FALSE,results=hide>>=
+png("overlapplot.png", 800, 600)
+@ 
+<<overlapplot>>=
+plot.modules(data=two.over[[1]],
+             list(rows=cbind(ov.modules.1$rows, ov.modules.2$rows),
+                  columns=cbind(ov.modules.1$columns,
+                    ov.modules.2$column)),
+             names=c("Input matrix", paste("Module", 1:6)))
+@
+<<overlapplot.post,echo=FALSE,results=hide>>=
+dev.off()
 @ 
 
 \begin{figure}
 \centering
-<<overlapplot2,fig=TRUE,echo=FALSE,results=hide,cache=TRUE,width=8,height=5>>=
-<<overlapplot>>
-@ 
-\caption{}
+\includegraphics{overlapplot}
+\caption{The input matrix with two overlapping blocks and the ISA
+  modules for this data set. The first three modules were found at
+  milder threshold parameters, that is why they are bigger. As you can
+  see for Modules #1 and #2, at milder thresholds there is a higher
+  probability that ISA will pick up some incorrect rows/columns.
+}
 \label{fig:overlapplot}
 \end{figure}
 
