@@ -1,4 +1,4 @@
-export(isa.in.silico, generate.seeds, images)
+export(isa.in.silico, generate.seeds, images, isa.biclust)
 
 exportMethods("isa",
               "isa.normalize",

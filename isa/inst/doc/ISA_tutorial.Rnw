@@ -597,14 +597,14 @@ modules.
 Finally, let us take a look at some of the other modules, that were
 also kept after the robustness-based filtering. Here we plot nine of
 them.
-<<othermods.pre>>=
+<<othermods.pre,echo=FALSE,results=hide>>=
 png("othermods.png", 800, 800)
 @ 
 <<othermods>>=
 othermods <- which(modules3$seeddata$rob < 27.5)[1:5]
 print(plot.modules(modules3, othermods, data=data[[1]]))
 @ 
-<<othermods.post>>=
+<<othermods.post,echo=FALSE,results=hide>>=
 dev.off()
 @ 
 
@@ -688,7 +688,6 @@ boxplot(best, names=noise, xlab="Noise level", ylab="Sensitivity",
 \caption{The sensitivity of the ISA in the function of noise. The
   sensitivity score is calculated by finding the best (in terms of
   Pearson correlation) ISA module for each block in the input matrix.
-  
   ISA is very sensitive to relatively large noise levels.
 }
 \label{fig:sensbox}
@@ -718,8 +717,7 @@ boxplot(spec, names=noise, xlab="Noise level", ylab="Specificity",
   by highest Pearson correlation -- matching block in the input matrix
   for each ISA module. These correlation coefficients are plotted in a
   boxplot for each noise level.
-
-  Specificity for ISA decreases approximately linearly with the
+  Specificity of ISA decreases approximately linearly with the
   increase of noise.
 }
 \label{fig:specbox}
@@ -785,7 +783,7 @@ dev.off()
 \caption{The input matrix with two overlapping blocks and the ISA
   modules for this data set. The first three modules were found at
   milder threshold parameters, that is why they are bigger. As you can
-  see for Modules #1 and #2, at milder thresholds there is a higher
+  see for Modules \#1 and \#2, at milder thresholds there is a higher
   probability that ISA will pick up some incorrect rows/columns.
 }
 \label{fig:overlapplot}
