@@ -489,6 +489,8 @@ isa.sweep.default <- function(data, normed.data, isaresult, method=c("cor"),
   result$seeddata <- do.call(rbind, isalist.seed)
   result$seeddata$father <- c(unlist(conv.to),
                               rep(NA, ncol(isalist.row[[i]])))
+  result$seeddata$level <- rep(seq_along(isalist.row),
+                               sapply(isalist.row, ncol))
 
   result$rundata <- isaresult$rundata
   result$rundata$N <- NN
