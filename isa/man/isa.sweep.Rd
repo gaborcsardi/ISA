@@ -85,7 +85,7 @@ set.seed(1)
 insili <- isa.in.silico()
 
 ## Do ISA with a bunch of row thresholds while keeping the column
-## threshold fixed
+## threshold fixed. This is quite an artificial example...
 isares <- isa(insili[[1]], thr.row=c(0.5,1,2), thr.col=0)
 
 ## Create a nice tree from the modules, we need the normed data for this
@@ -99,19 +99,19 @@ if (interactive()) {
                colSums(isa.tree$rows!=0), ",",
                colSums(isa.tree$columns!=0))
   par(mar=c(1,1,1,1))
-  plot(network, layout=layout.reingold.tilford,
+  roots <- tapply(topological.sort(network, mode="out"),
+                  clusters(network)$membership, function(x) x[1])
+  rootlevel <- isa.tree$seeddata$level-1
+  coords <- layout.reingold.tilford(network, root=roots,
+                                    rootlevel=rootlevel[roots+1])
+  plot(network, layout=coords,
        vertex.shape="rectangle", vertex.color="green",
        vertex.label=lab, vertex.size=30, vertex.size2=10)
 }
 
 ## Plot the modules themselves as well
 if (interactive()) {
-  layout( matrix(1:16, byrow=TRUE, nc=4) )
-  for (i in seq(ncol(isa.tree$rows))) {
-    par(mar=c(1,2,2,1))
-    image( outer(isa.tree$rows[,i], isa.tree$columns[,i]) )
-    text(1, 1, cex=2, paste(sep="", "#", i), adj=c(1,1))
-  }
+  plot.modules(isa.tree)
 }
 
 ## Yet another plot, the scores for the rows within the modules
