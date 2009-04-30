@@ -520,7 +520,7 @@ sweep.graph.default <- function(sweep.result) {
   from <- from[valid]
   to <- to[valid]
 
-  graph( rbind(from, to), n=nnodes )
+  graph( rbind(from, to)-1, n=nnodes )
 }
 
 setMethod("isa", signature(data="matrix"),
