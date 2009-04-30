@@ -1,7 +1,7 @@
 \name{isa.biclust}
 \alias{isa.biclust}
-\title{Convert ISA modules to a \code{Biclust} class, as defined by the
-  \code{biclust} package}
+\title{Convert ISA modules to a Biclust class, as defined by the
+  biclust package}
 \description{
   This function converts the object with ISA modules to a \code{Biclust}
   object, so all the functions in the \code{biclust} package can be used
