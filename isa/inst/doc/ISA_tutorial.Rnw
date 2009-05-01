@@ -255,7 +255,7 @@ input data, see Fig.~\ref{fig:block}.
 png("blockplot.png", 800, 600)
 @ 
 <<blockplot>>=
-print(image(Matrix(data)))
+images(list(data), xlab="", ylab="", strip=FALSE)
 @ 
 <<blockplot.post,echo=FALSE,results=hide>>=
 dev.off()
@@ -263,7 +263,7 @@ dev.off()
 
 \begin{figure}
 \centering
-\includegraphics[width=\textwidth]{blockplot}
+\includegraphics[width=0.6\textwidth]{blockplot}
 \caption{Another artificial data matrix with two modules and a lot of
   noisy elements.}
 \label{fig:block}
@@ -380,10 +380,10 @@ $\Sexpr{round(nrow(data[[1]])/2/10)}\times
 input matrix on Fig.~\ref{fig:tenmodules}.
 
 <<tenmods.pre,echo=FALSE,results=hide>>=
-png("tenmods.png", 600, 800)
+png("tenmods.png", 600, 400)
 @ 
 <<tenmods>>=
-print(image(Matrix(data[[1]])))
+images(list(data[[1]]), strip=FALSE, xlab="", ylab="")
 @ 
 <<tenmods.post,echo=FALSE,results=hide>>=
 dev.off()
@@ -525,7 +525,7 @@ boxplot(rob, ylab="Robustness")
 \begin{figure}
 \centering
 \setkeys{Gin}{width=0.7\textwidth}
-<<robbox2,fig=TRUE,echo=FALSE,results=hide,cache=TRUE>>=
+<<robbox2,fig=TRUE,echo=FALSE,results=hide,cache=TRUE,width=7,height=4>>=
 <<robbox>>
 @
 \caption{Box-plot for the robustness scores of the modules found by
@@ -568,7 +568,7 @@ plot(modules3$seeddata$rob, ylab="Robustness", cex.lab=1.5)
 \begin{figure}
 \centering
 \setkeys{Gin}{width=0.7\textwidth}
-<<robbox4,fig=TRUE,echo=FALSE,results=hide,cache=TRUE>>=
+<<robbox4,fig=TRUE,echo=FALSE,results=hide,cache=TRUE,width=7,height=4>>=
 <<robbox3>>
 @
 \caption{The robustness scores of ISA modules after filtering out some
@@ -598,11 +598,11 @@ Finally, let us take a look at some of the other modules, that were
 also kept after the robustness-based filtering. Here we plot nine of
 them.
 <<othermods.pre,echo=FALSE,results=hide>>=
-png("othermods.png", 800, 800)
+png("othermods.png", 400, 400)
 @ 
 <<othermods>>=
 othermods <- which(modules3$seeddata$rob < 27.5)[1:5]
-print(plot.modules(modules3, othermods, data=data[[1]]))
+print(plotModules(modules3, othermods, data=data[[1]]))
 @ 
 <<othermods.post,echo=FALSE,results=hide>>=
 dev.off()
@@ -610,7 +610,7 @@ dev.off()
 
 \begin{figure}
 \centering
-\includegraphics{othermods}
+\includegraphics[width=0.6\textwidth]{othermods}
 \caption{The input matrix and five modules with relatively low
   robustness scores. As it turns out, each of these modules contains
   in fact two blocks of the input matrix.}
@@ -619,11 +619,113 @@ dev.off()
 
 \subsection{Visualize the results}
 
-TODO
+Visualizing overlapping biclusters is quite a challenging task. We
+show simple methods that usually visualize a single bicluster 
+at a time. For some of these we will use the \Rpackage{biclust} R
+package.
+
+\subsubsection{The \Rpackage{biclust} package}
+
+The \Rpackage{biclust} R package implements several biclustering
+algorithms in a unified framework. It uses the class \Rclass{Biclust}
+to store a set of biclusters. The \Rfunction{isa.biclust} converts ISA
+modules to a \Rclass{Biclust} object. This requires the binarization
+of the modules, i.e. the ISA scores are lost, they are converted to
+zeros and ones:
+<<biclust,cache=TRUE>>=
+library(biclust)
+five.mods <- isa.in.silico(200,200,5,20,20)
+modules <- isa(five.mods[[1]],thr.row=2, thr.col=2)
+Bc <- isa.biclust(modules)
+Bc
+@ 
+
+\subsubsection{Image plots}
+
+There are some examples in this document that show how to create image
+plots for the modules and potentially also the input data. See
+e.g. Figs~\ref{fig:othermods} and
+\ref{fig:overlapplot}. These plots use the \Rfunction{plotModules}
+function, that directly takes the output of \Rfunction{isa} (and other
+functions with the same output format: \Rfunction{isa.iterate},
+Rfunction{isa.unique}, etc.
+
+In fact \Rfunction{plotModules} calls the
+\Rfunction{images} function to do its job. \Rfunction{images} takes a
+list of matrices, see Fig.~\ref{fig:noise} for an example.
+
+The \Rfunction{drawHeatmap} function of the \Rpackage{biclust} package
+can be also used to draw an image plot. This visualizes a single
+bicluster on top of the input matrix. It reorders the rows and columns
+of the input matrix to move the block of the bicluster to the top
+left corner of the input matrix (Fig.~\ref{fig:heatmap}).
+<<drawHeatmap.pre,echo=FALSE,results=hide>>=
+png("drawheatmap.png", 400,400)
+@ 
+<<drawHeatmap>>=
+drawHeatmap(five.mods[[1]], Bc, number=1,local=FALSE)
+@ 
+<<drawHeatmap.post,echo=FALSE,results=hide>>=
+dev.off()
+@ 
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{drawheatmap}
+\caption{Heatmap plot of the reordered input matrix. The rows and
+  columns corresponding to the first bicluster are moved to the
+  top-left corner of the matrix.}
+\label{fig:heatmap}
+\end{figure}
+
+\subsubsection{Profile plots}
+
+The \Rfunction{parallelCoordinates} function of the \Rpackage{biclust}
+package plots the profile of the rows (or columns) that are included
+in a bicluster with a different color. These plots visualize the
+difference between bicluster and the rest of the matrix, see
+Fig.\ref{fig:parallel} for an example.
+<<parallel.pre,include=TRUE>>=
+parallelCoordinates(five.mods[[1]], Bc, number=1, plotBoth=TRUE)
+@ 
+\begin{figure}
+\centering
+\setkeys{Gin}{width=0.6\textwidth}
+<<parallel,fig=TRUE,echo=FALSE,results=hide>>=
+<<parallel.pre>>
+@ 
+\caption{Profile plots for the first bicluster found by ISA. In this
+  artificial data set there is a clear distinction between the
+  background and the rows/columns of the module.}
+\label{fig:parallel}
+\end{figure}
+
+\subsubsection{Contrast bar plots}
+
+The \Rfunction{plotclust} function of the \Rpackage{biclust} package
+creates barplots for one or more biclusters. A single bar is the
+mean of the columns of the bicluster for a given row of the bicluster;
+or the mean of the columns of the background (i.e. the rest of the
+input matrix). The bigger the difference between the bars of the two
+colors, the better the bicluster. The results of the following code
+are in Fig.~\ref{fig:plotclust}.
+<<plotclust.pre,include=FALSE>>=
+plotclust(Bc, five.mods[[1]], Titel="")
+@
+\begin{figure}
+\centering
+\setkeys{Gin}{width=0.6\textwidth}
+<<plotclust,fig=TRUE,echo=FALSE,results=hide>>=
+<<plotclust.pre>>
+@ 
+\caption{Bar plots to show the difference between the biclusters and
+  the rest of the input matrix, for the first five modules found by
+  ISA.}
+\label{fig:plotclust}
+\end{figure}
 
 \section{Features of ISA}
 
-In this section we show some examples that highlight some key features
+In this section we show examples that highlight key features
 of the ISA: its resilience to noise and its ability to find
 overlapping modules.
 
@@ -767,11 +869,11 @@ modules found by ISA (Fig.~\ref{fig:overlapplot}).
 png("overlapplot.png", 800, 600)
 @ 
 <<overlapplot>>=
-plot.modules(data=two.over[[1]],
-             list(rows=cbind(ov.modules.1$rows, ov.modules.2$rows),
-                  columns=cbind(ov.modules.1$columns,
-                    ov.modules.2$column)),
-             names=c("Input matrix", paste("Module", 1:6)))
+plotModules(data=two.over[[1]],
+            list(rows=cbind(ov.modules.1$rows, ov.modules.2$rows),
+                 columns=cbind(ov.modules.1$columns,
+                   ov.modules.2$column)),
+            names=c("Input matrix", paste("Module", 1:6)))
 @
 <<overlapplot.post,echo=FALSE,results=hide>>=
 dev.off()
@@ -887,6 +989,12 @@ Ihmels, J., Bergmann, S., Barkai, N. (2004).
 \newblock Defining transcription modules using large-scale gene
   expression data.
 \newblock { \em Bioinformatics}, page 1993--2003.
+
+\bibitem[Kaiser, 2009]{biclust}
+Sebastian Kaiser, Rodrigo Santamaria, Roberto Theron, Luis Quintales
+and Friedrich Leisch. (2009). 
+\newblock {\em biclust: BiCluster Algorithms}. 
+\newblock R package version 0.7.2.
 
 \end{thebibliography}
 
