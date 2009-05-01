@@ -9,5 +9,5 @@ Description: The ISA is a biclustering algorithm that finds modules
   reordered input matrix.
 Depends: methods
 Suggests: igraph (>= 0.5.1), biclust, lattice
-License: GPL
+License: file LICENCE
 Packaged: Mon Jul 28 09:19:47 2008; csardi
