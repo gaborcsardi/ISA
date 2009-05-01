@@ -52,12 +52,17 @@
 }
 \value{
   \code{isa.sweep} returns a named list with the same components as in
-  the input (\code{isaresult}), but the \sQuote{\code{father}} column is
-  added to the \sQuote{\code{seeddata}} member. This contains the edges
-  of the sweep graph: if bicluster \eqn{m} is the father of bicluster
-  \eqn{n} that means that bicluster \eqn{n} converges to bicluster
-  \eqn{m} at the same threshold parameters that were used to find
-  biclusters \eqn{m}.
+  the input (\code{isaresult}), but the \sQuote{\code{father}} and the
+  \sQuote{\code{level}} columns are
+  added to the \sQuote{\code{seeddata}} member. \code{father} contains
+  the edges of the sweep graph: if bicluster \eqn{m} is the father of
+  bicluster \eqn{n} that means that bicluster \eqn{n} converges to
+  bicluster \eqn{m} at the same threshold parameters that were used to
+  find biclusters \eqn{m}.
+
+  \code{level} is a simple numbering of the different thresholds for
+  which the sweep tree was built. I.e. the most strict threshold is
+  level one, the second most is level two, etc.
 
   \code{sweep.graph} returns and igraph graph.
 }
