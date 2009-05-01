@@ -98,8 +98,10 @@ nm <- isa.normalize(insili[[1]])
 isa.tree <- isa.sweep(insili[[1]], nm, isares)
 network <- sweep.graph(isa.tree)
 
-## Plot the network of modules
-if (interactive()) {
+## Plot the network of modules, only if a recent igraph package is
+## installed
+if (interactive() && require(igraph) &&
+    compareVersion(packageDescription("igraph")$Version, "0.6")>=0) {
   lab <- paste(sep="", seq_len(ncol(isa.tree$rows)), ": ",
                colSums(isa.tree$rows!=0), ",",
                colSums(isa.tree$columns!=0))
