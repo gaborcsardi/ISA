@@ -23,14 +23,14 @@ images <- function(matrices, names=NULL, ...) {
             ...)
 } 
 
-setMethod("plot.modules", signature(modules="list"),
+setMethod("plotModules", signature(modules="list"),
           function(modules, ...)
-          plot.modules.default(modules, ...))
+          plotModules.default(modules, ...))
 
-plot.modules.default <- function(modules, to.plot=seq_len(ncol(modules$rows)),
-                                 data, binary=TRUE, names=NULL,
-                                 xlab="", ylab="",
-                                 ...) {
+plotModules.default <- function(modules, to.plot=seq_len(ncol(modules$rows)),
+                                data, binary=TRUE, names=NULL,
+                                xlab="", ylab="",
+                                ...) {
 
   require(lattice)
   

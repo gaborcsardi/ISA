@@ -116,7 +116,7 @@ if (interactive()) {
 
 ## Plot the modules themselves as well
 if (interactive()) {
-  plot.modules(isa.tree)
+  plotModules(isa.tree)
 }
 
 ## Yet another plot, the scores for the rows within the modules
