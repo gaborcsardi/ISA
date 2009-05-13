@@ -1,4 +1,4 @@
-% \VignetteIndexEntry{Running ISA in parallel}
+% \VignetteIndexEntry{Running ISA on multiple CPUs}
 \documentclass{article}
 \usepackage{ragged2e}
 
