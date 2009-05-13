@@ -897,60 +897,6 @@ also the union of them. With the stricter thresholds it find the
 non-overlapping parts of the two modules, plus their overlap as a
 separate module.
 
-\section{Running ISA in parallel}
-
-Since a typical ISA analysis consists of using a range of row/column
-and these runs are independent of each other; it is trivial to
-parallelize the task by performing the iterations for different
-threshold parameters on different processors or computers. Here we
-show and example on how to do this easily with the \Rpackage{snow} and
-the \Rpackage{Rmpi} packages:
-<<parallelloadpackage>>=
-library(snow)
-library(Rmpi)
-@ 
-
-We generate some simple in-silico data.
-<<paralleldata>>=
-pdata <- isa.in.silico()
-@
-
-Create the MPI cluster, with eight working nodes. You need to have a
-working MPI installation for this. See more in the documentation of
-the \Rpackage{Rmpi} and \Rpackage{snow} packages.
-<<createcluster>>=
-clu <- makeMPIcluster(8)
-invisible(clusterEvalQ(clu, library(isa)))
-clusterExport(clu, "pdata")
-@ 
-
-Create a big matrix in which each row is a combination of the
-threshold parameters.
-<<parthr>>=
-thr <- seq(1,3,by=0.2)
-thr.list <- expand.grid(thr, thr)
-@ 
-
-First we run the ISA on a single processor only, and measure the
-running time.
-<<seqrun,cache=TRUE>>=
-system.time(modules <- isa(pdata[[1]], thr.row=thr, thr.col=thr))
-@ 
-
-Let us now do a parallel run, again, with measuring the running
-time. If you are really running this on multiple CPUs, then it is much
-faster.
-<<parrun,cache=TRUE>>=
-system.time(modules.par <- parApply(clu, thr.list, 1, function(x) {
-  isa(pdata[[1]], thr.row=x[1], thr.col=x[2])
-}))
-@
-
-Finally, stop the cluster.
-<<closecluster>>=
-stopCluster(clu)
-@ 
-
 \section{Session information}
 
 The version number of R and packages loaded for generating this
