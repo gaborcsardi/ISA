@@ -29,7 +29,7 @@ options(width=60)
 \section{For the impatient}
 
 To run the typical ISA work flow with default parameters on your data
-matrix, just load the \Rpackage{isa} package and call the
+matrix, just load the \Rpackage{isa2} package and call the
 \Rfunction{isa} function with your matrix as the single argument. The
 return value of \Rfunction{isa} is a named list, the members
 \texttt{rows} and \texttt{columns} contain the biclusters ISA have
@@ -61,7 +61,7 @@ structure. It is a $20\times 20$ matrix and has two correlated blocks,
 each of them of size $10\times 10$.
 \begin{figure}
 <<toymatrix,echo=FALSE,fig=TRUE,width=6,height=3>>=
-library(isa)
+library(isa2)
 library(Matrix)
 data <- data2 <- isa.in.silico(20,20,2,10,10)[[1]]
 perm1 <- sample(seq_len(nrow(data)))
@@ -231,7 +231,7 @@ The \Rfunction{isa} function runs the ISA algorithm for all threshold
 combinations of the supplied row and column thresholds. For every
 single run the same set of random seeds are used.
 
-Let us see an example. We load the \Rpackage{isa} generate some in
+Let us see an example. We load the \Rpackage{isa2} generate some in
 silico data with the \Rfunction{isa.in.silico} function first:
 <<insilico,cache=TRUE>>=
 data <- isa.in.silico(200,200,2,50,50)[[1]]
@@ -920,7 +920,7 @@ Bergmann, S., Ihmels, J., and Barkai, N. (2003).
 
 \bibitem[Cs\'ardi, 2009]{isapackage}
 Cs\'ardi, G. (Apr 1, 2009).
-\newblock {\em isa: The Iterative Signature Algorithm}.
+\newblock {\em isa2: The Iterative Signature Algorithm}.
 \newblock R package version 0.1.
 
 \bibitem[Ihmels, 2002]{sa}

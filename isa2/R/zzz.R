@@ -1,5 +1,5 @@
 .onLoad <- function(dir, package) {
-  library.dynam("isa", package, dir, local=FALSE);
+  library.dynam("isa2", package, dir, local=FALSE);
 
   ## Default ISA options
   isa.options[["verbose"]] <-  FALSE
@@ -8,9 +8,9 @@
 }
 
 .onUnload <- function(libpath) {
-  library.dynam.unload("isa", libpath)
+  library.dynam.unload("isa2", libpath)
 }
 
 .Last.lib <- function(libpath) {
-  isa::.onUnload(libpath)
+  isa2::.onUnload(libpath)
 }

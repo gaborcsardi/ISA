@@ -1,11 +1,11 @@
-citHeader("To cite package 'isa' in publications use:")
+citHeader("To cite package 'isa2' in publications use:")
      
-desc <- packageDescription("isa")
+desc <- packageDescription("isa2")
 year <- sub(".*(2[[:digit:]]{3})-.*", "\\1", desc$Date)
 vers <- paste("R package version", desc$Version)
      
 citEntry(entry="Manual",
-         title = "isa: The Iterative Signature Algorithm",
+         title = "isa2: The Iterative Signature Algorithm",
          author = personList(as.person("Gábor Csárdi")),
          year = year,
          note = vers,
@@ -13,7 +13,7 @@ citEntry(entry="Manual",
          textVersion =
          paste("Gábor Csárdi (",
                 year,
-               "). isa: The Iterative Signature Algorithm. ",
+               "). isa2: The Iterative Signature Algorithm. ",
                vers, ".", sep=""))
 
 citEntry(entry="Article",

@@ -71,7 +71,7 @@
   Defining transcription modules using large-scale gene expression data
   \emph{Bioinformatics} 2004 Sep 1;20(13):1993-2003. Epub 2004 Mar 25.
 }
-\seealso{ \link{isa-package} for a short introduction on the Iterative
+\seealso{ \link{isa2-package} for a short introduction on the Iterative
   Signature Algorithm. See \code{\link{isa}} for an easy way of running
   ISA.
 }

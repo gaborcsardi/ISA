@@ -24,7 +24,7 @@
   \item{no.seeds}{Integer scalar, the number of seeds to use.}
 }
 \details{
-  Please read the \link{isa-package} manual page for an introduction on
+  Please read the \link{isa2-package} manual page for an introduction on
   ISA.
   
   The \code{isa} function provides an easy to use interface to the
@@ -139,7 +139,7 @@
   Defining transcription modules using large-scale gene expression data
   \emph{Bioinformatics} 2004 Sep 1;20(13):1993-2003. Epub 2004 Mar 25.
 }
-\seealso{ \link{isa-package} for a short introduction on the Iterative
+\seealso{ \link{isa2-package} for a short introduction on the Iterative
   Signature Algorithm. See the functions mentioned above if you want to
   change the default ISA parameters.
 }

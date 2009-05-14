@@ -34,7 +34,7 @@ threshold parameters on different processors or computers. Here we
 show and example on how to do this easily with the \Rpackage{snow} and
 the \Rpackage{Rmpi} packages:
 <<parallelloadpackage>>=
-library(isa)
+library(isa2)
 library(snow)
 library(Rmpi)
 @ 
@@ -49,7 +49,7 @@ working MPI installation for this. See more in the documentation of
 the \Rpackage{Rmpi} and \Rpackage{snow} packages.
 <<createcluster>>=
 clu <- makeMPIcluster(8)
-invisible(clusterEvalQ(clu, library(isa)))
+invisible(clusterEvalQ(clu, library(isa2)))
 clusterExport(clu, "pdata")
 @ 
 
@@ -103,7 +103,7 @@ Bergmann, S., Ihmels, J., and Barkai, N. (2003).
 
 \bibitem[Cs\'ardi, 2009]{isapackage}
 Cs\'ardi, G. (Apr 1, 2009).
-\newblock {\em isa: The Iterative Signature Algorithm}.
+\newblock {\em isa2: The Iterative Signature Algorithm}.
 \newblock R package version 0.1.
 
 \bibitem[Ihmels, 2002]{sa}

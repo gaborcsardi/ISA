@@ -237,11 +237,11 @@ isa.step <- function(normed.data, rows, thr.row, thr.col, direction) {
 
   filter <- function(x, t, dir) {
     if (dir=="updown") {
-      x <- .Call("beta_filter_updown_vart", x, as.double(t), PACKAGE="isa")
+      x <- .Call("beta_filter_updown_vart", x, as.double(t), PACKAGE="isa2")
     } else if (dir=="up") {
-      x <- .Call("beta_filter_up_vart", x, as.double(t), PACKAGE="isa")
+      x <- .Call("beta_filter_up_vart", x, as.double(t), PACKAGE="isa2")
     } else { ## dir=="down"
-      x <- .Call("beta_filter_down_vart", x, as.double(t), PACKAGE="isa")
+      x <- .Call("beta_filter_down_vart", x, as.double(t), PACKAGE="isa2")
     }
   }
 
@@ -337,11 +337,11 @@ isa.row.from.col <- function(normed.data, col.seeds, thr.row, direction) {
 
   filter <- function(x, t, dir) {
     if (dir=="updown") {
-      x <- .Call("beta_filter_updown_vart", x, as.double(t), PACKAGE="isa")
+      x <- .Call("beta_filter_updown_vart", x, as.double(t), PACKAGE="isa2")
     } else if (dir=="up") {
-      x <- .Call("beta_filter_up_vart", x, as.double(t), PACKAGE="isa")
+      x <- .Call("beta_filter_up_vart", x, as.double(t), PACKAGE="isa2")
     } else { ## dir=="down"
-      x <- .Call("beta_filter_down_vart", x, as.double(t), PACKAGE="isa")
+      x <- .Call("beta_filter_down_vart", x, as.double(t), PACKAGE="isa2")
     }
   }
 
