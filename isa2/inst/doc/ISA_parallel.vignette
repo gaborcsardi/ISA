@@ -31,7 +31,7 @@ Since a typical ISA analysis consists of using a range of row/column
 and these runs are independent of each other; it is trivial to
 parallelize the task by performing the iterations for different
 threshold parameters on different processors or computers. Here we
-show and example on how to do this easily with the \Rpackage{snow} and
+show an example on how to do this easily with the \Rpackage{snow} and
 the \Rpackage{Rmpi} packages:
 <<parallelloadpackage>>=
 library(isa2)
@@ -44,7 +44,7 @@ We generate some simple in-silico data.
 pdata <- isa.in.silico()
 @
 
-Create the MPI cluster, with eight working nodes. You need to have a
+Next, we create the MPI cluster, with eight working nodes. You need to have a
 working MPI installation for this. See more in the documentation of
 the \Rpackage{Rmpi} and \Rpackage{snow} packages.
 <<createcluster>>=
