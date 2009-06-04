@@ -10,33 +10,50 @@
   data.
 }
 \usage{
-\S4method{robustness}{list}(normed.data, row.scores, col.scores)
-\S4method{isa.filter.robust}{matrix}(data, normed.data, isares, perms = 1, row.seeds, col.seeds)
+\S4method{robustness}{list}(normed.data, \dots)
+\S4method{isa.filter.robust}{matrix}(data, \dots)
 }
 \arguments{
   \item{normed.data}{The normalized input data, usually calculated with
     \code{\link{isa.normalize}}.}
-  \item{row.scores}{The scores of the row components of the
-    biclusters. Usually the \code{rows} member of the result list, as
-    returned by \code{\link{isa}}, or \code{\link{isa.iterate}} or some
-    other ISA function.}
-  \item{col.scores}{The scores of the columns of the biclusters, usually
-    the \code{columns} member of the result list from
-    \code{\link{isa}}.}
   \item{data}{The original, not normalized input data.}
-  \item{isares}{The result of ISA, coming from \code{\link{isa}} or
-    \code{\link{isa.iterate}} or any other function that return the same
-    format.}
-  \item{perms}{The number of permutations to perform on the input data.}
-  \item{row.seeds}{Optionally the row seeds for the ISA run on the
-    scrambled data. If this and \code{col.seeds} are both omitted the
-    same number of random seeds are used as for \code{isaresult}.}
-  \item{col.seeds}{Optionally the column seed to use for the ISA on the
-    scrambled input matrix. If both this and \code{row.seeds} are
-    omitted, then the same number of random (row) seeds will be used as
-    for \code{isares}.}
+  \item{\dots}{Additional arguments, see details below.}
 }
 \details{
+  \code{robustness} can be called as
+  \preformatted{
+    robustness(normed.data, row.scores, col.scores)
+  }
+  and \code{isa.filter.robust} can be called as
+  \preformatted{
+    isa.filter.robust(data, normed.data, isares,
+                      perms = 1, row.seeds, col.seeds)
+  }
+  These arguments are:
+  \describe{
+    \item{normed.data}{The normalized input data, usually calculated with
+      \code{\link{isa.normalize}}.}
+    \item{row.scores}{The scores of the row components of the
+      biclusters. Usually the \code{rows} member of the result list, as
+      returned by \code{\link{isa}}, or \code{\link{isa.iterate}} or some
+      other ISA function.}
+    \item{col.scores}{The scores of the columns of the biclusters, usually
+      the \code{columns} member of the result list from
+      \code{\link{isa}}.}
+    \item{data}{The original, not normalized input data.}
+    \item{isares}{The result of ISA, coming from \code{\link{isa}} or
+      \code{\link{isa.iterate}} or any other function that return the same
+      format.}
+    \item{perms}{The number of permutations to perform on the input data.}
+    \item{row.seeds}{Optionally the row seeds for the ISA run on the
+      scrambled data. If this and \code{col.seeds} are both omitted the
+      same number of random seeds are used as for \code{isaresult}.}
+    \item{col.seeds}{Optionally the column seed to use for the ISA on the
+      scrambled input matrix. If both this and \code{row.seeds} are
+      omitted, then the same number of random (row) seeds will be used as
+      for \code{isares}.}
+  }
+
   Even if you generate a matrix with uniform random noise in it, if you
   calculate ISA on it, you will get some biclusters, except maybe if you
   use very strict threshold parameters. These biclusters contain rows

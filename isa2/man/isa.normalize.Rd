@@ -7,14 +7,26 @@
   ISA runs.
 }
 \usage{
-\S4method{isa.normalize}{matrix}(data, prenormalize = FALSE)
+\S4method{isa.normalize}{matrix}(data, \dots)
 }
 \arguments{
   \item{data}{A numeric matrix, the input data. It might contains
     \code{NA} and/or \code{NaN} values.}
-  \item{prenormalize}{Logical scalar, see details below.}
+  \item{\dots}{Additional arguments, see details below.}
 }
 \details{
+  This function can be called as
+  \preformatted{
+    isa.normalize(data, prenormalize = FALSE)    
+  }
+  where the arguments are:
+  \describe{
+    \item{data}{A numeric matrix, the input data. It might contains
+      \code{NA} and/or \code{NaN} values.}
+    \item{\dots}{Additional arguments, see details below.}
+    \item{prenormalize}{Logical scalar, see details below.}
+  }
+  
   It was observed that the ISA works better if the input matrix is
   scaled and its rows have mean zero and standard deviation one.
 

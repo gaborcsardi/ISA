@@ -8,27 +8,39 @@
   Relate the biclusters found in many ISA runs on the same input data.
 }
 \usage{
-\S4method{isa.sweep}{matrix}(data, normed.data, isaresult, method = c("cor"), neg.cor = TRUE,  
-     cor.limit = 0.9)
-\S4method{sweep.graph}{list}(sweep.result)
+\S4method{isa.sweep}{matrix}(data, \dots)
+\S4method{sweep.graph}{list}(sweep.result, \dots)
 }
 \arguments{
   \item{data}{The input matrix.}
-  \item{normed.data}{The normalized input matrix, usually the output of
-    the \code{\link{isa.normalize}} function.}
-  \item{isaresult}{An object containing the biclusters, the result of
-    \code{\link{isa}} or \code{\link{isa.iterate}}.}
-  \item{method}{Character scalar giving the method to determine which
-    seed converged which bicluster. Right now only \sQuote{\code{cor}}
-    is supported, this is based on Pearson correlation.}
-  \item{neg.cor}{Logical scalar, whether to consider negative
-    correlation as convergence.}
-  \item{cor.limit}{Numeric scalar giving the minimum correlation for
-    convergence.}
+  \item{\dots}{Additional arguments, see details
+    below. \code{sweep.graph} has no additional arguments currently.}
   \item{sweep.result}{An ISA result with hierarchy information in the
     seed data, typically calculated by the \code{isa.sweep} function.}
 }
 \details{
+  \code{isa.sweep} can be called as
+  \preformatted{
+    isa.sweep(data, normed.data, isaresult,
+              method = c("cor"), neg.cor = TRUE,  
+	      cor.limit = 0.9)
+	    }
+  where the arguments are:	    
+  \describe{
+    \item{data}{The input matrix.}
+    \item{normed.data}{The normalized input matrix, usually the output of
+      the \code{\link{isa.normalize}} function.}
+    \item{isaresult}{An object containing the biclusters, the result of
+      \code{\link{isa}} or \code{\link{isa.iterate}}.}
+    \item{method}{Character scalar giving the method to determine which
+      seed converged which bicluster. Right now only \sQuote{\code{cor}}
+      is supported, this is based on Pearson correlation.}
+    \item{neg.cor}{Logical scalar, whether to consider negative
+      correlation as convergence.}
+    \item{cor.limit}{Numeric scalar giving the minimum correlation for
+      convergence.}
+  }
+
   Many ISA runs with different thresholds typically create a bunch of
   biclusters and it is useful to visualize how these are related.
 
