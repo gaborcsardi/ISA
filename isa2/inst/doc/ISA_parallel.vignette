@@ -86,9 +86,7 @@ The version number of R and packages loaded for generating this
 vignette were:
 
 <<sessioninfo,results=tex,echo=FALSE>>=
-gsub(";", "; ", gsub("_", "\\\\_", sub("Locale:[ ]*\\\\verb\\|(.*)\\|", 
-                                       "\\\\texttt\\{\\1\\}", 
-                                       toLatex(sessionInfo()))))
+toLatex(sessionInfo())
 @ 
 
 \bibliographystyle{apalike}
