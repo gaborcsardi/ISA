@@ -73,6 +73,41 @@ setMethod("getSampleNames", signature(object="ISAModules"),
                    sampleNames(object)[ object@conditions[,x] != 0 ])
           })
 
+setMethod("getFeatureMatrix", signature(object="ISAModules"),
+          function(object, binary=FALSE, sparse=FALSE, mods) {
+            if (missing(mods)) {
+              res <- object@genes
+            } else {
+              res <- object@genes[,mods]
+            }
+            if (binary) {
+              res <- res != 0
+            }
+            if (sparse) {
+              require(Matrix)
+              res <- Matrix(res, sparse=TRUE)
+            }
+            res
+          })
+
+setMethod("getSampleMatrix", signature(object="ISAModules"),
+          function(object, binary=FALSE, sprase=FALSE, mods) {
+            if (missing(mods)) {
+              res <- object@conditions
+            } else {
+              res <- object@conditions[,mods]
+            }
+            if (binary) {
+              res <- res != 0
+            }
+            if (sparse) {
+              require(Matrix)
+              res <- Matrix(res, sparse=TRUE)
+            }
+            res
+          })            
+            
+
 setMethod("getFeatureScores", signature(object="ISAModules"),
           function(object, mods) {
             if (missing(mods)) { mods <- seq_len(ncol(object@genes)) }
@@ -86,21 +121,6 @@ setMethod("getSampleScores", signature(object="ISAModules"),
             if (missing(mods)) { mods <- seq_len(ncol(object@genes)) }
             lapply(mods, function(x)
                    object@conditions[,x][ object@conditions[,x] != 0 ])
-          })
-
-setMethod("getAllFeatureScores", signature(object="ISAModules"),
-          function(object, mods) {
-            if (missing(mods)) { mods <- seq_len(ncol(object@genes)) }
-            lapply(mods, function(x)
-                   object@genes[,x,drop=FALSE])
-          })
-
-
-setMethod("getAllSampleScores", signature(object="ISAModules"),
-          function(object, mods) {
-            if (missing(mods)) { mods <- seq_len(ncol(object@genes)) }
-            lapply(mods, function(x)
-                   object@conditions[,x,drop=FALSE])
           })
 
 setMethod("getNoFeatures", signature(object="ISAModules"),

@@ -710,8 +710,8 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
 
   print(paste("Module", m, "expression graph"))
 
-  ep <- exp.plot.create(nexp, getAllFeatureScores(isares, m)[[1]],
-                        getAllSampleScores(isares, m)[[1]], normalize=FALSE)
+  ep <- exp.plot.create(nexp, getFeatureMatrix(isares, m)[[1]],
+                        getSampleMatrix(isares, m)[[1]], normalize=FALSE)
   CairoPNG(file=paste(sep="", target.dir, "/expression-", m, ".png"),
            width=ep$width, height=ep$height)
   ## returns the box coordinates of the expression image
@@ -962,7 +962,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
     cond.to.include <- 1:6
   }
 
-  score <- round(getAllSampleScores(isares, m)[[1]], 2)
+  score <- round(getSampleMatrix(isares, m)[[1]], 2)
   seq <- which(score != 0)
   ord <- order(getSampleScores(isares, m)[[1]], decreasing=TRUE)
   pd <- pData(isares)[seq,,drop=FALSE][ ord,,drop=FALSE]
@@ -1013,7 +1013,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   
   CairoPNG(file=paste(sep="", target.dir, "/condplot-", m, ".png"),
            width=1200, height=400)
-  cond.plot(nm, genes=getAllFeatureScores(isares, m)[[1]], thr=my.cth,
+  cond.plot(nm, genes=getFeatureMatrix(isares, m)[[1]], thr=my.cth,
             markup=markup, markdown=markdown, sep=sep)
   dev.off()
   

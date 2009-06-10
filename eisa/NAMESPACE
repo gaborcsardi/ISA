@@ -11,8 +11,8 @@ export(autogen.table, autogen.modules)
 
 exportMethods("drive", "drive<-",
               "seedData", "runData", "getFeatureNames", "getSampleNames",
+              "getFeatureMatrix", "getSampleMatrix",
               "getFeatureScores", "getSampleScores",
-              "getAllFeatureScores", "getAllSampleScores",
               "getNoFeatures", "getNoSamples",
               "featureThreshold", "sampleThreshold")
 

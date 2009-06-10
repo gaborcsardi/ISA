@@ -10,11 +10,11 @@ setGeneric("organism", function(object) standardGeneric("organism"))
 setGeneric("getFeatureNames", function(object, ...) standardGeneric("getFeatureNames"))
 setGeneric("getSampleNames", function(object, ...) standardGeneric("getSampleNames"))
 
+setGeneric("getFeatureMatrix", function(object, ...) standardGeneric("getFeatureMatrix"))
+setGeneric("getSampleMatrix", function(object, ...) standardGeneric("getSampleMatrix"))
+
 setGeneric("getFeatureScores", function(object, ...) standardGeneric("getFeatureScores"))
 setGeneric("getSampleScores", function(object, ...) standardGeneric("getSampleScores"))
-
-setGeneric("getAllFeatureScores", function(object, ...) standardGeneric("getAllFeatureScores"))
-setGeneric("getAllSampleScores", function(object, ...) standardGeneric("getAllSampleScores"))
 
 setGeneric("getNoFeatures", function(object, ...) standardGeneric("getNoFeatures"))
 setGeneric("getNoSamples", function(object, ...) standardGeneric("getNoSamples"))
