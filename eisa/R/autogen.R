@@ -133,8 +133,8 @@ autogen.table <- function(nm, isares, target.dir,
 
   thr <- paste(sep="", seedData(isares)$thr.row[modules], "/",
                seedData(isares)$thr.col[modules])
-  no.genes <- getNoGenes(isares)
-  no.conds <- getNoConditions(isares)
+  no.genes <- getNoFeatures(isares)
+  no.conds <- getNoSamples(isares)
 
   #############
 
@@ -710,8 +710,8 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
 
   print(paste("Module", m, "expression graph"))
 
-  ep <- exp.plot.create(nexp, getAllGeneScores(isares, m)[[1]],
-                        getAllConditionScores(isares, m)[[1]], normalize=FALSE)
+  ep <- exp.plot.create(nexp, getAllFeatureScores(isares, m)[[1]],
+                        getAllSampleScores(isares, m)[[1]], normalize=FALSE)
   CairoPNG(file=paste(sep="", target.dir, "/expression-", m, ".png"),
            width=ep$width, height=ep$height)
   ## returns the box coordinates of the expression image
@@ -748,9 +748,9 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   entr <- unique(unlist(mget(getFeatureNames(isares, m)[[1]], ENTREZ)))
   entr <- entr[!is.na(entr)]
   title <- paste(sep="", "Module #", m, ", TG: ", my.gth,
-                 ", TC: ", my.cth, ", ", getNoGenes(isares,m), " probes, ",
+                 ", TC: ", my.cth, ", ", getNoFeatures(isares,m), " probes, ",
                  length(entr), " Entrez genes, ",
-                 getNoConditions(isares, m), " conditions")
+                 getNoSamples(isares, m), " conditions")
   lines[ grep("<!-- title -->", lines) ] <- title
 
   ## gth
@@ -911,7 +911,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   # Gene cloud
   print("  -- Gene cloud")
   nam <- getFeatureNames(isares, m)[[1]]
-  orig.val <- getGeneScores(isares, m)[[1]]
+  orig.val <- getFeatureScores(isares, m)[[1]]
   val <- round(orig.val*10)
   entrezNums <- mget(nam, envir = get(paste(sep="", chip, "ENTREZID"))) 
   entrezIds <- mget(nam, envir = get(paste(sep="", chip, "SYMBOL")))
@@ -962,9 +962,9 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
     cond.to.include <- 1:6
   }
 
-  score <- round(getAllConditionScores(isares, m)[[1]], 2)
+  score <- round(getAllSampleScores(isares, m)[[1]], 2)
   seq <- which(score != 0)
-  ord <- order(getConditionScores(isares, m)[[1]], decreasing=TRUE)
+  ord <- order(getSampleScores(isares, m)[[1]], decreasing=TRUE)
   pd <- pData(isares)[seq,,drop=FALSE][ ord,,drop=FALSE]
   pd <- pd[, cond.to.include,drop=FALSE]
 
@@ -1013,7 +1013,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   
   CairoPNG(file=paste(sep="", target.dir, "/condplot-", m, ".png"),
            width=1200, height=400)
-  cond.plot(nm, genes=getAllGeneScores(isares, m)[[1]], thr=my.cth,
+  cond.plot(nm, genes=getAllFeatureScores(isares, m)[[1]], thr=my.cth,
             markup=markup, markdown=markdown, sep=sep)
   dev.off()
   
@@ -1030,7 +1030,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
     entrezIds <- unlist(entrezIds)
   }
 
-  ord <- order(getGeneScores(isares, m)[[1]], decreasing=TRUE)
+  ord <- order(getFeatureScores(isares, m)[[1]], decreasing=TRUE)
   nam <- nam[ ord ]
   entrezIds <- unname(entrezIds[ ord ])
 #  longname <- longname[ ord ]

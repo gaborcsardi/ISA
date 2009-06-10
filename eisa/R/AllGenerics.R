@@ -8,16 +8,16 @@ setGeneric("runData", function(object) standardGeneric("runData"))
 setGeneric("organism", function(object) standardGeneric("organism"))
 
 setGeneric("getFeatureNames", function(object, ...) standardGeneric("getFeatureNames"))
-setGeneric("getConditions", function(object, ...) standardGeneric("getConditions"))
+setGeneric("getSampleNames", function(object, ...) standardGeneric("getSampleNames"))
 
-setGeneric("getGeneScores", function(object, ...) standardGeneric("getGeneScores"))
-setGeneric("getConditionScores", function(object, ...) standardGeneric("getConditionScores"))
+setGeneric("getFeatureScores", function(object, ...) standardGeneric("getFeatureScores"))
+setGeneric("geSampleScores", function(object, ...) standardGeneric("getSampleScores"))
 
-setGeneric("getAllGeneScores", function(object, ...) standardGeneric("getAllGeneScores"))
-setGeneric("getAllConditionScores", function(object, ...) standardGeneric("getAllConditionScores"))
+setGeneric("getAllFeatureScores", function(object, ...) standardGeneric("getAllFeatureScores"))
+setGeneric("getAllSampleScores", function(object, ...) standardGeneric("getAllSampleScores"))
 
-setGeneric("getNoGenes", function(object, ...) standardGeneric("getNoGenes"))
-setGeneric("getNoConditions", function(object, ...) standardGeneric("getNoConditions"))
+setGeneric("getNoFeatures", function(object, ...) standardGeneric("getNoFeatures"))
+setGeneric("getNoSamples", function(object, ...) standardGeneric("getNoSamples"))
 
-setGeneric("geneThreshold", function(object, ...) standardGeneric("geneThreshold"))
-setGeneric("conditionThreshold", function(object, ...) standardGeneric("conditionThreshold"))
+setGeneric("featureThreshold", function(object, ...) standardGeneric("featureThreshold"))
+setGeneric("sampleThreshold", function(object, ...) standardGeneric("sampleThreshold"))
