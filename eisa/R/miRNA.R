@@ -302,7 +302,7 @@ isa.miRNA <- function(modules,
 
   cat(" -- Extracting Entrez genes\n")
 
-  selectedEntrezIds <- getGenes(modules)
+  selectedEntrezIds <- getFeatureNames(modules)
   selectedEntrezIds <- lapply(selectedEntrezIds,
                               function(x) unlist(mget(x, ENTREZ)))
   selectedEntrezIds <- lapply(selectedEntrezIds, unique)

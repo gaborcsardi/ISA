@@ -745,7 +745,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   
   ## title
   print("  -- title")
-  entr <- unique(unlist(mget(getGenes(isares, m)[[1]], ENTREZ)))
+  entr <- unique(unlist(mget(getFeatureNames(isares, m)[[1]], ENTREZ)))
   entr <- entr[!is.na(entr)]
   title <- paste(sep="", "Module #", m, ", TG: ", my.gth,
                  ", TC: ", my.cth, ", ", getNoGenes(isares,m), " probes, ",
@@ -910,7 +910,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   
   # Gene cloud
   print("  -- Gene cloud")
-  nam <- getGenes(isares, m)[[1]]
+  nam <- getFeatureNames(isares, m)[[1]]
   orig.val <- getGeneScores(isares, m)[[1]]
   val <- round(orig.val*10)
   entrezNums <- mget(nam, envir = get(paste(sep="", chip, "ENTREZID"))) 
@@ -1019,7 +1019,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   
   ## Gene names for expression matrix cross
   print("  -- Gene names for cross")
-  nam <- getGenes(isares, m)[[1]]
+  nam <- getFeatureNames(isares, m)[[1]]
   entrezIds <- mget(nam, envir = get(paste(sep="", chip, "SYMBOL")))
 #  longname <- mget(nam, envir = get(paste(sep="", chip, "GENENAME")))
   haveEntrezId <- names(entrezIds)[sapply(entrezIds, function(x) !is.na(x))]

@@ -59,7 +59,7 @@ setMethod("organism", signature(object="ISAModules"),
             object@rundata$organism
           })
 
-setMethod("getGenes", signature(object="ISAModules"),
+setMethod("getFeatureNames", signature(object="ISAModules"),
           function(object, mods) {
             if (missing(mods)) { mods <- seq_len(ncol(object@genes)) }
             lapply(mods, function(x)
