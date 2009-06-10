@@ -11,7 +11,7 @@ setGeneric("getFeatureNames", function(object, ...) standardGeneric("getFeatureN
 setGeneric("getSampleNames", function(object, ...) standardGeneric("getSampleNames"))
 
 setGeneric("getFeatureScores", function(object, ...) standardGeneric("getFeatureScores"))
-setGeneric("geSampleScores", function(object, ...) standardGeneric("getSampleScores"))
+setGeneric("getSampleScores", function(object, ...) standardGeneric("getSampleScores"))
 
 setGeneric("getAllFeatureScores", function(object, ...) standardGeneric("getAllFeatureScores"))
 setGeneric("getAllSampleScores", function(object, ...) standardGeneric("getAllSampleScores"))
