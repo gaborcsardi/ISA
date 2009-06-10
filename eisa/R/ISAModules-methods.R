@@ -91,7 +91,7 @@ setMethod("getFeatureMatrix", signature(object="ISAModules"),
           })
 
 setMethod("getSampleMatrix", signature(object="ISAModules"),
-          function(object, binary=FALSE, sprase=FALSE, mods) {
+          function(object, binary=FALSE, sparse=FALSE, mods) {
             if (missing(mods)) {
               res <- object@conditions
             } else {
