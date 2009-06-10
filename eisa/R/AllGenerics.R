@@ -5,6 +5,7 @@ setGeneric("drive<-", function(r, value) standardGeneric("drive<-"))
 
 setGeneric("seedData", function(object) standardGeneric("seedData"))
 setGeneric("runData", function(object) standardGeneric("runData"))
+setGeneric("organism", function(object) standardGeneric("organism"))
 
 setGeneric("getGenes", function(object, ...) standardGeneric("getGenes"))
 setGeneric("getConditions", function(object, ...) standardGeneric("getConditions"))
