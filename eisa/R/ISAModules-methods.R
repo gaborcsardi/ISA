@@ -78,7 +78,7 @@ setMethod("getFeatureMatrix", signature(object="ISAModules"),
             if (missing(mods)) {
               res <- object@genes
             } else {
-              res <- object@genes[,mods]
+              res <- object@genes[,mods,drop=FALSE]
             }
             if (binary) {
               res <- res != 0
@@ -95,7 +95,7 @@ setMethod("getSampleMatrix", signature(object="ISAModules"),
             if (missing(mods)) {
               res <- object@conditions
             } else {
-              res <- object@conditions[,mods]
+              res <- object@conditions[,mods,drop=FALSE]
             }
             if (binary) {
               res <- res != 0
