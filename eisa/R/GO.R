@@ -367,7 +367,7 @@ isa.GO <- function(modules,
                    hgCutoff=0.001,
                    correction=TRUE, correction.method="holm") {
 
-  isa:::isa.status("Calculating GO enrichment", "in")
+  isa2:::isa.status("Calculating GO enrichment", "in")
   
   require(paste(sep="", ann, ".db"), character.only=TRUE)
   require(paste(sep=".", "org", shortorg, "eg", "db"), character.only=TRUE)
@@ -415,7 +415,7 @@ isa.GO <- function(modules,
     }
   }
   
-  isa:::isa.status("DONE", "out")
+  isa2:::isa.status("DONE", "out")
 
   res
 }

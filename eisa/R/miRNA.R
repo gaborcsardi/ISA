@@ -289,7 +289,7 @@ isa.miRNA <- function(modules,
                       hgCutoff=0.001,
                       correction=TRUE, correction.method="holm") {
 
-  isa:::isa.status("Calculating miRNA enrichment", "in")
+  isa2:::isa.status("Calculating miRNA enrichment", "in")
 
   if (! org %in% c("Mus musculus", "Homo sapiens")) {
     stop("This method is only implemented for `Mus musculus' and 'Homo sapiens'")
@@ -325,7 +325,7 @@ isa.miRNA <- function(modules,
     }
   }
 
-  isa:::isa.status("DONE", "out")
+  isa2:::isa.status("DONE", "out")
   
   hgOver
 }

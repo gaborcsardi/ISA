@@ -271,7 +271,7 @@ isa.KEGG <- function(modules,
                      hgCutoff=0.001,
                      correction=TRUE, correction.method="holm") {
 
-  isa:::isa.status("Calculating KEGG enrichment", "in")
+  isa2:::isa.status("Calculating KEGG enrichment", "in")
   
   require(paste(sep=".", "org", shortorg, "eg", "db"), character.only=TRUE)
   require(paste(sep="", ann, ".db"), character.only=TRUE)
@@ -306,7 +306,7 @@ isa.KEGG <- function(modules,
     }
   }
   
-  isa:::isa.status("DONE", "out")
+  isa2:::isa.status("DONE", "out")
   
   hgOver
 }

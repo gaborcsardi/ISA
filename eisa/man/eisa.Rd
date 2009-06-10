@@ -1,11 +1,12 @@
 \name{eisa}
-\alias{eisa}
+\alias{isa}
+\alias{isa,ExpressionSet-method}
 \concept{Iterative Signature Algorithm}
 \concept{Biclustering}
 \title{Iterative Signature Algorithm on Gene Expression data}
 \description{Run ISA on an ExpressionSet with the default parameters.}
 \usage{
-function (exp.set, flist = filterfun(function(x) IQR(x) > 0.5),            
+\S4method{isa}{ExpressionSet}(exp.set, flist = filterfun(function(x) IQR(x) > 0.5),
     uniqueEntrez = TRUE, thr.gene = seq(2, 4, by = 0.5),
     thr.cond = seq(1, 3, by = 0.5), no.seeds = 100)
 }
@@ -26,15 +27,15 @@ function (exp.set, flist = filterfun(function(x) IQR(x) > 0.5),
   \item{no.seeds}{Number of seeds to run ISA from.}
 }
 \details{
-  Please read the \link[isa]{isa-package} manual page in the \code{isa}
+  Please read the \link[isa2]{isa2-package} manual page in the \code{isa}
   package for an introduction on ISA.
 
-  The \code{eisa} function is a variant of the \code{\link[isa]{isa}}
+  The \code{eisa} function is a variant of the \code{\link[isa2]{isa}}
   function that works on \code{ExpressionSet} objects.
 }
 \value{
   A named list with the same slots as in the return value of
-  \code{\link[isa]{isa}}, except that \sQuote{\code{rows}} is renamed to
+  \code{\link[isa2]{isa}}, except that \sQuote{\code{rows}} is renamed to
   \sQuote{\code{genes}} and \sQuote{\code{columns}} is renamed to
   \sQuote{\code{conditions}}.
 }
@@ -54,7 +55,7 @@ function (exp.set, flist = filterfun(function(x) IQR(x) > 0.5),
 }
 \seealso{\code{\link{isa.GO}}, \code{\link{isa.KEGG}},
   \code{\link{isa.CHR}}, \code{\link{isa.miRNA}} for various enrichment
-  calculations. See \code{\link[isa]{isa-package}} if you want finer
+  calculations. See \code{\link[isa2]{isa2-package}} if you want finer
   control on the ISA run.
 }
 \examples{}

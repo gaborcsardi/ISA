@@ -5,7 +5,7 @@ autogen.table <- function(nm, isares, target.dir,
                           GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL, DBD=NULL,
                           htmltitle=NULL, notes=NULL, seed=NULL) {
 
-  isa:::isa.status("Creating HTML module table", "in")
+  isa2:::isa.status("Creating HTML module table", "in")
   
   chip <- annotation(isares)
   library(paste(sep="", chip, ".db"), character.only=TRUE)
@@ -219,7 +219,7 @@ autogen.table <- function(nm, isares, target.dir,
     file.symlink("maintable.html", paste(sep="", target.dir, "/maintree.html"))
   }
 
-  isa:::isa.status("DONE", "out")
+  isa2:::isa.status("DONE", "out")
   
   invisible(NULL)
 }  
@@ -235,7 +235,7 @@ autogen.modules <- function(nm, isares, modules=seq_len(length(isares)),
                             drive.CC=NULL, drive.MF=NULL, drive.KEGG=NULL,
                             drive.miRNA=NULL, drive.DBD=NULL, drive.CHR=NULL) {
 
-  isa:::isa.status("Generating module pages", "in")
+  isa2:::isa.status("Generating module pages", "in")
   
   if (!file.exists(target.dir)) {
     dir.create(target.dir)
@@ -283,7 +283,7 @@ autogen.modules <- function(nm, isares, modules=seq_len(length(isares)),
                        next.module=nx, prev.module=px)
   }
 
-  isa:::isa.status("DONE", "out")
+  isa2:::isa.status("DONE", "out")
   
   invisible(NULL)
 }
@@ -297,10 +297,9 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
                                drive.CHR=NULL,
                                next.module=NULL, prev.module=NULL) {
 
-  isa:::isa.status(paste("Generating HTML page for module", module), "in")
+  isa2:::isa.status(paste("Generating HTML page for module", module), "in")
 
   require(Cairo)
-  require(isa)
   require(affy)
   require(TeachingDemos)
   require(igraph)
@@ -1060,6 +1059,6 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   jfname <- paste(sep="", target.dir, "/module-", m, ".js")
   cat(jlines, file=jfname, sep="\n")
 
-  isa:::isa.status("DONE", "out")
+  isa2:::isa.status("DONE", "out")
 }
 

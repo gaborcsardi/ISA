@@ -2,7 +2,7 @@
 gograph <- function(table, colbar.length=30, label.cex=1, GOGRAPHS=NULL,
                     go.terms=NULL) {
 
-  isa:::isa.status("Creating a GO graph", "in")
+  isa2:::isa.status("Creating a GO graph", "in")
   
   require(GO.db)
   require(igraph)
@@ -169,7 +169,7 @@ gograph <- function(table, colbar.length=30, label.cex=1, GOGRAPHS=NULL,
   V(g2)$label.cex <- label.cex
   V(g2)$frame.color <- "grey"
 
-  isa:::isa.status("DONE", "out")
+  isa2:::isa.status("DONE", "out")
   
   g2
 }
@@ -202,7 +202,7 @@ gograph.plot <- function(graph) {
 exp.plot.create <- function(exp.matrix, genes, conditions,
                             normalize) {
 
-  isa:::isa.status("Creating an expression plot", "in")
+  isa2:::isa.status("Creating an expression plot", "in")
   
   require(affy)
 
@@ -244,7 +244,7 @@ exp.plot.create <- function(exp.matrix, genes, conditions,
   full.width <- 50 + exp.width + 100
   full.height <- 50 + exp.height + 70
 
-  isa:::isa.status("DONE", "out")
+  isa2:::isa.status("DONE", "out")
   
   list(exp=em, width=full.width, height=full.height,
        exp.width=exp.width, exp.height=exp.height, colbar=colbar,
@@ -356,7 +356,7 @@ cond.plot <- function(nm, genes, thr, markup, markdown, ylim=c(-1.2,1.5), all=TR
                       adj.above=c(0,0.5), adj.below=c(1,0.5),
                       plot.only=seq_len(dim(nm)[2]), ...) {
 
-  isa:::isa.status("Creating a condition plot", "in")
+  isa2:::isa.status("Creating a condition plot", "in")
   
   ## Calculate all condition scores, might not be correct for
   ## oscillating modules
@@ -413,12 +413,12 @@ cond.plot <- function(nm, genes, thr, markup, markdown, ylim=c(-1.2,1.5), all=TR
     par(xpd=FALSE)
   }
 
-  isa:::isa.status("DONE", "out")
+  isa2:::isa.status("DONE", "out")
 }
 
 overlap <- function(isares, algorithm=c("mds", "fr", "drl"), edge.limit=0.5) {
 
-  isa:::isa.status("Creating an overlap plot", "in")
+  isa2:::isa.status("Creating an overlap plot", "in")
   
   algorithm <- match.arg(algorithm)
 
@@ -477,7 +477,7 @@ overlap <- function(isares, algorithm=c("mds", "fr", "drl"), edge.limit=0.5) {
     E(g)$width <- abs(E(g)$weight) * 3
   }
 
-  isa:::isa.status("DONE", "out")
+  isa2:::isa.status("DONE", "out")
   
   g
 }
