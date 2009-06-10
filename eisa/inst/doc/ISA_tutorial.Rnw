@@ -8,7 +8,7 @@
 
 \begin{document}
 
-\title{The Iterative Signature Algorithm}
+\title{The Iterative Signature Algorithm on Gene Expression data}
 \author{G\'abor Cs\'ardi}
 \maketitle
 
@@ -27,57 +27,183 @@ samples. In the original ISA paper the biclusters are called
 transription modules (TM), we will often refer them under this name in
 the following.
 
-In this tutorial we will use the data in the \Rpackage{ALL}
-package. This is a data set from a clinical trial in acute
-lymphoblastic leukemia and it contains 128 samples altogether.
-
 \section{Preparing the data}
 
 \subsection{Loading the data}
 
-First, we load the required packages and the data to analyze.
-<<>>=
-library(isa)
+First, we load the required packages and the data to analyze. ISA is
+implemented in the \Rpackage{eisa} and \Rpackage{isa2} packages, see
+Section{sec:isapackages} for a more elaborated summary about the two
+packages. It is enough to load the \Rpackage{eisa} package,
+\Rpackage{isa2} and other required packages are loaded automatically.
+\Rpackage{eisa} 
+<<load the packages>>=
+library(eisa)
+@
+
+In this tutorial we will use the data in the \Rpackage{ALL}
+package. This is a data set from a clinical trial in acute
+lymphoblastic leukemia and it contains 128 samples altogether.
+<<load the data>>=
 library(ALL)
 library(hgu95av2.db)
 data(ALL)
 @
 
-\subsection{Filtering the genes}
+\section{Simple ISA runs}
 
-<<>>=
-library(genefilter)
-f1 <- pOverA(0.25, log2(100))
-f2 <- function(x) (IQR(x) > 0.5)
-ff <- filterfun(f1, f2)
-selected <- genefilter(ALL, ff)
-ALL2 <- ALL[selected,]
-@ 
-
-\subsection{Generating seeds for the ISA}
-
-<<>>=
-g <- generate.seeds(count=100, length=nrow(ALL2), gs=2/nrow(ALL2))
-@ 
-
-\subsection{Normalize the data}
-
-<<>>=
-ALL2.normed <- isa.normalize(ALL2)
-@ 
-
-\section{Running the ISA}
-
-<<>>=
+The simplest way to run ISA is to choose the two threshold parameters
+and then call the \Rfunction{isa} function on the
+\Rclass{ExpressionSet} object:
+<<simple ISA>>=
 thr.gene <- 2.7
 thr.cond <- 1.4
+set.seed(1) # to get the same results, always
+biclusts <- isa(ALL, thr.gene=thr.gene, thr.cond=thr.cond)
 @ 
 
-<<>>=
-biclusts <- isa(ALL2.normed, thr.gene=thr.gene, thr.cond=thr.cond)
+This first applies a non-specific filter to the data set filters the
+data set and then runs ISA from
+\Sexpr{formals(eisa:::isa.ExpressionSet)$no.seeds} % $
+random seeds (the default). See Section~\ref{sec:detailed-isa} if the
+default parameters are not appropriate for you and need more control.
+
+\section{Inspect the result}
+
+The \Rfunction{isa} function returns an \Rclass{ISAModules} object. By
+typing in its name we can get a brief summary of the results:
+<<type in name of ISAModules object>>=
+biclusts
+@
+
+There are various other \Rclass{ISAModules} methods that help to
+access the modules themselves and the ISA parameters that were used
+for the run. 
+
+% TODO: length, dim, featureNames, sampleNames, pData, 
+% annotation, organism, indexing
+
+The \Rfunction{getNoFeatures} function returns a numeric vector, the
+number of features (probesets in our case) in each module. Similarly,
+\Rfunction{getNoSamples} returns a numeric vector, the number of
+samples in each module. 
+<<number of features and samples>>=
+getNoFeatures(biclusts)
+getNoSamples(biclusts)
 @ 
+
+\Rfunction{getFeatureNames} lists the probes (more precisely,
+the feature names coming from the \Rclass{ExpressionSet} object) in
+the modules. It returns a list, here we just print the first entry in
+the list.
+<<list genes in modules>>=
+getFeatureNames(biclusts)[[1]]
+@
+
+The \Rfunction{getSampleNames} function does the same for the samples.
+Again, the sample names are taken from the \Rclass{ExpressionSet}
+object that was passed to \Rfunction{isa}:
+<<list conditions in modules>>=
+getSampleNames(biclusts)[[1]]
+@ 
+
+Remember, that the ISA biclustering is not binary, every feature (and
+similarly, every sample) has a score between -1 and 1; the further the
+score is from zero the stronger the association between the feature
+(or sample) and the module. If two features both have scores with the
+same sign, then they are correlated, if the sign of their scores are
+opposite, then they are anti-correlated. You can query the scores of
+the features with the \Rfunction{getFeatureScores} function, and
+similarly, the \Rfunction{getSampleScores} function queries the sample
+scores. You can supply the modules you want to query as an optional
+argument:
+<<query scores>>=
+getFeatureScores(biclusts, 3)
+getSampleScores(biclusts, 3)
+@ 
+
+You can also query the scores in a matrix form, that is probably
+better if you need many or all of them at the same time. The
+\Rfunction{getFeatureMatrix} and \RFunction{getSampleMatrix} functions
+are defined for this:
+<<query all scores>>=
+dim(getFeatureMatrix(biclusts))
+dim(getSampleMatrix(biclusts))
+@
+
+Objects from the \Rclass{ISAModules} class store various information
+about the ISA run and the convergence of the seeds. Information
+associated with the individual seeds can be queried with the
+\Rfunction{seedData} function, it returns a data frame, with as many
+rows as the number of seeds and various seed-level information,
+e.g. the number of iterations required for the seed to converge. See
+the manual page of \Rfunction{isa} for details.
+<<seed data>>=
+seedData(biclusts)
+@
+
+The \Rfunction{runData} function returns additional information about
+the ISA run, seed the \Rfunction{isa} manual page for details.
+<<run data>>=
+runData(biclusts)
+@ 
+
+\section{Enrichment calculations}
+
+The \Rpackage{eisa} package provides some functions to perform
+enrichment tests for the genes in the various modules against various
+databases. These tests are usually simplified and less sophisticated
+versions than the ones in the \Rpackage{Category}, \Rpackage{GOstats}
+or \Rpackages{topGO} packages, but they are much faster and this is
+important if we need to perform them for many modules.
+
+\subsection{Gene Ontology}
+
+To perform enrichment analysis against the Gene Ontology database, all
+you have to do is to supply your \Rclass{ISAModules} object to the
+\Rfunction{isa.GO} function.
+
+\subsection{KEGG Pathway Database}
+
+\subsection{Chromosomes}
+
+\subsection{Predicted $\mu$RNA targets 
+  from the TargetScan database}
+
+\subsection{Transcription regulation from the DBD database}
 
 \section{Visualizing the results}
+
+\subsection{Generating a HTML summary for the modules}
+
+\section{The \Rpackage{isa2} and \Rpackage{eisa} packages}%
+\label{sec:isapackages}
+
+ISA and its companion functions for visualization, functional
+enrichment calculation, etc. are distributed in two separate packages,
+\Rpackage{isa2} and \Rpackage{eisa}.
+
+\Rpackage{isa2} contains the implementation of ISA itself, and
+\Rpackage{eisa} specifically deals with supplying expression data to
+\Rpackage{isa2} and visualizing the results.
+
+The two packages provide some functions that share the same name, and
+the right one is selected based on the arguments supplied. E.g. both
+\Rpackage{isa2} and \Rpackage{eisa} has a function called
+\Rfunction{isa}. It the first argument of \Rfunction{isa} is an
+\Rclass{ExpressionSet}, then the \Rpackage{eisa} version is called. If
+the first argument is a matrix, then the \Rpackage{isa} version is
+called.
+
+This also means that there are two manual pages for the two
+\Rfunction{isa} functions. I.e. if one types `\verb+?isa+', (and both
+\Rpackage{isa2} and \Rpackage{eisa} are loaded, then one
+has to choose between the two versions. To avoid this, the
+\Rpackage{eisa} manual pages can also be referenced by supplying and
+`\verb+e+' prefix: `\verb+?eisa+' or `\verb+?eisa.unique+'.
+
+\section{Finer control over ISA parameters}%
+\label{sec:detailed-isa}
 
 \section{Session information}
 
