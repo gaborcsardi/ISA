@@ -5,7 +5,7 @@ export(isa.GO, isa.KEGG, isa.CHR, isa.miRNA, isa.DBD)
 
 export(gograph, gograph.plot, exp.plot.create, exp.plot.colbar,
        exp.plot, cond.plot, overlap, overlap.plot, mnplot, ISAmnplot,
-       ISA2heatmap)
+       ISA2heatmap, eisa.biclust)
        
 export(autogen.table, autogen.modules)
 
