@@ -230,7 +230,7 @@ autogen.modules <- function(nm, isares, modules=seq_len(length(isares)),
                             template=system.file("autogen", package="eisa"),
                             GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL, DBD=NULL,
                             cond.to.include=NULL,
-                            markup=numeric(), markdown=numeric(),
+                            cond.col="white",
                             sep=NULL, seed=NULL, drive.BP=NULL,
                             drive.CC=NULL, drive.MF=NULL, drive.KEGG=NULL,
                             drive.miRNA=NULL, drive.DBD=NULL, drive.CHR=NULL) {
@@ -275,7 +275,7 @@ autogen.modules <- function(nm, isares, modules=seq_len(length(isares)),
     isa.autogen.module(nm, isares, x, target.dir=target.dir, template=template,
                        GO=GO, KEGG=KEGG, miRNA=miRNA, DBD=DBD, CHR=CHR,
                        cond.to.include=cond.to.include,
-                       markup=markup, markdown=markdown, sep=sep,
+                       cond.col=cond.col, sep=sep,
                        seed=seed, drive.BP=drive.BP, drive.CC=drive.CC,
                        drive.MF=drive.MF, drive.KEGG=drive.KEGG,
                        drive.miRNA=drive.miRNA, drive.DBD=drive.DBD,
@@ -290,7 +290,7 @@ autogen.modules <- function(nm, isares, modules=seq_len(length(isares)),
 
 isa.autogen.module <- function(nm, isares, module, target.dir, template,
                                GO, KEGG, miRNA, CHR, DBD, cond.to.include,
-                               markup, markdown, sep=NULL,
+                               cond.col="white", sep=NULL,
                                seed=NULL, drive.BP=NULL, drive.CC=NULL,
                                drive.MF=NULL, drive.KEGG=NULL,
                                drive.miRNA=NULL, drive.DBD=NULL,
@@ -710,8 +710,8 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
 
   print(paste("Module", m, "expression graph"))
 
-  ep <- exp.plot.create(nexp, getFeatureMatrix(isares, m)[[1]],
-                        getSampleMatrix(isares, m)[[1]], normalize=FALSE)
+  ep <- exp.plot.create(nexp, getFeatureMatrix(isares, m),
+                        getSampleMatrix(isares, m), normalize=FALSE)
   CairoPNG(file=paste(sep="", target.dir, "/expression-", m, ".png"),
            width=ep$width, height=ep$height)
   ## returns the box coordinates of the expression image
@@ -843,7 +843,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
                    colbar.length=20, label.cex=1,
                    go.terms=go.terms, GOGRAPHS=GOGRAPHS)
     CairoPNG(file=filename, width=gop$width*4, height=gop$height*4)
-    co <- gograph.plot(gop)
+    co <- gograph.plot(gop, coords=TRUE)
     dev.off()
     list(graph=gop, coords=co)
   }
@@ -962,7 +962,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
     cond.to.include <- 1:6
   }
 
-  score <- round(getSampleMatrix(isares, m)[[1]], 2)
+  score <- round(getSampleMatrix(isares, m), 2)
   seq <- which(score != 0)
   ord <- order(getSampleScores(isares, m)[[1]], decreasing=TRUE)
   pd <- pData(isares)[seq,,drop=FALSE][ ord,,drop=FALSE]
@@ -1013,8 +1013,8 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   
   CairoPNG(file=paste(sep="", target.dir, "/condplot-", m, ".png"),
            width=1200, height=400)
-  cond.plot(nm, genes=getFeatureMatrix(isares, m)[[1]], thr=my.cth,
-            markup=markup, markdown=markdown, sep=sep)
+  cond.plot(isares, number=m, nm=nm,
+            cond.col=cond.col, sep=sep)
   dev.off()
   
   ## Gene names for expression matrix cross

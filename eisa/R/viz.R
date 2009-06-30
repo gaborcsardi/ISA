@@ -7,8 +7,8 @@ gograph <- function(table, colbar.length=30, label.cex=1, GOGRAPHS=NULL,
   require(GO.db)
   require(igraph)
 
-  terms <- as.character(table[,1])
-  pval <- table[,2]
+  terms <- rownames(table)
+  pval <- table[,1]
 
   #######################
   # Check which GO tree
@@ -174,9 +174,9 @@ gograph <- function(table, colbar.length=30, label.cex=1, GOGRAPHS=NULL,
   g2
 }
 
-gograph.plot <- function(graph) {
+gograph.plot <- function(graph, coords=FALSE, ...) {
 
-  require(TeachingDemos)
+  if (coords) require(TeachingDemos)
   
   if (dev.cur() == 1) {
     device <- options("device")[[1]]
@@ -187,15 +187,19 @@ gograph.plot <- function(graph) {
        ylim=c(0,graph$height), axes=FALSE)
   par(xpd=TRUE)
   plot(graph, add=TRUE, asp=FALSE, rescale=FALSE, vertex.label=V(graph)$abbrv,
-       vertex.size=V(graph)$size*200, vertex.size2=V(graph)$size2*200)
+       vertex.size=V(graph)$size*200, vertex.size2=V(graph)$size2*200, ...)
 
   text(graph$layout[,1]-V(graph)$size, graph$layout[,2], V(graph)$plabel,
        pos=2, cex=1, col="blue", font=2)
   text(graph$layout[,1]+V(graph)$size, graph$layout[,2], V(graph)$label,
        pos=4, cex=1, col="darkgreen", family="mono")
 
-  co <- cnvrt.coords(graph$layout[,1]-V(graph)$size,
-                     graph$layout[,2]+V(graph)$size2)$tdev
+  if (coords) {
+    cnvrt.coords(graph$layout[,1]-V(graph)$size,
+                 graph$layout[,2]+V(graph)$size2)$tdev
+  } else {
+    invisible(NULL)
+  }
 }
 
 
@@ -351,30 +355,54 @@ exp.plot <- function(epo, scores=TRUE) {
 # coords <- exp.plot(ep)
 # dev.off()
 
-cond.plot <- function(nm, genes, thr, markup, markdown, ylim=c(-1.2,1.5), all=TRUE,
+cond.plot <- function(modules, number, exprs, nm,
+                      col="white", all=TRUE,
                       sep=NULL, sepcol=NULL, val=TRUE, srt=90,
                       adj.above=c(0,0.5), adj.below=c(1,0.5),
                       plot.only=seq_len(dim(nm)[2]), ...) {
 
   isa2:::isa.status("Creating a condition plot", "in")
+
+  if (missing(exprs) && missing(nm)) {
+    stop("Either `exprs' or `nm' is required")
+  }
+
+  if (!missing(exprs) && !missing(nm)) {
+    warning("`exprs' ignored, because `nm' was also given")
+  }
+  if (missing(nm)) {
+    exprs <- exprs[ featureNames(modules), ]
+    nm <- isa.normalize(exprs)
+  } else {
+    nm <- nm[ featureNames(modules), ]
+  }
+  
+  genes <- getFeatureMatrix(modules, mods=number)
+  samp <- getSampleMatrix(modules, mods=number)
+  thr <- seedData(modules)$thr.col[number]
   
   ## Calculate all condition scores, might not be correct for
   ## oscillating modules
   scores <- as.vector(t(exprs(nm)) %*% genes)
-  if (any(scores != 0)) scores <- scores / max(abs(scores))
-  thr1 <- mean(scores) + thr * sd(scores)
-  thr2 <- mean(scores) - thr * sd(scores)
   msc <- mean(scores)
+  ssc <- sd(scores)
+  thr1 <- msc + thr * ssc
+  thr2 <- msc - thr * ssc
+
+  n.scores <- ifelse(samp != 0, scores, 0)
+  fact <- max(abs(n.scores))
+  if (any(scores != 0)) scores <- scores / fact
+  msc <- msc / fact
+  thr1 <- thr1 / fact
+  thr2 <- thr2 / fact
   scores <- scores[plot.only]
   to.plot <- scores
   if (!all) {
     to.plot [ to.plot > thr2 & to.plot < thr1 ] <- 0
   }
   
-  col <- rep("white", length(scores))
-  col[ markup ] <- "orange"
-  col[ markdown ] <- "darkolivegreen"
-
+  ylim <- range(to.plot)*1.4
+  par(mar=c(1,3,1,2))
   barplot(to.plot, space=0, col=col, ylim=ylim, ...)
 
   abline(h=thr1, col="red")
@@ -527,27 +555,17 @@ mnplot <- function(x, eset, data, group, ...) {
   invisible(tts)
 }
 
-ISAmnplot <- function(isares, module, eset, data, group, ...) {
-  x <- ures$rundata$features[ isares$genes[,module] != 0 ]
+ISAmnplot <- function(modules, module, eset, data=annotation(x), group, ...) {
+  x <- modules$rundata$features[ modules$genes[,module] != 0 ]
   mnplot(x, eset, data, group, ...)
 }
 
-ISA2heatmap <- function(isares, module, eset, data, ...) {
-  x <- ures$rundata$features[ isares$genes[,module] != 0 ]
+ISA2heatmap <- function(modules, module, eset, scale="none", ...) {
+  x <- getFeatureNames(modules, module)[[1]]
+  y <- getSampleNames (modules, module)[[1]]
+  dataM <- eset[x,y]
   if (is(eset, "ExpressionSet")) {
-    cont <- x %in% featureNames(eset)
-    if (any(!cont)) {
-      warning("Some features were dropped.")
-      x <- x[cont]
-    }
-    dataM <- exprs(eset)[x,]
-  } else {
-    cont <- x %in% rownames(eset)
-    if (!any(cont)) {
-      warning("Some features were dropped.")
-      x <- x[cont]
-    }
-    dataM <- eset[x != 0,]
+    dataM <- exprs(dataM)
   }
-  heatmap(dataM, ...)
+  heatmap(dataM, scale=scale, ...)
 }
