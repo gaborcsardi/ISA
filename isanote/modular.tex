@@ -1,0 +1,82 @@
+\documentclass{bioinfo}
+\usepackage{natbib}
+\copyrightyear{2009}
+\pubyear{2009}
+
+\begin{document}
+\firstpage{1}
+
+\title[Modular analysis]{Modular analysis of gene expression data with
+  GNU R or Matlab}
+\author[G\'abor Cs\'ardi \textit{et~al}]{G\'abor Cs\'ardi\,,$^{1,2}$,
+  Zolt\'an Kutalik\,$^{1,2}$ and Sven Bergmann\,$^{1,2}$}
+\address{$^{1}$Department of Medical Genetics, and 
+  $^{2}$Swiss Institute of Bioinformatics,
+  University of Lausanne, Rue de Bugnon 27 - DGM 328, CH-1005 Lausanne,
+  Switzerland.}
+
+\history{Received on XXXXX; revised on XXXXX; accepted on XXXXX}
+
+\editor{Associate Editor: XXXXXXX}
+
+\maketitle
+
+\begin{abstract}
+
+\section{Summary:}
+\section{Availability:}
+\section{Contact:} \href{Sven.Bergmann@unil.ch}{Sven.Bergmann@unil.ch}
+\end{abstract}
+
+\section{Introduction}
+
+What is biclustering.
+What is the ISA.
+
+\section{Methods}
+
+Normalization. 
+
+Random and smart seeding. 
+
+The ISA iteration. 
+
+Merging the modules.
+
+The robustness measure and filtering the modules. 
+
+Module trees.
+
+\section{R Implementation}
+
+Two packages: isa2 does the computation, eisa does everything related
+to biology.
+
+\subsection{Workflow}
+
+Two workflows, the simple workflow does everything with default
+parameters. In the detailed workflow the user has access to every step
+of the analysis.
+
+\subsection{Visualization}
+
+Expression plots, GO tree plots, module tree plots, HTML summary
+generation.
+
+\subsection{Connection to other software}
+
+The biclust package.
+
+\section{Matlab implementation}
+
+\section*{Acknowledgement}
+
+\paragraph{Funding\textcolon} 
+
+\paragraph{Conflict of interest\textcolon} None declared.
+
+\bibliographystyle{natbib}
+\bibliography{isa}
+\nocite{*}
+
+\end{document}
