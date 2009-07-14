@@ -1,5 +1,6 @@
 import(Category)
 import(AnnotationDbi)
+import(Biobase)
 
 export(isa.GO, isa.KEGG, isa.CHR, isa.miRNA, isa.DBD)
 
@@ -8,6 +9,10 @@ export(gograph, gograph.plot, exp.plot.create, exp.plot.colbar,
        ISA2heatmap, eisa.biclust)
        
 export(autogen.table, autogen.modules)
+
+exportMethods("feat.exprs", "samp.exprs",
+              "prenormalized", "prenormalized<-",
+              "hasNA", "hasNA<-")
 
 exportMethods("drive", "drive<-",
               "seedData", "runData", "getFeatureNames", "getSampleNames",

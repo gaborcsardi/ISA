@@ -1,4 +1,12 @@
 
+setGeneric("feat.exprs", function(object) standardGeneric("feat.exprs"))
+setGeneric("samp.exprs", function(object) standardGeneric("samp.exprs"))
+setGeneric("prenormalized", function(object) standardGeneric("prenormalized"))
+setGeneric("prenormalized<-", function(object, value) standardGeneric("prenormalized<-"))
+setGeneric("hasNA", function(object) standardGeneric("hasNA"))
+setGeneric("hasNA<-", function(object, value) standardGeneric("hasNA<-"))
+
+###########
 
 setGeneric("drive", function(r) standardGeneric("drive"))
 setGeneric("drive<-", function(r, value) standardGeneric("drive<-"))
