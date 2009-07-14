@@ -21,6 +21,10 @@
 
 \RaggedRight
 
+<<echo=FALSE,print=FALSE>>=
+options(width=60)
+@ 
+
 \section{Introduction}
 
 The Iterative Signature Algorithm (ISA) is biclustering method. The
@@ -200,24 +204,29 @@ since \Rfunction{isa.GO} calculates enrichment for many gene sets
 (i.e. for all biclusters), \Rfunction{summary} returns a list of data
 frames, one for each bicluster. A table for the first module:
 <<GO summary>>=
-summary(GO[[1]], p=0.001)[[1]]
+summary(GO[[1]], p=0.001)[[2]][,-6]
 @ 
 
-The \texttt{drive} column includes the Entrez ids of the genes that
-are included in the intersection of the bicluster and the GO
-category. They can be also obtained with the
+We omitted the sixth column of the result, because it is very wide and
+would look bad in this vignette. This column is called
+\variable{drive} and lists the Entrez IDs of the genes that are in the
+intersection of the bicluster and the GO category; or in other
+words, the genes that drive the enrichment.
+These genes can also be obtained with the
 \Rfunction{geneIdsByCategory} function. The following returns the
-genes in the first module and the second GO BP category.
+genes in the second module and the third GO BP category. (The GO
+categories are ordered according to the enrichment $p$-values, just
+like in the output of \Rfunction{summary}.)
 <<GO gene ids by category>>=
-geneIdsByCategory(GO[[1]])[[1]][[2]]
+geneIdsByCategory(GO[[1]])[[2]][[3]]
 @ 
 
 You can use the \Rpackage{GO.db} package to obtain more information
 about the enriched GO categories.
 <<GO info>>=
-sigCategories(GO[[1]])[[1]]
+sigCategories(GO[[1]])[[2]]
 library(GO.db)
-mget(sigCategories(GO[[1]])[[1]], GOTERM)
+mget(sigCategories(GO[[1]])[[2]], GOTERM)
 @ 
 
 In addition, the following functions are implemented to work on the
@@ -247,9 +256,9 @@ same way as for the Gene Ontology, this time we use the
 <<KEGG enrichment>>=
 KEGG <- isa.KEGG(modules)
 KEGG
-summary(KEGG)[[1]]
+summary(KEGG)[[4]]
 library(KEGG.db)
-mget(sigCategories(KEGG)[[1]], KEGGPATHID2NAME)
+mget(sigCategories(KEGG)[[4]], KEGGPATHID2NAME)
 @
 
 The functions mentioned in the Gene ontology enrichment section can be
@@ -262,11 +271,16 @@ in a bicluster are associated with a chromosome. See the
 \Rfunction{isa.CHR} function:
 <<CHR enrichment>>=
 CHR <- isa.CHR(modules)
-summary(CHR,p=0.05)[[11]]
+summary(CHR,p=0.05)[[11]][,-6]
 @ 
 
-The third bicluster has \Sexpr{summary(CHR,p=0.05)[[2]]$Count[1]} % $
-genes on chromosome \Sexpr{rownames(summary(CHR,p=0.05)[[2]])[1]}.
+The eleventh bicluster has \Sexpr{summary(CHR,p=0.05)[[11]]$Count[1]} % $
+genes on chromosome
+\Sexpr{rownames(summary(CHR,p=0.05)[[11]])[1]}. Here is a list of the
+genes:
+<<CHR enrichment list>>=
+unlist(mget(geneIdsByCategory(CHR)[[11]][[1]], org.Hs.egSYMBOL))
+@
 
 The functions mentioned in the Gene ontology enrichment section can be
 used for chromosome enrichment, as well.
@@ -288,7 +302,7 @@ KEGG, but the \Rfunction{isa.miRNA} function should be used:
 <<miRNA enrichment>>=
 if (require(targetscan.Hs.eg.db)) {
   miRNA <- isa.miRNA(modules)
-  summary(miRNA, p=1)[[7]]
+  summary(miRNA, p=0.05)[[11]]
 }
 @ 
 
@@ -307,7 +321,7 @@ package.
 
 The \Rpackage{biclust} R package implements several biclustering
 algorithms in a unified framework. It uses the class \Rclass{Biclust}
-to store a set of biclusters. The \Rfunction{eisa.biclust} converts ISA
+to store a set of biclusters. The \Rfunction{eisa.biclust} function converts ISA
 modules to a \Rclass{Biclust} object. This requires the binarization
 of the modules, i.e. the ISA scores are lost, they are converted to
 zeros and ones:
@@ -342,7 +356,7 @@ in Fig.~\ref{fig:drawHeatmap}.
 CairoPNG("heatmap.png", 400, 400 )
 @ 
 <<heatmap>>=
-drawHeatmap(exprs(ALL), Bc, number=1) 
+drawHeatmap(exprs(ALL[featureNames(modules),]), Bc, number=1) 
 @
 <<heatmap post,echo=FALSE,results=hide>>=
 dev.off() 
@@ -365,7 +379,8 @@ Fig.~\ref{fig:parallel}.
 CairoPNG("parallel.png", 400, 400 )
 @ 
 <<parallel>>=
-parallelCoordinates(exprs(ALL), Bc, number=1, plotBoth=TRUE, pch=NA)
+ex <- samp.exprs(isa.normalize(ALL[featureNames(modules),]))
+parallelCoordinates(ex, Bc, number=2, pch=NA)
 @
 <<parallel.post,echo=FALSE,results=hide>>=
 dev.off()
@@ -403,6 +418,7 @@ goplot.2 <- gograph(summary(GO[[1]], p=0.05)[[2]])
 graph with associated meta data:
 <<gograph object>>=
 summary(goplot.2)
+list.vertex.attributes(goplot.2)
 @ 
 The \texttt{width} and \texttt{height} graph attributes contain the
 suggested width and height of the graph, if plotted to a bitmap
@@ -463,6 +479,8 @@ in this transcription module can separate B-cell and T-cell leukemia
 samples.
 
 \subsection{Generating a HTML summary for the modules}
+
+The \Rfunction{autogen.table} function creates a summary 
 
 \section{How ISA works}
 
