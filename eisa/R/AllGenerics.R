@@ -15,6 +15,9 @@ setGeneric("seedData", function(object) standardGeneric("seedData"))
 setGeneric("runData", function(object) standardGeneric("runData"))
 setGeneric("organism", function(object) standardGeneric("organism"))
 
+setGeneric("getFeatures", function(object, ...) standardGeneric("getFeatures"))
+setGeneric("getSamples", function(object, ...) standardGeneric("getSamples"))
+
 setGeneric("getFeatureNames", function(object, ...) standardGeneric("getFeatureNames"))
 setGeneric("getSampleNames", function(object, ...) standardGeneric("getSampleNames"))
 

@@ -15,7 +15,9 @@ exportMethods("feat.exprs", "samp.exprs",
               "hasNA", "hasNA<-")
 
 exportMethods("drive", "drive<-",
-              "seedData", "runData", "getFeatureNames", "getSampleNames",
+              "seedData", "runData",
+              "getFeatures", "getSamples",
+              "getFeatureNames", "getSampleNames",
               "getFeatureMatrix", "getSampleMatrix",
               "getFeatureScores", "getSampleScores",
               "getNoFeatures", "getNoSamples",
