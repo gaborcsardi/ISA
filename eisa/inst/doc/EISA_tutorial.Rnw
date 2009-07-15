@@ -73,12 +73,12 @@ and then call the \Rfunction{isa} function on the
 thr.gene <- 2.7
 thr.cond <- 1.4
 set.seed(1) # to get the same results, always
-modules <- isa(ALL, thr.gene=thr.gene, thr.cond=thr.cond)
+modules <- ISA(ALL, thr.gene=thr.gene, thr.cond=thr.cond)
 @ 
 
 This first applies a non-specific filter to the data set filters the
 data set and then runs ISA from
-\Sexpr{formals(eisa:::isa.ExpressionSet)$no.seeds} % $
+\Sexpr{formals(eisa:::ISA)$no.seeds} % $
 random seeds (the default). See Section~\ref{sec:detailed-isa} if the
 default parameters are not appropriate for you and need more control.
 
@@ -175,12 +175,12 @@ important if we need to perform them for many modules.
 
 To perform enrichment analysis against the Gene Ontology database, all
 you have to do is to supply your \Rclass{ISAModules} object to the
-\Rfunction{isa.GO} function.
+\Rfunction{ISA.GO} function.
 <<GO enrichment>>=
-GO <- isa.GO(modules)
+GO <- ISA.GO(modules)
 @ 
 
-The \Rfunction{isa.GO} requires an annotation package that maps the
+The \Rfunction{ISA.GO} requires an annotation package that maps the
 Entrez identifiers of the studied organism to GO terms. For human, the
 \Rpackage{org.Hs.eg.db} package is required, for the mouse the
 \Rpackage{org.Mm.eg.db} package, etc.
@@ -200,7 +200,7 @@ least one annotation in the given category.
 For extracting the results themselves, the \Rfunction{summary}
 function can be used, this converts them to a simple data frame. The
 $p$-value limit can be supplied to \Rfunction{summary}. Note, that
-since \Rfunction{isa.GO} calculates enrichment for many gene sets
+since \Rfunction{ISA.GO} calculates enrichment for many gene sets
 (i.e. for all biclusters), \Rfunction{summary} returns a list of data
 frames, one for each bicluster. A table for the first module:
 <<GO summary>>=
@@ -230,7 +230,7 @@ mget(sigCategories(GO[[1]])[[2]], GOTERM)
 @ 
 
 In addition, the following functions are implemented to work on the
-objects returned by \Rfunction{isa.GO}: \Rfunction{htmlReport},
+objects returned by \Rfunction{ISA.GO}: \Rfunction{htmlReport},
 \Rfunction{pvalues}, \Rfunction{geneCounts}, \Rfunction{oddsRatios},
 \Rfunction{exprectedCounts}, \Rfunction{universeCounts},
 \Rfunction{universeMappedCount}, \Rfunction{geneMappedCount},
@@ -242,7 +242,7 @@ they calculate the results for all gene sets and return a list.
 
 \subsubsection{Multiple testing correction}
 
-By default, the \Rfunction{isa.GO} function performs multiple testing
+By default, the \Rfunction{ISA.GO} function performs multiple testing
 correction using the Holm method, this can be changed via the
 \texttt{correction} and \texttt{correction.method} arguments. See the
 manual page of the \Rfunction{p.adjust} function for the possible
@@ -252,9 +252,9 @@ multiple testing correction schemes.
 
 Enrichment calculation against the KEGG pathway goes essentially the
 same way as for the Gene Ontology, this time we use the
-\Rfunction{isa.KEGG} function:
+\Rfunction{ISA.KEGG} function:
 <<KEGG enrichment>>=
-KEGG <- isa.KEGG(modules)
+KEGG <- ISA.KEGG(modules)
 KEGG
 summary(KEGG)[[4]]
 library(KEGG.db)
@@ -268,9 +268,9 @@ used for KEGG, as well.
 
 The \Rpackage{eisa} includes a simple way to check whether the genes
 in a bicluster are associated with a chromosome. See the
-\Rfunction{isa.CHR} function:
+\Rfunction{ISA.CHR} function:
 <<CHR enrichment>>=
-CHR <- isa.CHR(modules)
+CHR <- ISA.CHR(modules)
 summary(CHR,p=0.05)[[11]][,-6]
 @ 
 
@@ -298,10 +298,10 @@ The \Rpackage{targetscan.Hs.eg.db} package is for human, the
 \Rpackage{targetscan.Mm.eg.db} package is for mouse.
 
 The enrichment calculation itself is basically the same as for GO and
-KEGG, but the \Rfunction{isa.miRNA} function should be used:
+KEGG, but the \Rfunction{ISA.miRNA} function should be used:
 <<miRNA enrichment>>=
 if (require(targetscan.Hs.eg.db)) {
-  miRNA <- isa.miRNA(modules)
+  miRNA <- ISA.miRNA(modules)
   summary(miRNA, p=0.05)[[11]]
 }
 @ 
@@ -321,13 +321,13 @@ package.
 
 The \Rpackage{biclust} R package implements several biclustering
 algorithms in a unified framework. It uses the class \Rclass{Biclust}
-to store a set of biclusters. The \Rfunction{eisa.biclust} function converts ISA
+to store a set of biclusters. The \Rfunction{ISA.biclust} function converts ISA
 modules to a \Rclass{Biclust} object. This requires the binarization
 of the modules, i.e. the ISA scores are lost, they are converted to
 zeros and ones:
 <<biclust,cache=TRUE>>=
 library(biclust)
-Bc <- eisa.biclust(modules)
+Bc <- ISA.biclust(modules)
 Bc
 @ 
 
@@ -523,8 +523,8 @@ correlation.
 
 It is very possible that the ISA finds the same module more than once;
 two or more seeds might converge to the same module. The function
-\Rfunction{isa.unique} eliminates every module from the result of 
-\Rfunction{isa.iterate} that is very similar (in terms of
+\Rfunction{ISA.unique} eliminates every module from the result of 
+\Rfunction{ISA.iterate} that is very similar (in terms of
 Pearson correlation) to the one that was already found before.
 
 It might be also apparent from the description of ISA, that the
@@ -555,7 +555,7 @@ results for different runs.
 It is possible to use non-random seeds as well. If you have some
 knowledge about the data or are interested in a particular subset of
 genes/samples, then you can feed in your seeds into the
-\Rfunction{isa.iterate} function directly. In this case the
+\Rfunction{ISA.iterate} function directly. In this case the
 algorithm is deterministic, for the same seed you will always get the
 same results. Using smart (i.e. non-random) seeds can be considered as
 a semi-supervised approach. 
@@ -563,7 +563,7 @@ a semi-supervised approach.
 \subsection{Normalization}
 
 Using in silico data we observed that ISA has the best performance if the
-input matrix is normalized (see \Rfunction{isa.normalize}). The
+input matrix is normalized (see \Rfunction{ISA.normalize}). The
 normalization produces two matrices: $E_r$ and
 $E_c$. $E_r$ is calculated by transposing $E$ and
 centering and scaling its genes (see the \Rfunction{scale} R function). $E_c$ is
@@ -574,7 +574,7 @@ to calculate the signature of the samples.
 It is possible to use another normalization. In this case the user is
 requested to supply the normalized input data in a named list,
 including the two matrices of appropriate
-dimensions to the \Rfunction{isa.iterate} function.
+dimensions to the \Rfunction{ISA.iterate} function.
 
 The \texttt{Er} entry of the list will be used for calculating the
 signature of the genes, \texttt{Ec} will be used for the signature of the
@@ -655,21 +655,6 @@ enrichment calculation, etc. are distributed in two separate packages,
 \Rpackage{isa2} contains the implementation of ISA itself, and
 \Rpackage{eisa} specifically deals with supplying expression data to
 \Rpackage{isa2} and visualizing the results.
-
-The two packages provide some functions that share the same name, and
-the right one is selected based on the arguments supplied. E.g. both
-\Rpackage{isa2} and \Rpackage{eisa} has a function called
-\Rfunction{isa}. It the first argument of \Rfunction{isa} is an
-\Rclass{ExpressionSet}, then the \Rpackage{eisa} version is called. If
-the first argument is a matrix, then the \Rpackage{isa} version is
-called.
-
-This also means that there are two manual pages for the two
-\Rfunction{isa} functions. I.e. if one types `\verb+?isa+', (and both
-\Rpackage{isa2} and \Rpackage{eisa} are loaded, then one
-has to choose between the two versions. To avoid this, the
-\Rpackage{eisa} manual pages can also be referenced by supplying and
-`\verb+e+' prefix: `\verb+?eisa+' or `\verb+?eisa.unique+'.
 
 \section{Finer control over ISA parameters}%
 \label{sec:detailed-isa}

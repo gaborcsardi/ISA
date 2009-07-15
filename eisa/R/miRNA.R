@@ -281,7 +281,7 @@ setMethod("sigCategories", signature(r="miRNAListHyperGResult"),
             })
           })
 
-isa.miRNA <- function(modules,
+ISA.miRNA <- function(modules,
                       org=organism(modules),
                       shortorg=abbreviate(org, 2),
                       ann=annotation(modules),

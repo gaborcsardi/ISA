@@ -263,7 +263,7 @@ setMethod("sigCategories", signature(r="KEGGListHyperGResult"),
             })
           })
 
-isa.KEGG <- function(modules,
+ISA.KEGG <- function(modules,
                      org=organism(modules),
                      shortorg=abbreviate(org, 2),
                      ann=annotation(modules),

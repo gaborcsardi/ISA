@@ -1,6 +1,6 @@
 
 setMethod("feat.exprs", signature(object="ISAExpressionSet"),
-          function(object) assayDataElement(object, "exprs"))
+          function(object) assayDataElement(object, "er.exprs"))
 
 setMethod("samp.exprs", signature(object="ISAExpressionSet"),
           function(object) assayDataElement(object, "ec.exprs"))

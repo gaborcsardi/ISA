@@ -1,9 +1,13 @@
 
-autogen.table <- function(nm, isares, target.dir,
-                          modules=seq_len(length(isares)),
-                          template=system.file("autogen", package="eisa"),
-                          GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL, DBD=NULL,
-                          htmltitle=NULL, notes=NULL, seed=NULL) {
+ISA.html <- function(...) {
+  ## TODO: call ISA.html.table and ISA.html.modules
+}
+
+ISA.html.table <- function(nm, isares, target.dir,
+                           modules=seq_len(length(isares)),
+                           template=system.file("autogen", package="eisa"),
+                           GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL, DBD=NULL,
+                           htmltitle=NULL, notes=NULL, seed=NULL) {
 
   isa2:::isa.status("Creating HTML module table", "in")
   
@@ -225,15 +229,15 @@ autogen.table <- function(nm, isares, target.dir,
 }  
                           
 
-autogen.modules <- function(nm, isares, modules=seq_len(length(isares)),
-                            target.dir,
-                            template=system.file("autogen", package="eisa"),
-                            GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL, DBD=NULL,
-                            cond.to.include=NULL,
-                            cond.col="white",
-                            sep=NULL, seed=NULL, drive.BP=NULL,
-                            drive.CC=NULL, drive.MF=NULL, drive.KEGG=NULL,
-                            drive.miRNA=NULL, drive.DBD=NULL, drive.CHR=NULL) {
+ISA.html.modules <- function(nm, isares, modules=seq_len(length(isares)),
+                             target.dir,
+                             template=system.file("autogen", package="eisa"),
+                             GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL, DBD=NULL,
+                             cond.to.include=NULL,
+                             cond.col="white",
+                             sep=NULL, seed=NULL, drive.BP=NULL,
+                             drive.CC=NULL, drive.MF=NULL, drive.KEGG=NULL,
+                             drive.miRNA=NULL, drive.DBD=NULL, drive.CHR=NULL) {
 
   isa2:::isa.status("Generating module pages", "in")
   

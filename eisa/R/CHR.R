@@ -267,7 +267,7 @@ setMethod("sigCategories", signature(r="CHRListHyperGResult"),
             })
           })
 
-isa.CHR <- function(modules,
+ISA.CHR <- function(modules,
                     org=organism(modules),
                     shortorg=abbreviate(org,2),
                     ann=annotation(modules),
