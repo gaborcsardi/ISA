@@ -379,8 +379,7 @@ Fig.~\ref{fig:parallel}.
 CairoPNG("parallel.png", 400, 400 )
 @ 
 <<parallel>>=
-ex <- samp.exprs(isa.normalize(ALL[featureNames(modules),]))
-parallelCoordinates(ex, Bc, number=2, pch=NA)
+profile.plot(modules, 2, ALL, plot="both")
 @
 <<parallel.post,echo=FALSE,results=hide>>=
 dev.off()
@@ -388,9 +387,14 @@ dev.off()
 \begin{figure}
 \centering
 \includegraphics[width=0.7\textwidth]{parallel}
-\caption{Profile plots for the first bicluster found by ISA.}
+\caption{Profile plots for the second bicluster found by ISA.}
 \label{fig:parallel}
 \end{figure}
+
+The \Rfunction{profile.plot} function has several options to set the
+plot colors and styles, please see the manual for the details. This
+function was inspired by the \Rfunction{parallelCoordinates} function
+in the \Rpackage{biclust} package. 
 
 \subsection{Gene ontology tree plots}
 
