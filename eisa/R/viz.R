@@ -569,3 +569,72 @@ ISA2heatmap <- function(modules, module, eset, scale="none", ...) {
   }
   heatmap(dataM, scale=scale, ...)
 }
+
+profile.plot <- function(modules, module, data, background=TRUE,
+                         plot=c("samples", "features", "both"),
+                         col=gray(0.7), col.mod=1,
+                         type="l", type.mod=type, order=FALSE,
+                         xlabs=c("Features","Samples"),
+                         ylab="Expression", ...) {
+
+  if (is(data, "ExpressionSet") || !is.null(rownames(data))) {
+    data <- data[featureNames(modules),]
+  }
+
+  if (is(data, "ISAExpressionSet")) {
+    data <- samp.exprs(data)
+  } else if (is(data, "ExpressionSet")) {
+    data <- samp.exprs(isa.normalize(data))
+  }
+
+  if (!all(dim(data) == dim(modules))) {
+    stop("data sizes do not match")
+  }
+  
+  feats <- getFeatures(modules, module)[[1]]
+  samps <- getSamples(modules, module)[[1]]
+
+  pp <- function(data, xx, yy, xlab) {
+
+    if (length(xx)==0) {
+      stop("No features to plot")
+    }
+    
+    nyy <- if (length(yy)!=0) { -yy } else { seq_ncol(data) }
+    data <- data[xx,]
+    
+    xlim <- c(1, length(xx))
+    ylim <- range(data)
+    
+    if (order) {
+      data <- data[ order(rowMeans(data[,yy])), ]
+    }
+    
+    par(mar=c(2,4,1,1)+0.1)
+    plot(NA, type="n", xlim=xlim, ylim=ylim, xlab=NA,
+         ylab=ylab, axes=FALSE, ...)
+    title(xlab=xlab, mgp=c(0,0,0))
+    axis(2)
+    if (background) {
+      for (i in seq_len(ncol(data))[nyy]) {
+        lines(data[,i], col=col, type=type, ...)
+      }
+    }
+    for (i in seq_len(ncol(data))[yy]) {
+      lines(data[,i], col=col.mod, type=type.mod, ...)
+    }
+  }
+
+  plot <- match.arg(plot)
+  if (plot=="samples") {
+    pp(data, xx=feats, yy=samps, xlab=xlabs[1])
+  } else if (plot=="features") {
+    pp(t(data), xx=samps, yy=feats, xlab=xlabs[2])
+  } else {
+    par(mfrow=c(2,1))
+    pp(data, xx=feats, yy=samps, xlab=xlabs[1])
+    pp(t(data), xx=samps, yy=feats, xlab=xlabs[2])
+  }
+
+  invisible(NULL)
+}
