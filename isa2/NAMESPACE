@@ -8,7 +8,8 @@ exportMethods("isa",
               "isa.filter.robust",
               "isa.sweep",
               "sweep.graph",
-              "plotModules")
+              "plotModules",
+              "orderModules")
 
 export(isa.option)
 
