@@ -1,4 +1,9 @@
 
+setClass("ISAExpressionSet",
+         representation(prenormalized="logical",
+                        hasNA="logical"),
+         contains = "ExpressionSet")
+
 setClass("ISAModules",
          representation=representation(
            genes="matrix",

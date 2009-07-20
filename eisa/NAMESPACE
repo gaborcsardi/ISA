@@ -1,16 +1,26 @@
 import(Category)
 import(AnnotationDbi)
+import(Biobase)
 
-export(isa.GO, isa.KEGG, isa.CHR, isa.miRNA, isa.DBD)
+export(ISA, ISA.normalize, ISA.iterate, ISA.unique, ISA.sweep,
+       ISA.sweep.graph, ISA.robustness, ISA.filter.robust)
+
+export(ISA.GO, ISA.KEGG, ISA.CHR, ISA.miRNA, ISA.DBD)
 
 export(gograph, gograph.plot, exp.plot.create, exp.plot.colbar,
        exp.plot, cond.plot, overlap, overlap.plot, mnplot, ISAmnplot,
-       ISA2heatmap, eisa.biclust)
+       ISA2heatmap, ISA.biclust, profile.plot)
        
-export(autogen.table, autogen.modules)
+export(ISA.html.table, ISA.html.modules, ISA.html)
+
+exportMethods("feat.exprs", "samp.exprs",
+              "prenormalized", "prenormalized<-",
+              "hasNA", "hasNA<-")
 
 exportMethods("drive", "drive<-",
-              "seedData", "runData", "getFeatureNames", "getSampleNames",
+              "seedData", "runData",
+              "getFeatures", "getSamples",
+              "getFeatureNames", "getSampleNames",
               "getFeatureMatrix", "getSampleMatrix",
               "getFeatureScores", "getSampleScores",
               "getNoFeatures", "getNoSamples",

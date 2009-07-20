@@ -1,4 +1,12 @@
 
+setGeneric("feat.exprs", function(object) standardGeneric("feat.exprs"))
+setGeneric("samp.exprs", function(object) standardGeneric("samp.exprs"))
+setGeneric("prenormalized", function(object) standardGeneric("prenormalized"))
+setGeneric("prenormalized<-", function(object, value) standardGeneric("prenormalized<-"))
+setGeneric("hasNA", function(object) standardGeneric("hasNA"))
+setGeneric("hasNA<-", function(object, value) standardGeneric("hasNA<-"))
+
+###########
 
 setGeneric("drive", function(r) standardGeneric("drive"))
 setGeneric("drive<-", function(r, value) standardGeneric("drive<-"))
@@ -6,6 +14,9 @@ setGeneric("drive<-", function(r, value) standardGeneric("drive<-"))
 setGeneric("seedData", function(object) standardGeneric("seedData"))
 setGeneric("runData", function(object) standardGeneric("runData"))
 setGeneric("organism", function(object) standardGeneric("organism"))
+
+setGeneric("getFeatures", function(object, ...) standardGeneric("getFeatures"))
+setGeneric("getSamples", function(object, ...) standardGeneric("getSamples"))
 
 setGeneric("getFeatureNames", function(object, ...) standardGeneric("getFeatureNames"))
 setGeneric("getSampleNames", function(object, ...) standardGeneric("getSampleNames"))

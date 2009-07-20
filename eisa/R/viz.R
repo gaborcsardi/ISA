@@ -355,35 +355,25 @@ exp.plot <- function(epo, scores=TRUE) {
 # coords <- exp.plot(ep)
 # dev.off()
 
-cond.plot <- function(modules, number, exprs, nm,
+cond.plot <- function(modules, number, eset,
                       col="white", all=TRUE,
                       sep=NULL, sepcol=NULL, val=TRUE, srt=90,
                       adj.above=c(0,0.5), adj.below=c(1,0.5),
-                      plot.only=seq_len(dim(nm)[2]), ...) {
+                      plot.only=seq_len(ncol(eset)), ...) {
 
   isa2:::isa.status("Creating a condition plot", "in")
 
-  if (missing(exprs) && missing(nm)) {
-    stop("Either `exprs' or `nm' is required")
-  }
+  eset <- eisa.get.nm(eset)
+  eset <- eset[featureNames(modules),]
+  nm <- list(t(feat.exprs(eset)), samp.exprs(eset))
 
-  if (!missing(exprs) && !missing(nm)) {
-    warning("`exprs' ignored, because `nm' was also given")
-  }
-  if (missing(nm)) {
-    exprs <- exprs[ featureNames(modules), ]
-    nm <- isa.normalize(exprs)
-  } else {
-    nm <- nm[ featureNames(modules), ]
-  }
-  
   genes <- getFeatureMatrix(modules, mods=number)
   samp <- getSampleMatrix(modules, mods=number)
   thr <- seedData(modules)$thr.col[number]
   
   ## Calculate all condition scores, might not be correct for
   ## oscillating modules
-  scores <- as.vector(t(exprs(nm)) %*% genes)
+  scores <- as.vector(nm[[1]] %*% genes)
   msc <- mean(scores)
   ssc <- sd(scores)
   thr1 <- msc + thr * ssc
@@ -555,12 +545,34 @@ mnplot <- function(x, eset, data, group, ...) {
   invisible(tts)
 }
 
-ISAmnplot <- function(modules, module, eset, data=annotation(x), group, ...) {
-  x <- modules$rundata$features[ modules$genes[,module] != 0 ]
+select.eset <- function(eset, norm=c("raw", "feature", "sample")) {
+  norm <- match.arg(norm)
+  if (norm=="raw") {
+    eset <- exprs(eset)
+  } else if (norm=="feature") {
+    eset <- eisa.get.nm(eset)
+    eset <- feat.exprs(eset)
+  } else if (norm=="sample") {
+    eset <- eisa.get.nm(eset)
+    eset <- samp.exprs(eset)
+  }
+  eset
+}
+  
+
+ISAmnplot <- function(modules, number, eset,
+                      norm=c("raw", "feature", "sample"),
+                      data=annotation(x), group, ...) {
+  x <- getFeatureNames(modules, number)[[1]]
+  eset <- select.eset(eset, norm)
   mnplot(x, eset, data, group, ...)
 }
 
-ISA2heatmap <- function(modules, module, eset, scale="none", ...) {
+ISA2heatmap <- function(modules, module, eset,
+                        norm=c("raw", "feature", "sample"),
+                        scale="none", ...) {
+
+  eset <- select.eset(eset, norm)
   x <- getFeatureNames(modules, module)[[1]]
   y <- getSampleNames (modules, module)[[1]]
   dataM <- eset[x,y]
@@ -568,4 +580,70 @@ ISA2heatmap <- function(modules, module, eset, scale="none", ...) {
     dataM <- exprs(dataM)
   }
   heatmap(dataM, scale=scale, ...)
+}
+
+profile.plot <- function(modules, module, eset,
+                         norm=c("raw", "feature", "sample"),
+                         plot=c("samples", "features", "both"),
+                         background=TRUE, col=gray(0.7), col.mod=1,
+                         type="l", type.mod=type, order=FALSE,
+                         xlabs=c("Features","Samples"),
+                         ylab="Expression", ...) {
+
+  data <- select.eset(eset, norm)
+  
+  if (is(data, "ExpressionSet") || !is.null(rownames(data))) {
+    data <- data[featureNames(modules),]
+  }
+
+  if (!all(dim(data) == dim(modules))) {
+    stop("data sizes do not match")
+  }
+  
+  feats <- getFeatures(modules, module)[[1]]
+  samps <- getSamples(modules, module)[[1]]
+
+  pp <- function(data, xx, yy, xlab) {
+
+    if (length(xx)==0) {
+      stop("No features to plot")
+    }
+    
+    nyy <- if (length(yy)!=0) { -yy } else { seq_ncol(data) }
+    data <- data[xx,]
+    
+    xlim <- c(1, length(xx))
+    ylim <- range(data)
+    
+    if (order) {
+      data <- data[ order(rowMeans(data[,yy])), ]
+    }
+    
+    par(mar=c(2,4,1,1)+0.1)
+    plot(NA, type="n", xlim=xlim, ylim=ylim, xlab=NA,
+         ylab=ylab, axes=FALSE, ...)
+    title(xlab=xlab, mgp=c(0,0,0))
+    axis(2)
+    if (background) {
+      for (i in seq_len(ncol(data))[nyy]) {
+        lines(data[,i], col=col, type=type, ...)
+      }
+    }
+    for (i in seq_len(ncol(data))[yy]) {
+      lines(data[,i], col=col.mod, type=type.mod, ...)
+    }
+  }
+
+  plot <- match.arg(plot)
+  if (plot=="samples") {
+    pp(data, xx=feats, yy=samps, xlab=xlabs[1])
+  } else if (plot=="features") {
+    pp(t(data), xx=samps, yy=feats, xlab=xlabs[2])
+  } else {
+    par(mfrow=c(2,1))
+    pp(data, xx=feats, yy=samps, xlab=xlabs[1])
+    pp(t(data), xx=samps, yy=feats, xlab=xlabs[2])
+  }
+
+  invisible(NULL)
 }

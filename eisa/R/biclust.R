@@ -1,5 +1,5 @@
 
-eisa.biclust <- function(modules) {
+ISA.biclust <- function(modules) {
 
   if (!require(biclust)) {
     stop("The `biclust' package is required for this")
