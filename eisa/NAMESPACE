@@ -26,7 +26,5 @@ exportMethods("drive", "drive<-",
               "getNoFeatures", "getNoSamples",
               "featureThreshold", "sampleThreshold")
 
-exportMethods("isa")
-
 export(toExpressionView)
 exportMethods("orderModules")
