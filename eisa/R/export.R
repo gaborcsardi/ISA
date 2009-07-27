@@ -18,6 +18,7 @@ toExpressionView <- function(eisamodules, gedata, order, filename="") {
 	nSamples <- (dim(eisamodules))[2]
 	nModules <- length(eisamodules)
 
+	writeBin("ExpressionViewFile", con, endian="swap")
 	writeBin(nGenes, con, 4, endian="swap")
 	writeBin(nSamples, con, 4, endian="swap")
 	writeBin(nModules, con, 4, endian="swap")
@@ -212,10 +213,20 @@ toExpressionView <- function(eisamodules, gedata, order, filename="") {
 				temp <- mat.or.vec(getNoFeatures(eisamodules)[module],1)
 				genesp <- mat.or.vec(getNoFeatures(eisamodules)[module],1)
 				i = 1;
+				intersectingmodulesgenes = list();
 				for ( gene in 1:nGenes ) {
 					if ( genes[gene] != 0 ) {
 						temp[i] <- gene
 						i <- i + 1
+						
+						for ( modulep in 1:nModules ) {
+							if ( module != modulep ) {
+								if ( eisamodules@genes[gene, modulep] != 0 ) {
+									intersectingmodulesgenes <- append(intersectingmodulesgenes, modulep)
+								}
+							}
+						}
+						
 					}
 				}
 				for ( gene in 1:length(temp) ) {
@@ -227,10 +238,21 @@ toExpressionView <- function(eisamodules, gedata, order, filename="") {
 				temp <- mat.or.vec(getNoSamples(eisamodules)[module],1)
 				samplesp <- mat.or.vec(getNoSamples(eisamodules)[module],1)
 				i = 1;
+				intersectingmodulessamples = list();
 				for ( sample in 1:nSamples ) {
 					if ( samples[sample] != 0 ) {
 						temp[i] <- sample
 						i <- i + 1
+						
+						for ( modulep in 1:nModules ) {
+							if ( module != modulep ) {
+								if ( eisamodules@conditions[sample, modulep] != 0 ) {
+									intersectingmodulessamples <- append(intersectingmodulessamples, modulep)
+								}
+							}
+						}
+
+						
 					}
 				}
 				for ( sample in 1:length(temp) ) {
@@ -238,7 +260,14 @@ toExpressionView <- function(eisamodules, gedata, order, filename="") {
 				}
 				xmldata$addNode("containedsamples", toString(samplesp))
 
-
+				intersectingmodules <- intersect(unique(intersectingmodulesgenes), unique(intersectingmodulessamples))
+				xmldata$addNode("intersectingmodules", toString(intersectingmodules))
+				
+				#cat(module)
+				#str(intersectingmodules)
+				#str(intersectingmodulesgenes)
+				#str(intersectingmodulessamples)
+				
 			xmldata$closeTag()
 		}
 		xmldata$closeTag()
@@ -247,7 +276,7 @@ toExpressionView <- function(eisamodules, gedata, order, filename="") {
 		# options(warn=-1)
 
 		#cat(saveXML(xmldata))
-		writeBin(saveXML(xmldata), con, 4, endian="swap")
+		writeBin(saveXML(xmldata), con, 1, endian="swap")
 		
 	close(con)
 
