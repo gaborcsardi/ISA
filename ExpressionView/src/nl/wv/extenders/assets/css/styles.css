@@ -1,0 +1,48 @@
+Application {
+   backgroundColor: #cccccc;
+   backgroundGradientColors: #bdcbd2, #5a8398;
+}
+Button {
+   highlightAlphas: 1, 0.33;
+   fillAlphas: 1, 0.16, 0.18, 1;
+   fillColors: #5f89b9, #697182, #ffffff, #eeeeee;
+}
+Panel {
+	headerHeight: 26;
+	roundedBottomCorners: true;
+	borderThicknessTop: 0;
+	borderThicknessBottom: 3;
+	borderThicknessLeft: 3;
+	borderThicknessRight: 3;
+	borderAlpha: 1.0;
+	titleStyleName: "mypanelTitle";
+}
+.mypanelTitle {
+	fontFamily: Arial;
+	fontSize: 10;
+	fontWeight: bold;
+}
+.closeBtn {
+	upSkin:        Embed('/nl/wv/extenders/assets/img/closeButton.png');
+	overSkin:      Embed('/nl/wv/extenders/assets/img/closeButton.png');
+	downSkin:      Embed('/nl/wv/extenders/assets/img/closeButton.png');
+	disabledSkin:  Embed('/nl/wv/extenders/assets/img/closeButton.png');
+}
+.increaseBtn {
+	upSkin:        Embed('/nl/wv/extenders/assets/img/increaseButton.png');
+	overSkin:      Embed('/nl/wv/extenders/assets/img/increaseButton.png');
+	downSkin:      Embed('/nl/wv/extenders/assets/img/increaseButton.png');
+	disabledSkin:  Embed('/nl/wv/extenders/assets/img/increaseButton.png');
+}
+.decreaseBtn {
+	upSkin:        Embed('/nl/wv/extenders/assets/img/decreaseButton.png');
+	overSkin:      Embed('/nl/wv/extenders/assets/img/decreaseButton.png');
+	downSkin:      Embed('/nl/wv/extenders/assets/img/decreaseButton.png');
+	disabledSkin:  Embed('/nl/wv/extenders/assets/img/decreaseButton.png');
+}
+.resizeHndlr {
+	upSkin:        Embed('/nl/wv/extenders/assets/img/resizeHandler.png');
+	overSkin:      Embed('/nl/wv/extenders/assets/img/resizeHandler.png');
+	downSkin:      Embed('/nl/wv/extenders/assets/img/resizeHandler.png');
+	disabledSkin:  Embed('/nl/wv/extenders/assets/img/resizeHandler.png');
+}
