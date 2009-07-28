@@ -108,7 +108,7 @@ package ch.unil.cbg.ExpressionView.view {
 												
 				if ( !modulesSearchableDataGrid ) {
 					modulesSearchableDataGrid = new SearchableDataGrid();
-					//modulesSearchableDataGrid.addEventListener(ListEvent.ITEM_CLICK, clickModulesHandler);
+					modulesSearchableDataGrid.addEventListener(SearchableDataGridSelectionEvent.ITEM_CLICK, clickModulesHandler);
 					modulesSearchableDataGrid.addEventListener(SearchableDataGridSelectionEvent.ITEM_DOUBLE_CLICK, doubleClickModulesHandler);
 					modulesPanel.addChild(modulesSearchableDataGrid);
 				}
@@ -256,8 +256,15 @@ package ch.unil.cbg.ExpressionView.view {
 		}
 		
 		private function clickModulesHandler(event:SearchableDataGridSelectionEvent): void {
-			
+			var module:int = mapOpenTabs[modulesNavigator.selectedIndex];
+			var highlightedModules:Array = [];
+			for ( var i:int = 0; i < event.selection.length; ++i ) {
+				var selectedModule:int = event.selection[i];
+				highlightedModules = highlightedModules.concat(ged.getModule(module).ModulesRectangles[selectedModule])
+			}
+			dispatchEvent(new UpdateHighlightedModulesEvent(highlightedModules));
 		}
+		
 		private function doubleClickModulesHandler(event:SearchableDataGridSelectionEvent): void {
 			
 			for ( var i:int = 0; i < event.selection.length; ++i ) {

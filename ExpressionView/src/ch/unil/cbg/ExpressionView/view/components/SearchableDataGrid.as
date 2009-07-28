@@ -4,6 +4,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 	
 	import flash.events.Event;
 	import flash.events.IEventDispatcher;
+	import flash.events.KeyboardEvent;
 	
 	import mx.collections.XMLListCollection;
 	import mx.containers.Canvas;
@@ -62,22 +63,34 @@ package ch.unil.cbg.ExpressionView.view.components {
 				dataGrid.doubleClickEnabled = true;
 				dataGrid.addEventListener(ListEvent.ITEM_CLICK, clickHandler);
 				dataGrid.addEventListener(ListEvent.ITEM_DOUBLE_CLICK, doubleClickHandler);
+				dataGrid.addEventListener(KeyboardEvent.KEY_UP, keyHandler);
 				addChild(dataGrid);
 			}
 			
 		}
 		
-		private function clickHandler(event:ListEvent): void {			
-		}
-		
-		private function doubleClickHandler(event:ListEvent): void {
-			var selected:Array = dataGrid.selectedIndices;
+		private function getSelection(selected:Array): Array {
 			var selection:Array = [];
 			for ( var i:int = 0; i < selected.length; ++ i ) {
 				selection.push(dataprovider[selected[i]].children()[0])
 			}
-			dispatchEvent(new SearchableDataGridSelectionEvent(SearchableDataGridSelectionEvent.ITEM_DOUBLE_CLICK, selection));
+			return selection;
 		}
+		
+		private function clickHandler(event:ListEvent): void {
+			dispatchEvent(new SearchableDataGridSelectionEvent(SearchableDataGridSelectionEvent.ITEM_CLICK, getSelection(dataGrid.selectedIndices)));
+		}
+		
+		private function doubleClickHandler(event:ListEvent): void {
+			dispatchEvent(new SearchableDataGridSelectionEvent(SearchableDataGridSelectionEvent.ITEM_DOUBLE_CLICK, getSelection(dataGrid.selectedIndices)));
+		}
+		
+		private function keyHandler(event:KeyboardEvent): void {
+			// 40 = down arrow, 38 = up arrow
+			if ( event.keyCode == 40  || event.keyCode == 38) {
+				dispatchEvent(new SearchableDataGridSelectionEvent(SearchableDataGridSelectionEvent.ITEM_CLICK, getSelection(dataGrid.selectedIndices)));
+			}
+		}		
 		
 		override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void {		
 			super.updateDisplayList(unscaledWidth, unscaledHeight);

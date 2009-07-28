@@ -250,7 +250,9 @@ package ch.unil.cbg.ExpressionView.model {
 					var value:Number = global.Image.bitmapData.getPixel(gene-1, sample-1);
 					bitmapdata.setPixel(genep, samplep, value);					
 					value = global.ModulesImage.bitmapData.getPixel(gene-1, sample-1);
-					modulesbitmapdata.setPixel(genep, samplep, value);
+					if ( value != ModulesColors[module][0] ) {
+						modulesbitmapdata.setPixel(genep, samplep, value);
+					}
 				}			
 			}			      
 			bitmapdata.unlock();
