@@ -190,10 +190,18 @@ package ch.unil.cbg.ExpressionView.model {
 			var nsamples:int = samples.length;
 			
 			newmodule.nGenes = ngenes;
+			//var Genes:XMLListCollection = new XMLListCollection
+			for ( var i:int = 0; i < genes.length; ++i ) {
+				newmodule.Genes.addItem(global.Genes[genes[i]-1]);
+			}			
 			newmodule.nSamples = nsamples;
+			for ( var i:int = 0; i < samples.length; ++i ) {
+				newmodule.Samples.addItem(global.Samples[samples[i]-1]);
+			}
 			
 			// get ModulesRectangles
 			newmodule.ModulesRectangles = new Vector.<Array>(nModules + 1, true);
+			newmodule.ModulesOutlines = [];
 			for ( var m:int = 0; m < ModulesLookupModules[module].length; ++m ) {
 								
 				var modulep:int = ModulesLookupModules[module][m];
@@ -223,19 +231,25 @@ package ch.unil.cbg.ExpressionView.model {
 						oldsample = sample;
 					};
 				};
-
+				
 				newmodule.ModulesRectangles[modulep] = [];
-				var x:int; var y:int; var dx:int; var dy:int;
-				var rectx:int; var recty:int;
-				for ( rectx = 0; rectx < rectxright.length; ++rectx ) {
-					for ( recty = 0; recty < rectytop.length; ++recty ) {
-						x = rectxleft[rectx];
-						y = rectytop[recty];
-						dx = rectxright[rectx] - x;
-						dx = rectybottom[recty] - y;
+				var maxarea:int = 0;
+				var bestrect:int = 0;
+				for ( var rectx:int = 0; rectx < rectxright.length; ++rectx ) {
+					for ( var recty:int = 0; recty < rectytop.length; ++recty ) {
+						var x:int = rectxleft[rectx] - 1;
+						var y:int = rectytop[recty] - 1;
+						var dx:int = rectxright[rectx] - x;
+						var dy:int = rectybottom[recty] - y;
+						var area:int = dx * dy;
+						if ( area > maxarea ) { 
+							maxarea = area;
+							bestrect = newmodule.ModulesRectangles[module].length;
+						}
 						newmodule.ModulesRectangles[modulep].push(new Rectangle(x, y, dx, dy));
 					}
 				}
+				newmodule.ModulesOutlines.push(bestrect);
 
 			}
 
@@ -250,9 +264,23 @@ package ch.unil.cbg.ExpressionView.model {
 					var value:Number = global.Image.bitmapData.getPixel(gene-1, sample-1);
 					bitmapdata.setPixel(genep, samplep, value);					
 					value = global.ModulesImage.bitmapData.getPixel(gene-1, sample-1);
+					var k:int = (sample - 1) * nGenes + gene - 1;
+					if ( ModulesLookup[k].length > 0 ) {
+						var color:uint = ModulesColors[ModulesLookup[k][ModulesLookup[k].length-1]][0];
+						if ( color != ModulesColors[module][0] ) {
+							modulesbitmapdata.setPixel(genep, samplep, color);
+						}
+						if ( color == ModulesColors[module][0] && ModulesLookup[k].length > 1 ) { 
+							color = ModulesColors[ModulesLookup[k][ModulesLookup[k].length-2]][0];
+							modulesbitmapdata.setPixel(genep, samplep, color);
+						}
+						
+					}
+/*
 					if ( value != ModulesColors[module][0] ) {
 						modulesbitmapdata.setPixel(genep, samplep, value);
 					}
+*/
 				}			
 			}			      
 			bitmapdata.unlock();

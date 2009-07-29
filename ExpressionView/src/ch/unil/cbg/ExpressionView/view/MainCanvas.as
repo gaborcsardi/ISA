@@ -313,8 +313,8 @@ package ch.unil.cbg.ExpressionView.view {
 				// update infoPanel
 				var infoString:String = "";
 				if ( infoArray.length != 0 ) {
-					infoString = infoString + "Gene: " + infoArray[0].name;
-					infoString = infoString + "\nSample: " + infoArray[1].name;
+					infoString = infoString + "Gene: " + infoArray[0].genetag1;
+					infoString = infoString + "\nSample: " + infoArray[1].sampletag1;
 					infoString = infoString + "\nModules: " + infoArray[2];
 					infoString = infoString + "\nData: " + infoArray[3];
 				}

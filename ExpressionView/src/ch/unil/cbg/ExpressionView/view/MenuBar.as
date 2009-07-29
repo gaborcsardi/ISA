@@ -4,6 +4,7 @@ package ch.unil.cbg.ExpressionView.view {
 	import ch.unil.cbg.ExpressionView.model.*;
 	
 	import flash.events.Event;
+	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.events.ProgressEvent;
 	import flash.net.FileFilter;
@@ -69,6 +70,20 @@ package ch.unil.cbg.ExpressionView.view {
 		
 		
 		// inspect, zoom, and pan
+		private function keyHandler(event:KeyboardEvent): void {
+			// i = 73, z = 89, and p = 80;
+			if ( event.keyCode == 73 ) {
+				dispatchEvent(new ModeChangeEvent(0));
+				navigationMenu.selectedIndex = 0;
+			} else if ( event.keyCode == 89 ) {
+				dispatchEvent(new ModeChangeEvent(1));
+				navigationMenu.selectedIndex = 1;
+			}
+			if ( event.keyCode == 80 ) {
+				dispatchEvent(new ModeChangeEvent(2));
+				navigationMenu.selectedIndex = 2;
+			}
+		}
 		private function navigationMenuClickHandler(event:ItemClickEvent): void {
 			dispatchEvent(new ModeChangeEvent(event.index));
 		}
@@ -247,6 +262,9 @@ package ch.unil.cbg.ExpressionView.view {
 					fullScreenButton.addEventListener(MouseEvent.CLICK, fullScreenHandler);
 					headerBox.addChild(fullScreenButton);
 				}
+				
+				parentApplication.addEventListener(KeyboardEvent.KEY_UP, keyHandler)
+				
 			}
 			
 		}
