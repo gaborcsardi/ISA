@@ -37,9 +37,9 @@ package ch.unil.cbg.ExpressionView.model {
 		private var Data:ByteArray;
 		private var ModularData:Vector.<GeneExpressionModule>;
 		
-		private var bitmapdata:BitmapData;
-		private var modulesbitmapdata:BitmapData;
-		private var templatebitmapdata:BitmapDataUnlimited;
+		private var gebitmapdata:LargeBitmapData;
+		private var modulesbitmapdata:LargeBitmapData;
+		//private var templatebitmapdata:BitmapDataUnlimited;
 		
 		private var ModulesLookup:Vector.<Array>;
 		private var ModulesLookupGenes:Vector.<Array>;
@@ -48,8 +48,6 @@ package ch.unil.cbg.ExpressionView.model {
 		
 		private var GenesLookup:Vector.<Array>;
 		private var SamplesLookup:Vector.<Array>;
-
-		private var testbitmapdata:LargeBitmapData;
 				
 		public function GeneExpressionData() {
 			super();
@@ -73,10 +71,7 @@ package ch.unil.cbg.ExpressionView.model {
 		}
 
 
-		public function initialize(bytes: ByteArray, unlimitedbitmapdata: BitmapDataUnlimited): void  {		
-
-			// initialize unlimited bitmap
-			templatebitmapdata = unlimitedbitmapdata;
+		public function initialize(bytes: ByteArray): void  {		
 
 			XML.ignoreWhitespace = true;
 
@@ -255,17 +250,17 @@ package ch.unil.cbg.ExpressionView.model {
 
 			}
 
-    		var bitmapdata:BitmapData = new BitmapData(ngenes, nsamples);
-    		var modulesbitmapdata:BitmapData = new BitmapData(ngenes, nsamples);
-    		bitmapdata.lock();
+    		var gebitmapdata:LargeBitmapData = new LargeBitmapData(ngenes, nsamples);
+    		var modulesbitmapdata:LargeBitmapData = new LargeBitmapData(ngenes, nsamples);
+    		gebitmapdata.lock();
     		modulesbitmapdata.lock();
 			for ( var genep:int = 0; genep < ngenes; ++genep ) {
 				var gene:int = genes[genep];
         		for ( var samplep:int = 0; samplep < nsamples; ++samplep ) {
         			var sample:int = samples[samplep];
-					var value:Number = global.Image.bitmapData.getPixel(gene-1, sample-1);
-					bitmapdata.setPixel(genep, samplep, value);					
-					value = global.ModulesImage.bitmapData.getPixel(gene-1, sample-1);
+					var value:Number = global.GEImage.getPixel(gene-1, sample-1);
+					gebitmapdata.setPixel(genep, samplep, value);					
+					value = global.ModulesImage.getPixel(gene-1, sample-1);
 					var k:int = (sample - 1) * nGenes + gene - 1;
 					if ( ModulesLookup[k].length > 0 ) {
 						var color:uint = ModulesColors[ModulesLookup[k][ModulesLookup[k].length-1]][0];
@@ -279,13 +274,11 @@ package ch.unil.cbg.ExpressionView.model {
 					}
 				}			
 			}			      
-			bitmapdata.unlock();
+			gebitmapdata.unlock();
 			modulesbitmapdata.unlock();
 			
-			newmodule.Image.bitmapData = bitmapdata.clone();
-			newmodule.ModulesImage.bitmapData = modulesbitmapdata.clone();
-			bitmapdata.dispose();
-			modulesbitmapdata.dispose();
+			newmodule.GEImage = gebitmapdata;
+			newmodule.ModulesImage = modulesbitmapdata;
 			
 			ModularData[module] = newmodule;
        					
@@ -418,13 +411,10 @@ package ch.unil.cbg.ExpressionView.model {
 		private function initTreatBitmap():void {
 			
 			// set Data and get global Bitmap
-			bitmapdata = templatebitmapdata.bitmapData.clone();
-			modulesbitmapdata = templatebitmapdata.bitmapData.clone();
-			
-			testbitmapdata = new LargeBitmapData(nGenes, nSamples);
-			testbitmapdata.lock();
-			
-			bitmapdata.lock();
+			gebitmapdata = new LargeBitmapData(nGenes, nSamples);
+			modulesbitmapdata = new LargeBitmapData(nGenes, nSamples);
+						
+			gebitmapdata.lock();
 			modulesbitmapdata.lock();
 			Data.position = 0;
 		
@@ -452,8 +442,7 @@ package ch.unil.cbg.ExpressionView.model {
 						red = 0;
 						green = -value * 255;
 					}
-					bitmapdata.setPixel(gene-1, sample-1, (red<<16) + (green<<8) + 0);
-					testbitmapdata.setPixel(gene-1, sample-1, (red<<16) + (green<<8) + 0);
+					gebitmapdata.setPixel(gene-1, sample-1, (red<<16) + (green<<8) + 0);
 					
 					var k:int = (sample-1) * nGenes + gene - 1;
 					if ( ModulesLookup[k].length > 0 ) {
@@ -497,12 +486,10 @@ package ch.unil.cbg.ExpressionView.model {
 		}
 				
 		private function finishTreatBitmap(): void {	
-			bitmapdata.unlock();
+			gebitmapdata.unlock();
 			modulesbitmapdata.unlock();
-			ModularData[0].Image.bitmapData = bitmapdata.clone();
-			ModularData[0].ModulesImage.bitmapData = modulesbitmapdata.clone();
-			bitmapdata.dispose();
-			modulesbitmapdata.dispose();
+			ModularData[0].GEImage = gebitmapdata;
+			ModularData[0].ModulesImage = modulesbitmapdata;
 			dispatchEvent(new GEDCompleteEvent());
 		}
 			

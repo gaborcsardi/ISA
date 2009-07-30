@@ -278,7 +278,7 @@ package ch.unil.cbg.ExpressionView.view {
 					modulesNavigator.addChild(openTabs[selectedTab]);
 					openTabs[selectedTab].label = "Module " + selectedModule.toString();
 					var largestRectangles:Array = [];
-					openTabs[selectedTab].dataProvider = new Array(gem.Image, gem.ModulesImage, largestRectangles);
+					openTabs[selectedTab].dataProvider = new Array(gem.GEImage, gem.ModulesImage, largestRectangles);
 					genesSearchableDataGrid.dataProvider = gem.Genes;
 					samplesSearchableDataGrid.dataProvider = gem.Samples;	
 					mapOpenTabs.push(selectedModule);
@@ -411,7 +411,7 @@ package ch.unil.cbg.ExpressionView.view {
 			}
 			openTabs[selectedTab].label = "Global";
 			openTabs[selectedTab].colors = ged.ModulesColors;
-			openTabs[selectedTab].dataProvider = new Array(gem.Image, gem.ModulesImage, largestRectangles);
+			openTabs[selectedTab].dataProvider = new Array(gem.GEImage, gem.ModulesImage, largestRectangles);
 			openTabs[selectedTab].addListener();
 			openTabs[selectedTab].addEventListener(MouseEvent.ROLL_OUT, rollOutHandler);
 

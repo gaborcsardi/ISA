@@ -2,15 +2,11 @@ package ch.unil.cbg.ExpressionView.view.components {
 	
 	import ch.unil.cbg.ExpressionView.events.*;
 	import ch.unil.cbg.ExpressionView.model.*;
-	
-	import com.formatlos.as3.lib.display.BitmapDataUnlimited;
-	import com.formatlos.as3.lib.display.events.BitmapDataUnlimitedEvent;
+	import ch.unil.cbg.ExpressionView.utilities.LargeBitmapData;
 	
 	import flash.display.Bitmap;
-	import flash.display.BitmapData;
 	import flash.display.Shape;
 	import flash.events.MouseEvent;
-	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.utils.getTimer;
@@ -30,16 +26,14 @@ package ch.unil.cbg.ExpressionView.view.components {
     	private static const ZOOM:int = 1;
     	private static const PAN:int = 2;
 	
-		private var fullgeimage:Bitmap;
-		private var fullmodulesimage:Bitmap;
+		private var fullgeimage:LargeBitmapData;
+		private var fullmodulesimage:LargeBitmapData;
 		private var maximalWidth:int = 0;
 		private var maximalHeight:int = 0;
 		
 		public var currentgeimage:Bitmap;
 		public var currentmodulesimage:Bitmap;		
-		
-		private var unlimitedbitmapdata:BitmapDataUnlimited;
-		
+				
 		private var lastMode:int;
 		
 		private var lastPt:Point;
@@ -70,16 +64,13 @@ package ch.unil.cbg.ExpressionView.view.components {
 			lastRectangle = new Rectangle();
 			lastPt = new Point();
 			
-			fullgeimage = new Bitmap();
+			//fullgeimage = new Bitmap();
 			currentgeimage = new Bitmap();
 
-			fullmodulesimage = new Bitmap();
+			//fullmodulesimage = new Bitmap();
 			currentmodulesimage = new Bitmap();
 						
 			lastMode = 0;
-			
-			unlimitedbitmapdata = new BitmapDataUnlimited();
-			unlimitedbitmapdata.addEventListener(BitmapDataUnlimitedEvent.COMPLETE, redrawImage);
 			
 			lastClick = getTimer();
 			
@@ -288,45 +279,13 @@ package ch.unil.cbg.ExpressionView.view.components {
 			}
 		}
 
-		private function drawImage(): void {	
-/*	
-			if ( currentRectangle.width == lastRectangle.width && currentRectangle.height == lastRectangle.height ) {
-				var bitmapdata:BitmapData = unlimitedbitmapdata.bitmapData.clone();
-				bitmapdata.copyPixels(fullgeimage.bitmapData, currentRectangle, new Point(0, 0));
-				currentgeimage.bitmapData = bitmapdata.clone();
-				bitmapdata.copyPixels(fullmodulesimage.bitmapData, currentRectangle, new Point(0, 0));
-				currentmodulesimage.bitmapData = bitmapdata.clone();
-				bitmapdata.dispose();
-			} else {
- 				unlimitedbitmapdata.create(currentRectangle.width, currentRectangle.height, false);
- 			}
- */
-			unlimitedbitmapdata.create(currentRectangle.width, currentRectangle.height, false);
+		private function drawImage(): void {
+			drawRectangles();			
+			var targetRect:Rectangle = new Rectangle(0, 0, canvaswidth, canvasheight);
+			currentgeimage.bitmapData = fullgeimage.getData(currentRectangle, targetRect);
+			currentmodulesimage.bitmapData = fullmodulesimage.getData(currentRectangle, targetRect);
  		}
-
-		private function redrawImage(event:BitmapDataUnlimitedEvent): void {
-			var bitmapdata:BitmapData = unlimitedbitmapdata.bitmapData.clone();			
-			bitmapdata.copyPixels(fullgeimage.bitmapData, currentRectangle, new Point(0, 0));
-			//currentgeimage.bitmapData = bitmapdata.clone();
-			
-			var scalex:Number = canvaswidth / currentRectangle.width;
-			var scaley:Number = canvasheight / currentRectangle.height;
-			var matrix:Matrix = new Matrix();
-			matrix.scale(scalex, scaley);
-			trace(matrix);
-			if ( scalex > 0 ) {
-				var newbitmapdata:BitmapData = new BitmapData(canvaswidth, canvasheight);
-				newbitmapdata.draw(bitmapdata, matrix);
-				currentgeimage.bitmapData = newbitmapdata.clone();
-				newbitmapdata.dispose();
-			}
-			
-			bitmapdata.copyPixels(fullmodulesimage.bitmapData, currentRectangle, new Point(0, 0));
-			currentmodulesimage.bitmapData = bitmapdata.clone();
-			bitmapdata.dispose();
-			drawRectangles();
-		}
-			
+ 		
 		override protected function createChildren(): void {
 			
 			super.createChildren();
@@ -416,7 +375,7 @@ package ch.unil.cbg.ExpressionView.view.components {
         	vscrollbar.pageScrollSize =  currentRectangle.height * 3 / 4;
 			vscrollbar.scrollPosition =  currentRectangle.y;
 			
-			drawRectangles();
+			drawImage();
 		}
 
 		public function set colors(data:Vector.<Array>): void {
@@ -431,7 +390,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 			maximalHeight = fullgeimage.height;
 			currentRectangle = new Rectangle(0, 0, maximalWidth, maximalHeight);
 			lastRectangle = currentRectangle.clone();
-			unlimitedbitmapdata.create(currentRectangle.width, currentRectangle.height, false);
+			drawImage();
 		}
 		
 		private function alphaSliderChangeHandler(event:AlphaSliderChangeEvent): void {

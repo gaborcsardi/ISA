@@ -2,8 +2,9 @@ package ch.unil.cbg.ExpressionView.model {
 	
 	import __AS3__.vec.Vector;
 	
+	import ch.unil.cbg.ExpressionView.utilities.LargeBitmapData;
+	
 	import flash.display.Bitmap;
-	import flash.utils.ByteArray;
 	
 	import mx.collections.XMLListCollection; 		
 	
@@ -19,8 +20,8 @@ package ch.unil.cbg.ExpressionView.model {
 		public var nSamples:int;
 		public var Samples:XMLListCollection;
 				
-		public var Image:Bitmap;
-		public var ModulesImage:Bitmap;
+		public var GEImage:LargeBitmapData;
+		public var ModulesImage:LargeBitmapData;
 
 		public var ModulesRectangles:Vector.<Array>;
 		public var ModulesOutlines:Array;
@@ -32,8 +33,8 @@ package ch.unil.cbg.ExpressionView.model {
 			nSamples = 0;
 			Samples = new XMLListCollection();
 			
-			Image = new Bitmap();
-			ModulesImage = new Bitmap();
+			//GEImage = new LargeBitmapData();
+			//ModulesImage = new LargeBitmapData();
 			
 			ModulesRectangles = new Vector.<Array>();
 		}

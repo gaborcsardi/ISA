@@ -19,9 +19,6 @@
 			import mx.controls.Alert;
 			import flash.display.StageAlign;
 			import flash.display.StageScaleMode;
-
-			import com.formatlos.as3.lib.display.BitmapDataUnlimited;
-			import com.formatlos.as3.lib.display.events.BitmapDataUnlimitedEvent;
 			
 			import ch.unil.cbg.ExpressionView.events.*;
 			import ch.unil.cbg.ExpressionView.model.*;
@@ -34,7 +31,6 @@
 			private var rawged:GeneExpressionData = new GeneExpressionData();
 			// possibly filtered data
 			private var ged:GeneExpressionData = new GeneExpressionData();
-			private var unlimitedbitmapdata:BitmapDataUnlimited = new BitmapDataUnlimited();
 			private var bytes:ByteArray = new ByteArray();
 			
 			private var oldStageWidth:Number;
@@ -158,18 +154,9 @@
 					return;				
 				}
 				
-				bytes.position = 19;
-				var nGenes:uint = bytes.readInt();
-				var nSamples:uint = bytes.readInt();
-				
-				unlimitedbitmapdata.addEventListener(BitmapDataUnlimitedEvent.COMPLETE, unlimitedBitmapCompleteHandler);
-	 			unlimitedbitmapdata.create(nGenes, nSamples, false);
-			}
-
-			private function unlimitedBitmapCompleteHandler(event:BitmapDataUnlimitedEvent): void {
 				dispatchEvent(new UpdateStatusBarEvent("parsing file"));
-				invalidateDisplayList();
-				rawged.initialize(bytes, unlimitedbitmapdata);
+				rawged.initialize(bytes);
+
 			}
 			
 			private function GEDCompleteHandler(event:GEDCompleteEvent): void {

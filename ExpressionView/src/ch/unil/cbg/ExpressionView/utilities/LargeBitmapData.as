@@ -4,12 +4,13 @@ package ch.unil.cbg.ExpressionView.utilities {
 	
 	import flash.display.BitmapData;
 	import flash.geom.Matrix;
-	import flash.geom.Rectangle;
 	import flash.geom.Point;
+	import flash.geom.Rectangle;
 
 	public class LargeBitmapData {
 	
 		private const LIMIT:Number = 8000;
+		private const OVERLAP:Number = 1000;
 	
 		private var bitmaps:Vector.<BitmapData>;
 		private var rectangles:Vector.<Rectangle>;
@@ -19,17 +20,14 @@ package ch.unil.cbg.ExpressionView.utilities {
 		
 		public var width:Number;
 		public var height:Number;
-		//private var restx:Number;
-		//private var resty:Number;
 	
-		public function LargeBitmapData(_width:Number = 0, _height:Number = 0) {
+		public function LargeBitmapData(_width:Number = 1, _height:Number = 1) {
 			width = _width;
 			height = _height;
 			dimx = int(width / LIMIT) + 1;
 			dimy = int(height / LIMIT) + 1;
 			dim = dimx * dimy;
-			var restx:Number = height % LIMIT;
-			var resty:Number = width % LIMIT;
+
 			bitmaps = new Vector.<BitmapData>(dim, false);
 			rectangles = new Vector.<Rectangle>(dim, false);
 			for ( var x:int = 0; x < dimx; ++x ) {
@@ -38,10 +36,10 @@ package ch.unil.cbg.ExpressionView.utilities {
 					var w:Number = LIMIT;
 					var h:Number = LIMIT;
 					if ( x == dimx - 1 ) {
-						w = restx;
+						w = width % LIMIT;
 					}
 					if ( y == dimy - 1 ) {
-						h = resty;
+						h = height % LIMIT;
 					}
 					bitmaps[k] = new BitmapData(w, h);
 					rectangles[k] = new Rectangle(x * LIMIT, y * LIMIT, w, h);
@@ -59,15 +57,17 @@ package ch.unil.cbg.ExpressionView.utilities {
 			return bitmaps[position[0]].getPixel(position[1], position[2]);
 		}
 		
+		
+		/*
 		public function getData(sourceRect:Rectangle, targetRect:Rectangle):BitmapData {
 			if ( targetRect.width > 0 && targetRect.width <= LIMIT && targetRect.height > 0 && targetRect.height <= LIMIT ) {  
 				var bitmapdata:BitmapData = new BitmapData(targetRect.width, targetRect.height);
 				var transformation:Matrix = new Matrix();
-				transformation.scale(sourceRect.width / targetRect.width, sourceRect.height / targetRect.height); 
 				if ( sourceRect.width <= LIMIT && sourceRect.height <= LIMIT ) {
+					transformation.scale(targetRect.width / sourceRect.width, targetRect.height / sourceRect.height);
 					var tempbitmapdata:BitmapData = new BitmapData(sourceRect.width, sourceRect.height);
 					for ( var sector:int = 0; sector < dim; ++sector ) {
-						var intersection:Rectangle = sourceRect.intersection(rectangles[sector]); 
+						var intersection:Rectangle = rectangles[sector].intersection(sourceRect);
 						if ( !intersection.equals(new Rectangle(0, 0, 0, 0)) ) {
 							var x:Number = intersection.topLeft.x - sourceRect.topLeft.x;
 							var y:Number = intersection.topLeft.y - sourceRect.topLeft.y;							
@@ -76,15 +76,67 @@ package ch.unil.cbg.ExpressionView.utilities {
 					}
 					bitmapdata.draw(tempbitmapdata, transformation);
 					tempbitmapdata.dispose();
-				} else {
-					
 				}
-				return bitmapdata;
+				return bitmapdata.clone();
 				bitmapdata.dispose();
 			}
 			return null;
 		}
+		*/
 		
+		public function getData(sourceRect:Rectangle, targetRect:Rectangle):BitmapData {
+			if ( targetRect.width > 0 && targetRect.width <= LIMIT && targetRect.height > 0 && targetRect.height <= LIMIT ) {  
+				var bitmapdata:BitmapData = new BitmapData(targetRect.width, targetRect.height);
+				var transformation:Matrix = new Matrix();
+				var scalex:Number = targetRect.width / sourceRect.width;
+				var scaley:Number = targetRect.height / sourceRect.height;
+				transformation.scale(scalex, scaley);
+	
+				var dimxp:Number = int(sourceRect.width / LIMIT) + 1;
+				var dimyp:Number = int(sourceRect.height / LIMIT) + 1;
+
+				for ( var x:int = 0; x < dimxp; ++x ) {
+					for ( var y:int = 0; y < dimyp; ++y ) {
+						var w:Number = LIMIT;
+						var h:Number = LIMIT;
+						if ( x == dimxp - 1 ) {
+							w = sourceRect.width % LIMIT;
+						}
+						if ( y == dimyp - 1 ) {
+							h = sourceRect.height % LIMIT;
+						}
+						var tempbitmapdata:BitmapData = new BitmapData(w, h);
+						var rectangle:Rectangle = new Rectangle(sourceRect.x + x * LIMIT, sourceRect.y + y * LIMIT, w, h)					
+					
+						for ( var sector:int = 0; sector < dim; ++sector ) {
+							var intersection:Rectangle = rectangle.intersection(rectangles[sector]);
+							if ( !intersection.equals(new Rectangle(0, 0, 0, 0)) ) {
+								var xp:Number = intersection.topLeft.x - rectangle.topLeft.x;
+								var yp:Number = intersection.topLeft.y - rectangle.topLeft.y;
+								var dintersection:Rectangle = intersection.clone();
+								dintersection.offset(-rectangles[sector].x, -rectangles[sector].y);
+								tempbitmapdata.copyPixels(bitmaps[sector], dintersection, new Point(xp, yp));
+							}
+						}
+						
+						var tempbitmapdatascaled:BitmapData = new BitmapData(w * scalex, h * scaley);
+						tempbitmapdatascaled.draw(tempbitmapdata, transformation);
+						
+						rectangle = new Rectangle(0, 0, tempbitmapdatascaled.width, tempbitmapdatascaled.height);
+						var pt:Point = new Point(x * LIMIT * scalex, y * LIMIT * scaley);
+						bitmapdata.copyPixels(tempbitmapdatascaled, rectangle, pt);
+						
+						tempbitmapdata.dispose();
+						tempbitmapdatascaled.dispose();
+						
+					}
+				}
+				return bitmapdata.clone();
+				bitmapdata.dispose();
+			}
+			return null;
+		}
+
 		public function lock(): void {
 			for ( var sector:int = 0; sector < dim; ++sector ) {
 				bitmaps[sector].lock();
