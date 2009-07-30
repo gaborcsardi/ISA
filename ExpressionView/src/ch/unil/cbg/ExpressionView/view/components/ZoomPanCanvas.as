@@ -1,6 +1,5 @@
 package ch.unil.cbg.ExpressionView.view.components {
 	
-	
 	import ch.unil.cbg.ExpressionView.events.*;
 	import ch.unil.cbg.ExpressionView.model.*;
 	
@@ -11,6 +10,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 	import flash.display.BitmapData;
 	import flash.display.Shape;
 	import flash.events.MouseEvent;
+	import flash.geom.Matrix;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.utils.getTimer;
@@ -56,7 +56,8 @@ package ch.unil.cbg.ExpressionView.view.components {
 		private var lastClick:int;
 		
 		// layout
-		private var outerCanvas:Canvas;
+		private var canvaswidth:Number;
+		private var canvasheight:Number;
 		private var hscrollbar:HScrollBar;
 		private var vscrollbar:VScrollBar;		
 		private var geimage:Image;
@@ -79,6 +80,11 @@ package ch.unil.cbg.ExpressionView.view.components {
 			
 			unlimitedbitmapdata = new BitmapDataUnlimited();
 			unlimitedbitmapdata.addEventListener(BitmapDataUnlimitedEvent.COMPLETE, redrawImage);
+			
+			lastClick = getTimer();
+			
+			canvaswidth = this.width;
+			canvasheight = this.height;
 
 		}
 		
@@ -131,20 +137,22 @@ package ch.unil.cbg.ExpressionView.view.components {
 
 		// inspect events
 		private function inspectMouseMoveHandler(event:MouseEvent):void {
-			var gene:int = currentRectangle.x + event.localX / outerCanvas.width * currentRectangle.width;
-			var sample:int = currentRectangle.y + event.localY / outerCanvas.height * currentRectangle.height;
+			var gene:int = currentRectangle.x + event.localX / canvaswidth * currentRectangle.width;
+			var sample:int = currentRectangle.y + event.localY / canvasheight * currentRectangle.height;
 			dispatchEvent(new BroadcastInspectPositionEvent(gene, sample));			
 		}
 
 		// zoom events
 		private function zoomMouseDownHandler(event:MouseEvent): void {
-			lastClick = getTimer();
-			overlayCanvas.addEventListener(MouseEvent.MOUSE_MOVE, zoomMouseMoveHandler);
-			overlayCanvas.addEventListener(MouseEvent.MOUSE_UP, zoomMouseUpHandler);
-			var selection:Shape = new Shape();
-			selectionRectangle = new Rectangle(event.localX, event.localY);
-			selection.graphics.drawRect(selectionRectangle.x, selectionRectangle.y, 0, 0);
-			overlayCanvas.rawChildren.addChildAt(selection, overlayCanvas.rawChildren.numChildren);
+			if ( getTimer() - lastClick > 100 ) { 
+				lastClick = getTimer();
+				overlayCanvas.addEventListener(MouseEvent.MOUSE_MOVE, zoomMouseMoveHandler);
+				overlayCanvas.addEventListener(MouseEvent.MOUSE_UP, zoomMouseUpHandler);
+				var selection:Shape = new Shape();
+				selectionRectangle = new Rectangle(event.localX, event.localY);
+				selection.graphics.drawRect(selectionRectangle.x, selectionRectangle.y, 0, 0);
+				overlayCanvas.rawChildren.addChildAt(selection, overlayCanvas.rawChildren.numChildren);
+			}
 		}
 		private function zoomMouseMoveHandler(event:MouseEvent): void {
 			overlayCanvas.addEventListener(MouseEvent.MOUSE_DOWN, zoomMouseDownHandler);
@@ -159,13 +167,13 @@ package ch.unil.cbg.ExpressionView.view.components {
 		private function zoomMouseUpHandler(event:MouseEvent): void {
 			overlayCanvas.removeEventListener(MouseEvent.MOUSE_MOVE, zoomMouseMoveHandler);
 			overlayCanvas.removeEventListener(MouseEvent.MOUSE_UP, zoomMouseUpHandler);	
-			if ( getTimer() - lastClick > 250 ) {
+			if ( getTimer() - lastClick > 100 ) {
 				overlayCanvas.rawChildren.removeChildAt(overlayCanvas.rawChildren.numChildren-1);
 	
-				var x:Number = currentRectangle.x + selectionRectangle.x / outerCanvas.width * currentRectangle.width;
-				var y:Number = currentRectangle.y + selectionRectangle.y / outerCanvas.height * currentRectangle.height;
-				var width:Number = selectionRectangle.width * currentRectangle.width / outerCanvas.width;
-				var height:Number = selectionRectangle.height * currentRectangle.height / outerCanvas.height;
+				var x:Number = currentRectangle.x + selectionRectangle.x / canvaswidth * currentRectangle.width;
+				var y:Number = currentRectangle.y + selectionRectangle.y / canvasheight * currentRectangle.height;
+				var width:Number = selectionRectangle.width * currentRectangle.width / canvaswidth;
+				var height:Number = selectionRectangle.height * currentRectangle.height / canvasheight;
 				
 				if ( width < 0 ) {
 					width *= -1;
@@ -193,15 +201,13 @@ package ch.unil.cbg.ExpressionView.view.components {
 				var newHeight:int = int(currentRectangle.height * zoomfactor);
 				currentRectangle.width = newWidth;
 				currentRectangle.height = newHeight;
-				var offsetx:int = int( localPt.x / outerCanvas.width * lastRectangle.width - newWidth / 2 );
-				var offsety:int = int( localPt.y / outerCanvas.height * lastRectangle.height - newHeight / 2 );
+				var offsetx:int = int( localPt.x / canvaswidth * lastRectangle.width - newWidth / 2 );
+				var offsety:int = int( localPt.y / canvasheight * lastRectangle.height - newHeight / 2 );
 				currentRectangle.offset(offsetx, offsety);
-	
 				currentRectangle = adjustRectangle(currentRectangle);
-				if ( currentRectangle != lastRectangle ) {
-					drawImage();
-					lastRectangle = currentRectangle;		
-				}
+
+				drawImage();
+				lastRectangle = currentRectangle.clone();		
 			}
 			overlayCanvas.addEventListener(MouseEvent.MOUSE_DOWN, zoomMouseDownHandler);
 			
@@ -219,8 +225,8 @@ package ch.unil.cbg.ExpressionView.view.components {
 		private function dragMouseMoveHandler(event:MouseEvent): void {
 			var pt:Point = new Point(event.localX, event.localY);
 			currentRectangle = lastRectangle.clone();
-			var offsetx:int = int( (lastPt.x - pt.x) / outerCanvas.width * currentRectangle.width );
-			var offsety:int = int( (lastPt.y - pt.y) / outerCanvas.height * currentRectangle.height );
+			var offsetx:int = int( (lastPt.x - pt.x) / canvaswidth * currentRectangle.width );
+			var offsety:int = int( (lastPt.y - pt.y) / canvasheight * currentRectangle.height );
 			currentRectangle.offset(offsetx, offsety);
 			
 			currentRectangle = adjustRectangle(currentRectangle);
@@ -231,8 +237,8 @@ package ch.unil.cbg.ExpressionView.view.components {
 		private function dragMouseUpHandler(event:MouseEvent): void {
 			var pt:Point = new Point(event.localX, event.localY);
 			currentRectangle = lastRectangle.clone();
-			var offsetx:int = int( (lastPt.x - pt.x) / outerCanvas.width * currentRectangle.width );
-			var offsety:int = int( (lastPt.y - pt.y) / outerCanvas.height * currentRectangle.height );
+			var offsetx:int = int( (lastPt.x - pt.x) / canvaswidth * currentRectangle.width );
+			var offsety:int = int( (lastPt.y - pt.y) / canvasheight * currentRectangle.height );
 			currentRectangle.offset(offsetx, offsety);
 			currentRectangle = adjustRectangle(currentRectangle);
 			drawImage();
@@ -262,14 +268,15 @@ package ch.unil.cbg.ExpressionView.view.components {
 
 
 		private function drawRectangles(): void {
+			if ( canvaswidth > 0 ) {
 			modulesCanvas.graphics.clear();
 			var r:Rectangle;
 			var x:Number; var y:Number; var dx:Number; var dy:Number;
 			for ( var module:int = 0; module < modulesOutlines.length; ++module ) {
 				r = currentRectangle.intersection(modulesOutlines[module]);
 				if ( r.width > 0 && r.height > 0 ) {
-					var scalex:Number = modulesCanvas.width / currentRectangle.width;
-					var scaley:Number = modulesCanvas.height / currentRectangle.height;
+					var scalex:Number = canvaswidth / currentRectangle.width;
+					var scaley:Number = canvasheight / currentRectangle.height;
 					x = (r.x - currentRectangle.x) * scalex;
 					y = (r.y - currentRectangle.y) * scaley;
 					dx = r.width * scalex;
@@ -278,99 +285,91 @@ package ch.unil.cbg.ExpressionView.view.components {
 					modulesCanvas.graphics.drawRect(x, y, dx, dy);
 				}
 			}
+			}
 		}
 
-		private function drawImage(): void {
-			
+		private function drawImage(): void {	
+/*	
 			if ( currentRectangle.width == lastRectangle.width && currentRectangle.height == lastRectangle.height ) {
-				
-				drawRectangles();
-						
-				var bitmapdata:BitmapData = unlimitedbitmapdata.bitmapData.clone();			
-
+				var bitmapdata:BitmapData = unlimitedbitmapdata.bitmapData.clone();
 				bitmapdata.copyPixels(fullgeimage.bitmapData, currentRectangle, new Point(0, 0));
 				currentgeimage.bitmapData = bitmapdata.clone();
-
 				bitmapdata.copyPixels(fullmodulesimage.bitmapData, currentRectangle, new Point(0, 0));
 				currentmodulesimage.bitmapData = bitmapdata.clone();
-
 				bitmapdata.dispose();
-				
 			} else {
  				unlimitedbitmapdata.create(currentRectangle.width, currentRectangle.height, false);
  			}
-		}
+ */
+			unlimitedbitmapdata.create(currentRectangle.width, currentRectangle.height, false);
+ 		}
 
 		private function redrawImage(event:BitmapDataUnlimitedEvent): void {
-
-			drawRectangles();
-			
 			var bitmapdata:BitmapData = unlimitedbitmapdata.bitmapData.clone();			
-			
 			bitmapdata.copyPixels(fullgeimage.bitmapData, currentRectangle, new Point(0, 0));
-			currentgeimage.bitmapData = bitmapdata.clone();
+			//currentgeimage.bitmapData = bitmapdata.clone();
+			
+			var scalex:Number = canvaswidth / currentRectangle.width;
+			var scaley:Number = canvasheight / currentRectangle.height;
+			var matrix:Matrix = new Matrix();
+			matrix.scale(scalex, scaley);
+			trace(matrix);
+			if ( scalex > 0 ) {
+				var newbitmapdata:BitmapData = new BitmapData(canvaswidth, canvasheight);
+				newbitmapdata.draw(bitmapdata, matrix);
+				currentgeimage.bitmapData = newbitmapdata.clone();
+				newbitmapdata.dispose();
+			}
 			
 			bitmapdata.copyPixels(fullmodulesimage.bitmapData, currentRectangle, new Point(0, 0));
 			currentmodulesimage.bitmapData = bitmapdata.clone();
-			
 			bitmapdata.dispose();
-			invalidateDisplayList();						
+			drawRectangles();
 		}
-
 			
 		override protected function createChildren(): void {
 			
 			super.createChildren();
 			
-			if ( !outerCanvas ) {
-				outerCanvas = new Canvas();
-				addChild(outerCanvas);
-
-				if ( !hscrollbar ) {
-					hscrollbar = new HScrollBar();
-					hscrollbar.addEventListener(ScrollEvent.SCROLL, hScrollHandler);
-					outerCanvas.addChild(hscrollbar);
-				}
-
-				if ( !vscrollbar ) {
-					vscrollbar = new VScrollBar();
-					vscrollbar.addEventListener(ScrollEvent.SCROLL, vScrollHandler);
-					outerCanvas.addChild(vscrollbar);
-				}
-
-				if ( !modulesimage ) {
-					modulesimage = new Image();
-					modulesimage.maintainAspectRatio = false;
-					modulesimage.source = currentmodulesimage;
-					modulesimage.alpha = 1;
-					modulesimage.visible = true;
-					outerCanvas.addChild(modulesimage);
-				}
-
-				if ( !geimage ) {
-					geimage = new Image();
-					geimage.maintainAspectRatio = false;
-					geimage.source = currentgeimage;
-					geimage.alpha = 0.1;
-					geimage.visible = true;
-					outerCanvas.addChild(geimage);
-				}
-
-				if ( !modulesCanvas ) {
-					modulesCanvas = new Canvas();
-					outerCanvas.addChild(modulesCanvas);
-				}
-					
-				if ( !overlayCanvas ) {
-					overlayCanvas = new Canvas();
-					overlayCanvas.alpha = 0.3;
-					overlayCanvas.addEventListener(MouseEvent.MOUSE_MOVE, inspectMouseMoveHandler);
-					outerCanvas.addChild(overlayCanvas);
-				}
-			
-				
+			if ( !modulesimage ) {
+				modulesimage = new Image();
+				modulesimage.maintainAspectRatio = false;
+				modulesimage.source = currentmodulesimage;
+				addChild(modulesimage);
 			}
-			
+
+			if ( !geimage ) {
+				geimage = new Image();
+				geimage.maintainAspectRatio = false;
+				geimage.source = currentgeimage;
+				geimage.alpha = 0.2;
+				addChild(geimage);
+			}
+
+			if ( !modulesCanvas ) {
+				modulesCanvas = new Canvas();
+				addChild(modulesCanvas);
+			}
+				
+			if ( !overlayCanvas ) {
+				overlayCanvas = new Canvas();
+				overlayCanvas.alpha = 0.3;
+				overlayCanvas.addEventListener(MouseEvent.MOUSE_MOVE, inspectMouseMoveHandler);
+				addChild(overlayCanvas);
+			}
+
+			if ( !hscrollbar ) {
+				hscrollbar = new HScrollBar();
+				hscrollbar.addEventListener(ScrollEvent.SCROLL, hScrollHandler);
+				addChild(hscrollbar);
+			}
+
+			if ( !vscrollbar ) {
+				vscrollbar = new VScrollBar();
+				vscrollbar.addEventListener(ScrollEvent.SCROLL, vScrollHandler);
+				addChild(vscrollbar);
+			}
+						
 			parentApplication.addEventListener(AlphaSliderChangeEvent.ALPHASLIDERCHANGEEVENT, alphaSliderChangeHandler);
 			parentApplication.addEventListener(SetOutlineVisibilityEvent.SETOUTLINEVISIBILITYEVENT, setOutlineVisibilityHandler);
 			parentApplication.addEventListener(SetFillingVisibilityEvent.SETFILLINGVISIBILITYEVENT, setFillingVisibilityHandler);
@@ -379,16 +378,26 @@ package ch.unil.cbg.ExpressionView.view.components {
 		}
 
 		override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void {
+			
 			super.updateDisplayList(unscaledWidth, unscaledHeight);
 			
-			outerCanvas.percentWidth = 100;
-			outerCanvas.percentHeight = 100;
-			
 			var thickness:Number = 16;
-			hscrollbar.width = outerCanvas.width - thickness;
+			canvaswidth = unscaledWidth - thickness;
+			canvasheight = unscaledHeight - thickness;
+
+			geimage.width = canvaswidth;
+			geimage.height = canvasheight;
+			modulesimage.width = canvaswidth;
+			modulesimage.height = canvasheight;
+			modulesCanvas.width = canvaswidth;
+			modulesCanvas.height = canvasheight;
+			overlayCanvas.width = canvaswidth;
+			overlayCanvas.height = canvasheight;
+						
+			hscrollbar.width = canvaswidth;
 			hscrollbar.height = thickness;
 			hscrollbar.x = 0;
-			hscrollbar.y = outerCanvas.height - hscrollbar.height;
+			hscrollbar.y = canvasheight;
 			hscrollbar.minScrollPosition = 0
 			hscrollbar.maxScrollPosition = maximalWidth - currentRectangle.width;
 			hscrollbar.pageSize = currentRectangle.width;
@@ -396,9 +405,9 @@ package ch.unil.cbg.ExpressionView.view.components {
         	hscrollbar.pageScrollSize =  currentRectangle.width * 3 / 4;
 			hscrollbar.scrollPosition = currentRectangle.x; 
 			
-			vscrollbar.height = outerCanvas.height - hscrollbar.height;
+			vscrollbar.height = canvasheight;
 			vscrollbar.width = thickness;
-			vscrollbar.x = outerCanvas.width - vscrollbar.width;
+			vscrollbar.x = canvaswidth;
 			vscrollbar.y = 0;
 			vscrollbar.minScrollPosition = 0
 			vscrollbar.maxScrollPosition = maximalHeight - currentRectangle.height;
@@ -407,15 +416,7 @@ package ch.unil.cbg.ExpressionView.view.components {
         	vscrollbar.pageScrollSize =  currentRectangle.height * 3 / 4;
 			vscrollbar.scrollPosition =  currentRectangle.y;
 			
-			geimage.width = outerCanvas.width - thickness;
-			geimage.height = outerCanvas.height - thickness;
-			modulesimage.width = outerCanvas.width - thickness;
-			modulesimage.height = outerCanvas.height - thickness;
-			modulesCanvas.width = outerCanvas.width - thickness;
-			modulesCanvas.height = outerCanvas.height - thickness;
-			overlayCanvas.width = outerCanvas.width - thickness;
-			overlayCanvas.height = outerCanvas.height - thickness;
-			
+			drawRectangles();
 		}
 
 		public function set colors(data:Vector.<Array>): void {
@@ -456,8 +457,8 @@ package ch.unil.cbg.ExpressionView.view.components {
 				for ( i = 0; i < nRectangles; ++i ) {
 					r = currentRectangle.intersection(event.modulesRectangles[i]);
 					if ( r.width > 0 && r.height > 0 ) {
-						var scalex:Number = overlayCanvas.width / currentRectangle.width;
-						var scaley:Number = overlayCanvas.height / currentRectangle.height;
+						var scalex:Number = canvaswidth / currentRectangle.width;
+						var scaley:Number = canvasheight / currentRectangle.height;
 						x = (r.x - currentRectangle.x) * scalex;
 						y = (r.y - currentRectangle.y) * scaley;
 						dx = r.width * scalex;

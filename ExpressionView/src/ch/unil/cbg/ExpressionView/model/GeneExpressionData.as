@@ -3,6 +3,7 @@ package ch.unil.cbg.ExpressionView.model {
 	import __AS3__.vec.Vector;
 	
 	import ch.unil.cbg.ExpressionView.events.*;
+	import ch.unil.cbg.ExpressionView.utilities.LargeBitmapData;
 	
 	import com.formatlos.as3.lib.display.BitmapDataUnlimited;
 	
@@ -48,6 +49,7 @@ package ch.unil.cbg.ExpressionView.model {
 		private var GenesLookup:Vector.<Array>;
 		private var SamplesLookup:Vector.<Array>;
 
+		private var testbitmapdata:LargeBitmapData;
 				
 		public function GeneExpressionData() {
 			super();
@@ -273,14 +275,8 @@ package ch.unil.cbg.ExpressionView.model {
 						if ( color == ModulesColors[module][0] && ModulesLookup[k].length > 1 ) { 
 							color = ModulesColors[ModulesLookup[k][ModulesLookup[k].length-2]][0];
 							modulesbitmapdata.setPixel(genep, samplep, color);
-						}
-						
+						}						
 					}
-/*
-					if ( value != ModulesColors[module][0] ) {
-						modulesbitmapdata.setPixel(genep, samplep, value);
-					}
-*/
 				}			
 			}			      
 			bitmapdata.unlock();
@@ -425,6 +421,9 @@ package ch.unil.cbg.ExpressionView.model {
 			bitmapdata = templatebitmapdata.bitmapData.clone();
 			modulesbitmapdata = templatebitmapdata.bitmapData.clone();
 			
+			testbitmapdata = new LargeBitmapData(nGenes, nSamples);
+			testbitmapdata.lock();
+			
 			bitmapdata.lock();
 			modulesbitmapdata.lock();
 			Data.position = 0;
@@ -454,6 +453,7 @@ package ch.unil.cbg.ExpressionView.model {
 						green = -value * 255;
 					}
 					bitmapdata.setPixel(gene-1, sample-1, (red<<16) + (green<<8) + 0);
+					testbitmapdata.setPixel(gene-1, sample-1, (red<<16) + (green<<8) + 0);
 					
 					var k:int = (sample-1) * nGenes + gene - 1;
 					if ( ModulesLookup[k].length > 0 ) {

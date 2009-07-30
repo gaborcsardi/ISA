@@ -13,6 +13,8 @@ package ch.unil.cbg.ExpressionView.view {
 	import flexlib.containers.SuperTabNavigator;
 	
 	import mx.containers.Canvas;
+	import mx.containers.Panel;
+	import mx.containers.TabNavigator;
 	import mx.controls.Text;
 	import mx.controls.dataGridClasses.DataGridColumn;
 	import mx.events.IndexChangedEvent;
@@ -305,6 +307,7 @@ package ch.unil.cbg.ExpressionView.view {
 			var gene:int = event.gene;
 			var sample:int = event.sample;
 			
+			infoContent.text = "";
 			var module:int = mapOpenTabs[modulesNavigator.selectedIndex]
 			// Array returned is Array(geneDescription, sampleDescription, modules, data, modulesRectangles);
 			var infoArray:Array = ged.getInfo(module, gene, sample);
