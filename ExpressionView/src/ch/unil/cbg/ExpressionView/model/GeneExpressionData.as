@@ -5,8 +5,6 @@ package ch.unil.cbg.ExpressionView.model {
 	import ch.unil.cbg.ExpressionView.events.*;
 	import ch.unil.cbg.ExpressionView.utilities.LargeBitmapData;
 	
-	import com.formatlos.as3.lib.display.BitmapDataUnlimited;
-	
 	import flash.display.BitmapData;
 	import flash.events.EventDispatcher;
 	import flash.geom.Rectangle;

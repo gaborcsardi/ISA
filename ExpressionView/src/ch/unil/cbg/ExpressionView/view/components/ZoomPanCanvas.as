@@ -64,10 +64,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 			lastRectangle = new Rectangle();
 			lastPt = new Point();
 			
-			//fullgeimage = new Bitmap();
 			currentgeimage = new Bitmap();
-
-			//fullmodulesimage = new Bitmap();
 			currentmodulesimage = new Bitmap();
 						
 			lastMode = 0;
@@ -84,6 +81,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 			if ( mode != lastMode ) {
 				if ( lastMode == INSPECT ) {
 					overlayCanvas.removeEventListener(MouseEvent.MOUSE_MOVE, inspectMouseMoveHandler);
+					overlayCanvas.removeEventListener(MouseEvent.MOUSE_OUT, inspectMouseOutHandler);
 				} else if ( lastMode == ZOOM ) {
 					overlayCanvas.removeEventListener(MouseEvent.MOUSE_DOWN, zoomMouseDownHandler);
 					overlayCanvas.removeEventListener(MouseEvent.MOUSE_MOVE, zoomMouseMoveHandler);
@@ -97,6 +95,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 				
 				if ( mode == INSPECT ) {
 					overlayCanvas.addEventListener(MouseEvent.MOUSE_MOVE, inspectMouseMoveHandler);
+					overlayCanvas.addEventListener(MouseEvent.MOUSE_OUT, inspectMouseOutHandler);
 				}
 				else if ( mode == ZOOM ) {
 					overlayCanvas.addEventListener(MouseEvent.MOUSE_DOWN, zoomMouseDownHandler);
@@ -131,6 +130,9 @@ package ch.unil.cbg.ExpressionView.view.components {
 			var gene:int = currentRectangle.x + event.localX / canvaswidth * currentRectangle.width;
 			var sample:int = currentRectangle.y + event.localY / canvasheight * currentRectangle.height;
 			dispatchEvent(new BroadcastInspectPositionEvent(gene, sample));			
+		}
+		private function inspectMouseOutHandler(event:MouseEvent):void {
+			dispatchEvent(new BroadcastInspectPositionEvent(-1, -1));			
 		}
 
 		// zoom events
@@ -314,6 +316,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 				overlayCanvas = new Canvas();
 				overlayCanvas.alpha = 0.3;
 				overlayCanvas.addEventListener(MouseEvent.MOUSE_MOVE, inspectMouseMoveHandler);
+				overlayCanvas.addEventListener(MouseEvent.MOUSE_OUT, inspectMouseOutHandler);
 				addChild(overlayCanvas);
 			}
 
