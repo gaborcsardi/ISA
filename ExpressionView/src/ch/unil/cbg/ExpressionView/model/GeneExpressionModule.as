@@ -4,7 +4,7 @@ package ch.unil.cbg.ExpressionView.model {
 	
 	import ch.unil.cbg.ExpressionView.utilities.LargeBitmapData;
 	
-	import flash.display.Bitmap;
+	import flash.geom.Rectangle;
 	
 	import mx.collections.XMLListCollection; 		
 	
@@ -24,7 +24,7 @@ package ch.unil.cbg.ExpressionView.model {
 		public var ModulesImage:LargeBitmapData;
 
 		public var ModulesRectangles:Vector.<Array>;
-		public var ModulesOutlines:Array;
+		public var ModulesOutlines:Vector.<int>;
 
 		public function GeneExpressionModule() {
 			nGenes = 0;
@@ -32,9 +32,6 @@ package ch.unil.cbg.ExpressionView.model {
 			
 			nSamples = 0;
 			Samples = new XMLListCollection();
-			
-			//GEImage = new LargeBitmapData();
-			//ModulesImage = new LargeBitmapData();
 			
 			ModulesRectangles = new Vector.<Array>();
 		}

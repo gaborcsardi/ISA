@@ -7,14 +7,13 @@ package ch.unil.cbg.ExpressionView.view {
 	import ch.unil.cbg.ExpressionView.view.components.*;
 	
 	import flash.events.MouseEvent;
+	import flash.geom.Rectangle;
 	import flash.net.FileReference;
 	import flash.utils.ByteArray;
 	
 	import flexlib.containers.SuperTabNavigator;
 	
 	import mx.containers.Canvas;
-	import mx.containers.Panel;
-	import mx.containers.TabNavigator;
 	import mx.controls.Text;
 	import mx.controls.dataGridClasses.DataGridColumn;
 	import mx.events.IndexChangedEvent;
@@ -277,8 +276,16 @@ package ch.unil.cbg.ExpressionView.view {
 					selectedTab = openTabs.push(new ZoomPanCanvas()) - 1;
 					modulesNavigator.addChild(openTabs[selectedTab]);
 					openTabs[selectedTab].label = "Module " + selectedModule.toString();
-					var largestRectangles:Array = [];
-					openTabs[selectedTab].dataProvider = new Array(gem.GEImage, gem.ModulesImage, largestRectangles);
+
+					var largestRectangles:Array = new Array(ged.nModules);
+					for ( i = 1; i <= ged.nModules; ++i ) {
+						if ( gem.ModulesRectangles[i] != null ) {
+							largestRectangles[i-1] = gem.ModulesRectangles[i][gem.ModulesOutlines[i]];
+						} else {
+							largestRectangles[i-1] = new Rectangle();
+						}
+					}
+					openTabs[selectedTab].dataProvider = new Array(gem.GEImage, gem.ModulesImage, largestRectangles, ged.ModulesColors);
 					genesSearchableDataGrid.dataProvider = gem.Genes;
 					samplesSearchableDataGrid.dataProvider = gem.Samples;	
 					mapOpenTabs.push(selectedModule);
@@ -407,11 +414,10 @@ package ch.unil.cbg.ExpressionView.view {
 
 			var largestRectangles:Array = [];
 			for ( i = 1; i <= ged.nModules; ++i ) {
-				largestRectangles.push(gem.ModulesRectangles[i][gem.ModulesOutlines[i-1]]);
+				largestRectangles.push(gem.ModulesRectangles[i][gem.ModulesOutlines[i]]);
 			}
 			openTabs[selectedTab].label = "Global";
-			openTabs[selectedTab].colors = ged.ModulesColors;
-			openTabs[selectedTab].dataProvider = new Array(gem.GEImage, gem.ModulesImage, largestRectangles);
+			openTabs[selectedTab].dataProvider = new Array(gem.GEImage, gem.ModulesImage, largestRectangles, ged.ModulesColors);
 			openTabs[selectedTab].addListener();
 			openTabs[selectedTab].addEventListener(MouseEvent.ROLL_OUT, rollOutHandler);
 

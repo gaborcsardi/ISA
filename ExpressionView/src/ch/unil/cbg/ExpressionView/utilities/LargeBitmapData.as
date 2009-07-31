@@ -7,7 +7,26 @@ package ch.unil.cbg.ExpressionView.utilities {
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 
-	public class LargeBitmapData {
+	/**
+	 * The LargeBitmapData class can store bitmapdata of arbitrary size.
+	 * 
+	 * @author Andreas Lüscher
+	 *
+	 * @example
+	 * The example shows how to use the LargeBitmapData class with a bitmap of 10000 x 10000 pixels.
+	 * <div class="listing">
+	 * <pre>
+	 * 
+	 * var width:Number = 10000;
+	 * var height:Number = 10000;
+	 * largebitmapdata = new LargeBitmapData(width, height);
+	 * ...
+	 * 
+	 * </pre>
+	 * </div>
+	 * 
+	 */
+	 public class LargeBitmapData {
 	
 		private const LIMIT:Number = 8000;
 		private const OVERLAP:Number = 1000;
@@ -21,6 +40,9 @@ package ch.unil.cbg.ExpressionView.utilities {
 		public var width:Number;
 		public var height:Number;
 	
+		/**
+		* Constructor.
+		*/	
 		public function LargeBitmapData(_width:Number = 1, _height:Number = 1) {
 			width = _width;
 			height = _height;
@@ -46,44 +68,42 @@ package ch.unil.cbg.ExpressionView.utilities {
 				}
 			}
 		}
-		
+
+		/**
+		* Set the color of a Pixel.
+		* 
+		* @param x x-Position
+		* @param y y-Position
+		* @param value uint representing the color 
+		*/	
 		public function setPixel(x:Number, y:Number, value:uint):void {
 			var position:Array = map(x, y);
 			bitmaps[position[0]].setPixel(position[1], position[2], value);
 		}
 
+
+		/**
+		* Get the color of a Pixel.
+		* 
+		* @param x x-Position
+		* @param y y-Position
+		* 
+		* @return uint representing the color  
+		*/	
 		public function getPixel(x:Number, y:Number):uint {
 			var position:Array = map(x, y);
 			return bitmaps[position[0]].getPixel(position[1], position[2]);
 		}
 		
-		
-		/*
-		public function getData(sourceRect:Rectangle, targetRect:Rectangle):BitmapData {
-			if ( targetRect.width > 0 && targetRect.width <= LIMIT && targetRect.height > 0 && targetRect.height <= LIMIT ) {  
-				var bitmapdata:BitmapData = new BitmapData(targetRect.width, targetRect.height);
-				var transformation:Matrix = new Matrix();
-				if ( sourceRect.width <= LIMIT && sourceRect.height <= LIMIT ) {
-					transformation.scale(targetRect.width / sourceRect.width, targetRect.height / sourceRect.height);
-					var tempbitmapdata:BitmapData = new BitmapData(sourceRect.width, sourceRect.height);
-					for ( var sector:int = 0; sector < dim; ++sector ) {
-						var intersection:Rectangle = rectangles[sector].intersection(sourceRect);
-						if ( !intersection.equals(new Rectangle(0, 0, 0, 0)) ) {
-							var x:Number = intersection.topLeft.x - sourceRect.topLeft.x;
-							var y:Number = intersection.topLeft.y - sourceRect.topLeft.y;							
-							tempbitmapdata.copyPixels(bitmaps[sector], intersection, new Point(x, y));
-						}
-					}
-					bitmapdata.draw(tempbitmapdata, transformation);
-					tempbitmapdata.dispose();
-				}
-				return bitmapdata.clone();
-				bitmapdata.dispose();
-			}
-			return null;
-		}
-		*/
-		
+				
+		/**
+		* Get the rescaled bitmapdata.
+		* 
+		* @param sourceRect Part of the bitmap you want to scale
+		* @param targetRect Target size
+		* 
+		* @return Bitmapdata containing a rescaled part of the bitmap   
+		*/	
 		public function getData(sourceRect:Rectangle, targetRect:Rectangle):BitmapData {
 			if ( targetRect.width > 0 && targetRect.width <= LIMIT && targetRect.height > 0 && targetRect.height <= LIMIT ) {  
 				var bitmapdata:BitmapData = new BitmapData(targetRect.width, targetRect.height);
@@ -137,18 +157,32 @@ package ch.unil.cbg.ExpressionView.utilities {
 			return null;
 		}
 
+		/**
+		* Lock largebitmapdata before setting pixels.
+		*/
 		public function lock(): void {
 			for ( var sector:int = 0; sector < dim; ++sector ) {
 				bitmaps[sector].lock();
 			}
 		}
 
+		/**
+		* Unlock largebitmapdata after setting pixels.
+		*/
 		public function unlock(): void {
 			for ( var sector:int = 0; sector < dim; ++sector ) {
 				bitmaps[sector].unlock();
 			}
 		}
 		
+		/**
+		* Map the coordinates (x,y) onto the corresponding tiles.
+		*
+		* @param x x-Position  
+		* @param y y-Position
+		*
+		* @return Array(x',y',sector) containing the corresponding (x',y') coordinates in tile sector.
+		*/
 		private function map(x:Number, y:Number): Array {
 			var sector:int = int(y / LIMIT) * dimx + int(x / LIMIT);
 			var xp:Number = x % LIMIT;

@@ -262,22 +262,22 @@ package ch.unil.cbg.ExpressionView.view.components {
 
 		private function drawRectangles(): void {
 			if ( canvaswidth > 0 ) {
-			modulesCanvas.graphics.clear();
-			var r:Rectangle;
-			var x:Number; var y:Number; var dx:Number; var dy:Number;
-			for ( var module:int = 0; module < modulesOutlines.length; ++module ) {
-				r = currentRectangle.intersection(modulesOutlines[module]);
-				if ( r.width > 0 && r.height > 0 ) {
-					var scalex:Number = canvaswidth / currentRectangle.width;
-					var scaley:Number = canvasheight / currentRectangle.height;
-					x = (r.x - currentRectangle.x) * scalex;
-					y = (r.y - currentRectangle.y) * scaley;
-					dx = r.width * scalex;
-					dy = r.height * scaley;
-					modulesCanvas.graphics.lineStyle(2, modulesColors[module][1], 1);
-					modulesCanvas.graphics.drawRect(x, y, dx, dy);
+				modulesCanvas.graphics.clear();
+				var r:Rectangle;
+				var x:Number; var y:Number; var dx:Number; var dy:Number;
+				for ( var module:int = 0; module < modulesOutlines.length; ++module ) {
+					r = currentRectangle.intersection(modulesOutlines[module]);
+					if ( r.width > 0 && r.height > 0 ) {
+						var scalex:Number = canvaswidth / currentRectangle.width;
+						var scaley:Number = canvasheight / currentRectangle.height;
+						x = (r.x - currentRectangle.x) * scalex;
+						y = (r.y - currentRectangle.y) * scaley;
+						dx = r.width * scalex;
+						dy = r.height * scaley;
+						modulesCanvas.graphics.lineStyle(2, modulesColors[module][1], 1);
+						modulesCanvas.graphics.drawRect(x, y, dx, dy);
+					}
 				}
-			}
 			}
 		}
 
@@ -380,15 +380,12 @@ package ch.unil.cbg.ExpressionView.view.components {
 			
 			drawImage();
 		}
-
-		public function set colors(data:Vector.<Array>): void {
-			modulesColors = data;
-		}
 		
 		public function set dataProvider(data: Array): void {
 			fullgeimage = data[0];
 			fullmodulesimage = data[1];
 			modulesOutlines = data[2];
+			modulesColors = data[3];
 			maximalWidth = fullgeimage.width;
 			maximalHeight = fullgeimage.height;
 			currentRectangle = new Rectangle(0, 0, maximalWidth, maximalHeight);
@@ -410,28 +407,23 @@ package ch.unil.cbg.ExpressionView.view.components {
 
 		private function updateHighlightedModulesHandler(event:UpdateHighlightedModulesEvent): void {
 			overlayCanvas.graphics.clear();
-			
-			var nRectangles:int = event.modulesRectangles.length;
-			if ( nRectangles > 0 ) {
-				var i:int;
-				var r:Rectangle;
-				var x:Number; var y:Number; var dx:Number; var dy:Number;
-				for ( i = 0; i < nRectangles; ++i ) {
-					r = currentRectangle.intersection(event.modulesRectangles[i]);
-					if ( r.width > 0 && r.height > 0 ) {
-						var scalex:Number = canvaswidth / currentRectangle.width;
-						var scaley:Number = canvasheight / currentRectangle.height;
-						x = (r.x - currentRectangle.x) * scalex;
-						y = (r.y - currentRectangle.y) * scaley;
-						dx = r.width * scalex;
-						dy = r.height * scaley;
-						overlayCanvas.graphics.beginFill(0xffff00);
-						overlayCanvas.graphics.drawRect(x, y, dx, dy);
-						overlayCanvas.graphics.endFill();
-					}
+			for ( var i:int = 0; i < event.modulesRectangles.length; ++i ) {
+				var r:Rectangle = new Rectangle();
+				if ( event.modulesRectangles[i] != null ) {
+				 	r = currentRectangle.intersection(event.modulesRectangles[i]);
 				}
-			}
-			
+				if ( r.width > 0 && r.height > 0 ) {
+					var scalex:Number = canvaswidth / currentRectangle.width;
+					var scaley:Number = canvasheight / currentRectangle.height;
+					var x:Number = (r.x - currentRectangle.x) * scalex;
+					var y:Number = (r.y - currentRectangle.y) * scaley;
+					var dx:Number = r.width * scalex;
+					var dy:Number = r.height * scaley;
+					overlayCanvas.graphics.beginFill(0xffff00);
+					overlayCanvas.graphics.drawRect(x, y, dx, dy);
+					overlayCanvas.graphics.endFill();
+				}
+			}		
 		}
 
 		public function addListener(): void {
