@@ -262,12 +262,7 @@ toExpressionView <- function(eisamodules, gedata, order, filename="") {
 
 				intersectingmodules <- intersect(unique(intersectingmodulesgenes), unique(intersectingmodulessamples))
 				xmldata$addNode("intersectingmodules", toString(intersectingmodules))
-				
-				#cat(module)
-				#str(intersectingmodules)
-				#str(intersectingmodulesgenes)
-				#str(intersectingmodulessamples)
-				
+								
 			xmldata$closeTag()
 		}
 		xmldata$closeTag()
@@ -275,7 +270,7 @@ toExpressionView <- function(eisamodules, gedata, order, filename="") {
 		# to get rid of In xmlRoot.XMLInternalDocument(currentNodes[[1]]) : empty XML document use
 		# options(warn=-1)
 
-		#cat(saveXML(xmldata))
+		# cat(saveXML(xmldata))
 		writeBin(saveXML(xmldata), con, 1, endian="swap")
 		
 	close(con)

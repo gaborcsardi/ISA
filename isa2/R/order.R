@@ -7,37 +7,55 @@ orderModules.default <- function(modules, debuglevel=0, timelimit=60) {
 	no.mods <- ncol(modules$rows)
 	no.rows <- nrow(modules$rows)
 	no.cols <- nrow(modules$columns)
-		
-	for ( i in 1:2 ) {
+	
+	no.slots <- c(no.rows, no.cols)
+	clusters = list(mat.or.vec(no.rows, no.mods), mat.or.vec(no.cols, no.mods))
+	intersections = list()
+	
+	# determine intersecting modules
+	for ( mod in 1:no.mods ) {
+	
+		intersection <- list()
+		for ( i in 1:2 ) {
 
-		if ( i == 1 ) {
-			no.slots <- no.rows
-		} else {
-			no.slots <- no.cols
-		}
-				
-		matrix <- modules[[i]]
-		
-		clusters <- mat.or.vec(no.slots, no.mods)
-		for ( mod in 1:no.mods ) {
-			for ( slot in 1:no.slots ) {
-				if ( matrix[slot, mod] != 0. ) {
-					clusters[slot, mod] <- 1
+			contains <- mat.or.vec(0, 1)
+			for ( slot in 1:no.slots[i] ) {
+				if ( modules[[i]][slot, mod] != 0 ) {
+					clusters[[i]][slot, mod] <- 1
+					
+					for ( modp in 1:no.mods ) {
+						if ( modp != mod ) {
+							if ( modules[[i]][slot, modp] != 0 ) {
+								contains <- append(contains, modp)
+							}
+						}
+					}
+					
 				}
 			}
+			
+			intersection[[i]] <- sort(unique(contains))
+
 		}
 		
+		intersections[[mod]] <- intersect(intersection[[1]], intersection[[2]])
+
+	}
+	
+
+	
+	for ( i in 1:2 ) {
+						
 		map <- list()
 
 		# global
 		if ( i == 1 ) {
-			cat("ordering", no.rows, "genes\r")
-		} else {
+			cat("ordering", no.rows, "genes\r")			} else {
 			cat("ordering", no.cols, "samples\r")
 		}
 		flush.console()
 		
-		map[[1]] <- .Call("order", clusters, debuglevel, timelimit)
+		map[[1]] <- .Call("order", clusters[[i]], debuglevel, timelimit)
 
 		# modules
 		for ( mod in 1:no.mods ) {
@@ -49,47 +67,29 @@ orderModules.default <- function(modules, debuglevel=0, timelimit=60) {
 			}
 			flush.console()
 			
-			nslots <- sum(clusters[,mod])
-		
-			contains <- mat.or.vec(0,1)
-			for ( slot in 1:no.slots ) {
-				if ( clusters[slot, mod] == 1 ) {
-					for ( modp in 1:no.mods) {
-						if ( clusters[slot, modp] == 1 && modp != mod ) {
-							contains <- append(contains, modp)
-						}
-					}
-				}
-			}
-			contains <- sort(unique(contains))
-			
-			if ( length(contains) > 1 ) {
+			nslots <- sum(clusters[[i]][,mod])
+					
+			contains <- intersections[[mod]]
+						
+			if ( length(contains) >= 1 ) {
 
-				invcontains <- mat.or.vec(length(contains),1)
-				for ( modp in 1:length(contains) ) {
-					invcontains[contains[[modp]]] <- modp
-				}
-
-				subclusters <- mat.or.vec(nslots, length(contains))
+				subclusters <- matrix(0, nslots, length(contains))
 				slotp <- 0
-				for ( slot in 1:no.slots ) {
-					if ( clusters[slot, mod] == 1 ) {
+				for ( slot in 1:no.slots[i] ) {
+					if ( clusters[[i]][slot, mod] == 1 ) {
 						slotp <- slotp + 1
 						for ( modp in 1:no.mods) {
-							if ( clusters[slot, modp] == 1 && modp != mod ) {
-								subclusters[slotp, invcontains[modp]] <- 1
+							if ( clusters[[i]][slot, modp] == 1 && modp %in% contains ) {
+								subclusters[slotp, which(contains==modp)] <- 1
 							}
 						}
 					}
 				}
+				
 				map[[mod+1]] <- .Call("order", subclusters, debuglevel, timelimit)
 
 			} else {
-				if ( length(contains) > 0 ) {
-					map[[mod+1]] <- unique(c(contains[[1]],1:nslots))
-				} else {
-					map[[mod+1]] <- c(1:nslots)
-				}
+				map[[mod+1]] <- c(1:nslots)
 			}
 		
 		}
@@ -102,7 +102,7 @@ orderModules.default <- function(modules, debuglevel=0, timelimit=60) {
 	
 	}
 
-	cat("ordering done.\r")
+	cat("ordering done.                                  \r")
 	flush.console()
 
 	res = list(rows=row.map, cols=col.map)
@@ -112,4 +112,3 @@ orderModules.default <- function(modules, debuglevel=0, timelimit=60) {
 	res
 
 }
-
