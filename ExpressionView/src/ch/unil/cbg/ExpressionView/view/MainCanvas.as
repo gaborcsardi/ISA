@@ -144,13 +144,13 @@ package ch.unil.cbg.ExpressionView.view {
 
 			useDefaultPositions = true;
 			
-			parentApplication.addEventListener(SetDefaultPositionsEvent.SETDEFAULTPOSITIONSEVENT, setDefaultPositionsHandler);
+			parentApplication.addEventListener(MenuEvent.DEFAULT_POSITIONS, setDefaultPositionsHandler);
 			parentApplication.addEventListener(UpdateGEDataEvent.UPDATEGEDATAEVENT, updateGEDataHandler);
-			parentApplication.addEventListener(ModeChangeEvent.MODECHANGEEVENT, modeChangeHandler);
-			parentApplication.addEventListener(SetPanelVisibilityEvent.SETPANELVISIBILITYEVENT, setPanelVisibilityHandler);
+			parentApplication.addEventListener(MenuEvent.MODE, modeChangeHandler);
+			parentApplication.addEventListener(MenuEvent.PANELS, setPanelVisibilityHandler);
 			parentApplication.addEventListener(BroadcastInspectPositionEvent.BROADCASTINSPECTPOSITIONEVENT, broadcastInspectPositionHandler);
-			parentApplication.addEventListener(PDFExportEvent.PDFEXPORTEVENT, pdfExportHandler);
-			parentApplication.addEventListener(AlphaSliderChangeEvent.ALPHASLIDERCHANGEEVENT, alphaSliderChangeHandler);	
+			parentApplication.addEventListener(MenuEvent.PDF_EXPORT, pdfExportHandler);
+			parentApplication.addEventListener(MenuEvent.ALPHA, alphaSliderChangeHandler);	
 			parentApplication.addEventListener(ResizeBrowserEvent.RESIZEBROWSEREVENT, resizeBrowserHandler);
 		}
 		
@@ -243,17 +243,18 @@ package ch.unil.cbg.ExpressionView.view {
 			
 		}
 
-		private function modeChangeHandler(event:ModeChangeEvent): void {
-			if ( event.mode != selectedMode ) {
+		private function modeChangeHandler(event:MenuEvent): void {
+			var mode:int = event.data[0];
+			if ( mode != selectedMode ) {
 				lastHighlightedModules = new Array();
 			}
-			selectedMode = event.mode;
+			selectedMode = mode;
 		}
 		
 		private function tabChangeHandler(event:IndexChangedEvent): void {
 			openTabs[event.oldIndex].removeListener();
 			openTabs[event.newIndex].addListener();
-			dispatchEvent(new ModeChangeEvent(selectedMode));
+			dispatchEvent(new MenuEvent(MenuEvent.MODE, [selectedMode]));
 		}
 		
 		private function clickModulesHandler(event:SearchableDataGridSelectionEvent): void {
@@ -350,26 +351,26 @@ package ch.unil.cbg.ExpressionView.view {
 			}
 		}
 		
-		private function setDefaultPositionsHandler(event:SetDefaultPositionsEvent): void {
+		private function setDefaultPositionsHandler(event:MenuEvent): void {
 			useDefaultPositions = true;
 			invalidateDisplayList();
 		}
 		
-		private function setPanelVisibilityHandler(event:SetPanelVisibilityEvent): void {
-			var panel:String = event.panel;
-			var visible:Boolean = event.visible;
+		private function setPanelVisibilityHandler(event:MenuEvent): void {
+			var panel:int = event.data[0]
+			var visible:Boolean = event.data[1];
 			
 			switch (panel) {
-				case "info":
+				case 0:
 					infoPanel.visible = visible;
 					break;
-				case "modules":
+				case 1:
 					modulesPanel.visible = visible;
 					break;
-				case "genes":
+				case 2:
 					genesPanel.visible = visible;
 					break;
-				case "samples":
+				case 3:
 					samplesPanel.visible = visible;
 					break;
 			}			
@@ -432,7 +433,7 @@ package ch.unil.cbg.ExpressionView.view {
 			dispatchEvent(new UpdateHighlightedModulesEvent([]))
 		}
 		
-		private function pdfExportHandler(event:PDFExportEvent): void {
+		private function pdfExportHandler(event:MenuEvent): void {
 				
 			var myPDF:PDF;
 			myPDF = new PDF(Orientation.PORTRAIT, Unit.MM, Size.A4);
@@ -450,8 +451,8 @@ package ch.unil.cbg.ExpressionView.view {
 	
 		}
 		
-		private function alphaSliderChangeHandler(event:AlphaSliderChangeEvent): void {
-			currentalpha = event.alpha;
+		private function alphaSliderChangeHandler(event:MenuEvent): void {
+			currentalpha = event.data[0];
 		}
 		
 	}

@@ -65,14 +65,14 @@
 					addChild(statusBar);
 				}
 
-				addEventListener(ProcessFileEvent.PROCESSFILEEVENT, processFileHandler);
+				addEventListener(MenuEvent.OPEN, processFileHandler);
 				rawged.addEventListener(GEDCompleteEvent.GEDCOMPLETEEVENT, GEDCompleteHandler);
 				rawged.addEventListener(UpdateStatusBarEvent.UPDATESTATUSBAREVENT, updateStatusBarHandler);
 
 				stage.scaleMode = StageScaleMode.NO_SCALE;
 				stage.align = StageAlign.TOP_LEFT;
 				stage.addEventListener(Event.RESIZE, resizeHandler);
-				stage.addEventListener(ToggleFullScreenEvent.TOGGLEFULLSCREENEVENT, toggleFullScreenHandler);
+				stage.addEventListener(MenuEvent.FULLSCREEN, toggleFullScreenHandler);
 				
 				filename = Application.application.parameters.filename;
 				if ( filename != "" ) {
@@ -92,7 +92,7 @@
 			}
 
 			private function fileLoadCompleteHandler(event:Event):void {
-				dispatchEvent(new ProcessFileEvent(loader.data));
+				dispatchEvent(new MenuEvent(MenuEvent.OPEN, [loader.data]));
 				loader.removeEventListener(ProgressEvent.PROGRESS, fileLoadProgressHandler);
         		dispatchEvent(new UpdateStatusBarEvent("")); 					
 				loader.removeEventListener(Event.COMPLETE, fileLoadCompleteHandler);		
@@ -133,8 +133,8 @@
 				oldStageHeight = stage.stageHeight;
 			}
 
-			private function toggleFullScreenHandler(event:ToggleFullScreenEvent):void {
-				var screen:String = event.screen;
+			private function toggleFullScreenHandler(event:MenuEvent):void {
+				var screen:String = event.data[0];
 				if ( screen == "normal" ) {
 					stage.displayState = StageDisplayState.FULL_SCREEN;
 				} else {
@@ -143,8 +143,8 @@
 			}
 
 			// initilize unlimited Bitmaps
-			private function processFileHandler(event:ProcessFileEvent): void {
-				bytes = event.filecontent;
+			private function processFileHandler(event:MenuEvent): void {
+				bytes = event.data[0];				
 				bytes.position = 0;
 				
 				var identifier:String = bytes.readUTFBytes(18);

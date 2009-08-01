@@ -76,8 +76,8 @@ package ch.unil.cbg.ExpressionView.view.components {
 
 		}
 		
-		private function modeChangeHandler(event:ModeChangeEvent):void {
-			var mode:int = event.mode;
+		private function modeChangeHandler(event:MenuEvent):void {
+			var mode:int = event.data[0];
 			if ( mode != lastMode ) {
 				if ( lastMode == INSPECT ) {
 					overlayCanvas.removeEventListener(MouseEvent.MOUSE_MOVE, inspectMouseMoveHandler);
@@ -334,9 +334,9 @@ package ch.unil.cbg.ExpressionView.view.components {
 				addChild(vscrollbar);
 			}
 						
-			parentApplication.addEventListener(AlphaSliderChangeEvent.ALPHASLIDERCHANGEEVENT, alphaSliderChangeHandler);
-			parentApplication.addEventListener(SetOutlineVisibilityEvent.SETOUTLINEVISIBILITYEVENT, setOutlineVisibilityHandler);
-			parentApplication.addEventListener(SetFillingVisibilityEvent.SETFILLINGVISIBILITYEVENT, setFillingVisibilityHandler);
+			parentApplication.addEventListener(MenuEvent.ALPHA, alphaSliderChangeHandler);
+			parentApplication.addEventListener(MenuEvent.OUTLINE, setOutlineVisibilityHandler);
+			parentApplication.addEventListener(MenuEvent.FILLING, setFillingVisibilityHandler);
 			parentApplication.addEventListener(UpdateHighlightedModulesEvent.UPDATEHIGHLIGHTEDMODULESEVENT, updateHighlightedModulesHandler);			
 			
 		}
@@ -395,16 +395,16 @@ package ch.unil.cbg.ExpressionView.view.components {
 			drawImage();
 		}
 		
-		private function alphaSliderChangeHandler(event:AlphaSliderChangeEvent): void {
-			geimage.alpha = event.alpha;
+		private function alphaSliderChangeHandler(event:MenuEvent): void {
+			geimage.alpha = event.data[0]
 		}
 
-		private function setOutlineVisibilityHandler(event:SetOutlineVisibilityEvent): void {
-			modulesCanvas.visible = event.visible;
+		private function setOutlineVisibilityHandler(event:MenuEvent): void {
+			modulesCanvas.visible = event.data[0];
 		}
 
-		private function setFillingVisibilityHandler(event:SetFillingVisibilityEvent): void {
-			modulesimage.visible = event.visible;
+		private function setFillingVisibilityHandler(event:MenuEvent): void {
+			modulesimage.visible = event.data[0];
 		}
 
 		private function updateHighlightedModulesHandler(event:UpdateHighlightedModulesEvent): void {
@@ -431,11 +431,11 @@ package ch.unil.cbg.ExpressionView.view.components {
 		}
 
 		public function addListener(): void {
-			parentApplication.addEventListener(ModeChangeEvent.MODECHANGEEVENT, modeChangeHandler);
+			parentApplication.addEventListener(MenuEvent.MODE, modeChangeHandler);
 		}
 
 		public function removeListener(): void {
-			parentApplication.removeEventListener(ModeChangeEvent.MODECHANGEEVENT, modeChangeHandler);
+			parentApplication.removeEventListener(MenuEvent.MODE, modeChangeHandler);
 		}
 
 				

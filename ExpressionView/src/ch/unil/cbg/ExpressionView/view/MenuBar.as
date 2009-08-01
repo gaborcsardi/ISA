@@ -29,6 +29,7 @@ package ch.unil.cbg.ExpressionView.view {
 		private var fillingVisibility:CheckBox;
 		private var alphaSlider:HSlider;
 		private var pdfExportButton:Button;
+		private var GEDataInfoButton:Button;
 		private var infoVisibilityButton:Button;
 		private var modulesVisibilityButton:Button;
 		private var genesVisibilityButton:Button;
@@ -57,7 +58,7 @@ package ch.unil.cbg.ExpressionView.view {
 		}
         
         private function fileLoadHandler(event:Event):void {
-        	dispatchEvent(new ProcessFileEvent(event.target.data));
+			dispatchEvent(new MenuEvent(MenuEvent.OPEN, [event.target.data]));        	
 			file.removeEventListener(ProgressEvent.PROGRESS, fileLoadProgressHandler);
         	dispatchEvent(new UpdateStatusBarEvent("")); 					
 			file.removeEventListener(Event.COMPLETE, fileLoadHandler);								
@@ -73,39 +74,44 @@ package ch.unil.cbg.ExpressionView.view {
 		private function keyHandler(event:KeyboardEvent): void {
 			// i = 73, z = 89, and p = 80;
 			if ( event.keyCode == 73 ) {
-				dispatchEvent(new ModeChangeEvent(0));
+				dispatchEvent(new MenuEvent(MenuEvent.MODE, [0]))
 				navigationMenu.selectedIndex = 0;
 			} else if ( event.keyCode == 89 ) {
-				dispatchEvent(new ModeChangeEvent(1));
+				dispatchEvent(new MenuEvent(MenuEvent.MODE, [1]))
 				navigationMenu.selectedIndex = 1;
 			}
 			if ( event.keyCode == 80 ) {
-				dispatchEvent(new ModeChangeEvent(2));
+				dispatchEvent(new MenuEvent(MenuEvent.MODE, [2]))
 				navigationMenu.selectedIndex = 2;
 			}
 		}
 		private function navigationMenuClickHandler(event:ItemClickEvent): void {
-			dispatchEvent(new ModeChangeEvent(event.index));
+			dispatchEvent(new MenuEvent(MenuEvent.MODE, [event.index]));
 		}
 		
 		// checkbox for outlines
 		private function outlineVisibilityChangeHandler(event:MouseEvent): void {
-			dispatchEvent(new SetOutlineVisibilityEvent(outlineVisibility.selected));
+			dispatchEvent(new MenuEvent(MenuEvent.OUTLINE, [outlineVisibility.selected]));
 		}
 		
 		// checkbox for fillings
 		private function fillingVisibilityChangeHandler(event:MouseEvent): void {
-			dispatchEvent(new SetFillingVisibilityEvent(fillingVisibility.selected));
+			dispatchEvent(new MenuEvent(MenuEvent.FILLING, [fillingVisibility.selected]));
 		}
 
 		// alpha slider
 		private function alphaSliderChangeHandler(event:SliderEvent): void {
-			dispatchEvent(new AlphaSliderChangeEvent(event.value));
+			dispatchEvent(new MenuEvent(MenuEvent.ALPHA, [event.value]));
 		}
 		
+		// GEData info
+		private function GEDataInfoHandler(event:MouseEvent): void {
+			dispatchEvent(new MenuEvent(MenuEvent.DATA_DESCRIPTION));
+		}
+
 		// alpha slider
 		private function pdfExportHandler(event:MouseEvent): void {
-			dispatchEvent(new PDFExportEvent());
+			dispatchEvent(new MenuEvent(MenuEvent.PDF_EXPORT));
 		}
 
 
@@ -115,33 +121,33 @@ package ch.unil.cbg.ExpressionView.view {
 			if ( !infoVisibilityButton.selected ) {
 				visibility = false;
 			}
-			dispatchEvent(new SetPanelVisibilityEvent("info", visibility));
+			dispatchEvent(new MenuEvent(MenuEvent.PANELS, [0, visibility]));
 		}
 		private function modulesVisibilityButtonClickHandler(event:MouseEvent): void {
 			var visibility:Boolean = true;
 			if ( !modulesVisibilityButton.selected ) {
 				visibility = false;
 			}
-			dispatchEvent(new SetPanelVisibilityEvent("modules", visibility));
+			dispatchEvent(new MenuEvent(MenuEvent.PANELS, [1, visibility]));
 		}
 		private function genesVisibilityButtonClickHandler(event:MouseEvent): void {
 			var visibility:Boolean = true;
 			if ( !genesVisibilityButton.selected ) {
 				visibility = false;
 			}
-			dispatchEvent(new SetPanelVisibilityEvent("genes", visibility));
+			dispatchEvent(new MenuEvent(MenuEvent.PANELS, [2, visibility]));
 		}
 		private function samplesVisibilityButtonClickHandler(event:MouseEvent): void {
 			var visibility:Boolean = true;
 			if ( !samplesVisibilityButton.selected ) {
 				visibility = false;
 			}
-			dispatchEvent(new SetPanelVisibilityEvent("samples", visibility));
+			dispatchEvent(new MenuEvent(MenuEvent.PANELS, [3, visibility]));
 		}
 		
 		// resize
 		private function resizeHandler(event:MouseEvent): void {
-			dispatchEvent(new SetDefaultPositionsEvent());
+			dispatchEvent(new MenuEvent(MenuEvent.DEFAULT_POSITIONS));
 		}
 		// fullscreen
 		private function fullScreenHandler(event:MouseEvent): void {
@@ -149,7 +155,7 @@ package ch.unil.cbg.ExpressionView.view {
 			if ( !fullScreenButton.selected ) {
 				screen = "full";
 			}
-			dispatchEvent(new ToggleFullScreenEvent(screen));
+			dispatchEvent(new MenuEvent(MenuEvent.FULLSCREEN, [screen]));
 		}
 		
 		// layout	
@@ -206,6 +212,13 @@ package ch.unil.cbg.ExpressionView.view {
 					alphaSlider.value = 0.1;
 					alphaSlider.addEventListener(SliderEvent.CHANGE, alphaSliderChangeHandler);
 					headerBox.addChild(alphaSlider);
+				}
+
+				if ( !GEDataInfoButton ) {
+					GEDataInfoButton = new Button();
+					GEDataInfoButton.label = "Data Description";
+					GEDataInfoButton.addEventListener(MouseEvent.CLICK, GEDataInfoHandler);
+					headerBox.addChild(GEDataInfoButton);
 				}
 
 				if ( !pdfExportButton ) {
