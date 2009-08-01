@@ -469,7 +469,7 @@ void Clusters::arrange() {
 		
 		for ( int cluster = 0; cluster < nClusters; cluster++ ) {
 	
-			if ( elapsedtime() > maxtime ) {
+			if ( elapsedtime() > maxtime && maxtime != 0 ) {
 				go =  false;
 				if ( debug > 0 ) {
 					printf("reached time limit.\n");
