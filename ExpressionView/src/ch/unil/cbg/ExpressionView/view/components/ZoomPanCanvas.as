@@ -142,6 +142,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 				overlayCanvas.addEventListener(MouseEvent.MOUSE_MOVE, zoomMouseMoveHandler);
 				overlayCanvas.addEventListener(MouseEvent.MOUSE_UP, zoomMouseUpHandler);
 				var selection:Shape = new Shape();
+				selection.alpha = 0.3;
 				selectionRectangle = new Rectangle(event.localX, event.localY);
 				selection.graphics.drawRect(selectionRectangle.x, selectionRectangle.y, 0, 0);
 				overlayCanvas.rawChildren.addChildAt(selection, overlayCanvas.rawChildren.numChildren);
@@ -151,6 +152,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 			overlayCanvas.addEventListener(MouseEvent.MOUSE_DOWN, zoomMouseDownHandler);
 			overlayCanvas.rawChildren.removeChildAt(overlayCanvas.rawChildren.numChildren-1);
 			var selection:Shape = new Shape();
+			selection.alpha = 0.3;
 			selectionRectangle.bottomRight = new Point(event.localX, event.localY);
 			selection.graphics.beginFill(0x0000ff);
 			selection.graphics.drawRect(selectionRectangle.x, selectionRectangle.y, selectionRectangle.width, selectionRectangle.height); 
@@ -265,7 +267,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 				modulesCanvas.graphics.clear();
 				var r:Rectangle;
 				var x:Number; var y:Number; var dx:Number; var dy:Number;
-				for ( var module:int = 0; module < modulesOutlines.length; ++module ) {
+				for ( var module:int = 1; module < modulesOutlines.length; ++module ) {
 					r = currentRectangle.intersection(modulesOutlines[module]);
 					if ( r.width > 0 && r.height > 0 ) {
 						var scalex:Number = canvaswidth / currentRectangle.width;
@@ -274,7 +276,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 						y = (r.y - currentRectangle.y) * scaley;
 						dx = r.width * scalex;
 						dy = r.height * scaley;
-						modulesCanvas.graphics.lineStyle(2, modulesColors[module][1], 1);
+						modulesCanvas.graphics.lineStyle(2, modulesColors[module][1]);
 						modulesCanvas.graphics.drawRect(x, y, dx, dy);
 					}
 				}
@@ -314,7 +316,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 				
 			if ( !overlayCanvas ) {
 				overlayCanvas = new Canvas();
-				overlayCanvas.alpha = 0.3;
+				overlayCanvas.alpha = 1;
 				overlayCanvas.addEventListener(MouseEvent.MOUSE_MOVE, inspectMouseMoveHandler);
 				overlayCanvas.addEventListener(MouseEvent.MOUSE_OUT, inspectMouseOutHandler);
 				addChild(overlayCanvas);
@@ -407,23 +409,25 @@ package ch.unil.cbg.ExpressionView.view.components {
 
 		private function updateHighlightedModulesHandler(event:UpdateHighlightedModulesEvent): void {
 			overlayCanvas.graphics.clear();
-			for ( var i:int = 0; i < event.modulesRectangles.length; ++i ) {
-				var r:Rectangle = new Rectangle();
-				if ( event.modulesRectangles[i] != null ) {
-				 	r = currentRectangle.intersection(event.modulesRectangles[i]);
+			for ( var module:int = 1; module < event.modulesRectangles.length; ++module ) {
+				if ( event.modulesRectangles[module] == null ) { 
+					continue;
 				}
-				if ( r.width > 0 && r.height > 0 ) {
-					var scalex:Number = canvaswidth / currentRectangle.width;
-					var scaley:Number = canvasheight / currentRectangle.height;
-					var x:Number = (r.x - currentRectangle.x) * scalex;
-					var y:Number = (r.y - currentRectangle.y) * scaley;
-					var dx:Number = r.width * scalex;
-					var dy:Number = r.height * scaley;
-					overlayCanvas.graphics.beginFill(0xffff00);
-					overlayCanvas.graphics.drawRect(x, y, dx, dy);
-					overlayCanvas.graphics.endFill();
+				for ( var i:int = 0; i < event.modulesRectangles[module].length; ++i ) {
+					var r:Rectangle = currentRectangle.intersection(event.modulesRectangles[module][i]);
+					if ( r.width > 0 && r.height > 0 ) {
+						var scalex:Number = canvaswidth / currentRectangle.width;
+						var scaley:Number = canvasheight / currentRectangle.height;
+						var x:Number = (r.x - currentRectangle.x) * scalex;
+						var y:Number = (r.y - currentRectangle.y) * scaley;
+						var dx:Number = r.width * scalex;
+						var dy:Number = r.height * scaley;
+						overlayCanvas.graphics.beginFill(modulesColors[module][1]);
+						overlayCanvas.graphics.drawRect(x, y, dx, dy);
+						overlayCanvas.graphics.endFill();
+					}
 				}
-			}		
+			}	
 		}
 
 		public function addListener(): void {

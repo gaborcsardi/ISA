@@ -258,12 +258,13 @@ package ch.unil.cbg.ExpressionView.view {
 		
 		private function clickModulesHandler(event:SearchableDataGridSelectionEvent): void {
 			var module:int = mapOpenTabs[modulesNavigator.selectedIndex];
-			var highlightedModules:Array = [];
+			var highlightedRectangles:Array = new Array(ged.nModules + 1);
 			for ( var i:int = 0; i < event.selection.length; ++i ) {
-				var selectedModule:int = event.selection[i];
-				highlightedModules = highlightedModules.concat(ged.getModule(module).ModulesRectangles[selectedModule])
+				var modulep:int = event.selection[i];
+				highlightedRectangles[modulep] = ged.getModule(module).ModulesRectangles[modulep];
 			}
-			dispatchEvent(new UpdateHighlightedModulesEvent(highlightedModules));
+			dispatchEvent(new UpdateHighlightedModulesEvent(highlightedRectangles));
+
 		}
 		
 		private function doubleClickModulesHandler(event:SearchableDataGridSelectionEvent): void {
@@ -275,14 +276,15 @@ package ch.unil.cbg.ExpressionView.view {
 					var gem:GeneExpressionModule = ged.getModule(selectedModule);
 					selectedTab = openTabs.push(new ZoomPanCanvas()) - 1;
 					modulesNavigator.addChild(openTabs[selectedTab]);
-					openTabs[selectedTab].label = "Module " + selectedModule.toString();
+					openTabs[selectedTab].label = "m" + selectedModule.toString();
 
-					var largestRectangles:Array = new Array(ged.nModules);
-					for ( i = 1; i <= ged.nModules; ++i ) {
-						if ( gem.ModulesRectangles[i] != null ) {
-							largestRectangles[i-1] = gem.ModulesRectangles[i][gem.ModulesOutlines[i]];
+					var largestRectangles:Array = new Array(ged.nModules + 1);
+					largestRectangles[0] = new Rectangle();
+					for ( var module:int = 1; module <= ged.nModules; ++module ) {
+						if ( gem.ModulesRectangles[module] != null ) {
+							largestRectangles[module] = gem.ModulesRectangles[module][gem.ModulesOutlines[module]];
 						} else {
-							largestRectangles[i-1] = new Rectangle();
+							largestRectangles[module] = new Rectangle();
 						}
 					}
 					openTabs[selectedTab].dataProvider = new Array(gem.GEImage, gem.ModulesImage, largestRectangles, ged.ModulesColors);
@@ -332,19 +334,19 @@ package ch.unil.cbg.ExpressionView.view {
 	
 				// highlight module
 				if ( lastHighlightedModules != modules ) {
-					var highlightedModules:Array = [];
+					var highlightedRectangles:Array = new Array(ged.nModules + 1);
 					for ( var modulep:int = 0; modulep < modules.length; ++modulep ) {
 						if ( modules[modulep] != module ) {
-							highlightedModules = highlightedModules.concat(ged.getModule(module).ModulesRectangles[modules[modulep]]);
+							highlightedRectangles[modules[modulep]] = ged.getModule(module).ModulesRectangles[modules[modulep]];
 						}
 					}
-					dispatchEvent(new UpdateHighlightedModulesEvent(highlightedModules));
+					dispatchEvent(new UpdateHighlightedModulesEvent(highlightedRectangles));
 					lastHighlightedModules = modules;
 				}
 			
 			} else {
 				infoContent.text = "";
-				dispatchEvent(new UpdateHighlightedModulesEvent([]));
+				dispatchEvent(new UpdateHighlightedModulesEvent(new Array(ged.nModules + 1)));
 			}
 		}
 		
@@ -412,9 +414,10 @@ package ch.unil.cbg.ExpressionView.view {
 			var selectedTab:int = openTabs.push(new ZoomPanCanvas()) - 1;
 			modulesNavigator.addChild(openTabs[selectedTab]);
 
-			var largestRectangles:Array = [];
-			for ( i = 1; i <= ged.nModules; ++i ) {
-				largestRectangles.push(gem.ModulesRectangles[i][gem.ModulesOutlines[i]]);
+			var largestRectangles:Array = new Array(ged.nModules + 1);
+			largestRectangles[0] = new Rectangle();
+			for ( var module:int = 1; module <= ged.nModules; ++module ) {
+				largestRectangles[module] = gem.ModulesRectangles[module][gem.ModulesOutlines[module]];
 			}
 			openTabs[selectedTab].label = "Global";
 			openTabs[selectedTab].dataProvider = new Array(gem.GEImage, gem.ModulesImage, largestRectangles, ged.ModulesColors);
