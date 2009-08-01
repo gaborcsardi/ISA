@@ -248,6 +248,16 @@ double Clusters::getfitness() {
 	
 }
 
+double Clusters::getoptimalfitness() {
+	double optimum = 0.;
+	for ( int slot = 0; slot < nSlots; slot++ ) {
+		for ( int cluster = 0; cluster < nClusters; cluster++ ) {
+			optimum += matrix[slot][cluster] * multiplicity[slot];
+		}
+	}
+	return optimum;
+}
+
 void Clusters::swap(int slot1, int slot2) {
 	int temp = order[slot1];
 	order[slot1] = order[slot2];
@@ -454,13 +464,8 @@ void Clusters::arrange() {
 		printf("arrange()\n");
 	}
 	
-	double optimalsolution = 0.;
-	for ( int slot = 0; slot < nSlots; slot++ ) {
-		for ( int cluster = 0; cluster < nClusters; cluster++ ) {
-			optimalsolution += matrix[slot][cluster] * multiplicity[slot];
-		}
-	}
-	double actualsolution;
+	optimalfitness = getoptimalfitness();
+	double actualfitness;
 	
 	bool go;
 	do {
@@ -493,8 +498,8 @@ void Clusters::arrange() {
 
 		}
 		
-		actualsolution = getfitness();
-		if ( actualsolution == optimalsolution ) {
+		actualfitness = getfitness();
+		if ( actualfitness == optimalfitness ) {
 			if ( debug > 0 ) {
 				printf("optimal solution found.\n");
 			}
@@ -504,9 +509,13 @@ void Clusters::arrange() {
 	} while ( go );
 	
 	if ( debug > 0 ) {
-		printf("reached %4.2f of optimum.\n", actualsolution/optimalsolution);
+		printf("reached %4.2f of optimum.\n", actualfitness/optimalfitness);
 	}
 	
+}
+
+double Clusters::quality() {
+	return getfitness() / getoptimalfitness();
 }
 
 void Clusters::output() {

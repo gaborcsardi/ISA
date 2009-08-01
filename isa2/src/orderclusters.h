@@ -15,13 +15,15 @@ class Clusters {
 		vector<int> multiplicity;
 		vector<set<int> > redundantslots;
 		vector<int> optimallength;
-
+		double optimalfitness;
+		
 		int random(int, int);
 		void swap(int, int);
 		void shift(int, int, int);
 		int findbestposition(int, int);
 
 		double getfitness();
+		double getoptimalfitness();
 
 		int reposition(int);
 		int exchange(int, int);
@@ -51,6 +53,8 @@ class Clusters {
 		void simplify();
 		void complexify();
 		void output();
+		
+		double quality();
 		
 };
 
