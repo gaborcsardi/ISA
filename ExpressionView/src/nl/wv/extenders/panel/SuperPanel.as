@@ -24,7 +24,7 @@ package nl.wv.extenders.panel {
 		[Bindable] public var showControls:Boolean = true;
 		[Bindable] public var enableResize:Boolean = true;
 				
-		[Embed(source="../assets/img/resizeCursor.png")]
+		[Embed(source="/ch/unil/cbg/ExpressionView/assets/cursor/resizeCursor.png")]
 		private static var resizeCursor:Class;
 		
 		private var	pTitleBar:UIComponent;

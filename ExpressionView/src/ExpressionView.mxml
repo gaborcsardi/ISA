@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Application 
+<mx:Application
 	xmlns:mx = "http://www.adobe.com/2006/mxml"
 	xmlns:view = "ch.unil.cbg.ExpressionView.view.*"
 	layout = "absolute"
@@ -172,6 +172,10 @@
 		]]>
 	</mx:Script>
 
+<!--
 	<mx:Style source="nl/wv/extenders/assets/css/styles.css"/>
+	-->
+	<mx:Style source="ch/unil/cbg/ExpressionView/styles/global.css"/>
+	<mx:Style source="ch/unil/cbg/ExpressionView/styles/panel.css"/>
 
 </mx:Application>

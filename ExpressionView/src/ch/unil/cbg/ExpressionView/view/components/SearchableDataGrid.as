@@ -90,6 +90,27 @@ package ch.unil.cbg.ExpressionView.view.components {
 			if ( event.keyCode == 40  || event.keyCode == 38) {
 				dispatchEvent(new SearchableDataGridSelectionEvent(SearchableDataGridSelectionEvent.ITEM_CLICK, getSelection(dataGrid.selectedIndices)));
 			}
+			// 65 = a
+			if ( event.ctrlKey && event.keyCode == 65 ) {
+				var selection:Array = [];
+				for ( var i:int = 0; i < dataprovider.length; ++i ) {
+					selection.push(i);
+				}
+				dataGrid.selectedIndices = selection;
+				dispatchEvent(new SearchableDataGridSelectionEvent(SearchableDataGridSelectionEvent.ITEM_CLICK, getSelection(dataGrid.selectedIndices)));
+			}
+			// 73 = i
+			if ( event.ctrlKey && event.keyCode == 73 ) {
+				var oldselection:Array = dataGrid.selectedIndices; 
+				var newselection:Array = [];
+				for ( i = 0; i < dataprovider.length; ++i ) {
+					if ( oldselection.indexOf(i, 0) == -1 ) {
+						newselection.push(i);
+					}
+				}
+				dataGrid.selectedIndices = newselection;
+				dispatchEvent(new SearchableDataGridSelectionEvent(SearchableDataGridSelectionEvent.ITEM_CLICK, getSelection(dataGrid.selectedIndices)));				
+			}
 		}		
 		
 		override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void {		

@@ -17,7 +17,6 @@ package ch.unil.cbg.ExpressionView.view {
 	import mx.controls.TextArea;
 	import mx.controls.dataGridClasses.DataGridColumn;
 	import mx.events.IndexChangedEvent;
-	import mx.events.ListEvent;
 	
 	import nl.wv.extenders.panel.SuperPanel;
 	
@@ -125,8 +124,8 @@ package ch.unil.cbg.ExpressionView.view {
 												
 				if ( !genesSearchableDataGrid ) {
 					genesSearchableDataGrid = new SearchableDataGrid();
-					genesSearchableDataGrid.addEventListener(ListEvent.ITEM_CLICK, clickGenesHandler);
-					genesSearchableDataGrid.addEventListener(ListEvent.ITEM_DOUBLE_CLICK, doubleClickGenesHandler);
+					genesSearchableDataGrid.addEventListener(SearchableDataGridSelectionEvent.ITEM_CLICK, clickGenesHandler);
+					genesSearchableDataGrid.addEventListener(SearchableDataGridSelectionEvent.ITEM_DOUBLE_CLICK, doubleClickGenesHandler);
 					genesPanel.addChild(genesSearchableDataGrid);
 				}			
 			}
@@ -138,8 +137,8 @@ package ch.unil.cbg.ExpressionView.view {
 												
 				if ( !samplesSearchableDataGrid ) {
 					samplesSearchableDataGrid = new SearchableDataGrid();
-					samplesSearchableDataGrid.addEventListener(ListEvent.ITEM_CLICK, clickSamplesHandler);
-					samplesSearchableDataGrid.addEventListener(ListEvent.ITEM_DOUBLE_CLICK, doubleClickSamplesHandler);
+					samplesSearchableDataGrid.addEventListener(SearchableDataGridSelectionEvent.ITEM_CLICK, clickSamplesHandler);
+					samplesSearchableDataGrid.addEventListener(SearchableDataGridSelectionEvent.ITEM_DOUBLE_CLICK, doubleClickSamplesHandler);
 					samplesPanel.addChild(samplesSearchableDataGrid);
 				}			
 			}
@@ -327,15 +326,65 @@ package ch.unil.cbg.ExpressionView.view {
 			}			
 		}
 
-		private function clickGenesHandler(event:ListEvent): void {
+		private function clickGenesHandler(event:SearchableDataGridSelectionEvent): void {
+			var genes:Array = event.selection;
+			genes.sort(Array.NUMERIC);
 			
+			var rectxleft:Array = []; var rectxright:Array = [];
+			var oldgene:int = genes[0];
+			rectxleft.push(oldgene);
+			for ( var genep:int = 0; genep < genes.length; ++genep ) {
+				var gene:int = genes[genep];
+				if ( gene > oldgene + 1 ) {
+					rectxright.push(oldgene);
+					rectxleft.push(gene);
+				}
+				oldgene = gene;
+			};
+			rectxright.push(oldgene);
+			
+			var rectangles:Array = [];
+			for ( var i:int = 0; i < rectxleft.length; ++i ) {
+				var x:Number = rectxleft[i] - 1;
+				var y:Number = 0;
+				var dx:Number = rectxright[i] - x;
+				var dy:Number = ged.nSamples;
+				rectangles.push(new Rectangle(x, y, dx, dy));  
+			}
+			dispatchEvent(new HighlightingEvent(HighlightingEvent.GENE, [rectangles]));
 		}
-		private function doubleClickGenesHandler(event:ListEvent): void {
+		private function doubleClickGenesHandler(event:SearchableDataGridSelectionEvent): void {
 		}
 
-		private function clickSamplesHandler(event:ListEvent): void {
+		private function clickSamplesHandler(event:SearchableDataGridSelectionEvent): void {
+			var samples:Array = event.selection;
+			samples.sort(Array.NUMERIC);
+
+			var rectytop:Array = []; var rectybottom:Array = [];				
+			var oldsample:int = samples[0];
+			rectytop.push(oldsample);
+			for ( var samplep:int = 0; samplep < samples.length; ++samplep ) {
+				var sample:int = samples[samplep];
+				if ( sample > oldsample + 1 ) {
+					rectybottom.push(oldsample);
+					rectytop.push(sample);
+				}
+				oldsample = sample;
+			};
+			rectybottom.push(oldsample);
+
+			var rectangles:Array = [];
+			for ( var i:int = 0; i < rectytop.length; ++i ) {
+				var x:Number = 0;
+				var y:Number = rectytop[i] - 1;
+				var dx:Number = ged.nGenes;
+				var dy:Number = rectybottom[i] - y; 
+				rectangles.push(new Rectangle(x, y, dx, dy));  
+			}
+
+			dispatchEvent(new HighlightingEvent(HighlightingEvent.SAMPLE, [rectangles]));
 		}
-		private function doubleClickSamplesHandler(event:ListEvent): void {
+		private function doubleClickSamplesHandler(event:SearchableDataGridSelectionEvent): void {
 		}
 
 		private function broadcastInspectPositionHandler(event:BroadcastInspectPositionEvent): void {

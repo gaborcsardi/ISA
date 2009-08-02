@@ -57,6 +57,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 		private var geimage:Image;
 		private var modulesimage:Image;
 		private var modulesCanvas:Canvas;
+		private var highlightCanvas:Canvas;
 		private var overlayCanvas:Canvas;
 		
 		public function ZoomPanCanvas() {
@@ -314,6 +315,12 @@ package ch.unil.cbg.ExpressionView.view.components {
 				addChild(modulesCanvas);
 			}
 				
+			if ( !highlightCanvas ) {
+				highlightCanvas = new Canvas();
+				highlightCanvas.alpha = 1;
+				addChild(highlightCanvas);
+			}
+
 			if ( !overlayCanvas ) {
 				overlayCanvas = new Canvas();
 				overlayCanvas.alpha = 1;
@@ -337,8 +344,9 @@ package ch.unil.cbg.ExpressionView.view.components {
 			parentApplication.addEventListener(MenuEvent.ALPHA, alphaSliderChangeHandler);
 			parentApplication.addEventListener(MenuEvent.OUTLINE, setOutlineVisibilityHandler);
 			parentApplication.addEventListener(MenuEvent.FILLING, setFillingVisibilityHandler);
-			parentApplication.addEventListener(HighlightingEvent.MODULE, updateHighlightedModulesHandler);			
-			
+			parentApplication.addEventListener(HighlightingEvent.MODULE, highlightModulesHandler);
+			parentApplication.addEventListener(HighlightingEvent.GENE, highlightGenesHandler);
+			parentApplication.addEventListener(HighlightingEvent.SAMPLE, highlightSamplesHandler);			
 		}
 
 		override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void {
@@ -407,9 +415,16 @@ package ch.unil.cbg.ExpressionView.view.components {
 			modulesimage.visible = event.data[0];
 		}
 
-		private function updateHighlightedModulesHandler(event:HighlightingEvent): void {
+		private function highlightModulesHandler(event:HighlightingEvent): void {
+			try {
+				highlightCanvas.rawChildren.removeChild(highlightCanvas.rawChildren.getChildByName("modules"));
+			} catch (err:Error) { 
+			}
+			
 			var modulesRectangles:Array = event.data[0];
-			overlayCanvas.graphics.clear();
+			var shape:Shape = new Shape();			
+			shape.name = "modules";
+			
 			for ( var module:int = 1; module < modulesRectangles.length; ++module ) {
 				if ( modulesRectangles[module] == null ) { 
 					continue;
@@ -423,12 +438,69 @@ package ch.unil.cbg.ExpressionView.view.components {
 						var y:Number = (r.y - currentRectangle.y) * scaley;
 						var dx:Number = r.width * scalex;
 						var dy:Number = r.height * scaley;
-						overlayCanvas.graphics.beginFill(modulesColors[module][1]);
-						overlayCanvas.graphics.drawRect(x, y, dx, dy);
-						overlayCanvas.graphics.endFill();
+						shape.graphics.beginFill(modulesColors[module][1]);
+						shape.graphics.drawRect(x, y, dx, dy);
+						shape.graphics.endFill();
 					}
 				}
-			}	
+			}
+			highlightCanvas.rawChildren.addChild(shape);
+		}
+
+		private function highlightGenesHandler(event:HighlightingEvent): void {
+			try {
+				highlightCanvas.rawChildren.removeChild(highlightCanvas.rawChildren.getChildByName("genes"));
+			} catch (err:Error) { 
+			}
+			
+			var rectangles:Array = event.data[0];
+			var shape:Shape = new Shape();
+			shape.name = "genes";
+			shape.alpha = 0.3;
+						
+			for ( var i:int = 0; i < rectangles.length; ++i ) {
+				var r:Rectangle = currentRectangle.intersection(rectangles[i]);
+				if ( r.width > 0 && r.height > 0 ) {
+					var scalex:Number = canvaswidth / currentRectangle.width;
+					var scaley:Number = canvasheight / currentRectangle.height;
+					var x:Number = (r.x - currentRectangle.x) * scalex;
+					var y:Number = (r.y - currentRectangle.y) * scaley;
+					var dx:Number = r.width * scalex;
+					var dy:Number = r.height * scaley;
+					shape.graphics.beginFill(0xffff00);
+					shape.graphics.drawRect(x, y, dx, dy);
+					shape.graphics.endFill();
+				}
+			}
+			highlightCanvas.rawChildren.addChild(shape);
+		}
+		
+		private function highlightSamplesHandler(event:HighlightingEvent): void {
+			try {
+				highlightCanvas.rawChildren.removeChild(highlightCanvas.rawChildren.getChildByName("samples"));
+			} catch (err:Error) { 
+			}
+			
+			var rectangles:Array = event.data[0];
+			var shape:Shape = new Shape();
+			shape.name = "samples";
+			shape.alpha = 0.3;
+			
+			for ( var i:int = 0; i < rectangles.length; ++i ) {
+				var r:Rectangle = currentRectangle.intersection(rectangles[i]);
+				if ( r.width > 0 && r.height > 0 ) {
+					var scalex:Number = canvaswidth / currentRectangle.width;
+					var scaley:Number = canvasheight / currentRectangle.height;
+					var x:Number = (r.x - currentRectangle.x) * scalex;
+					var y:Number = (r.y - currentRectangle.y) * scaley;
+					var dx:Number = r.width * scalex;
+					var dy:Number = r.height * scaley;
+					shape.graphics.beginFill(0xffff00);
+					shape.graphics.drawRect(x, y, dx, dy);
+					shape.graphics.endFill();
+				}
+			}
+			highlightCanvas.rawChildren.addChild(shape);
 		}
 
 		public function addListener(): void {

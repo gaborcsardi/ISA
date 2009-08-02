@@ -19,8 +19,8 @@ package ch.unil.cbg.ExpressionView.model {
 		public var nModules:int;
 		public var Modules:XMLListCollection;
 
-		private var nGenes:int;
-		private var nSamples:int;
+		public var nGenes:int;
+		public var nSamples:int;
 		
 		public var XMLData:XML;
 		
@@ -360,11 +360,9 @@ package ch.unil.cbg.ExpressionView.model {
 				var modules:Array = string.split(", ");
 				modules.sort(Array.NUMERIC);
 									
-				var rectxleft:Array = []; var rectxright:Array = [];
-				var rectytop:Array = []; var rectybottom:Array = [];				
-
-				// determine rectangles				
 				
+				// determine rectangles				
+				var rectxleft:Array = []; var rectxright:Array = [];
 				var oldgene:int = genes[0];
 				rectxleft.push(oldgene);
 				for ( genep = 0; genep < genes.length; ++genep ) {
@@ -377,6 +375,7 @@ package ch.unil.cbg.ExpressionView.model {
 				};
 				rectxright.push(oldgene);
 	
+				var rectytop:Array = []; var rectybottom:Array = [];				
 				var oldsample:int = samples[0];
 				rectytop.push(oldsample);
 				for ( samplep = 0; samplep < samples.length; ++samplep ) {
