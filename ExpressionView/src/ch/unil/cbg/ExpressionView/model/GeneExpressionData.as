@@ -22,6 +22,8 @@ package ch.unil.cbg.ExpressionView.model {
 		private var nGenes:int;
 		private var nSamples:int;
 		
+		public var XMLData:XML;
+		
 		public var shortLabelsGene:Array;
 		public var shortLabelsSample:Array;
 		public var shortLabelsModule:Array;
@@ -53,6 +55,7 @@ package ch.unil.cbg.ExpressionView.model {
 			nGenes = 0;
 			nSamples = 0;
 					
+			XMLData = new XML();
 			Data = new ByteArray();
 			
 			ModularData = new Vector.<GeneExpressionModule>();
@@ -82,9 +85,9 @@ package ch.unil.cbg.ExpressionView.model {
 			XML.ignoreWhitespace = true;
 			bytes.position = (nGenes * nSamples + 3) * 4 + 19;
 			var length:int = bytes.length - bytes.position;
-			var xmldata:XML = new XML(bytes.readUTFBytes(length));
+			XMLData = new XML(bytes.readUTFBytes(length));
 
-			Modules = new XMLListCollection(xmldata.modules.module);
+			Modules = new XMLListCollection(XMLData.modules.module);
 			ModularData = new Vector.<GeneExpressionModule>(nModules+1, true);
 			ModulesColors = new Vector.<Array>(nModules+1, true);
 			for ( var module:int = 0; module <= nModules; ++module ) {
@@ -95,8 +98,8 @@ package ch.unil.cbg.ExpressionView.model {
 			// set labels
 			shortLabelsGene = [];
 			longLabelsGene = [];
-			var shortgenetags:XMLListCollection = new XMLListCollection(xmldata.genes.shortgenetags.genetag);
-			var longgenetags:XMLListCollection = new XMLListCollection(xmldata.genes.longgenetags.genetag);
+			var shortgenetags:XMLListCollection = new XMLListCollection(XMLData.genes.shortgenetags.genetag);
+			var longgenetags:XMLListCollection = new XMLListCollection(XMLData.genes.longgenetags.genetag);
 			for ( var tag:int = 0; tag < shortgenetags.length; ++tag ) {
 				shortLabelsGene.push(shortgenetags[tag]);
 			}
@@ -105,8 +108,8 @@ package ch.unil.cbg.ExpressionView.model {
 			}
 			shortLabelsSample = [];
 			longLabelsSample = [];
-			var shortsampletags:XMLListCollection = new XMLListCollection(xmldata.samples.shortsampletags.sampletag);
-			var longsampletags:XMLListCollection = new XMLListCollection(xmldata.samples.longsampletags.sampletag);
+			var shortsampletags:XMLListCollection = new XMLListCollection(XMLData.samples.shortsampletags.sampletag);
+			var longsampletags:XMLListCollection = new XMLListCollection(XMLData.samples.longsampletags.sampletag);
 			for ( tag = 0; tag < shortsampletags.length; ++tag ) {
 				shortLabelsSample.push(shortsampletags[tag]);
 			}
@@ -115,8 +118,8 @@ package ch.unil.cbg.ExpressionView.model {
 			}
 			shortLabelsModule = [];
 			longLabelsModule = [];
-			var shortmoduletags:XMLListCollection = new XMLListCollection(xmldata.modules.shortmoduletags.moduletag);
-			var longmoduletags:XMLListCollection = new XMLListCollection(xmldata.modules.longmoduletags.moduletag);
+			var shortmoduletags:XMLListCollection = new XMLListCollection(XMLData.modules.shortmoduletags.moduletag);
+			var longmoduletags:XMLListCollection = new XMLListCollection(XMLData.modules.longmoduletags.moduletag);
 			for ( tag = 0; tag < shortmoduletags.length; ++tag ) {
 				shortLabelsModule.push(shortmoduletags[tag]);
 			}
@@ -126,9 +129,9 @@ package ch.unil.cbg.ExpressionView.model {
 
 			// set modularData[0]
 			ModularData[0].nGenes = nGenes;
-			ModularData[0].Genes = new XMLListCollection(xmldata.genes.gene);
+			ModularData[0].Genes = new XMLListCollection(XMLData.genes.gene);
 			ModularData[0].nSamples = nSamples;
-			ModularData[0].Samples = new XMLListCollection(xmldata.samples.sample);
+			ModularData[0].Samples = new XMLListCollection(XMLData.samples.sample);
 
 			ModulesLookup = new Vector.<Array>(nGenes * nSamples, true);
 			for ( var i:int = 0; i < ModulesLookup.length; ++i ) { ModulesLookup[i] = []; }

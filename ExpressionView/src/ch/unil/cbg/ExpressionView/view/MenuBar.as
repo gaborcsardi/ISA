@@ -29,7 +29,7 @@ package ch.unil.cbg.ExpressionView.view {
 		private var fillingVisibility:CheckBox;
 		private var alphaSlider:HSlider;
 		private var pdfExportButton:Button;
-		private var GEDataInfoButton:Button;
+		private var gedatainfoVisibilityButton:Button;
 		private var infoVisibilityButton:Button;
 		private var modulesVisibilityButton:Button;
 		private var genesVisibilityButton:Button;
@@ -104,11 +104,6 @@ package ch.unil.cbg.ExpressionView.view {
 			dispatchEvent(new MenuEvent(MenuEvent.ALPHA, [event.value]));
 		}
 		
-		// GEData info
-		private function GEDataInfoHandler(event:MouseEvent): void {
-			dispatchEvent(new MenuEvent(MenuEvent.DATA_DESCRIPTION));
-		}
-
 		// alpha slider
 		private function pdfExportHandler(event:MouseEvent): void {
 			dispatchEvent(new MenuEvent(MenuEvent.PDF_EXPORT));
@@ -116,33 +111,40 @@ package ch.unil.cbg.ExpressionView.view {
 
 
 		// set Panel visibility
+		private function gedatainfoVisibilityButtonClickHandler(event:MouseEvent): void {
+			var visibility:Boolean = true;
+			if ( !gedatainfoVisibilityButton.selected ) {
+				visibility = false;
+			}
+			dispatchEvent(new MenuEvent(MenuEvent.PANELS, [0, visibility]));
+		}
 		private function infoVisibilityButtonClickHandler(event:MouseEvent): void {
 			var visibility:Boolean = true;
 			if ( !infoVisibilityButton.selected ) {
 				visibility = false;
 			}
-			dispatchEvent(new MenuEvent(MenuEvent.PANELS, [0, visibility]));
+			dispatchEvent(new MenuEvent(MenuEvent.PANELS, [1, visibility]));
 		}
 		private function modulesVisibilityButtonClickHandler(event:MouseEvent): void {
 			var visibility:Boolean = true;
 			if ( !modulesVisibilityButton.selected ) {
 				visibility = false;
 			}
-			dispatchEvent(new MenuEvent(MenuEvent.PANELS, [1, visibility]));
+			dispatchEvent(new MenuEvent(MenuEvent.PANELS, [2, visibility]));
 		}
 		private function genesVisibilityButtonClickHandler(event:MouseEvent): void {
 			var visibility:Boolean = true;
 			if ( !genesVisibilityButton.selected ) {
 				visibility = false;
 			}
-			dispatchEvent(new MenuEvent(MenuEvent.PANELS, [2, visibility]));
+			dispatchEvent(new MenuEvent(MenuEvent.PANELS, [3, visibility]));
 		}
 		private function samplesVisibilityButtonClickHandler(event:MouseEvent): void {
 			var visibility:Boolean = true;
 			if ( !samplesVisibilityButton.selected ) {
 				visibility = false;
 			}
-			dispatchEvent(new MenuEvent(MenuEvent.PANELS, [3, visibility]));
+			dispatchEvent(new MenuEvent(MenuEvent.PANELS, [4, visibility]));
 		}
 		
 		// resize
@@ -214,13 +216,6 @@ package ch.unil.cbg.ExpressionView.view {
 					headerBox.addChild(alphaSlider);
 				}
 
-				if ( !GEDataInfoButton ) {
-					GEDataInfoButton = new Button();
-					GEDataInfoButton.label = "Data Description";
-					GEDataInfoButton.addEventListener(MouseEvent.CLICK, GEDataInfoHandler);
-					headerBox.addChild(GEDataInfoButton);
-				}
-
 				if ( !pdfExportButton ) {
 					pdfExportButton = new Button();
 					pdfExportButton.label = "PDF Export";
@@ -228,6 +223,14 @@ package ch.unil.cbg.ExpressionView.view {
 					headerBox.addChild(pdfExportButton);
 				}
 
+				if ( !gedatainfoVisibilityButton ) {
+					gedatainfoVisibilityButton = new Button();
+					gedatainfoVisibilityButton.label = "Data Description";
+					gedatainfoVisibilityButton.selected = false;
+					gedatainfoVisibilityButton.toggle = true;
+					gedatainfoVisibilityButton.addEventListener(MouseEvent.CLICK, gedatainfoVisibilityButtonClickHandler);
+					headerBox.addChild(gedatainfoVisibilityButton);
+				}
 				if ( !infoVisibilityButton ) {
 					infoVisibilityButton = new Button();
 					infoVisibilityButton.label = "Info";

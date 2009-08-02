@@ -14,7 +14,7 @@ package ch.unil.cbg.ExpressionView.view {
 	import flexlib.containers.SuperTabNavigator;
 	
 	import mx.containers.Canvas;
-	import mx.controls.Text;
+	import mx.controls.TextArea;
 	import mx.controls.dataGridClasses.DataGridColumn;
 	import mx.events.IndexChangedEvent;
 	import mx.events.ListEvent;
@@ -47,15 +47,17 @@ package ch.unil.cbg.ExpressionView.view {
 		private var mapOpenTabs:Vector.<int>;
 		
 		private var infoPanel:SuperPanel;
-		private var infoContent:Text;
+		private var infoContent:TextArea;
 		
 		private var modulesPanel:SuperPanel;
 		private var modulesSearchableDataGrid:SearchableDataGrid;
-		
 		private var genesPanel:SuperPanel;
 		private var genesSearchableDataGrid:SearchableDataGrid;		
 		private var samplesPanel:SuperPanel;
 		private var samplesSearchableDataGrid:SearchableDataGrid;
+		
+		private var gedatainfoPanel:SuperPanel;
+		private var gedatainfoContent:TextArea;
 
 		private var currentalpha:Number;
 				
@@ -96,7 +98,7 @@ package ch.unil.cbg.ExpressionView.view {
 				addChild(infoPanel);
 				
 				if ( !infoContent ) {
-					infoContent = new Text();
+					infoContent = new TextArea();
 					infoPanel.addChild(infoContent);
 				}
 				
@@ -142,6 +144,22 @@ package ch.unil.cbg.ExpressionView.view {
 				}			
 			}
 
+			if ( !gedatainfoPanel ) {
+				gedatainfoPanel = new SuperPanel();
+				gedatainfoPanel.showControls = true;
+				gedatainfoPanel.enableResize = true;
+				gedatainfoPanel.setStyle("backgroundColor", "white");
+				gedatainfoPanel.alpha = 1.0;
+				gedatainfoPanel.title = "Gene Expression Data Description";
+				gedatainfoPanel.visible = false;
+				addChild(gedatainfoPanel);
+				
+				if ( !gedatainfoContent ) {
+					gedatainfoContent = new TextArea();
+					gedatainfoPanel.addChild(gedatainfoContent);					
+				}
+			}
+
 			useDefaultPositions = true;
 			
 			parentApplication.addEventListener(MenuEvent.DEFAULT_POSITIONS, setDefaultPositionsHandler);
@@ -154,6 +172,9 @@ package ch.unil.cbg.ExpressionView.view {
 			parentApplication.addEventListener(ResizeBrowserEvent.RESIZEBROWSEREVENT, resizeBrowserHandler);
 		}
 		
+		private function dataDescriptionHandler(event:MenuEvent): void {
+			gedatainfoPanel.visible = event.data[0];
+		}
 		
 		private function resizeBrowserHandler(event:ResizeBrowserEvent): void {
 			
@@ -192,6 +213,10 @@ package ch.unil.cbg.ExpressionView.view {
 			
 			super.updateDisplayList(unscaledWidth, unscaledHeight);
 
+			gedatainfoContent.percentWidth = 100;
+			gedatainfoContent.percentHeight = 100;
+			infoContent.percentWidth = 100;
+			infoContent.percentHeight = 100;
 			modulesSearchableDataGrid.percentWidth = 100;
 			modulesSearchableDataGrid.percentHeight = 100;
 			genesSearchableDataGrid.percentWidth = 100;
@@ -362,15 +387,21 @@ package ch.unil.cbg.ExpressionView.view {
 			
 			switch (panel) {
 				case 0:
-					infoPanel.visible = visible;
+					if ( gedatainfoContent.htmlText == "" ) {
+						generategedatainfo();
+					}
+					gedatainfoPanel.visible = visible;
 					break;
 				case 1:
-					modulesPanel.visible = visible;
+					infoPanel.visible = visible;
 					break;
 				case 2:
-					genesPanel.visible = visible;
+					modulesPanel.visible = visible;
 					break;
 				case 3:
+					genesPanel.visible = visible;
+					break;
+				case 4:
 					samplesPanel.visible = visible;
 					break;
 			}			
@@ -453,6 +484,27 @@ package ch.unil.cbg.ExpressionView.view {
 		
 		private function alphaSliderChangeHandler(event:MenuEvent): void {
 			currentalpha = event.data[0];
+		}
+		
+		private function generategedatainfo(): void {
+			if ( ged.XMLData.experimentdata.title != "" ) {
+				gedatainfoContent.htmlText = "<b>" + ged.XMLData.experimentdata.title + "</b><br><br>";
+			} 
+			if ( ged.XMLData.experimentdata.name != "" ) {
+				gedatainfoContent.htmlText += ged.XMLData.experimentdata.name + "<br><br>";
+			} 
+			if ( ged.XMLData.experimentdata.lab != "" ) {
+				gedatainfoContent.htmlText += "<i>" + ged.XMLData.experimentdata.lab + "</i><br><br>";
+			} 
+			if ( ged.XMLData.experimentdata.abstract != "" ) {
+				gedatainfoContent.htmlText += "<p>" + ged.XMLData.experimentdata.abstract + "</p><br><br>";
+			}
+			if ( ged.XMLData.experimentdata.url != "" ) {
+				gedatainfoContent.htmlText += ged.XMLData.experimentdata.url + "<br>";
+			}
+			if ( ged.XMLData.experimentdata.annotation != "" ) {
+				gedatainfoContent.htmlText += "Annotation: " + ged.XMLData.experimentdata.annotation;
+			}
 		}
 		
 	}
