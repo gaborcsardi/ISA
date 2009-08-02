@@ -1,0 +1,35 @@
+.openButton {
+	icon: Embed('/ch/unil/cbg/ExpressionView/assets/menu/open.png');
+}
+
+.pdfExportButton {
+	icon: Embed('/ch/unil/cbg/ExpressionView/assets/menu/pdf.png');
+}
+
+.gedatainfoVisibilityButton {
+	icon: Embed('/ch/unil/cbg/ExpressionView/assets/menu/data.png');
+}
+
+.infoVisibilityButton {
+	icon: Embed('/ch/unil/cbg/ExpressionView/assets/menu/info.png');
+}
+
+.modulesVisibilityButton {
+	icon: Embed('/ch/unil/cbg/ExpressionView/assets/menu/modules.png');
+}
+
+.genesVisibilityButton {
+	icon: Embed('/ch/unil/cbg/ExpressionView/assets/menu/genes.png');
+}
+
+.samplesVisibilityButton {
+	icon: Embed('/ch/unil/cbg/ExpressionView/assets/menu/samples.png');
+}
+
+.resizeButton {
+	icon: Embed('/ch/unil/cbg/ExpressionView/assets/menu/fullscreen.png');
+}
+
+.fullScreenButton {
+	icon: Embed('/ch/unil/cbg/ExpressionView/assets/menu/fullscreen.png');
+}

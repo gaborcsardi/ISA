@@ -172,10 +172,8 @@
 		]]>
 	</mx:Script>
 
-<!--
-	<mx:Style source="nl/wv/extenders/assets/css/styles.css"/>
-	-->
 	<mx:Style source="ch/unil/cbg/ExpressionView/styles/global.css"/>
 	<mx:Style source="ch/unil/cbg/ExpressionView/styles/panel.css"/>
-
+	<mx:Style source="ch/unil/cbg/ExpressionView/styles/menu.css"/>
+	
 </mx:Application>

@@ -9,6 +9,7 @@ package ch.unil.cbg.ExpressionView.view {
 	import flash.events.ProgressEvent;
 	import flash.net.FileFilter;
 	import flash.net.FileReference;
+	import flash.text.TextField;
 	
 	import mx.containers.Canvas;
 	import mx.containers.HBox;
@@ -21,7 +22,18 @@ package ch.unil.cbg.ExpressionView.view {
 
 	public class MenuBar extends Canvas {
 		
-		private var headerBox:HBox;
+		private var fileBox:HBox;
+		private var navigationBox:HBox;
+		private var selectionBox:HBox;
+		private var panelBox:HBox;
+		private var windowBox:HBox;
+		
+		[Embed(source='/ch/unil/cbg/ExpressionView/assets/menu/inspect.png')]
+		public var inspectIcon:Class; 
+		[Embed(source='/ch/unil/cbg/ExpressionView/assets/menu/zoom.png')]
+		public var zoomIcon:Class; 
+		[Embed(source='/ch/unil/cbg/ExpressionView/assets/menu/pan.png')]
+		public var panIcon:Class; 
 		
 		private var openButton:Button;
 		private var navigationMenu:ToggleButtonBar;
@@ -163,34 +175,74 @@ package ch.unil.cbg.ExpressionView.view {
 		// layout	
 		override protected function createChildren() : void{	
 			super.createChildren();
-		
-			if ( !headerBox ) {
-				headerBox = new HBox();
-				headerBox.setStyle("verticalAlign", "middle");
-				
-				addChild(headerBox);
+						
+			if ( !fileBox ) {
+				fileBox = new HBox();
+				fileBox.setStyle("verticalAlign", "middle");
+				addChild(fileBox);
 				
 				if ( !openButton ) {
 					openButton = new Button();
 					openButton.label = "Open";
+					openButton.styleName = "openButton";
+					openButton.toolTip = "Open ExpressionView file.";
 					openButton.addEventListener(MouseEvent.CLICK, fileOpenHandler);
-					headerBox.addChild(openButton);
+					fileBox.addChild(openButton);
 				}
+
+				if ( !pdfExportButton ) {
+					pdfExportButton = new Button();
+					pdfExportButton.label = "PDF";
+					pdfExportButton.toolTip = "Export PDF file.";
+					pdfExportButton.styleName = "pdfExportButton";
+					
+					pdfExportButton.addEventListener(MouseEvent.CLICK, pdfExportHandler);
+					fileBox.addChild(pdfExportButton);
+				}
+			}
+
+			if ( !navigationBox ) {
+				navigationBox = new HBox();
+				navigationBox.setStyle("verticalAlign", "middle");
+				addChild(navigationBox);
 
 				if ( !navigationMenu ) {
 					navigationMenu = new ToggleButtonBar();
-					navigationMenu.dataProvider = new Array("Inspect", "Zoom", "Pan");
+					var buttons:Array = [];
+					var item:Object = new Object();
+					item.label = "Inspect";
+					item.icon = inspectIcon;
+					item.toolTip = "Inspect";
+					buttons.push(item);
+					item = new Object();
+					item.label = "Zoom";
+					item.icon = zoomIcon;
+					item.toolTip = "Zoom";
+					buttons.push(item);
+					item = new Object();
+					item.label = "Pan";
+					item.icon = panIcon;
+					item.toolTip = "Pan";
+					buttons.push(item);
+					navigationMenu.dataProvider = buttons;
 					navigationMenu.addEventListener(ItemClickEvent.ITEM_CLICK, navigationMenuClickHandler);
-					headerBox.addChild(navigationMenu);
+					navigationMenu.styleName = "navigationMenu";
+					navigationBox.addChild(navigationMenu);
 				}
-				
+			}
+			
+			if ( !selectionBox ) {
+				selectionBox = new HBox();
+				selectionBox.setStyle("verticalAlign", "middle");
+				addChild(selectionBox);
+
 				if ( !outlineVisibility ) {
 					outlineVisibility = new CheckBox();
 					outlineVisibility.selected = true;
 					outlineVisibility.labelPlacement = "top";
 					outlineVisibility.label = "Outline";
 					outlineVisibility.addEventListener(MouseEvent.CLICK, outlineVisibilityChangeHandler);
-					headerBox.addChild(outlineVisibility);
+					selectionBox.addChild(outlineVisibility);
 				}
 
 				if ( !fillingVisibility ) {
@@ -199,7 +251,7 @@ package ch.unil.cbg.ExpressionView.view {
 					fillingVisibility.labelPlacement = "top";
 					fillingVisibility.label = "Filling";
 					fillingVisibility.addEventListener(MouseEvent.CLICK, fillingVisibilityChangeHandler);
-					headerBox.addChild(fillingVisibility);
+					selectionBox.addChild(fillingVisibility);
 				}
 
 				if ( !alphaSlider ) {
@@ -213,70 +265,89 @@ package ch.unil.cbg.ExpressionView.view {
 					alphaSlider.liveDragging = true;
 					alphaSlider.value = 0.1;
 					alphaSlider.addEventListener(SliderEvent.CHANGE, alphaSliderChangeHandler);
-					headerBox.addChild(alphaSlider);
+					selectionBox.addChild(alphaSlider);
 				}
+			}
 
-				if ( !pdfExportButton ) {
-					pdfExportButton = new Button();
-					pdfExportButton.label = "PDF Export";
-					pdfExportButton.addEventListener(MouseEvent.CLICK, pdfExportHandler);
-					headerBox.addChild(pdfExportButton);
-				}
+			if ( !panelBox ) {
+				panelBox = new HBox();
+				panelBox.setStyle("verticalAlign", "middle");
+				addChild(panelBox);
 
 				if ( !gedatainfoVisibilityButton ) {
 					gedatainfoVisibilityButton = new Button();
-					gedatainfoVisibilityButton.label = "Data Description";
+					//gedatainfoVisibilityButton.label = "Data Description";
 					gedatainfoVisibilityButton.selected = false;
 					gedatainfoVisibilityButton.toggle = true;
+					gedatainfoVisibilityButton.styleName = "gedatainfoVisibilityButton";
+					gedatainfoVisibilityButton.toolTip = "Show/hide gene expression data description.";
 					gedatainfoVisibilityButton.addEventListener(MouseEvent.CLICK, gedatainfoVisibilityButtonClickHandler);
-					headerBox.addChild(gedatainfoVisibilityButton);
+					panelBox.addChild(gedatainfoVisibilityButton);
 				}
 				if ( !infoVisibilityButton ) {
 					infoVisibilityButton = new Button();
-					infoVisibilityButton.label = "Info";
+					//infoVisibilityButton.label = "Info";
 					infoVisibilityButton.selected = true;
 					infoVisibilityButton.toggle = true;
+					infoVisibilityButton.styleName = "infoVisibilityButton";
+					infoVisibilityButton.toolTip = "Show/hide info panel.";
 					infoVisibilityButton.addEventListener(MouseEvent.CLICK, infoVisibilityButtonClickHandler);
-					headerBox.addChild(infoVisibilityButton);
+					panelBox.addChild(infoVisibilityButton);
 				}
 				if ( !modulesVisibilityButton ) {
 					modulesVisibilityButton = new Button();
-					modulesVisibilityButton.label = "Modules";
+					//modulesVisibilityButton.label = "Modules";
 					modulesVisibilityButton.selected = true;
 					modulesVisibilityButton.toggle = true;
+					modulesVisibilityButton.styleName = "modulesVisibilityButton";
+					modulesVisibilityButton.toolTip = "Show/hide modules panel.";
 					modulesVisibilityButton.addEventListener(MouseEvent.CLICK, modulesVisibilityButtonClickHandler);
-					headerBox.addChild(modulesVisibilityButton);
+					panelBox.addChild(modulesVisibilityButton);
 				}
 				if ( !genesVisibilityButton ) {
 					genesVisibilityButton = new Button();
-					genesVisibilityButton.label = "Genes";
+					//genesVisibilityButton.label = "Genes";
 					genesVisibilityButton.selected = true;
 					genesVisibilityButton.toggle = true;
+					genesVisibilityButton.styleName = "genesVisibilityButton";
+					genesVisibilityButton.toolTip = "Show/hide genes panel.";
 					genesVisibilityButton.addEventListener(MouseEvent.CLICK, genesVisibilityButtonClickHandler);
-					headerBox.addChild(genesVisibilityButton);
+					panelBox.addChild(genesVisibilityButton);
 				}
 				if ( !samplesVisibilityButton ) {
 					samplesVisibilityButton = new Button();
-					samplesVisibilityButton.label = "Samples";
+					//samplesVisibilityButton.label = "Samples";
 					samplesVisibilityButton.selected = true;
 					samplesVisibilityButton.toggle = true;
+					samplesVisibilityButton.styleName = "samplesVisibilityButton";
+					samplesVisibilityButton.toolTip = "Show/hide samples panel.";
 					samplesVisibilityButton.addEventListener(MouseEvent.CLICK, samplesVisibilityButtonClickHandler);
-					headerBox.addChild(samplesVisibilityButton);
+					panelBox.addChild(samplesVisibilityButton);
 				}
+			}
+
+			if ( !windowBox ) {
+				windowBox = new HBox();
+				windowBox.setStyle("verticalAlign", "middle");
+				addChild(windowBox);				
 
 				if ( !resizeButton ) {
 					resizeButton = new Button();
 					resizeButton.label = "Default Positions";
+					resizeButton.styleName = "resizeButton";
+					resizeButton.toolTip = "Align panels at default positions.";
 					resizeButton.addEventListener(MouseEvent.CLICK, resizeHandler);
-					headerBox.addChild(resizeButton);
+					windowBox.addChild(resizeButton);
 				}
 				if ( !fullScreenButton ) {
 					fullScreenButton = new Button();
 					fullScreenButton.label = "FullScreen";
 					fullScreenButton.toggle = true;
 					fullScreenButton.selected = false;
+					fullScreenButton.styleName = "fullScreenButton";
+					fullScreenButton.toolTip = "Change to fullscreen view.";
 					fullScreenButton.addEventListener(MouseEvent.CLICK, fullScreenHandler);
-					headerBox.addChild(fullScreenButton);
+					windowBox.addChild(fullScreenButton);
 				}
 				
 				parentApplication.addEventListener(KeyboardEvent.KEY_UP, keyHandler)
@@ -287,8 +358,19 @@ package ch.unil.cbg.ExpressionView.view {
 		
 		override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void {		
 			super.updateDisplayList(unscaledWidth, unscaledHeight);
-			headerBox.percentWidth = 100;
-			headerBox.percentHeight = 100;
+
+			fileBox.x = 0;
+			fileBox.y = 9;
+			navigationBox.x = fileBox.x + fileBox.width + 40;
+			navigationBox.y = 9;
+			selectionBox.x = navigationBox.x + navigationBox.width + 40;
+			selectionBox.y = 4;
+			panelBox.x = selectionBox.x + selectionBox.width + 40;
+			panelBox.y = 9;
+			windowBox.x = panelBox.x + panelBox.width + 40;
+			windowBox.y = 9;
+
+
 			alphaSlider.percentHeight = 100;
 			alphaSlider.width = 120; 
 		}
