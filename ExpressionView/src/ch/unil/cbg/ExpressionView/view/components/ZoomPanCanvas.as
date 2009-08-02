@@ -337,7 +337,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 			parentApplication.addEventListener(MenuEvent.ALPHA, alphaSliderChangeHandler);
 			parentApplication.addEventListener(MenuEvent.OUTLINE, setOutlineVisibilityHandler);
 			parentApplication.addEventListener(MenuEvent.FILLING, setFillingVisibilityHandler);
-			parentApplication.addEventListener(UpdateHighlightedModulesEvent.UPDATEHIGHLIGHTEDMODULESEVENT, updateHighlightedModulesHandler);			
+			parentApplication.addEventListener(HighlightingEvent.MODULE, updateHighlightedModulesHandler);			
 			
 		}
 
@@ -407,14 +407,15 @@ package ch.unil.cbg.ExpressionView.view.components {
 			modulesimage.visible = event.data[0];
 		}
 
-		private function updateHighlightedModulesHandler(event:UpdateHighlightedModulesEvent): void {
+		private function updateHighlightedModulesHandler(event:HighlightingEvent): void {
+			var modulesRectangles:Array = event.data[0];
 			overlayCanvas.graphics.clear();
-			for ( var module:int = 1; module < event.modulesRectangles.length; ++module ) {
-				if ( event.modulesRectangles[module] == null ) { 
+			for ( var module:int = 1; module < modulesRectangles.length; ++module ) {
+				if ( modulesRectangles[module] == null ) { 
 					continue;
 				}
-				for ( var i:int = 0; i < event.modulesRectangles[module].length; ++i ) {
-					var r:Rectangle = currentRectangle.intersection(event.modulesRectangles[module][i]);
+				for ( var i:int = 0; i < modulesRectangles[module].length; ++i ) {
+					var r:Rectangle = currentRectangle.intersection(modulesRectangles[module][i]);
 					if ( r.width > 0 && r.height > 0 ) {
 						var scalex:Number = canvaswidth / currentRectangle.width;
 						var scaley:Number = canvasheight / currentRectangle.height;

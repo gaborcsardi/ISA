@@ -4,7 +4,7 @@ package ch.unil.cbg.ExpressionView.events {
 	
 	public class UpdateStatusBarEvent extends Event {
 
-		// file data
+		// statusbar content
 		public var statusbarcontent:String
 		public static const UPDATESTATUSBAREVENT:String = "UpdateStatusBarEvent";
 		

@@ -289,8 +289,7 @@ package ch.unil.cbg.ExpressionView.view {
 				var modulep:int = event.selection[i];
 				highlightedRectangles[modulep] = ged.getModule(module).ModulesRectangles[modulep];
 			}
-			dispatchEvent(new UpdateHighlightedModulesEvent(highlightedRectangles));
-
+			dispatchEvent(new HighlightingEvent(HighlightingEvent.MODULE, [highlightedRectangles]));
 		}
 		
 		private function doubleClickModulesHandler(event:SearchableDataGridSelectionEvent): void {
@@ -329,6 +328,7 @@ package ch.unil.cbg.ExpressionView.view {
 		}
 
 		private function clickGenesHandler(event:ListEvent): void {
+			
 		}
 		private function doubleClickGenesHandler(event:ListEvent): void {
 		}
@@ -366,13 +366,13 @@ package ch.unil.cbg.ExpressionView.view {
 							highlightedRectangles[modules[modulep]] = ged.getModule(module).ModulesRectangles[modules[modulep]];
 						}
 					}
-					dispatchEvent(new UpdateHighlightedModulesEvent(highlightedRectangles));
+					dispatchEvent(new HighlightingEvent(HighlightingEvent.MODULE, [highlightedRectangles]));
 					lastHighlightedModules = modules;
 				}
 			
 			} else {
 				infoContent.text = "";
-				dispatchEvent(new UpdateHighlightedModulesEvent(new Array(ged.nModules + 1)));
+				dispatchEvent(new HighlightingEvent(HighlightingEvent.MODULE, [new Array(ged.nModules + 1)]));
 			}
 		}
 		
@@ -461,7 +461,7 @@ package ch.unil.cbg.ExpressionView.view {
 		}
 		
 		private function rollOutHandler(event:MouseEvent): void {
-			dispatchEvent(new UpdateHighlightedModulesEvent([]))
+			dispatchEvent(new HighlightingEvent(HighlightingEvent.MODULE, [[]]))
 		}
 		
 		private function pdfExportHandler(event:MenuEvent): void {

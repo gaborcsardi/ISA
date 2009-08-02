@@ -4,7 +4,7 @@ package ch.unil.cbg.ExpressionView.events {
 	
 	public class BroadcastInspectPositionEvent extends Event {
 
-		// file data
+		// position on screen
 		public var gene:int;
 		public var sample:int;
 		public static const BROADCASTINSPECTPOSITIONEVENT:String = "BroadcastInspectPositionEvent";

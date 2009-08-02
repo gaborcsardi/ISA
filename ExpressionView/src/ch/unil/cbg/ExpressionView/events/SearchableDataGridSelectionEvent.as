@@ -4,7 +4,7 @@ package ch.unil.cbg.ExpressionView.events {
 	
 	public class SearchableDataGridSelectionEvent extends Event {
 
-		// file data
+		// type of click
 		public var selection:Array;		
 		public static const ITEM_CLICK:String = "ItemClick";
 		public static const ITEM_DOUBLE_CLICK:String = "ItemDoubleClick";
