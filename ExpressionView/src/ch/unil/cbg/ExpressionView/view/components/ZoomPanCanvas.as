@@ -61,7 +61,8 @@ package ch.unil.cbg.ExpressionView.view.components {
 		private var vscrollbar:VScrollBar;		
 		private var geimage:Image;
 		private var modulesimage:Image;
-		private var modulesCanvas:Canvas;
+		//private var modulesCanvas:Canvas;
+		public var modulesCanvas:Canvas;
 		private var highlightCanvas:Canvas;
 		private var overlayCanvas:Canvas;
 		

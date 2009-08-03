@@ -60,6 +60,9 @@ package ch.unil.cbg.ExpressionView.view {
 		private var gedatainfoContent:TextArea;
 
 		private var currentalpha:Number;
+		private var showoutline:Boolean;
+		private var showfilling:Boolean;
+		
 				
 		public function MainCanvas() {
 			super();
@@ -68,6 +71,8 @@ package ch.unil.cbg.ExpressionView.view {
 			lastHighlightedModules = new Array();
 			useDefaultPositions = true;
 			currentalpha = 0.2;
+			showoutline = true;
+			showfilling = true;
 		}
 		
 		override protected function createChildren(): void {
@@ -168,7 +173,9 @@ package ch.unil.cbg.ExpressionView.view {
 			parentApplication.addEventListener(MenuEvent.PANELS, setPanelVisibilityHandler);
 			parentApplication.addEventListener(BroadcastInspectPositionEvent.BROADCASTINSPECTPOSITIONEVENT, broadcastInspectPositionHandler);
 			parentApplication.addEventListener(MenuEvent.PDF_EXPORT, pdfExportHandler);
-			parentApplication.addEventListener(MenuEvent.ALPHA, alphaSliderChangeHandler);	
+			parentApplication.addEventListener(MenuEvent.ALPHA, alphaSliderChangeHandler);
+			parentApplication.addEventListener(MenuEvent.FILLING, showFillingChangeHandler);
+			parentApplication.addEventListener(MenuEvent.OUTLINE, showOutlineChangeHandler);	
 			parentApplication.addEventListener(ResizeBrowserEvent.RESIZEBROWSEREVENT, resizeBrowserHandler);
 		}
 		
@@ -543,7 +550,13 @@ package ch.unil.cbg.ExpressionView.view {
 			trans.alphaMultiplier = 1 - currentalpha;
 			var pdfBitmapData:BitmapData = new BitmapData(width, height);
 			pdfBitmapData.draw(openTabs[module].currentgeimage);
-			pdfBitmapData.draw(openTabs[module].currentmodulesimage, null, trans);
+			if ( showfilling ) {
+				pdfBitmapData.draw(openTabs[module].currentmodulesimage, null, trans);
+			}
+			if ( showoutline ) {
+				pdfBitmapData.draw(openTabs[module].modulesCanvas);
+			}
+			
 			var pdfBitmap:Bitmap = new Bitmap(pdfBitmapData);
 			
 			var myPDF:PDF;
@@ -551,10 +564,13 @@ package ch.unil.cbg.ExpressionView.view {
 			myPDF.addPage();
 			myPDF.textStyle(new RGBColor(10));
 			myPDF.setFont(FontFamily.HELVETICA, Style.BOLD);
-			myPDF.setFontSize(14);
-			myPDF.addText("ExpressionView Export", 10, 10);
-			
-			myPDF.addImage(pdfBitmap,10,20,190,0);
+			myPDF.setFontSize(12);
+			var title:String = ged.XMLData.experimentdata.title;
+			if ( title != "" ) {
+				myPDF.setXY(10,10);
+				myPDF.addMultiCell(190, 6, title);
+			}
+			myPDF.addImage(pdfBitmap,10,myPDF.getY() + 10,190,0);
 
 			var bytes:ByteArray = myPDF.save(Method.LOCAL);
 			var file:FileReference = new FileReference();
@@ -564,6 +580,12 @@ package ch.unil.cbg.ExpressionView.view {
 		
 		private function alphaSliderChangeHandler(event:MenuEvent): void {
 			currentalpha = event.data[0];
+		}
+		private function showOutlineChangeHandler(event:MenuEvent): void {
+			showoutline = event.data[0];
+		}
+		private function showFillingChangeHandler(event:MenuEvent): void {
+			showfilling = event.data[0];
 		}
 		
 		private function generategedatainfo(): void {
