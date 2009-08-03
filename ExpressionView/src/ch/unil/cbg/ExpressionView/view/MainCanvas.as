@@ -6,7 +6,10 @@ package ch.unil.cbg.ExpressionView.view {
 	import ch.unil.cbg.ExpressionView.model.*;
 	import ch.unil.cbg.ExpressionView.view.components.*;
 	
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 	import flash.events.MouseEvent;
+	import flash.geom.ColorTransform;
 	import flash.geom.Rectangle;
 	import flash.net.FileReference;
 	import flash.utils.ByteArray;
@@ -64,6 +67,7 @@ package ch.unil.cbg.ExpressionView.view {
 			ged = new GeneExpressionData();
 			lastHighlightedModules = new Array();
 			useDefaultPositions = true;
+			currentalpha = 0.2;
 		}
 		
 		override protected function createChildren(): void {
@@ -527,7 +531,21 @@ package ch.unil.cbg.ExpressionView.view {
 		}
 		
 		private function pdfExportHandler(event:MenuEvent): void {
-				
+			
+			if ( openTabs.length == 0 ) {
+				return;
+			}
+			
+			var module:int = modulesNavigator.selectedIndex;
+			var width:Number = openTabs[module].currentgeimage.bitmapData.width;
+			var height:Number = openTabs[module].currentgeimage.bitmapData.height;
+			var trans:ColorTransform = new ColorTransform();
+			trans.alphaMultiplier = 1 - currentalpha;
+			var pdfBitmapData:BitmapData = new BitmapData(width, height);
+			pdfBitmapData.draw(openTabs[module].currentgeimage);
+			pdfBitmapData.draw(openTabs[module].currentmodulesimage, null, trans);
+			var pdfBitmap:Bitmap = new Bitmap(pdfBitmapData);
+			
 			var myPDF:PDF;
 			myPDF = new PDF(Orientation.PORTRAIT, Unit.MM, Size.A4);
 			myPDF.addPage();
@@ -535,8 +553,8 @@ package ch.unil.cbg.ExpressionView.view {
 			myPDF.setFont(FontFamily.HELVETICA, Style.BOLD);
 			myPDF.setFontSize(14);
 			myPDF.addText("ExpressionView Export", 10, 10);
-			myPDF.addImage(openTabs[modulesNavigator.selectedIndex].currentgeimage,10,20,190,0);
-			myPDF.addImage(openTabs[modulesNavigator.selectedIndex].currentmodulesimage,10,20,190,0,null,100,currentalpha);
+			
+			myPDF.addImage(pdfBitmap,10,20,190,0);
 
 			var bytes:ByteArray = myPDF.save(Method.LOCAL);
 			var file:FileReference = new FileReference();

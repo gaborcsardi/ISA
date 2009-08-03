@@ -280,7 +280,7 @@ package ch.unil.cbg.ExpressionView.view {
 					alphaSlider.labels = ["Modules", "GE Data"];
 					alphaSlider.tickValues = [0, 1]
 					alphaSlider.liveDragging = true;
-					alphaSlider.value = 0.1;
+					alphaSlider.value = 0.2;
 					alphaSlider.addEventListener(SliderEvent.CHANGE, alphaSliderChangeHandler);
 					selectionBox.addChild(alphaSlider);
 				}
