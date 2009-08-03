@@ -1,9 +1,10 @@
 Application {
-   backgroundGradientColors: #bdcbd2, #5a8398;
+	backgroundGradientColors:	#99ccff, #cccccc;
+	backgroundGradientAlphas:	0.75, 0.25;
 }
 
 Button {
-   highlightAlphas: 1, 0.33;
-   fillAlphas: 1, 0.16, 0.18, 1;
-   fillColors: #5f89b9, #697182, #ffffff, #eeeeee;
+   highlightAlphas:				1, 0.33;
+   fillAlphas:					1, 0.16, 0.18, 1;
+   fillColors:					#5f89b9, #697182, #ffffff, #eeeeee;
 }

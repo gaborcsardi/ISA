@@ -9,7 +9,6 @@ package ch.unil.cbg.ExpressionView.view {
 	import flash.events.ProgressEvent;
 	import flash.net.FileFilter;
 	import flash.net.FileReference;
-	import flash.text.TextField;
 	
 	import mx.containers.Canvas;
 	import mx.containers.HBox;
@@ -22,6 +21,7 @@ package ch.unil.cbg.ExpressionView.view {
 
 	public class MenuBar extends Canvas {
 		
+		private var menuBox:HBox;
 		private var fileBox:HBox;
 		private var navigationBox:HBox;
 		private var selectionBox:HBox;
@@ -175,11 +175,17 @@ package ch.unil.cbg.ExpressionView.view {
 		// layout	
 		override protected function createChildren() : void{	
 			super.createChildren();
-						
+			
+			if ( !menuBox ) {
+				menuBox = new HBox;
+				menuBox.styleName = "menuBox";
+				addChild(menuBox);
+			}
+			
 			if ( !fileBox ) {
 				fileBox = new HBox();
-				fileBox.setStyle("verticalAlign", "middle");
-				addChild(fileBox);
+				fileBox.styleName = "menuItemBox";
+				menuBox.addChild(fileBox);
 				
 				if ( !openButton ) {
 					openButton = new Button();
@@ -203,8 +209,8 @@ package ch.unil.cbg.ExpressionView.view {
 
 			if ( !navigationBox ) {
 				navigationBox = new HBox();
-				navigationBox.setStyle("verticalAlign", "middle");
-				addChild(navigationBox);
+				navigationBox.styleName = "menuItemBox";
+				menuBox.addChild(navigationBox);
 
 				if ( !navigationMenu ) {
 					navigationMenu = new ToggleButtonBar();
@@ -233,8 +239,8 @@ package ch.unil.cbg.ExpressionView.view {
 			
 			if ( !selectionBox ) {
 				selectionBox = new HBox();
-				selectionBox.setStyle("verticalAlign", "middle");
-				addChild(selectionBox);
+				selectionBox.styleName = "menuSpecialItemBox";
+				menuBox.addChild(selectionBox);
 
 				if ( !outlineVisibility ) {
 					outlineVisibility = new CheckBox();
@@ -271,8 +277,8 @@ package ch.unil.cbg.ExpressionView.view {
 
 			if ( !panelBox ) {
 				panelBox = new HBox();
-				panelBox.setStyle("verticalAlign", "middle");
-				addChild(panelBox);
+				panelBox.styleName = "menuItemBox";
+				menuBox.addChild(panelBox);
 
 				if ( !gedatainfoVisibilityButton ) {
 					gedatainfoVisibilityButton = new Button();
@@ -328,12 +334,12 @@ package ch.unil.cbg.ExpressionView.view {
 
 			if ( !windowBox ) {
 				windowBox = new HBox();
-				windowBox.setStyle("verticalAlign", "middle");
-				addChild(windowBox);				
+				windowBox.styleName = "menuItemBox";
+				menuBox.addChild(windowBox);				
 
 				if ( !resizeButton ) {
 					resizeButton = new Button();
-					resizeButton.label = "Default Positions";
+					resizeButton.label = "Default";
 					resizeButton.styleName = "resizeButton";
 					resizeButton.toolTip = "Align panels at default positions.";
 					resizeButton.addEventListener(MouseEvent.CLICK, resizeHandler);
@@ -341,7 +347,7 @@ package ch.unil.cbg.ExpressionView.view {
 				}
 				if ( !fullScreenButton ) {
 					fullScreenButton = new Button();
-					fullScreenButton.label = "FullScreen";
+					fullScreenButton.label = "Fullscreen";
 					fullScreenButton.toggle = true;
 					fullScreenButton.selected = false;
 					fullScreenButton.styleName = "fullScreenButton";
@@ -359,20 +365,12 @@ package ch.unil.cbg.ExpressionView.view {
 		override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void {		
 			super.updateDisplayList(unscaledWidth, unscaledHeight);
 
-			fileBox.x = 0;
-			fileBox.y = 9;
-			navigationBox.x = fileBox.x + fileBox.width + 40;
-			navigationBox.y = 9;
-			selectionBox.x = navigationBox.x + navigationBox.width + 40;
-			selectionBox.y = 4;
-			panelBox.x = selectionBox.x + selectionBox.width + 40;
-			panelBox.y = 9;
-			windowBox.x = panelBox.x + panelBox.width + 40;
-			windowBox.y = 9;
-
-
+			menuBox.percentWidth = 100;
+			menuBox.percentHeight = 100;
+			
 			alphaSlider.percentHeight = 100;
-			alphaSlider.width = 120; 
+			alphaSlider.width = 120;
+			 
 		}
 		
 	}

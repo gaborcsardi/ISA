@@ -1,12 +1,5 @@
-/********************************************
- title   : SuperPanel
- version : 1.5
- author  : Wietse Veenstra
- website : http://www.wietseveenstra.nl
- date    : 2007-03-30
- modified: 2009-05
-********************************************/
-package nl.wv.extenders.panel {
+// modified version of the SuperPanel by Wietse Veenstra (http://www.wietseveenstra.nl)
+package ch.unil.cbg.ExpressionView.view.components {
 	
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
@@ -20,7 +13,7 @@ package nl.wv.extenders.panel {
 	import mx.events.EffectEvent;
 	import mx.managers.CursorManager;
 	
-	public class SuperPanel extends Panel {
+	public class ResizablePanel extends Panel {
 		[Bindable] public var showControls:Boolean = true;
 		[Bindable] public var enableResize:Boolean = true;
 				
@@ -40,19 +33,18 @@ package nl.wv.extenders.panel {
 		private var oPoint:Point 			= new Point();
 		private var resizeCur:Number		= 0;
 				
-		public function SuperPanel() {
+		public function ResizablePanel() {
 			super();
 		}
 
 		override protected function createChildren():void {
 			super.createChildren();
+			styleName = "resizablePanel";
+			doubleClickEnabled = true;
 			
 			if ( !pTitleBar ) {
 				pTitleBar = super.titleBar;
 			}
-			this.setStyle("headerColors", [0xC3D1D9, 0xD2DCE2]);
-			this.setStyle("borderColor", 0xD2DCE2);
-			this.doubleClickEnabled = true;
 			
 			if ( enableResize ) {
 				if ( !resizeHandler ) {

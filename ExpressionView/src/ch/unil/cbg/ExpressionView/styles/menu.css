@@ -1,35 +1,59 @@
+.menuBox {
+	verticalAlign:		middle;
+	horizontalAlign:	left;
+	horizontalGap:		20;
+}
+
+.menuItemBox {
+	borderStyle:		solid;
+	cornerRadius:		10;
+	borderThickness:	2;
+	borderColor:		#99ccff;
+	verticalAlign:		middle;
+	horizontalAlign:	center;
+	paddingTop:			5;
+	paddingBottom:		5;
+	paddingLeft:		5;
+	paddingRight:		5;
+}
+
+.menuSpecialItemBox {
+	verticalAlign:		middle;
+	horizontalAlign:	center;
+}
+
 .openButton {
-	icon: Embed('/ch/unil/cbg/ExpressionView/assets/menu/open.png');
+	icon: 				Embed('/ch/unil/cbg/ExpressionView/assets/menu/open.png');
 }
 
 .pdfExportButton {
-	icon: Embed('/ch/unil/cbg/ExpressionView/assets/menu/pdf.png');
+	icon: 				Embed('/ch/unil/cbg/ExpressionView/assets/menu/pdf.png');
 }
 
 .gedatainfoVisibilityButton {
-	icon: Embed('/ch/unil/cbg/ExpressionView/assets/menu/data.png');
+	icon: 				Embed('/ch/unil/cbg/ExpressionView/assets/menu/data.png');
 }
 
 .infoVisibilityButton {
-	icon: Embed('/ch/unil/cbg/ExpressionView/assets/menu/info.png');
+	icon: 				Embed('/ch/unil/cbg/ExpressionView/assets/menu/info.png');
 }
 
 .modulesVisibilityButton {
-	icon: Embed('/ch/unil/cbg/ExpressionView/assets/menu/modules.png');
+	icon:	 			Embed('/ch/unil/cbg/ExpressionView/assets/menu/modules.png');
 }
 
 .genesVisibilityButton {
-	icon: Embed('/ch/unil/cbg/ExpressionView/assets/menu/genes.png');
+	icon: 				Embed('/ch/unil/cbg/ExpressionView/assets/menu/genes.png');
 }
 
 .samplesVisibilityButton {
-	icon: Embed('/ch/unil/cbg/ExpressionView/assets/menu/samples.png');
+	icon: 				Embed('/ch/unil/cbg/ExpressionView/assets/menu/samples.png');
 }
 
 .resizeButton {
-	icon: Embed('/ch/unil/cbg/ExpressionView/assets/menu/fullscreen.png');
+	icon: 				Embed('/ch/unil/cbg/ExpressionView/assets/menu/resize.png');
 }
 
 .fullScreenButton {
-	icon: Embed('/ch/unil/cbg/ExpressionView/assets/menu/fullscreen.png');
+	icon: 				Embed('/ch/unil/cbg/ExpressionView/assets/menu/fullscreen.png');
 }

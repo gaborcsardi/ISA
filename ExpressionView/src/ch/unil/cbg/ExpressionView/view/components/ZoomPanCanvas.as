@@ -49,6 +49,11 @@ package ch.unil.cbg.ExpressionView.view.components {
 		
 		private var lastClick:int;
 		
+		private var highlightedModules:Array;
+		private var highlightedGenes:Array;
+		private var highlightedSamples:Array;
+		
+		
 		// layout
 		private var canvaswidth:Number;
 		private var canvasheight:Number;
@@ -74,7 +79,10 @@ package ch.unil.cbg.ExpressionView.view.components {
 			
 			canvaswidth = this.width;
 			canvasheight = this.height;
-
+			
+			highlightedModules = [];
+			highlightedGenes = [];
+			highlightedSamples = [];
 		}
 		
 		private function modeChangeHandler(event:MenuEvent):void {
@@ -285,10 +293,13 @@ package ch.unil.cbg.ExpressionView.view.components {
 		}
 
 		private function drawImage(): void {
-			drawRectangles();			
+			drawRectangles();
 			var targetRect:Rectangle = new Rectangle(0, 0, canvaswidth, canvasheight);
 			currentgeimage.bitmapData = fullgeimage.getData(currentRectangle, targetRect);
 			currentmodulesimage.bitmapData = fullmodulesimage.getData(currentRectangle, targetRect);
+			dispatchEvent(new HighlightingEvent(HighlightingEvent.MODULE, [highlightedModules]));
+			dispatchEvent(new HighlightingEvent(HighlightingEvent.GENE, [highlightedGenes]));
+			dispatchEvent(new HighlightingEvent(HighlightingEvent.SAMPLE, [highlightedSamples]));
  		}
  		
 		override protected function createChildren(): void {
@@ -421,16 +432,16 @@ package ch.unil.cbg.ExpressionView.view.components {
 			} catch (err:Error) { 
 			}
 			
-			var modulesRectangles:Array = event.data[0];
+			highlightedModules = event.data[0];
 			var shape:Shape = new Shape();			
 			shape.name = "modules";
 			
-			for ( var module:int = 1; module < modulesRectangles.length; ++module ) {
-				if ( modulesRectangles[module] == null ) { 
+			for ( var module:int = 1; module < highlightedModules.length; ++module ) {
+				if ( highlightedModules[module] == null ) { 
 					continue;
 				}
-				for ( var i:int = 0; i < modulesRectangles[module].length; ++i ) {
-					var r:Rectangle = currentRectangle.intersection(modulesRectangles[module][i]);
+				for ( var i:int = 0; i < highlightedModules[module].length; ++i ) {
+					var r:Rectangle = currentRectangle.intersection(highlightedModules[module][i]);
 					if ( r.width > 0 && r.height > 0 ) {
 						var scalex:Number = canvaswidth / currentRectangle.width;
 						var scaley:Number = canvasheight / currentRectangle.height;
@@ -453,13 +464,13 @@ package ch.unil.cbg.ExpressionView.view.components {
 			} catch (err:Error) { 
 			}
 			
-			var rectangles:Array = event.data[0];
+			highlightedGenes = event.data[0];
 			var shape:Shape = new Shape();
 			shape.name = "genes";
 			shape.alpha = 0.3;
 						
-			for ( var i:int = 0; i < rectangles.length; ++i ) {
-				var r:Rectangle = currentRectangle.intersection(rectangles[i]);
+			for ( var i:int = 0; i < highlightedGenes.length; ++i ) {
+				var r:Rectangle = currentRectangle.intersection(highlightedGenes[i]);
 				if ( r.width > 0 && r.height > 0 ) {
 					var scalex:Number = canvaswidth / currentRectangle.width;
 					var scaley:Number = canvasheight / currentRectangle.height;
@@ -481,13 +492,13 @@ package ch.unil.cbg.ExpressionView.view.components {
 			} catch (err:Error) { 
 			}
 			
-			var rectangles:Array = event.data[0];
+			highlightedSamples = event.data[0];
 			var shape:Shape = new Shape();
 			shape.name = "samples";
 			shape.alpha = 0.3;
 			
-			for ( var i:int = 0; i < rectangles.length; ++i ) {
-				var r:Rectangle = currentRectangle.intersection(rectangles[i]);
+			for ( var i:int = 0; i < highlightedSamples.length; ++i ) {
+				var r:Rectangle = currentRectangle.intersection(highlightedSamples[i]);
 				if ( r.width > 0 && r.height > 0 ) {
 					var scalex:Number = canvaswidth / currentRectangle.width;
 					var scaley:Number = canvasheight / currentRectangle.height;

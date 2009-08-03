@@ -18,8 +18,6 @@ package ch.unil.cbg.ExpressionView.view {
 	import mx.controls.dataGridClasses.DataGridColumn;
 	import mx.events.IndexChangedEvent;
 	
-	import nl.wv.extenders.panel.SuperPanel;
-	
 	import org.alivepdf.colors.RGBColor;
 	import org.alivepdf.fonts.FontFamily;
 	import org.alivepdf.fonts.Style;
@@ -40,22 +38,22 @@ package ch.unil.cbg.ExpressionView.view {
 		
 		private var lastHighlightedModules:Array;
 		
-		private var gePanel:SuperPanel;
+		private var gePanel:ResizablePanel;
 		private var modulesNavigator:SuperTabNavigator;
 		private var openTabs:Vector.<ZoomPanCanvas>;
 		private var mapOpenTabs:Vector.<int>;
 		
-		private var infoPanel:SuperPanel;
+		private var infoPanel:ResizablePanel;
 		private var infoContent:TextArea;
 		
-		private var modulesPanel:SuperPanel;
+		private var modulesPanel:ResizablePanel;
 		private var modulesSearchableDataGrid:SearchableDataGrid;
-		private var genesPanel:SuperPanel;
+		private var genesPanel:ResizablePanel;
 		private var genesSearchableDataGrid:SearchableDataGrid;		
-		private var samplesPanel:SuperPanel;
+		private var samplesPanel:ResizablePanel;
 		private var samplesSearchableDataGrid:SearchableDataGrid;
 		
-		private var gedatainfoPanel:SuperPanel;
+		private var gedatainfoPanel:ResizablePanel;
 		private var gedatainfoContent:TextArea;
 
 		private var currentalpha:Number;
@@ -73,7 +71,7 @@ package ch.unil.cbg.ExpressionView.view {
 			super.createChildren();
 						
 			if ( !gePanel ) {
-				gePanel = new SuperPanel();
+				gePanel = new ResizablePanel();
 				addChild(gePanel);
 				
 				if ( !modulesNavigator ) {
@@ -88,7 +86,7 @@ package ch.unil.cbg.ExpressionView.view {
 			}
 			
 			if ( !infoPanel ) {
-				infoPanel = new SuperPanel();
+				infoPanel = new ResizablePanel();
 				infoPanel.showControls = true;
 				infoPanel.enableResize = true;
 				infoPanel.setStyle("backgroundColor", "white");
@@ -104,7 +102,7 @@ package ch.unil.cbg.ExpressionView.view {
 			}
 		
 			if ( !modulesPanel ) {
-				modulesPanel = new SuperPanel();
+				modulesPanel = new ResizablePanel();
 				modulesPanel.title = "Modules";
 				addChild(modulesPanel);
 												
@@ -118,7 +116,7 @@ package ch.unil.cbg.ExpressionView.view {
 			}
 
 			if ( !genesPanel ) {
-				genesPanel = new SuperPanel();
+				genesPanel = new ResizablePanel();
 				genesPanel.title = "Genes";
 				addChild(genesPanel);
 												
@@ -131,7 +129,7 @@ package ch.unil.cbg.ExpressionView.view {
 			}
 			
 			if ( !samplesPanel ) {
-				samplesPanel = new SuperPanel();
+				samplesPanel = new ResizablePanel();
 				samplesPanel.title = "Samples";
 				addChild(samplesPanel);
 												
@@ -144,7 +142,7 @@ package ch.unil.cbg.ExpressionView.view {
 			}
 
 			if ( !gedatainfoPanel ) {
-				gedatainfoPanel = new SuperPanel();
+				gedatainfoPanel = new ResizablePanel();
 				gedatainfoPanel.showControls = true;
 				gedatainfoPanel.enableResize = true;
 				gedatainfoPanel.setStyle("backgroundColor", "white");

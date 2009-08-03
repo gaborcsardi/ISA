@@ -1,18 +1,23 @@
-Panel {
-	headerHeight: 26;
-	roundedBottomCorners: true;
-	borderThicknessTop: 0;
-	borderThicknessBottom: 3;
-	borderThicknessLeft: 3;
-	borderThicknessRight: 3;
-	borderAlpha: 1.0;
+.resizablePanel {
+	headerHeight:			20;
+	borderColor:			#cccccc;
+	headerColors:			#99ccff, #cccccc;
+	roundedBottomCorners:	true;
+	borderThicknessTop:		0;
+	borderThicknessBottom:	2;
+	borderThicknessLeft:	2;
+	borderThicknessRight:	2;
+	borderAlpha:			1.0;
+	
 	titleStyleName: "mypanelTitle";
 }
+
 .mypanelTitle {
 	fontFamily: Arial;
 	fontSize: 10;
 	fontWeight: bold;
 }
+
 .closeBtn {
 	upSkin:        Embed('/ch/unil/cbg/ExpressionView/assets/panel/closeButton.png');
 	overSkin:      Embed('/ch/unil/cbg/ExpressionView/assets/panel/closeButton.png');
