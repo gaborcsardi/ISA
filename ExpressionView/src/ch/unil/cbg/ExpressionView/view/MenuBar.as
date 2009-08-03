@@ -46,7 +46,7 @@ package ch.unil.cbg.ExpressionView.view {
 		private var modulesVisibilityButton:Button;
 		private var genesVisibilityButton:Button;
 		private var samplesVisibilityButton:Button;
-		private var resizeButton:Button;
+		private var defaultPositionsButton:Button;
 		private var fullScreenButton:Button;
 
 		private var file:FileReference = new FileReference();
@@ -54,7 +54,7 @@ package ch.unil.cbg.ExpressionView.view {
 		public function MenuBar() {
 			super();
 		}
-		
+				
 		// open
 		private function fileOpenHandler(event:MouseEvent):void {
 			var filter:FileFilter = new FileFilter("Gene Expression Data", "*");
@@ -123,6 +123,17 @@ package ch.unil.cbg.ExpressionView.view {
 
 
 		// set Panel visibility
+		private function updatePanelVisibility(event:MenuEvent):void {
+			var whichPanel:int = event.data[0];
+			var visibility:Boolean = event.data[1];
+			if ( whichPanel == 0 ) { gedatainfoVisibilityButton.selected = visibility; }
+			else if ( whichPanel == 1 ) { infoVisibilityButton.selected = visibility; }
+			else if ( whichPanel == 2 ) { modulesVisibilityButton.selected = visibility; }
+			else if ( whichPanel == 3 ) { genesVisibilityButton.selected = visibility; }
+			else if ( whichPanel == 4 ) { samplesVisibilityButton.selected = visibility; } 
+		}
+
+		
 		private function gedatainfoVisibilityButtonClickHandler(event:MouseEvent): void {
 			var visibility:Boolean = true;
 			if ( !gedatainfoVisibilityButton.selected ) {
@@ -337,13 +348,13 @@ package ch.unil.cbg.ExpressionView.view {
 				windowBox.styleName = "menuItemBox";
 				menuBox.addChild(windowBox);				
 
-				if ( !resizeButton ) {
-					resizeButton = new Button();
-					resizeButton.label = "Default";
-					resizeButton.styleName = "resizeButton";
-					resizeButton.toolTip = "Align panels at default positions.";
-					resizeButton.addEventListener(MouseEvent.CLICK, resizeHandler);
-					windowBox.addChild(resizeButton);
+				if ( !defaultPositionsButton ) {
+					defaultPositionsButton = new Button();
+					defaultPositionsButton.label = "Default";
+					defaultPositionsButton.styleName = "defaultPositionsButton";
+					defaultPositionsButton.toolTip = "Align panels at default positions.";
+					defaultPositionsButton.addEventListener(MouseEvent.CLICK, resizeHandler);
+					windowBox.addChild(defaultPositionsButton);
 				}
 				if ( !fullScreenButton ) {
 					fullScreenButton = new Button();
@@ -356,8 +367,9 @@ package ch.unil.cbg.ExpressionView.view {
 					windowBox.addChild(fullScreenButton);
 				}
 				
-				parentApplication.addEventListener(KeyboardEvent.KEY_UP, keyHandler)
-				
+				parentApplication.addEventListener(KeyboardEvent.KEY_UP, keyHandler);
+				parentApplication.addEventListener(MenuEvent.PANELS, updatePanelVisibility);
+			
 			}
 			
 		}

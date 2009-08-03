@@ -50,8 +50,8 @@
 	icon: 				Embed('/ch/unil/cbg/ExpressionView/assets/menu/samples.png');
 }
 
-.resizeButton {
-	icon: 				Embed('/ch/unil/cbg/ExpressionView/assets/menu/resize.png');
+.defaultPositionsButton {
+	icon: 				Embed('/ch/unil/cbg/ExpressionView/assets/menu/default.png');
 }
 
 .fullScreenButton {

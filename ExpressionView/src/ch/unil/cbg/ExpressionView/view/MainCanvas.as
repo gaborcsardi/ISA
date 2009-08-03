@@ -72,6 +72,7 @@ package ch.unil.cbg.ExpressionView.view {
 						
 			if ( !gePanel ) {
 				gePanel = new ResizablePanel();
+				gePanel.enableClose = false;
 				addChild(gePanel);
 				
 				if ( !modulesNavigator ) {
@@ -87,15 +88,13 @@ package ch.unil.cbg.ExpressionView.view {
 			
 			if ( !infoPanel ) {
 				infoPanel = new ResizablePanel();
-				infoPanel.showControls = true;
-				infoPanel.enableResize = true;
-				infoPanel.setStyle("backgroundColor", "white");
-				infoPanel.alpha = 0.8;
 				infoPanel.title = "Info";
+				infoPanel.addEventListener(ResizablePanelEvent.CLOSE, infoPanelCloseHandler);
 				addChild(infoPanel);
 				
 				if ( !infoContent ) {
 					infoContent = new TextArea();
+					infoContent.setStyle("backgroundAlpha", infoPanel.getStyle("backgroundAlpha"));
 					infoPanel.addChild(infoContent);
 				}
 				
@@ -104,6 +103,7 @@ package ch.unil.cbg.ExpressionView.view {
 			if ( !modulesPanel ) {
 				modulesPanel = new ResizablePanel();
 				modulesPanel.title = "Modules";
+				modulesPanel.addEventListener(ResizablePanelEvent.CLOSE, modulesPanelCloseHandler);
 				addChild(modulesPanel);
 												
 				if ( !modulesSearchableDataGrid ) {
@@ -118,6 +118,7 @@ package ch.unil.cbg.ExpressionView.view {
 			if ( !genesPanel ) {
 				genesPanel = new ResizablePanel();
 				genesPanel.title = "Genes";
+				genesPanel.addEventListener(ResizablePanelEvent.CLOSE, genesPanelCloseHandler);
 				addChild(genesPanel);
 												
 				if ( !genesSearchableDataGrid ) {
@@ -131,6 +132,7 @@ package ch.unil.cbg.ExpressionView.view {
 			if ( !samplesPanel ) {
 				samplesPanel = new ResizablePanel();
 				samplesPanel.title = "Samples";
+				samplesPanel.addEventListener(ResizablePanelEvent.CLOSE, samplesPanelCloseHandler);
 				addChild(samplesPanel);
 												
 				if ( !samplesSearchableDataGrid ) {
@@ -143,12 +145,9 @@ package ch.unil.cbg.ExpressionView.view {
 
 			if ( !gedatainfoPanel ) {
 				gedatainfoPanel = new ResizablePanel();
-				gedatainfoPanel.showControls = true;
-				gedatainfoPanel.enableResize = true;
-				gedatainfoPanel.setStyle("backgroundColor", "white");
-				gedatainfoPanel.alpha = 1.0;
 				gedatainfoPanel.title = "Gene Expression Data Description";
 				gedatainfoPanel.visible = false;
+				gedatainfoPanel.addEventListener(ResizablePanelEvent.CLOSE, gedatainfoPanelCloseHandler);
 				addChild(gedatainfoPanel);
 				
 				if ( !gedatainfoContent ) {
@@ -167,6 +166,22 @@ package ch.unil.cbg.ExpressionView.view {
 			parentApplication.addEventListener(MenuEvent.PDF_EXPORT, pdfExportHandler);
 			parentApplication.addEventListener(MenuEvent.ALPHA, alphaSliderChangeHandler);	
 			parentApplication.addEventListener(ResizeBrowserEvent.RESIZEBROWSEREVENT, resizeBrowserHandler);
+		}
+		
+		private function gedatainfoPanelCloseHandler(event:ResizablePanelEvent):void {
+			parentApplication.dispatchEvent(new MenuEvent(MenuEvent.PANELS, [0, false]));
+		}
+		private function infoPanelCloseHandler(event:ResizablePanelEvent):void {
+			parentApplication.dispatchEvent(new MenuEvent(MenuEvent.PANELS, [1, false]));
+		}
+		private function modulesPanelCloseHandler(event:ResizablePanelEvent):void {
+			parentApplication.dispatchEvent(new MenuEvent(MenuEvent.PANELS, [2, false]));
+		}
+		private function genesPanelCloseHandler(event:ResizablePanelEvent):void {
+			parentApplication.dispatchEvent(new MenuEvent(MenuEvent.PANELS, [3, false]));
+		}
+		private function samplesPanelCloseHandler(event:ResizablePanelEvent):void {
+			parentApplication.dispatchEvent(new MenuEvent(MenuEvent.PANELS, [4, false]));
 		}
 		
 		private function dataDescriptionHandler(event:MenuEvent): void {

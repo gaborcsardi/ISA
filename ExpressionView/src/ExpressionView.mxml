@@ -8,20 +8,21 @@
 	scriptTimeLimit = "60" 
 	horizontalScrollPolicy="off" 
 	verticalScrollPolicy="off" 
-	applicationComplete="applicationCompleteHandler()">
+	applicationComplete="applicationCompleteHandler()" viewSourceURL="srcview/index.html">
 	
 	<mx:Script>
 		<![CDATA[
-			import ch.unil.cbg.ExpressionView.view.StatusBar;
-			import ch.unil.cbg.ExpressionView.view.MainCanvas;
-			import ch.unil.cbg.ExpressionView.view.MenuBar;
-			import mx.events.ResizeEvent;
-			import mx.controls.Alert;
-			import flash.display.StageAlign;
-			import flash.display.StageScaleMode;
-			
+			import ch.unil.cbg.ExpressionView.view.*;
 			import ch.unil.cbg.ExpressionView.events.*;
 			import ch.unil.cbg.ExpressionView.model.*;
+			
+			import mx.events.ResizeEvent;
+			import mx.controls.Alert;
+			
+			import flash.display.StageAlign;
+			import flash.display.StageScaleMode;
+			import flash.system.Capabilities;
+			
 
 			private var menuBar:MenuBar;
 			private var mainCanvas:MainCanvas;
@@ -136,6 +137,16 @@
 			private function toggleFullScreenHandler(event:MenuEvent):void {
 				var screen:String = event.data[0];
 				if ( screen == "normal" ) {
+					
+		            var regExp:RegExp = new RegExp("mac", "i");
+            		var match:Boolean = regExp.test(Capabilities.os)
+					if ( match ) {
+						var alert:String = "The fullscreen mode on " + Capabilities.os;
+						alert += " is NOT working properly due to a bug in the Flash Player. ";
+						alert += "For instance opening files, exporting PDFs, ";
+						alert += "or zooming out is doomed. Sorry."; 
+						Alert.show(alert , 'Warning', mx.controls.Alert.OK)
+					}
 					stage.displayState = StageDisplayState.FULL_SCREEN;
 				} else {
 					stage.displayState = StageDisplayState.NORMAL;					

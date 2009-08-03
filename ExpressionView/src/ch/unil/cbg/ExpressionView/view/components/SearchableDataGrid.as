@@ -66,7 +66,6 @@ package ch.unil.cbg.ExpressionView.view.components {
 				dataGrid.addEventListener(KeyboardEvent.KEY_UP, keyHandler);
 				addChild(dataGrid);
 			}
-			
 		}
 		
 		private function getSelection(selected:Array): Array {

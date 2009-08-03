@@ -1,3 +1,4 @@
+
 .resizablePanel {
 	headerHeight:			20;
 	borderColor:			#cccccc;
@@ -8,37 +9,44 @@
 	borderThicknessLeft:	2;
 	borderThicknessRight:	2;
 	borderAlpha:			1.0;
-	
-	titleStyleName: "mypanelTitle";
+	backgroundAlpha:		0.2;
+	dropShadowEnabled:		false;
+	titleStyleName: "resizablePanelTitle";
 }
 
-.mypanelTitle {
-	fontFamily: Arial;
-	fontSize: 10;
-	fontWeight: bold;
+.resizablePanelTitle {
+	fontFamily:				Arial;
+	fontSize:				10;
+	fontWeight:				bold;
 }
 
-.closeBtn {
+.closeButton {
 	upSkin:        Embed('/ch/unil/cbg/ExpressionView/assets/panel/closeButton.png');
 	overSkin:      Embed('/ch/unil/cbg/ExpressionView/assets/panel/closeButton.png');
 	downSkin:      Embed('/ch/unil/cbg/ExpressionView/assets/panel/closeButton.png');
 	disabledSkin:  Embed('/ch/unil/cbg/ExpressionView/assets/panel/closeButton.png');
 }
-.increaseBtn {
+.maximizeButtonIncrease {
 	upSkin:        Embed('/ch/unil/cbg/ExpressionView/assets/panel/increaseButton.png');
 	overSkin:      Embed('/ch/unil/cbg/ExpressionView/assets/panel/increaseButton.png');
 	downSkin:      Embed('/ch/unil/cbg/ExpressionView/assets/panel/increaseButton.png');
 	disabledSkin:  Embed('/ch/unil/cbg/ExpressionView/assets/panel/increaseButton.png');
 }
-.decreaseBtn {
+.maximizeButtonDecrease {
 	upSkin:        Embed('/ch/unil/cbg/ExpressionView/assets/panel/decreaseButton.png');
 	overSkin:      Embed('/ch/unil/cbg/ExpressionView/assets/panel/decreaseButton.png');
 	downSkin:      Embed('/ch/unil/cbg/ExpressionView/assets/panel/decreaseButton.png');
 	disabledSkin:  Embed('/ch/unil/cbg/ExpressionView/assets/panel/decreaseButton.png');
 }
-.resizeHndlr {
-	upSkin:        Embed('/ch/unil/cbg/ExpressionView/assets/panel/resizeHandler.png');
-	overSkin:      Embed('/ch/unil/cbg/ExpressionView/assets/panel/resizeHandler.png');
-	downSkin:      Embed('/ch/unil/cbg/ExpressionView/assets/panel/resizeHandler.png');
-	disabledSkin:  Embed('/ch/unil/cbg/ExpressionView/assets/panel/resizeHandler.png');
+.minimizeButton {
+	upSkin:        Embed('/ch/unil/cbg/ExpressionView/assets/panel/minimizeButton.png');
+	overSkin:      Embed('/ch/unil/cbg/ExpressionView/assets/panel/minimizeButton.png');
+	downSkin:      Embed('/ch/unil/cbg/ExpressionView/assets/panel/minimizeButton.png');
+	disabledSkin:  Embed('/ch/unil/cbg/ExpressionView/assets/panel/minimizeButton.png');
+}
+.resizeButton {
+	upSkin:        Embed('/ch/unil/cbg/ExpressionView/assets/panel/resizeButton.png');
+	overSkin:      Embed('/ch/unil/cbg/ExpressionView/assets/panel/resizeButton.png');
+	downSkin:      Embed('/ch/unil/cbg/ExpressionView/assets/panel/resizeButton.png');
+	disabledSkin:  Embed('/ch/unil/cbg/ExpressionView/assets/panel/resizeButton.png');
 }
