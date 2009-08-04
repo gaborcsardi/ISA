@@ -98,8 +98,8 @@ package ch.unil.cbg.ExpressionView.model {
 			// set labels
 			shortLabelsGene = [];
 			longLabelsGene = [];
-			var shortgenetags:XMLListCollection = new XMLListCollection(XMLData.genes.shortgenetags.genetag);
-			var longgenetags:XMLListCollection = new XMLListCollection(XMLData.genes.longgenetags.genetag);
+			var shortgenetags:XMLListCollection = new XMLListCollection(XMLData.genes.shortgenetags.tag);
+			var longgenetags:XMLListCollection = new XMLListCollection(XMLData.genes.longgenetags.tag);
 			for ( var tag:int = 0; tag < shortgenetags.length; ++tag ) {
 				shortLabelsGene.push(shortgenetags[tag]);
 			}
@@ -108,8 +108,8 @@ package ch.unil.cbg.ExpressionView.model {
 			}
 			shortLabelsSample = [];
 			longLabelsSample = [];
-			var shortsampletags:XMLListCollection = new XMLListCollection(XMLData.samples.shortsampletags.sampletag);
-			var longsampletags:XMLListCollection = new XMLListCollection(XMLData.samples.longsampletags.sampletag);
+			var shortsampletags:XMLListCollection = new XMLListCollection(XMLData.samples.shortsampletags.tag);
+			var longsampletags:XMLListCollection = new XMLListCollection(XMLData.samples.longsampletags.tag);
 			for ( tag = 0; tag < shortsampletags.length; ++tag ) {
 				shortLabelsSample.push(shortsampletags[tag]);
 			}
@@ -118,8 +118,8 @@ package ch.unil.cbg.ExpressionView.model {
 			}
 			shortLabelsModule = [];
 			longLabelsModule = [];
-			var shortmoduletags:XMLListCollection = new XMLListCollection(XMLData.modules.shortmoduletags.moduletag);
-			var longmoduletags:XMLListCollection = new XMLListCollection(XMLData.modules.longmoduletags.moduletag);
+			var shortmoduletags:XMLListCollection = new XMLListCollection(XMLData.modules.shortmoduletags.tag);
+			var longmoduletags:XMLListCollection = new XMLListCollection(XMLData.modules.longmoduletags.tag);
 			for ( tag = 0; tag < shortmoduletags.length; ++tag ) {
 				shortLabelsModule.push(shortmoduletags[tag]);
 			}
@@ -188,13 +188,13 @@ package ch.unil.cbg.ExpressionView.model {
 			newmodule.nGenes = ngenes;
 			for ( var gene:int = 0; gene < genes.length; ++gene ) {
 				var item:XML = global.Genes[genes[gene]-1];
-				item.genetag0 = gene + 1;
+				item.tag0 = gene + 1;
 				newmodule.Genes.addItem(item);
 			}			
 			newmodule.nSamples = nsamples;
 			for ( var sample:int = 0; sample < samples.length; ++sample ) {
 				item = global.Samples[samples[sample]-1];
-				item.sampletag0 = sample + 1;
+				item.tag0 = sample + 1;
 				newmodule.Samples.addItem(item);
 			}
 			

@@ -20,6 +20,7 @@ package ch.unil.cbg.ExpressionView.view {
 	import mx.controls.Alert;
 	import mx.controls.TextArea;
 	import mx.controls.dataGridClasses.DataGridColumn;
+	import mx.utils.ObjectUtil;
 	import mx.events.IndexChangedEvent;
 	
 	import org.alivepdf.colors.RGBColor;
@@ -440,8 +441,8 @@ package ch.unil.cbg.ExpressionView.view {
 				// update infoPanel
 				var infoString:String = "";
 				if ( infoArray.length != 0 ) {
-					infoString = infoString + "Gene: " + infoArray[0].genetag1;
-					infoString = infoString + "\nSample: " + infoArray[1].sampletag1;
+					infoString = infoString + "Gene: " + infoArray[0].tag1;
+					infoString = infoString + "\nSample: " + infoArray[1].tag1;
 					infoString = infoString + "\nModules: " + infoArray[2];
 					infoString = infoString + "\nData: " + infoArray[3];
 				}
@@ -505,26 +506,41 @@ package ch.unil.cbg.ExpressionView.view {
 			genesSearchableDataGrid.dataProvider = gem.Genes;
 			samplesSearchableDataGrid.dataProvider = gem.Samples;
 			var temp:Array = [];
-			for ( var i:int = 1; i < ged.shortLabelsGene.length; i++ ) {
+			for ( var i:int = 0; i < ged.shortLabelsGene.length; i++ ) {
 				var column:DataGridColumn = new DataGridColumn();
-				column.dataField = "genetag" + i;
-				column.headerText = ged.shortLabelsGene[i];
+				column.dataField = "tag" + i;
+				if ( i > 0 ) {
+					column.headerText = ged.shortLabelsGene[i];
+				} else {
+					column.headerText = "#";
+				}
+				column.sortCompareFunction = sortFunction(i);
 				temp.push(column)
 			}
 			genesSearchableDataGrid.columns = temp;
 			temp = [];
-			for ( i = 1; i < ged.shortLabelsSample.length; i++ ) {
+			for ( i = 0; i < ged.shortLabelsSample.length; i++ ) {
 				column = new DataGridColumn();
-				column.dataField = "sampletag" + i;
-				column.headerText = ged.shortLabelsSample[i];
+				column.dataField = "tag" + i;
+				if ( i > 0 ) {
+					column.headerText = ged.shortLabelsSample[i];
+				} else {
+					column.headerText = "#";
+				}
+				column.sortCompareFunction = sortFunction(i);
 				temp.push(column)
 			}
 			samplesSearchableDataGrid.columns = temp;
 			temp = [];
-			for ( i = 1; i < ged.shortLabelsModule.length; i++ ) {
+			for ( i = 0; i < ged.shortLabelsModule.length; i++ ) {
 				column = new DataGridColumn();
-				column.dataField = "moduletag" + i;
-				column.headerText = ged.shortLabelsModule[i];
+				column.dataField = "tag" + i;
+				if ( i > 0 ) {
+					column.headerText = ged.shortLabelsModule[i];
+				} else {
+					column.headerText = "#";
+				}
+				column.sortCompareFunction = sortFunction(i);
 				temp.push(column)
 			}
 			modulesSearchableDataGrid.columns = temp;
@@ -547,6 +563,21 @@ package ch.unil.cbg.ExpressionView.view {
 
 			mapOpenTabs = new Vector.<int>;
 			mapOpenTabs.push(0);				
+		}
+		
+		private function sortFunction(sortfield:int):Function {
+			return function (obj1:Object, obj2:Object):int {
+				var childname:String = "tag" + sortfield;
+				var result:int;
+				if ( isNaN(Number(obj1.child(childname))) ) {
+					result = ObjectUtil.stringCompare(obj1.child(childname),obj2.child(childname),true);
+				} else {
+					result = ObjectUtil.numericCompare(Number(obj1.child(childname)),Number(obj2.child(childname)));
+				}        		
+				//var num:Number = Number(obj1.child(childname)) - Number(obj2.child(childname));
+	    	    //return (num > 0) ? 1 : ((num < 0) ? -1 : 0);
+	    	    return result;
+    		}
 		}
 		
 		private function rollOutHandler(event:MouseEvent): void {
