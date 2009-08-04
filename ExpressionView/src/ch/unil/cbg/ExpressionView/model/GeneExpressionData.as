@@ -187,11 +187,15 @@ package ch.unil.cbg.ExpressionView.model {
 			
 			newmodule.nGenes = ngenes;
 			for ( var gene:int = 0; gene < genes.length; ++gene ) {
-				newmodule.Genes.addItem(global.Genes[genes[gene]-1]);
+				var item:XML = global.Genes[genes[gene]-1];
+				item.genetag0 = gene + 1;
+				newmodule.Genes.addItem(item);
 			}			
 			newmodule.nSamples = nsamples;
 			for ( var sample:int = 0; sample < samples.length; ++sample ) {
-				newmodule.Samples.addItem(global.Samples[samples[sample]-1]);
+				item = global.Samples[samples[sample]-1];
+				item.sampletag0 = sample + 1;
+				newmodule.Samples.addItem(item);
 			}
 			
 			// get ModulesRectangles

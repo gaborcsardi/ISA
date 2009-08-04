@@ -7,16 +7,17 @@ package ch.unil.cbg.ExpressionView.view {
 	import ch.unil.cbg.ExpressionView.view.components.*;
 	
 	import flash.display.Bitmap;
-	import flash.display.BitmapData;
 	import flash.events.MouseEvent;
-	import flash.geom.ColorTransform;
 	import flash.geom.Rectangle;
 	import flash.net.FileReference;
 	import flash.utils.ByteArray;
 	
 	import flexlib.containers.SuperTabNavigator;
+	import flexlib.events.SuperTabEvent;
+	import flexlib.events.TabReorderEvent;
 	
 	import mx.containers.Canvas;
+	import mx.controls.Alert;
 	import mx.controls.TextArea;
 	import mx.controls.dataGridClasses.DataGridColumn;
 	import mx.events.IndexChangedEvent;
@@ -29,7 +30,7 @@ package ch.unil.cbg.ExpressionView.view {
 	import org.alivepdf.layout.Unit;
 	import org.alivepdf.pdf.PDF;
 	import org.alivepdf.saving.Method;
-
+	
 	public class MainCanvas extends Canvas {
 		
 		private var useDefaultPositions:Boolean;
@@ -59,20 +60,12 @@ package ch.unil.cbg.ExpressionView.view {
 		private var gedatainfoPanel:ResizablePanel;
 		private var gedatainfoContent:TextArea;
 
-		private var currentalpha:Number;
-		private var showoutline:Boolean;
-		private var showfilling:Boolean;
-		
-				
 		public function MainCanvas() {
 			super();
 
 			ged = new GeneExpressionData();
 			lastHighlightedModules = new Array();
 			useDefaultPositions = true;
-			currentalpha = 0.2;
-			showoutline = true;
-			showfilling = true;
 		}
 		
 		override protected function createChildren(): void {
@@ -87,6 +80,8 @@ package ch.unil.cbg.ExpressionView.view {
 				if ( !modulesNavigator ) {
 					modulesNavigator = new SuperTabNavigator();
 					modulesNavigator.addEventListener(IndexChangedEvent.CHANGE, tabChangeHandler);
+					modulesNavigator.addEventListener(SuperTabEvent.TAB_CLOSE, tabCloseHandler);
+					//modulesNavigator.addEventListener(TabReorderEvent.CHANGED, tabReorderHandler);
 					gePanel.addChild(modulesNavigator);
 					
 					openTabs = new Vector.<ZoomPanCanvas>;
@@ -173,9 +168,6 @@ package ch.unil.cbg.ExpressionView.view {
 			parentApplication.addEventListener(MenuEvent.PANELS, setPanelVisibilityHandler);
 			parentApplication.addEventListener(BroadcastInspectPositionEvent.BROADCASTINSPECTPOSITIONEVENT, broadcastInspectPositionHandler);
 			parentApplication.addEventListener(MenuEvent.PDF_EXPORT, pdfExportHandler);
-			parentApplication.addEventListener(MenuEvent.ALPHA, alphaSliderChangeHandler);
-			parentApplication.addEventListener(MenuEvent.FILLING, showFillingChangeHandler);
-			parentApplication.addEventListener(MenuEvent.OUTLINE, showOutlineChangeHandler);	
 			parentApplication.addEventListener(ResizeBrowserEvent.RESIZEBROWSEREVENT, resizeBrowserHandler);
 		}
 		
@@ -302,9 +294,33 @@ package ch.unil.cbg.ExpressionView.view {
 		private function tabChangeHandler(event:IndexChangedEvent): void {
 			openTabs[event.oldIndex].removeListener();
 			openTabs[event.newIndex].addListener();
+			var module:int = mapOpenTabs[event.newIndex];
+			genesSearchableDataGrid.dataProvider = ged.getModule(module).Genes;
+			samplesSearchableDataGrid.dataProvider = ged.getModule(module).Samples;
 			dispatchEvent(new MenuEvent(MenuEvent.MODE, [selectedMode]));
 		}
 		
+		private function tabCloseHandler(event:SuperTabEvent): void {
+			if ( event.tabIndex == 0 ) {
+				event.preventDefault();
+			} else {
+				event.preventDefault();
+				Alert.show("Closing tabs is not yet supported.", 'Warning', mx.controls.Alert.OK)
+				//openTabs.splice(event.tabIndex, 1);
+				//mapOpenTabs.splice(event.tabIndex, 1);
+			}
+		}
+
+		private function tabReorderHandler(event:TabReorderEvent): void {
+			if ( event.oldIndex == 0 ) {
+				event.preventDefault();
+			} else {
+				var temp:int = mapOpenTabs[event.oldIndex];
+				mapOpenTabs[event.oldIndex] = mapOpenTabs[event.newIndex];
+				mapOpenTabs[event.newIndex] = temp;
+			}
+		}
+
 		private function clickModulesHandler(event:SearchableDataGridSelectionEvent): void {
 			var module:int = mapOpenTabs[modulesNavigator.selectedIndex];
 			var highlightedRectangles:Array = new Array(ged.nModules + 1);
@@ -542,22 +558,8 @@ package ch.unil.cbg.ExpressionView.view {
 			if ( openTabs.length == 0 ) {
 				return;
 			}
-			
 			var module:int = modulesNavigator.selectedIndex;
-			var width:Number = openTabs[module].currentgeimage.bitmapData.width;
-			var height:Number = openTabs[module].currentgeimage.bitmapData.height;
-			var trans:ColorTransform = new ColorTransform();
-			trans.alphaMultiplier = 1 - currentalpha;
-			var pdfBitmapData:BitmapData = new BitmapData(width, height);
-			pdfBitmapData.draw(openTabs[module].currentgeimage);
-			if ( showfilling ) {
-				pdfBitmapData.draw(openTabs[module].currentmodulesimage, null, trans);
-			}
-			if ( showoutline ) {
-				pdfBitmapData.draw(openTabs[module].modulesCanvas);
-			}
-			
-			var pdfBitmap:Bitmap = new Bitmap(pdfBitmapData);
+			var pdfBitmap:Bitmap = openTabs[module].getBitmap();
 			
 			var myPDF:PDF;
 			myPDF = new PDF(Orientation.PORTRAIT, Unit.MM, Size.A4);
@@ -577,17 +579,7 @@ package ch.unil.cbg.ExpressionView.view {
 			file.save(bytes);
 	
 		}
-		
-		private function alphaSliderChangeHandler(event:MenuEvent): void {
-			currentalpha = event.data[0];
-		}
-		private function showOutlineChangeHandler(event:MenuEvent): void {
-			showoutline = event.data[0];
-		}
-		private function showFillingChangeHandler(event:MenuEvent): void {
-			showfilling = event.data[0];
-		}
-		
+				
 		private function generategedatainfo(): void {
 			if ( ged.XMLData.experimentdata.title != "" ) {
 				gedatainfoContent.htmlText = "<b>" + ged.XMLData.experimentdata.title + "</b><br><br>";

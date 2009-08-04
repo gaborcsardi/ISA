@@ -5,8 +5,10 @@ package ch.unil.cbg.ExpressionView.view.components {
 	import ch.unil.cbg.ExpressionView.utilities.LargeBitmapData;
 	
 	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 	import flash.display.Shape;
 	import flash.events.MouseEvent;
+	import flash.geom.ColorTransform;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.utils.getTimer;
@@ -17,8 +19,9 @@ package ch.unil.cbg.ExpressionView.view.components {
 	import mx.controls.VScrollBar;
 	import mx.events.ScrollEvent;
 
+
 	public class ZoomPanCanvas extends Canvas {
-						
+
 		private const MINIMAL_WIDTH:int = 2;
 		private const MINIMAL_HEIGHT:int = 2;
 	
@@ -31,8 +34,8 @@ package ch.unil.cbg.ExpressionView.view.components {
 		private var maximalWidth:int = 0;
 		private var maximalHeight:int = 0;
 		
-		public var currentgeimage:Bitmap;
-		public var currentmodulesimage:Bitmap;		
+		private var currentgeimage:Bitmap;
+		private var currentmodulesimage:Bitmap;		
 				
 		private var lastMode:int;
 		
@@ -61,8 +64,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 		private var vscrollbar:VScrollBar;		
 		private var geimage:Image;
 		private var modulesimage:Image;
-		//private var modulesCanvas:Canvas;
-		public var modulesCanvas:Canvas;
+		private var modulesCanvas:Canvas;
 		private var highlightCanvas:Canvas;
 		private var overlayCanvas:Canvas;
 		
@@ -301,6 +303,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 			dispatchEvent(new HighlightingEvent(HighlightingEvent.MODULE, [highlightedModules]));
 			dispatchEvent(new HighlightingEvent(HighlightingEvent.GENE, [highlightedGenes]));
 			dispatchEvent(new HighlightingEvent(HighlightingEvent.SAMPLE, [highlightedSamples]));
+			updateScrollBars();
  		}
  		
 		override protected function createChildren(): void {
@@ -333,14 +336,6 @@ package ch.unil.cbg.ExpressionView.view.components {
 				addChild(highlightCanvas);
 			}
 
-			if ( !overlayCanvas ) {
-				overlayCanvas = new Canvas();
-				overlayCanvas.alpha = 1;
-				overlayCanvas.addEventListener(MouseEvent.MOUSE_MOVE, inspectMouseMoveHandler);
-				overlayCanvas.addEventListener(MouseEvent.MOUSE_OUT, inspectMouseOutHandler);
-				addChild(overlayCanvas);
-			}
-
 			if ( !hscrollbar ) {
 				hscrollbar = new HScrollBar();
 				hscrollbar.addEventListener(ScrollEvent.SCROLL, hScrollHandler);
@@ -352,6 +347,14 @@ package ch.unil.cbg.ExpressionView.view.components {
 				vscrollbar.addEventListener(ScrollEvent.SCROLL, vScrollHandler);
 				addChild(vscrollbar);
 			}
+
+			if ( !overlayCanvas ) {
+				overlayCanvas = new Canvas();
+				overlayCanvas.alpha = 1;
+				overlayCanvas.addEventListener(MouseEvent.MOUSE_MOVE, inspectMouseMoveHandler);
+				overlayCanvas.addEventListener(MouseEvent.MOUSE_OUT, inspectMouseOutHandler);
+				addChild(overlayCanvas);
+			}
 						
 			parentApplication.addEventListener(MenuEvent.ALPHA, alphaSliderChangeHandler);
 			parentApplication.addEventListener(MenuEvent.OUTLINE, setOutlineVisibilityHandler);
@@ -359,6 +362,22 @@ package ch.unil.cbg.ExpressionView.view.components {
 			parentApplication.addEventListener(HighlightingEvent.MODULE, highlightModulesHandler);
 			parentApplication.addEventListener(HighlightingEvent.GENE, highlightGenesHandler);
 			parentApplication.addEventListener(HighlightingEvent.SAMPLE, highlightSamplesHandler);			
+		}
+
+		private function updateScrollBars():void {
+			hscrollbar.minScrollPosition = 0
+			hscrollbar.maxScrollPosition = maximalWidth - currentRectangle.width;
+			hscrollbar.pageSize = currentRectangle.width;
+			hscrollbar.lineScrollSize = currentRectangle.width / 4; 
+        	hscrollbar.pageScrollSize =  currentRectangle.width * 3 / 4;
+			hscrollbar.scrollPosition = currentRectangle.x; 
+
+			vscrollbar.minScrollPosition = 0
+			vscrollbar.maxScrollPosition = maximalHeight - currentRectangle.height;
+			vscrollbar.pageSize = currentRectangle.height;
+			vscrollbar.lineScrollSize = currentRectangle.height / 4; 
+        	vscrollbar.pageScrollSize =  currentRectangle.height * 3 / 4;
+			vscrollbar.scrollPosition =  currentRectangle.y;			
 		}
 
 		override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void {
@@ -382,24 +401,13 @@ package ch.unil.cbg.ExpressionView.view.components {
 			hscrollbar.height = thickness;
 			hscrollbar.x = 0;
 			hscrollbar.y = canvasheight;
-			hscrollbar.minScrollPosition = 0
-			hscrollbar.maxScrollPosition = maximalWidth - currentRectangle.width;
-			hscrollbar.pageSize = currentRectangle.width;
-			hscrollbar.lineScrollSize = currentRectangle.width / 4; 
-        	hscrollbar.pageScrollSize =  currentRectangle.width * 3 / 4;
-			hscrollbar.scrollPosition = currentRectangle.x; 
 			
 			vscrollbar.height = canvasheight;
 			vscrollbar.width = thickness;
 			vscrollbar.x = canvaswidth;
 			vscrollbar.y = 0;
-			vscrollbar.minScrollPosition = 0
-			vscrollbar.maxScrollPosition = maximalHeight - currentRectangle.height;
-			vscrollbar.pageSize = currentRectangle.height;
-			vscrollbar.lineScrollSize = currentRectangle.height / 4; 
-        	vscrollbar.pageScrollSize =  currentRectangle.height * 3 / 4;
-			vscrollbar.scrollPosition =  currentRectangle.y;
 			
+			updateScrollBars();
 			drawImage();
 		}
 		
@@ -523,7 +531,21 @@ package ch.unil.cbg.ExpressionView.view.components {
 			parentApplication.removeEventListener(MenuEvent.MODE, modeChangeHandler);
 		}
 
-				
+
+		public function getBitmap():Bitmap {
+			var trans:ColorTransform = new ColorTransform();
+			trans.alphaMultiplier = 1 - geimage.alpha;
+			var bitmapData:BitmapData = new BitmapData(currentgeimage.width, currentgeimage.height);
+			bitmapData.draw(currentgeimage);
+			if ( modulesimage.visible ) {
+				bitmapData.draw(currentmodulesimage, null, trans);
+			}
+			if ( modulesCanvas.visible ) {
+				bitmapData.draw(modulesCanvas);
+			}			
+			return new Bitmap(bitmapData);
+		}
+		
 	}
 }	
 
