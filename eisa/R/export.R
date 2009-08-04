@@ -18,10 +18,10 @@ toExpressionView <- function(eisamodules, gedata, order, filename="") {
 	nSamples <- (dim(eisamodules))[2]
 	nModules <- length(eisamodules)
 
-	writeBin("ExpressionViewFile", con, endian="swap")
-	writeBin(nGenes, con, 4, endian="swap")
-	writeBin(nSamples, con, 4, endian="swap")
-	writeBin(nModules, con, 4, endian="swap")
+	writeBin("ExpressionViewFile", con, endian="big")
+	writeBin(nGenes, con, 4, endian="big")
+	writeBin(nSamples, con, 4, endian="big")
+	writeBin(nModules, con, 4, endian="big")
 
 	GenesLookup = c(0);
 	for ( gene in 1:nGenes ) {
@@ -50,7 +50,7 @@ toExpressionView <- function(eisamodules, gedata, order, filename="") {
 		for ( gene in 1:nGenes ) {
 			value <- Data[sample, gene]
 			value <- (value - Data.min) / Data.delta * 2 - 1
-			writeBin(value, con, 4, endian="swap")
+			writeBin(value, con, 4, endian="big")
 		}
 	}
 	
@@ -271,7 +271,7 @@ toExpressionView <- function(eisamodules, gedata, order, filename="") {
 		# options(warn=-1)
 
 		# cat(saveXML(xmldata))
-		writeBin(saveXML(xmldata), con, 1, endian="swap")
+		writeBin(saveXML(xmldata), con, 1, endian="big")
 		
 	close(con)
 
