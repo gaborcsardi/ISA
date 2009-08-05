@@ -24,7 +24,8 @@ exportMethods("drive", "drive<-",
               "getFeatureMatrix", "getSampleMatrix",
               "getFeatureScores", "getSampleScores",
               "getNoFeatures", "getNoSamples",
-              "featureThreshold", "sampleThreshold")
+              "featureThreshold", "sampleThreshold",
+              "getOrganism")
 
 export(toExpressionView)
 exportMethods("orderModules")

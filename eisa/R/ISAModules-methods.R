@@ -54,7 +54,7 @@ setMethod("annotation", signature(object="ISAModules"),
             object@rundata$annotation
           })
 
-setMethod("organism", signature(object="ISAModules"),
+setMethod("getOrganism", signature(object="ISAModules"),
           function(object) {
             object@rundata$organism
           })

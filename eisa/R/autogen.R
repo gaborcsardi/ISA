@@ -13,7 +13,7 @@ ISA.html.table <- function(nm, isares, target.dir,
   
   chip <- annotation(isares)
   library(paste(sep="", chip, ".db"), character.only=TRUE)
-  organism <- organism(isares)
+  organism <- getOrganism(isares)
 
   ################################################
   ## GO
@@ -312,7 +312,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
 
   chip <- annotation(isares)
   library(paste(sep="", chip, ".db"),  character.only=TRUE)
-  organism <- organism(isares)
+  organism <- getOrganism(isares)
   short.organism <- organism
   require(paste(sep="", "org.", abbreviate(organism, 2), ".eg.db"),
           character.only=TRUE)
@@ -939,7 +939,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   
   valid <- !is.na(entrezIds)
 
-  if (organism(isares) == "Homo sapiens") {
+  if (getOrganism(isares) == "Homo sapiens") {
     html <- paste(sep="", "<a href=\"http://www.genecards.org/cgi-bin/carddisp.pl?gene=", entrezIds[valid],
                   "\" class=\"tag", val[valid],
                   "\">", entrezIds[valid], "<span>", longname[valid], ", score: ", orig.val[valid], "</span></a>")

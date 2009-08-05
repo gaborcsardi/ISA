@@ -13,7 +13,7 @@ setGeneric("drive<-", function(r, value) standardGeneric("drive<-"))
 
 setGeneric("seedData", function(object) standardGeneric("seedData"))
 setGeneric("runData", function(object) standardGeneric("runData"))
-setGeneric("organism", function(object) standardGeneric("organism"))
+setGeneric("getOrganism", function(object) standardGeneric("getOrganism"))
 
 setGeneric("getFeatures", function(object, ...) standardGeneric("getFeatures"))
 setGeneric("getSamples", function(object, ...) standardGeneric("getSamples"))

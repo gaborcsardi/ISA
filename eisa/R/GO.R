@@ -360,7 +360,7 @@ setMethod("sigCategories", signature(r="GOListHyperGResult"),
           })
 
 ISA.GO <- function(modules,
-                   org=organism(modules),
+                   org=getOrganism(modules),
                    shortorg=abbreviate(org, 2),
                    ann=annotation(modules),
                    features=featureNames(modules),
