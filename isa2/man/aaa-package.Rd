@@ -1,7 +1,6 @@
 \docType{package}
 \name{isa2-package}
 \alias{isa2-package}
-\alias{ISA}
 \title{The isa package}
 \description{The Iterative Signature Algorithm}
 \section{Introduction}{
