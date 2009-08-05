@@ -80,7 +80,7 @@ ISA <- function(data,
   modules
 }
 
-ISA.normalize <- function(data, prenormalize=FALSE) {
+ISA.normalize <- function(data, prenormalize=TRUE) {
 
   isa2:::isa.status("Normalizing ExpressionSet", "in")
   
