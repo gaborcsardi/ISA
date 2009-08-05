@@ -94,16 +94,61 @@ There are various other \Rclass{ISAModules} methods that help to
 access the modules themselves and the ISA parameters that were used
 for the run. 
 
-% TODO: length, dim, featureNames, sampleNames, pData, 
-% annotation, organism, indexing
+Calling \Rfunction{length} on \variable{modules} returns the number of
+ISA modules in the set, \Rfunction{dim} gives the dimension of the
+input expression matrix: the number of features and the number of
+samples.
+<<accessors 1>>=
+length(modules)
+dim(modules)
+@ 
+
+Functions \Rfunction{featureNames} and \Rfunction{sampleNames} return
+the names of the features and samples, just like the functions with
+the same name for an \Rclass{ExpressionSet}
+<<accessors 2>>=
+featureNames(modules)[1:5]
+sampleNames(modules)[1:5]
+@ 
 
 The \Rfunction{getNoFeatures} function returns a numeric vector, the
 number of features (probesets in our case) in each module. Similarly,
 \Rfunction{getNoSamples} returns a numeric vector, the number of
-samples in each module. 
+samples in each module. Similarly, \Rfunction{pData} returns the
+phenotype data of the expression set as a data frame. The
+\Rfunction{getOrganism} function returns the scientific name of the
+organism, \Rfunction{annotation} the name of the chip. For the former
+the appropriate annotation must be installed.
 <<number of features and samples>>=
 getNoFeatures(modules)
 getNoSamples(modules)
+colnames(pData(modules))
+getOrganism(modules)
+annotation(modules)
+@ 
+
+The double bracket indexing operator (`\verb+[[+') can be used to
+select some modules from the complete set, the result is another,
+smaller \Rclass{ISAModules} object. The following selects the first
+five modules.
+<<indexing>>=
+modules[[1:5]]
+@ 
+
+The single bracket indexing operator can be used to restrict an
+\Rclass{ISAModules} object to a subset of features and/or
+samples. E.g. selecting all features that map to a gene on
+chromosome~1 can be done with 
+<<indexing 2>>=
+chr <- get(paste(annotation(modules), sep="", "CHR"))
+entrez <- sapply(mget(featureNames(modules), chr), 
+                 function(x) "1" %in% x)
+modules[entrez,]
+@
+
+Similarly, selecting all B-cell samples can be performed with
+<<indexing 3>>=
+modules[ ,grep("^B", pData(modules)$BT)]
 @ 
 
 \Rfunction{getFeatureNames} lists the probes (more precisely,
@@ -290,7 +335,7 @@ used for chromosome enrichment, as well.
 
 $\mu$RNAs are short RNA molecules that regulate gene expression.
 TargetScan is a data based of predicted target genes of $\mu$RNAs, for
-severral organisms. There are two R packages that incorporate this
+several organisms. There are two R packages that incorporate this
 database, one for human and another one for mouse, right now they can
 be downloaded from
 \url{http://www2.unil.ch/cbg/index.php?title=Building_BioConductor_Annotation_Packages}.
@@ -364,7 +409,7 @@ dev.off()
 \begin{figure}
   \centering
   \includegraphics[width=0.7\textwidth]{heatmap}
-  \caption{TODO}
+  \caption{Heatmap of the first transcription module.}
   \label{fig:drawHeatmap}
 \end{figure}
 
@@ -658,6 +703,277 @@ enrichment calculation, etc. are distributed in two separate packages,
 
 \section{Finer control over ISA parameters}%
 \label{sec:detailed-isa}
+
+The \Rfunction{ISA} function takes care of all steps performed during
+a modular study, and for each step it uses parameters work reasonably
+well. In some cases, however, one wants to access these steps
+individually, to use custom parameters instead of the defaults.
+
+In this section, we will still use the acute lymphoblastic leukemia
+gene expression data from the \Rpackage{ALL} package. 
+
+\subsection{Non-specific filtering}
+
+The first step of the analysis typically involves non-specific
+filtering of the probesets. The aim is to eliminate the probesets that
+do not show variation across the samples, as they only contribute
+noise to the data. 
+
+By default (i.e. if the \Rfunction{ISA} function is called) this is
+performed using the \Rpackage{genefilter} package, and the default
+filter is based on the inter-quantile ratio of the probesets'
+expression values, a robust measure of variance. Other possible
+filtering techniques include using the AffyMetrix present/absent calls
+produced by the \Rfunction{mas5calls} function of the \Rpackage{affy}
+package, but this requires the raw data, so in this vignette we use a
+simple method based on variance and minimum expression value: only
+probesets that have a variance of at least \variable{varLimit} and
+that have at least \variable{kLimit} samples with expression values
+over \variable{ALimit} are kept.
+<<filtering>>=
+varLimit <- 0.5
+kLimit <- 4
+ALimit <- 5
+flist <- filterfun(function(x) var(x)>varLimit, kOverA(kLimit,ALimit))
+ALL.filt <- ALL[genefilter(ALL, flist), ]
+@ 
+
+The original expression set had \Sexpr{nrow(ALL)} features, the
+filtered one has only \Sexpr{nrow(ALL.filt)}.
+
+
+\subsection{Entrez Id matching}
+
+In this step we match the probesets to Entrez Id and remove the ones
+that don't map to any Entrez genes.
+<<Entrez>>=
+ann <- annotation(ALL.filt)
+library(paste(ann, sep=".", "db"), character.only=TRUE)
+ENTREZ <- get( paste(ann, sep="", "ENTREZID") )
+EntrezIds <- mget(featureNames(ALL.filt), ENTREZ)
+keep <- sapply(EntrezIds, function(x) length(x) >= 1 && !is.na(x))
+ALL.filt.2 <- ALL.filt[keep,]
+@ 
+
+To reduce ambiguity in the interpretation of the results, we might
+also want to keep only single probeset for each Entrez genes.
+<<Entrez unique>>=
+vari <- apply(exprs(ALL.filt.2), 1, var)
+larg <- findLargest(featureNames(ALL.filt.2), vari, data=annotation(ALL.filt.2))
+ALL.filt.3 <- ALL.filt.2[larg,]
+@ 
+
+\subsection{Normalizing the data}
+
+The ISA works best, if the expression matrix is scaled and
+centered. In fact, the two sub-steps of an ISA step require expression
+matrices that are normalized differently. The
+\Rfunction{ISA.normalize} function can be used to calculate the
+normalized expression matrices; it returns an \Rclass{ExpressionSet}
+object including three expression matrices: the original raw
+expression, the row-wise normalized and the column-wise normalized
+expression matrix.
+<<normed>>=
+ALL.normed <- ISA.normalize(ALL.filt.3)
+ls(assayData(ALL.normed))
+@ 
+
+\subsection{Generating starting seeds for the ISA}
+
+The ISA is an iterative algorithm that starts with a set of input
+seeds. An input seed is basically a set of probesets and the ISA stepwise
+refines this set by 1) including other probesets in the set that are
+coexpressed with the input probesets and 2) removing probesets from it
+that are not coexpressed with the rest of the input set.
+
+The \Rfunction{generate.seeds} generates a set of random seeds (i.e. a
+set of random gene sets). See its documentation if you need to change
+the sparsity of the seeds.
+
+<<seeds>>=
+random.seeds <- generate.seeds(length=nrow(ALL.normed), count=100)
+@ 
+
+In addition to random seeds, it is possible to start the ISA iteration
+from ``educated'' seeds, i.e. gene sets the user is interested in, or
+a set of samples that are supposed to have coexpressed genes. We
+create another set of starting seeds here, based on the type of acute
+lymphoblastic leukemia: ``B'', ``B1'', ``B2'', ``B3'', ``B4'' or
+``T'', ``T1'', ``T2'', ``T3'' and ``T4''.
+<<smart seeds>>=
+type <- as.character(pData(ALL.normed)$BT)
+ss1 <- ifelse(grepl("^B", type), -1, 1)
+ss2 <- ifelse(grepl("^B1", type), 1, 0)
+ss3 <- ifelse(grepl("^B2", type), 1, 0)
+ss4 <- ifelse(grepl("^B3", type), 1, 0)
+ss5 <- ifelse(grepl("^B4", type), 1, 0)
+ss6 <- ifelse(grepl("^T1", type), 1, 0)
+ss7 <- ifelse(grepl("^T2", type), 1, 0)
+ss8 <- ifelse(grepl("^T3", type), 1, 0)
+ss9 <- ifelse(grepl("^T4", type), 1, 0)
+smart.seeds <- cbind(ss1, ss2, ss3, ss4, ss5, ss6, ss7, ss8, ss9)
+@
+
+The \variable{ss1} seed includes all samples, but their sign is
+opposite for B-cell leukemia samples and T-cell samples. This way ISA
+is looking for sets of genes that are differently regulated in these
+two groups of samples. \variable{ss2} contains only B1 type samples,
+so here we look for genes that are specific to this variant of the
+disease. The other seeds are similar, for the other subtypes.
+
+\subsection{Performing the ISA iteration}
+
+We perform the ISA iterations for our two sets of seeds separately.
+<<iteration>>=
+modules1 <- ISA.iterate(ALL.normed, row.seeds=random.seeds, 
+                        thr.row=2, thr.col=2)
+modules2 <- ISA.iterate(ALL.normed, col.seeds=smart.seeds,
+                        thr.row=2, thr.col=2)
+@
+
+\subsection{Dropping non-unique modules}
+
+\Rfunction{ISA.iterate} returns the same number of ``modules'' as the
+number of input seeds; these, however, do not always correspond to
+meaningful modules, the input seeds can converge to an all-zero
+vector, or occasionally they may not converge at all. It is also
+possible that two or more input seeds converge to the same module. 
+
+The \Rfunction{ISA.unique} function eliminates the all-zero or
+non-convergent input seeds and keeps only one instance of the
+duplicated ones.
+<<unique>>=
+modules1.unique <- ISA.unique(ALL.normed, modules1)
+modules2.unique <- ISA.unique(ALL.normed, modules2)
+@ 
+
+\Sexpr{length(modules1.unique)} modules were kept for the first set of
+seeds and \Sexpr{length(modules2.unique)} for the second set.
+
+\subsection{Dropping non-robust modules}
+
+The \Rfunction{ISA.filter.robust} function filters a set of modules by
+running ISA with the same parameters on a scrambled data set and then
+calculating a robustness score, both for the real modules and the ones
+from the scrambled data. The highest robustness score obtained from
+the scrambled data is used as a threshold to filter the real modules.
+<<robust>>=
+modules1.robust <- ISA.filter.robust(ALL.normed, modules1.unique)
+modules2.robust <- ISA.filter.robust(ALL.normed, modules2.unique)
+@ 
+
+We still have \Sexpr{length(modules1.robust)} modules for
+the first set of seeds and \Sexpr{length(modules2.unique)} for the
+second set.
+
+\subsection{Differentially regulated modules}
+
+Now we check whether the ISA modules that we found can be used as
+classifiers for the different types of ALL. For this we use the sample
+scores of the modules, the score of a sample in a given module is the
+(weighted) average of the expression of the genes of the module in
+the sample in question.
+
+Let's first check, whether any of the modules can distinguish between
+T-cell and B-cell ALL samples.
+<<B vs T>>=
+scores1 <- getSampleMatrix(modules1.robust)
+tt1 <- colttests(scores1, as.factor(substr(type, 1, 1)))
+scores2 <- getSampleMatrix(modules2.robust)
+tt2 <- colttests(scores2, as.factor(substr(type, 1, 1)))
+sign1 <- which(p.adjust(tt1$p.value, "holm") < 0.05)
+sign2 <- which(p.adjust(tt2$p.value, "holm") < 0.05)
+@
+
+For the first set of samples \Sexpr{length(sign1)} modules show
+significant difference for T-cell and B-cell samples, for the second
+(smart) set \Sexpr{length(sign2)} of them.
+
+Let's make some condition plots for the best separating modules from
+each set.
+<<conditions-plots-dysreg,fig=TRUE,width=10,height=8>>=
+color <- ifelse(grepl("T", type), "orange", "darkolivegreen")
+layout(cbind(1:2))
+cond.plot(modules1.robust, which.min(tt1$p.value), ALL.normed, col=color, 
+          main="Best separator, random seeds")
+cond.plot(modules2.robust, which.min(tt2$p.value), ALL.normed, col=color,
+          main="Best separator, smart seeds")
+@ 
+
+Let's extract the modules that are good separators.
+<<extract separators>>=
+modules1.TB <- modules1.robust[[sign1]]
+modules2.TB <- modules2.robust[[sign2]]
+@ 
+
+\subsection{Enrichment calculations}
+
+We can check our separator modules against the Gene Ontology
+categories and the pathways in the KEGG database to find dysregulated
+GO categories and/or KEGG pathways.
+<<dysreg enrichment>>=
+GO.dysreg1 <- ISA.GO(modules1.TB)
+GO.dysreg2 <- ISA.GO(modules2.TB)
+KEGG.dysreg1 <- ISA.KEGG(modules1.TB)
+KEGG.dysreg2 <- ISA.KEGG(modules2.TB)
+@ 
+
+Let's collect the significantly enriched GO categories and KEGG
+pathways.
+<<dysreg enriched categories>>=
+gocats <- unique(unlist(lapply(c(GO.dysreg1, GO.dysreg2), function(x) 
+                               unique(unlist(sigCategories(x))))))
+keggp  <- unique(unlist(lapply(list(KEGG.dysreg1, KEGG.dysreg2), function(x)
+                        unique(unlist(sigCategories(x))))))
+library(GO.db)
+library(KEGG.db)
+sapply(mget(gocats, GOTERM), Term)
+mget(keggp, KEGGPATHID2NAME)
+@ 
+
+\subsection{More separator modules}
+
+Of course we can search for modules that can separate the samples of
+the ALL subtypes as well, e.g. let's try to find some that
+differentiate between type B1 and other B types. 
+<<B1 vs others>>=
+keep <- grepl("^B[1234]", type)
+type.B <- ifelse(type[keep]=="B1", "B1", "Bx")
+scores.B1.1 <- scores1[keep,]
+scores.B1.2 <- scores2[keep,]
+tt.B1.1 <- colttests(scores.B1.1, as.factor(type.B))
+tt.B1.2 <- colttests(scores.B1.2, as.factor(type.B))
+min(p.adjust(na.omit(tt.B1.1$p.value)))
+min(p.adjust(na.omit(tt.B1.2$p.value)))
+@ 
+
+Both module sets seem to have some good separators, let us make some
+condition plots.
+<<B1-cond-plots,fig=TRUE,width=10,height=8>>=
+color <- ifelse(type == "B1", "green", 
+                ifelse(grepl("^T", type), "orange", "darkolivegreen"))
+layout(cbind(1:2))
+cond.plot(modules1.robust, which.min(tt.B1.1$p.value), ALL.normed, col=color, 
+          main="Best B1 separator, random seeds")
+cond.plot(modules2.robust, which.min(tt.B1.2$p.value), ALL.normed, col=color,
+          main="Best B1 separator, smart seeds")
+@ 
+
+From the plot it seems that these two modules are essentially the
+same, one is the opposite of the others.
+<<check B1 same module>>=
+B1.cor <- c(cor(scores1[,which.min(tt.B1.1$p.value)],
+                scores2[,which.min(tt.B1.2$p.value)]),
+            cor(getFeatureMatrix(modules1.robust, 
+                                 mods=which.min(tt.B1.1$p.value)),
+                getFeatureMatrix(modules2.robust, 
+                                 mods=which.min(tt.B1.2$p.value))))
+B1.cor
+@ 
+
+Indeed, they are almost the same, their Pearson correlation is around
+\Sexpr{round(B1.cor[1],3)} for the sample scores and
+\Sexpr{round(B1.cor[2],3)} for the feature (=gene) scores.
 
 \section{Session information}
 
