@@ -98,7 +98,7 @@ isa.iterate.default <- function(normed.data, row.seeds, col.seeds,
   }
   if (!missing(col.seeds)) {
     col.seeds <- isa.row.from.col(normed.data, col.seeds=col.seeds,
-                                  thr.row=tail(thr.row, ncol(row.seeds)),
+                                  thr.row=tail(thr.row, ncol(col.seeds)),
                                   direction=direction[2])
     all.seeds <- cbind(all.seeds, col.seeds)
   }
