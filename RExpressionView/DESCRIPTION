@@ -1,0 +1,15 @@
+Package: ExpressionView
+Version: 0.1
+Date: aug 6, 2009
+Title: Visualize overlapping biclusters
+Author: Andreas Luscher <andreas.luescher@a3.epfl.ch>
+Maintainer: Andreas Luscher <andreas.luescher@a3.epfl.ch>
+Description: ExpressionView visualizes possibly overlapping biclusters
+	in a gene expression matrix. It can use the result of the ISA
+	algorithm (eisa package) or the algorithms in the biclust
+	package. The program itself was developed using Adobe Flex and
+	runs in a flash-enabled web browser.
+Depends: 
+Suggests: isa2, eisa, biclust
+License: GPL
+Packaged: Mon Jul 28 09:19:47 2008; csardi

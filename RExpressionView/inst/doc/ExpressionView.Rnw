@@ -1,0 +1,35 @@
+% \VignetteIndexEntry{ExpressionView manual}
+\documentclass{article}
+
+\newcommand{\Rfunction}[1]{\texttt{#1}}
+\newcommand{\Rpackage}[1]{\texttt{#1}}
+\newcommand{\Rclass}[1]{\texttt{#1}}
+\newcommand{\Rargument}[1]{\textsl{#1}}
+\newcommand{\filename}[1]{\texttt{#1}}
+\newcommand{\variable}[1]{\texttt{#1}}
+
+\SweaveOpts{cache=TRUE}
+\SweaveOpts{prefix.string=graphics/plot}
+
+\begin{document}
+
+\title{}
+\author{}
+\maketitle
+
+\tableofcontents
+
+<<set width,echo=FALSE,print=FALSE>>=
+options(width=60)
+@ 
+
+\section{Session information}
+
+The version number of R and packages loaded for generating this
+vignette were:
+
+<<sessioninfo,results=tex,echo=FALSE>>=
+toLatex(sessionInfo())
+@ 
+
+\end{document}

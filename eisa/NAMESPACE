@@ -28,6 +28,3 @@ exportMethods("drive", "drive<-",
               "getNoFeatures", "getNoSamples",
               "featureThreshold", "sampleThreshold",
               "getOrganism")
-
-export(toExpressionView)
-exportMethods("orderModules")

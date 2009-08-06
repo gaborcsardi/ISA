@@ -1,5 +1,7 @@
-setMethod("orderModules", signature(modules="list"),
-	function(modules, ...) orderModules.default(modules, ...))
+if (require(isa2)) {
+  setMethod("orderModules", signature(modules="list"),
+            function(modules, ...) orderModules.default(modules, ...))
+}
 
 orderModules.default <- function(modules, debuglevel=0, timelimit=60) {
 	#isa.status("ISA ordering", "in")
