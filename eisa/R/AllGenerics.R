@@ -24,6 +24,9 @@ setGeneric("getSampleNames", function(object, ...) standardGeneric("getSampleNam
 setGeneric("getFeatureMatrix", function(object, ...) standardGeneric("getFeatureMatrix"))
 setGeneric("getSampleMatrix", function(object, ...) standardGeneric("getSampleMatrix"))
 
+setGeneric("getFullFeatureMatrix", function(object, ...) standardGeneric("getFullFeatureMatrix"))
+setGeneric("getFullSampleMatrix", function(object, ...) standardGeneric("getFullSampleMatrix"))
+
 setGeneric("getFeatureScores", function(object, ...) standardGeneric("getFeatureScores"))
 setGeneric("getSampleScores", function(object, ...) standardGeneric("getSampleScores"))
 

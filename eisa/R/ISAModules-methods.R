@@ -118,7 +118,56 @@ setMethod("getSampleMatrix", signature(object="ISAModules"),
             }
             res
           })            
-            
+
+setMethod("getFullFeatureMatrix", signature(object="ISAModules"),
+          function(object, eset, mods) {
+            eset <- eisa.get.nm(eset)
+            eset <- eset[featureNames(object),]
+            nm <- list(t(feat.exprs(eset)), samp.exprs(eset))
+            if (missing(mods)) {
+              genes <- getFeatureMatrix(object)
+              samp  <- getSampleMatrix(object)
+              thr <- seedData(object)$thr.col
+            } else {
+              genes <- getFeatureMatrix(object, mods=mods)
+              samp <- getSampleMatrix(object, mods=mods)
+              thr <- seedData(object)$thr.col[mods]
+            }
+            scores <- nm[[2]] %*% samp
+            n.scores <- ifelse(genes != 0, scores, 0)
+            for (i in seq_len(ncol(scores))) {
+              m <- max(abs(n.scores[,i]))
+              if (m!=0) { 
+                scores[,i] <- scores[,i] / m                  
+              }
+            }
+            scores            
+          })
+
+setMethod("getFullSampleMatrix", signature(object="ISAModules"),
+          function(object, eset, mods) {
+            eset <- eisa.get.nm(eset)
+            eset <- eset[featureNames(object),]
+            nm <- list(t(feat.exprs(eset)), samp.exprs(eset))
+            if (missing(mods)) {
+              genes <- getFeatureMatrix(object)
+              samp  <- getSampleMatrix(object)
+              thr <- seedData(object)$thr.col
+            } else {
+              genes <- getFeatureMatrix(object, mods=mods)
+              samp <- getSampleMatrix(object, mods=mods)
+              thr <- seedData(object)$thr.col[mods]
+            }
+            scores <- nm[[1]] %*% genes
+            n.scores <- ifelse(samp != 0, scores, 0)
+            for (i in seq_len(ncol(scores))) {
+              m <- max(abs(n.scores[,i]))
+              if (m!=0) { 
+                scores[,i] <- scores[,i] / m                  
+              }
+            }
+            scores
+          })
 
 setMethod("getFeatureScores", signature(object="ISAModules"),
           function(object, mods) {
