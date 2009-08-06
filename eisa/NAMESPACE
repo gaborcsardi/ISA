@@ -1,3 +1,4 @@
+import(isa2)
 import(Category)
 import(AnnotationDbi)
 import(Biobase)
