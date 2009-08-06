@@ -1,3 +1,4 @@
+% \VignetteIndexEntry{The Iterative Signature Algorithm for Gene Expression Data}
 \documentclass{article}
 \usepackage{ragged2e}
 \usepackage{url}
@@ -398,7 +399,7 @@ You can also use the \Rpackage{biclust} package to create image
 plots, by calling the \Rfunction{drawHeatmap} function. The result is
 in Fig.~\ref{fig:drawHeatmap}.
 <<heatmap biclust pre,echo=FALSE,results=hide>>=
-CairoPNG("heatmap.png", 400, 400 )
+png("heatmap.png", 400, 400 )
 @ 
 <<heatmap>>=
 drawHeatmap(exprs(ALL[featureNames(modules),]), Bc, number=1) 
@@ -421,7 +422,7 @@ contains a line plot for every single gene (or sample) and the genes
 that belong to the module have a different color, see
 Fig.~\ref{fig:parallel}.
 <<parallel.pre,echo=FALSE,results=hide>>=
-CairoPNG("parallel.png", 400, 400 )
+png("parallel.png", 400, 400 )
 @ 
 <<parallel>>=
 profile.plot(modules, 2, ALL, plot="both")
