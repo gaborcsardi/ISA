@@ -1,5 +1,5 @@
-\name{isa.KEGG}
-\alias{isa.KEGG}
+\name{ISA.KEGG}
+\alias{ISA.KEGG}
 \concept{Enrichment analysis}
 \title{Calculate KEGG Pathway enrichment for transcription modules}
 \description{}

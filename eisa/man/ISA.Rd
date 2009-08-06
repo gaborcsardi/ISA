@@ -91,4 +91,4 @@ ISA (data, flist = filterfun(function(x) IQR(x) > 0.5),
   The vignette included in the \code{eisa} package.
 }
 \examples{}
-\keyword{cluster,classif,array,optimize}
+\keyword{cluster}

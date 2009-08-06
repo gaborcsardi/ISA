@@ -1,5 +1,5 @@
-\name{isa.GO}
-\alias{isa.GO}
+\name{ISA.GO}
+\alias{ISA.GO}
 \concept{Gene Ontology}
 \concept{Enrichment analysis}
 \title{Calculate Gene Ontology enrichment for transcription modules}

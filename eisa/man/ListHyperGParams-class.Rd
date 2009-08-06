@@ -1,10 +1,20 @@
-\name{ListHyperGParams-class.Rd}
+\name{ListHyperGParams-class}
 \docType{class}
 \alias{CHRListHyperGParams-class}
 \alias{DBDListHyperGParams-class}
 \alias{GOListHyperGParams-class}
 \alias{KEGGListHyperGParams-class}
 \alias{miRNAListHyperGParams-class}
+\alias{drive,GOListHyperGParams,logical-method}
+\alias{drive,KEGGListHyperGParams,logical-method}
+\alias{drive,CHRListHyperGParams,logical-method}
+\alias{drive,miRNAListHyperGParams,logical-method}
+\alias{drive,DBDListHyperGParams,logical-method}
+\alias{drive<-,GOListHyperGParams,logical-method}
+\alias{drive<-,KEGGListHyperGParams,logical-method}
+\alias{drive<-,CHRListHyperGParams,logical-method}
+\alias{drive<-,miRNAListHyperGParams,logical-method}
+\alias{drive<-,DBDListHyperGParams,logical-method}
 \title{Classes for GO/KEGG/CHR/miRNA enrichment of ISA modules}
 \description{}
 \section{Methods}{

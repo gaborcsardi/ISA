@@ -1,14 +1,20 @@
 \name{ISAModules-class}
 \docType{class}
+\alias{ISAModules}
+\alias{class:ISAModules}
 \alias{ISAModules-class}
 \alias{seedData,ISAModules-method}
 \alias{runData,ISAModules-method}
 \alias{featureNames,ISAModules-method}
 \alias{sampleNames,ISAModules-method}
+\alias{getFeatures,ISAModules-method}
+\alias{getSamples,ISAModules-method}
 \alias{getFeatureNames,ISAModules-method}
 \alias{getSampleNames,ISAModules-method}
 \alias{getFeatureMatrix,ISAModules-method}
 \alias{getSampleMatrix,ISAModules-method}
+\alias{getFullFeatureMatrix,ISAModules-method}
+\alias{getFullSampleMatrix,ISAModules-method}
 \alias{getFeatureScores,ISAModules-method}
 \alias{getSampleScores,ISAModules-method}
 \alias{getNoFeatures,ISAModules-method}
@@ -19,9 +25,9 @@
 \alias{dim,ISAModules-method}
 \alias{pData,ISAModules-method}
 \alias{annotation,ISAModules-method}
-\alias{organism,ISAModules-method}
-\alias{[,ISAModules-method}
-\alias{[[,ISAModules-method}
+\alias{getOrganism,ISAModules-method}
+\alias{[,ISAModules,ANY-method}
+\alias{[[,ISAModules,ANY,ANY-method}
 \title{A set of ISA modules}
 \description{}
 \section{Methods}{
