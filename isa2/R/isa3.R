@@ -2,7 +2,7 @@
 setMethod("isa.normalize", signature(data="matrix"),
           function(data, ...) isa.normalize.default(data, ...))
 
-isa.normalize.default <- function(data, prenormalize=TRUE) {
+isa.normalize.default <- function(data, prenormalize=FALSE) {
 
   isa.status("ISA normalization", "in")
 
