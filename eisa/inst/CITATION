@@ -1,0 +1,34 @@
+citHeader("To cite package 'eisa' in publications use:")
+     
+desc <- packageDescription("eisa")
+year <- sub(".*(2[[:digit:]]{3})-.*", "\\1", desc$Date)
+vers <- paste("R package version", desc$Version)
+     
+citEntry(entry="Manual",
+         title = "eisa: The Iterative Signature Algorithm for Gene Expression Data",
+         author = personList(as.person("Gábor Csárdi")),
+         year = year,
+         note = vers,
+     
+         textVersion =
+         paste("Gábor Csárdi (",
+                year,
+               "). eisa: The Iterative Signature Algorithm for Gene Expression Data. ",
+               vers, ".", sep=""))
+
+citEntry(entry="Article",
+	 title = "Iterative signature algorithm for the analysis of large-scale gene expression data",
+         author = personList(as.person("Sven Bergmann"),
+           as.person("Jan Ihmels"),
+           as.person("Naama Barkai")),
+         journal = "Phys Rev E Nonlin Soft Matter Phys",
+         year  = "2003",
+	 pages = "031902",
+
+         textVersion =
+         paste(sep="",
+               "Bergmann S, Ihmels J, Barkai N: ",
+               "Iterative signature algorithm for the ",
+               "analysis of large-scale gene expression data ",
+               "Phys Rev E Stat Nonlin Soft Matter Phys. 2003",
+               "Mar;67(3 Pt 1):031902. Epub 2003 Mar 11."))
