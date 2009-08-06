@@ -25,7 +25,16 @@ eisa_$(VERSION).tar.gz:	eisa/DESCRIPTION eisa/NAMESPACE			\
 			eisa/inst/CITATION eisa/inst/doc/*.Rnw
 	R CMD build --no-vignettes eisa
 
-ExpressionView_$(VERSION).tar.gz: RExpressionView/DESCRIPTION 			\
+EVFILES=ExpressionView/src/ch/unil/cbg/ExpressionView/*/*	\
+	ExpressionView/src/ExpressionView.mxml
+
+RExpressionView/inst/ExpressionView.swf: $(EVFILES)
+	cd ExpressionView/src && \
+		mxmlc -compiler.include-libraries=../libs/flexlib.swc,../libs/AlivePDF.swc ExpressionView.mxml
+	cp ExpressionView/src/$(@F) $(@)
+
+ExpressionView_$(VERSION).tar.gz: RExpressionView/inst/ExpressionView.swf	\
+			RExpressionView/DESCRIPTION 				\
 			RExpressionView/NAMESPACE				\
 			RExpressionView/R/*.R RExpressionView/man/*.Rd 		\
 			RExpressionView/src/*.h RExpressionView/src/*.cpp 	\
@@ -36,11 +45,11 @@ ExpressionView_$(VERSION).tar.gz: RExpressionView/DESCRIPTION 			\
 ####################################################
 ## Homepage
 
-homepage: homepage/ISA.html           		\
-		homepage/ISA_tutorial.html  	\
-		homepage/ISA_tutorial.pdf   	\
-		homepage/EISA_tutorial.html 	\
-	homepage/EISA_tutorial.pdf
+VIGNETTES=homepage/ISA_tutorial.html homepage/ISA_tutorial.pdf   	\
+	homepage/EISA_tutorial.html homepage/EISA_tutorial.pdf		\
+	homepage/ExpressionView.html homepage/ExpressionView.pdf
+
+homepage: homepage/ISA.html $(VIGNETTES)
 
 ####################################################
 ## Vignettes to homepage
@@ -76,13 +85,13 @@ eisa/inst/doc/EISA_tutorial.tex: eisa/inst/doc/EISA_tutorial.Rnw
 # ExpressionView
 
 homepage/ExpressionView.html: RExpressionView/inst/doc/ExpressionView.tex
-	cd RExpresssionView/inst/doc && sweave2html ExpressionView
-	cp RExpresssionView/inst/doc/ExpressionView.html homepage/
-	cp RExpresssionView/inst/doc/graphics/*.png homepage/graphics
+	cd RExpressionView/inst/doc && sweave2html ExpressionView
+	cp RExpressionView/inst/doc/ExpressionView.html homepage/
+#	cp RExpressionView/inst/doc/graphics/*.png homepage/graphics
 
-homepage/ExpressionView.pdf: RExpresssionView/inst/doc/ExpressionView.tex
-	cd RExpresssionView/inst/doc && pdflatex ExpressionView && pdflatex ExpressionView
-	cp RExpresssionView/inst/doc/ExpressionView.pdf homepage/
+homepage/ExpressionView.pdf: RExpressionView/inst/doc/ExpressionView.tex
+	cd RExpressionView/inst/doc && pdflatex ExpressionView && pdflatex ExpressionView
+	cp RExpressionView/inst/doc/ExpressionView.pdf homepage/
 
-RExpresssionView/inst/doc/ExpressionView.tex: RExpresssionView/inst/doc/ExpressionView.Rnw
-	cd RExpresssionView/inst/doc && R CMD Sweave ExpressionView.Rnw
+RExpressionView/inst/doc/ExpressionView.tex: RExpressionView/inst/doc/ExpressionView.Rnw
+	cd RExpressionView/inst/doc && R CMD Sweave ExpressionView.Rnw
