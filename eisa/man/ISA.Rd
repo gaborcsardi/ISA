@@ -1,43 +1,77 @@
-\name{eisa}
-\alias{isa}
-\alias{isa,ExpressionSet-method}
+\name{ISA}
+\alias{ISA}
 \concept{Iterative Signature Algorithm}
 \concept{Biclustering}
 \title{Iterative Signature Algorithm on Gene Expression data}
 \description{Run ISA on an ExpressionSet with the default parameters.}
 \usage{
-\S4method{isa}{ExpressionSet}(exp.set, flist = filterfun(function(x) IQR(x) > 0.5),
+ISA (data, flist = filterfun(function(x) IQR(x) > 0.5), 
     uniqueEntrez = TRUE, thr.gene = seq(2, 4, by = 0.5),
-    thr.cond = seq(1, 3, by = 0.5), no.seeds = 100)
+    thr.cond = seq(1, 3, by = 0.5), no.seeds = 100) 
 }
 \arguments{
   \item{exp.set}{The input, an ExpressionSet object.}
   \item{flist}{A \sQuote{list} of filter functions to apply to the
     array. This is passed to the \code{\link[genefilter]{genefilter}}
-    function without touching it.}
+    function without touching it. Supply \code{NA} here if you don't
+    want to filter the expression set before running ISA on it.}
   \item{uniqueEntrez}{Logical scalar, whether to filter the input
     expression set to keep exactly one probeset for each Entrez
-    gene. Probets that are not mapped to an Entrez gene are dropped.}
+    gene. Probesets that are not mapped to an Entrez gene are
+    dropped.}
   \item{thr.gene}{Numeric vector. The threshold parameters for the ISA,
-    for genes. All combinations of \code{thr.gene} and \code{thr.cond}
+    for features (=probesets or genes). All combinations of
+    \code{thr.gene} and \code{thr.cond} 
     will be used to run ISA.} 
   \item{thr.cond}{Numeric vector. The threshold parameters for the ISA,
-    fot conditions. All combinations of \code{thr.gene} and \code{thr.cond}
+    for samples. All combinations of \code{thr.gene} and \code{thr.cond}
     will be used to run ISA.}
   \item{no.seeds}{Number of seeds to run ISA from.}
 }
 \details{
-  Please read the \link[isa2]{isa2-package} manual page in the \code{isa}
-  package for an introduction on ISA.
+  Please read tutorial vignette included in this package for an
+  introduction on ISA. \link[isa2]{isa2-package} is also useful.
 
-  The \code{eisa} function is a variant of the \code{\link[isa2]{isa}}
-  function that works on \code{ExpressionSet} objects.
+  The \code{ISA} function performs the ISA algorithm on the supplied
+  expression data. This involves the following steps:
+  \enumerate{
+    \item Filtering the features (i.e. probe sets) according to their
+    variance. You will need the \code{genefilter} package for
+    this. The default filtering function keeps the features that have
+    an \code{\link[stats]{IQR}} of 0.5 or more. See
+    \code{\link[genefilter]{genefilter}} for details on how to create
+    filtering functions. If \code{NA} is given as the \code{flist}
+    argument, then no filtering is performed.
+    \item Filtering the features by mapping them to Entrez
+    genes. Features that do not map to Entrez genes are removed from
+    the data set. If more features map to the same Entrez gene, then
+    only the one with the highest variance will be kept.
+    \item Calling the \code{\link[isa2]{isa}} function in the
+    \code{isa2} package to perform the Iterative Signature
+    Algorithm. This itself performs the following steps:
+    \enumerate{
+      \item Normalizing the data by calling
+      \code{\link[isa2]{isa.normalize}}. 
+      \item Generating random input seeds via
+      \code{\link[isa2]{generate.seeds}}.
+      \item Running ISA with all combinations of given feature and
+      sample thresholds, by calling \code{\link[isa2]{isa.iterate}}. 
+      \item Merging similar modules, separately for each threshold
+      combination, by calling \code{\link[isa2]{isa.unique}}.
+      \item Filtering the modules separately for each threshold combination,
+      by calling \code{\link[isa2]{isa.filter.robust}}.
+      \item Putting all modules from the runs with different thresholds into
+      a single object.
+      \item Merging similar modules, across all threshold combinations, if
+      two modules are similar, then the one with the
+      milder thresholds is kept.
+    }
+    \item Creates an \code{\link{ISAModules-class}} object from the ISA
+    results.
+  }
 }
 \value{
-  A named list with the same slots as in the return value of
-  \code{\link[isa2]{isa}}, except that \sQuote{\code{rows}} is renamed to
-  \sQuote{\code{genes}} and \sQuote{\code{columns}} is renamed to
-  \sQuote{\code{conditions}}.
+  An \code{\link{ISAModules-class}} object.
 }
 \author{ Gabor Csardi \email{Gabor.Csardi@unil.ch}}
 \references{
@@ -53,10 +87,8 @@
   Defining transcription modules using large-scale gene expression data
   \emph{Bioinformatics} 2004 Sep 1;20(13):1993-2003. Epub 2004 Mar 25.
 }
-\seealso{\code{\link{isa.GO}}, \code{\link{isa.KEGG}},
-  \code{\link{isa.CHR}}, \code{\link{isa.miRNA}} for various enrichment
-  calculations. See \code{\link[isa2]{isa2-package}} if you want finer
-  control on the ISA run.
+\seealso{
+  The vignette included in the \code{eisa} package.
 }
 \examples{}
 \keyword{cluster,classif,array,optimize}
