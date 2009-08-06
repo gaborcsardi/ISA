@@ -9,6 +9,8 @@
 \newcommand{\filename}[1]{\texttt{#1}}
 \newcommand{\listentry}[1]{\texttt{#1}}
 
+\SweaveOpts{prefix.string=graphics/plot}
+
 \begin{document}
 
 \setkeys{Gin}{width=\textwidth}
@@ -260,7 +262,7 @@ the correct module memberships of the elements, see the manual page of
 input data, see Fig.~\ref{fig:block}.
 
 <<blockplot.pre,echo=FALSE,results=hide>>=
-png("blockplot.png", 800, 600)
+png("graphics/blockplot.png", 800, 600)
 @ 
 <<blockplot>>=
 images(list(data), xlab="", ylab="", strip=FALSE)
@@ -392,7 +394,7 @@ $\Sexpr{round(nrow(data[[1]])/2/10)}\times
 input matrix on Fig.~\ref{fig:tenmodules}.
 
 <<tenmods.pre,echo=FALSE,results=hide>>=
-png("tenmods.png", 600, 400)
+png("graphics/tenmods.png", 600, 400)
 @ 
 <<tenmods>>=
 images(list(data[[1]]), strip=FALSE, xlab="", ylab="")
@@ -611,7 +613,7 @@ Finally, let us take a look at some of the other modules, that were
 also kept after the robustness-based filtering. Here we plot five of
 them, together with the input matrix.
 <<othermods.pre,echo=FALSE,results=hide>>=
-png("othermods.png", 400, 400)
+png("graphics/othermods.png", 400, 400)
 @ 
 <<othermods>>=
 othermods <- order(modules3$seeddata$rob)[1:5]
@@ -671,7 +673,7 @@ bicluster on top of the input matrix. It reorders the rows and columns
 of the input matrix to move the block of the bicluster to the top
 left corner of the input matrix (Fig.~\ref{fig:heatmap}).
 <<drawHeatmap.pre,echo=FALSE,results=hide>>=
-png("drawheatmap.png", 400,400)
+png("graphics/drawheatmap.png", 400,400)
 @ 
 <<drawHeatmap>>=
 drawHeatmap(five.mods[[1]], Bc, number=1,local=FALSE)
@@ -751,7 +753,7 @@ data <- lapply(noise, function(x) isa.in.silico(500,200,10,noise=x))
 @ 
 
 <<noiseplot.pre,echo=FALSE,results=hide>>=
-png("noise.png", width=800, height=600)
+png("graphics/noise.png", width=800, height=600)
 @ 
 <<noiseplot>>=
 images(lapply(data, "[[", 1), names=as.character(noise), 
@@ -879,7 +881,7 @@ modules with the strict ones. Let us plot the original data and the
 modules found by ISA (Fig.~\ref{fig:overlapplot}).
 
 <<overlapplot.pre,echo=FALSE,results=hide>>=
-png("overlapplot.png", 800, 600)
+png("graphics/overlapplot.png", 800, 600)
 @ 
 <<overlapplot>>=
 plotModules(data=two.over[[1]],
