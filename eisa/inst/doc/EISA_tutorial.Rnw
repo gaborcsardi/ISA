@@ -11,6 +11,7 @@
 \newcommand{\variable}[1]{\texttt{#1}}
 
 \SweaveOpts{cache=TRUE}
+\SweaveOpts{prefix.string=graphics/plot}
 
 \begin{document}
 
@@ -22,7 +23,7 @@
 
 \RaggedRight
 
-<<echo=FALSE,print=FALSE>>=
+<<set width,echo=FALSE,print=FALSE>>=
 options(width=60)
 @ 
 
@@ -399,7 +400,11 @@ You can also use the \Rpackage{biclust} package to create image
 plots, by calling the \Rfunction{drawHeatmap} function. The result is
 in Fig.~\ref{fig:drawHeatmap}.
 <<heatmap biclust pre,echo=FALSE,results=hide>>=
-png("heatmap.png", 400, 400 )
+if (require(Cairo)) {
+  CairoPNG("graphics/heatmap.png", 400, 400 )  
+} else {
+  png("graphics/heatmap.png", 400, 400 )
+}
 @ 
 <<heatmap>>=
 drawHeatmap(exprs(ALL[featureNames(modules),]), Bc, number=1) 
@@ -409,7 +414,7 @@ dev.off()
 @ 
 \begin{figure}
   \centering
-  \includegraphics[width=0.7\textwidth]{heatmap}
+  \includegraphics[width=0.7\textwidth]{graphics/heatmap}
   \caption{Heatmap of the first transcription module.}
   \label{fig:drawHeatmap}
 \end{figure}
@@ -422,7 +427,11 @@ contains a line plot for every single gene (or sample) and the genes
 that belong to the module have a different color, see
 Fig.~\ref{fig:parallel}.
 <<parallel.pre,echo=FALSE,results=hide>>=
-png("parallel.png", 400, 400 )
+if (require(Cairo)) {
+  CairoPNG("graphics/parallel.png", 400, 400 )
+} else {
+  png("graphics/parallel.png", 400, 400 )
+}
 @ 
 <<parallel>>=
 profile.plot(modules, 2, ALL, plot="both")
@@ -432,7 +441,7 @@ dev.off()
 @ 
 \begin{figure}
 \centering
-\includegraphics[width=0.7\textwidth]{parallel}
+\includegraphics[width=0.7\textwidth]{graphics/parallel}
 \caption{Profile plots for the second bicluster found by ISA.}
 \label{fig:parallel}
 \end{figure}
