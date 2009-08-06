@@ -26,6 +26,7 @@
 <<Roptions,echo=FALSE,results=hide>>=
 ## Some options for R
 options(width=60)
+if (require(Cairo)) { png <- CairoPNG }
 @ 
 
 \section{For the impatient}
