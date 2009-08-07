@@ -23,6 +23,30 @@
 options(width=60)
 @ 
 
+<<load packages>>=
+library(ExpressionView)
+library(eisa)
+library(genefilter)
+@ 
+
+<<do ISA>>=
+library(ALL)
+data(ALL)
+ALL.T <- ALL[, grepl("^T", ALL$BT)]
+filter <- filterfun( function(x) IQR(x) > 1)
+probes.keep <- genefilter(ALL.T, filter)
+ALL.T.filt <- ALL.T[probes.keep,]                          
+modules <- ISA(ALL.T.filt)
+@
+
+<<order the modules>>=
+module.order <- orderModules(modules)
+# ExpressionView(modules, ALL.T.filt, module.order)
+@
+
+<<show them>>=
+@
+
 \section{Session information}
 
 The version number of R and packages loaded for generating this

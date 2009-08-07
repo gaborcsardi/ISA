@@ -4,8 +4,8 @@ if (require(eisa)) {
 }
 
 orderModules.ISAModules <- function(modules, debuglevel=0, timelimit=60) {
-	isamodules <- ISAModules.to.isa.result(modules)
-	resp <- isa2::orderModules(isamodules, debuglevel, timelimit)
+	isamodules <- eisa:::ISAModules.to.isa.result(modules)
+	resp <- orderModules(isamodules, debuglevel, timelimit)
 	res <- list(genes=resp$rows, samples=resp$cols)
 	res
 }

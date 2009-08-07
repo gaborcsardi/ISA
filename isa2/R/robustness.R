@@ -84,7 +84,6 @@ isa.filter.robust.default <- function(data, normed.data, isares, perms=1,
     permres$seeddata <- permres$seeddata[valid,,drop=FALSE]
 
     rob2 <- robustness(normed.data.scrambled, permres$rows, permres$columns)
-    if (any(is.na(rob2))) { browser() }
     rob.max <- max(rob2, rob.max, na.rm=TRUE)
   }
 

@@ -30,10 +30,12 @@ EVFILES=ExpressionView/src/ch/unil/cbg/ExpressionView/*/*	\
 
 RExpressionView/inst/ExpressionView.swf: $(EVFILES)
 	cd ExpressionView/src && \
-		mxmlc -compiler.library-path+=../libs/flexlib.swc,../libs/AlivePDF.swc ExpressionView.mxml
+		mxmlc -compiler.library-path+=../libs/flexlib.swc,../libs/AlivePDF.swc \
+			-use-network=false ExpressionView.mxml
 	cp ExpressionView/src/$(@F) $(@)
 
 ExpressionView_$(VERSION).tar.gz: RExpressionView/inst/ExpressionView.swf	\
+			RExpressionView/inst/ExpressionView.html		\
 			RExpressionView/DESCRIPTION 				\
 			RExpressionView/NAMESPACE				\
 			RExpressionView/R/*.R RExpressionView/man/*.Rd 		\

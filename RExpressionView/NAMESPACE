@@ -1,3 +1,4 @@
+export(ExpressionView)
 export(toExpressionView)
 exportMethods("orderModules")
 
