@@ -54,12 +54,9 @@ setMethod("categoryToEntrezBuilder",
            ann <- p@annotation
            org <- get(paste(sep="", ann, "ORGANISM"))
            short.org <- abbreviate(org, 2)
-           if (short.org == "Mm") {
-             data(miRNA.mm, package="eisa")
-             miRNA <- miRNA.mm
-           } else if (short.org=="Hs") {
-             data(miRNA.hs, package="eisa")
-             miRNA <- miRNA.hs
+           if (org %in% c("Homo sapiens", "Mus musculus")) {
+             miRNA <- toTable(get(paste(sep="", "targetscan.",
+                                        short.org, ".egTARGETS")))
            } else {
              stop("Unknown organism in miRNA enrichment")
            }
@@ -83,12 +80,9 @@ setMethod("universeBuilder", signature=(p="miRNAListHyperGParams"),
             ann <- p@annotation
             org <- get(paste(sep="", ann, "ORGANISM"))
             short.org <- abbreviate(org, 2)
-            if (short.org == "Mm") {
-              data(miRNA.mm, package="eisa")
-              miRNA <- miRNA.mm
-            } else if (short.org=="Hs") {
-              data(miRNA.hs, package="eisa")
-              miRNA <- miRNA.hs
+            if (org %in% c("Homo sapiens", "Mus musculus")) {
+              miRNA <- toTable(get(paste(sep="", "targetscan.",
+                                         short.org, ".egTARGETS")))
             } else {
               stop("Unknown organism in miRNA enrichment")
             }
@@ -294,7 +288,10 @@ ISA.miRNA <- function(modules,
   if (! org %in% c("Mus musculus", "Homo sapiens")) {
     stop("This method is only implemented for `Mus musculus' and 'Homo sapiens'")
   }
-  
+
+  short.organism <- abbreviate(org, 2)
+  require(paste(sep=".", "targetscan", short.organism, "eg.db"),
+                character.only=TRUE)
   require(paste(sep="", ann, ".db"), character.only=TRUE)
   require(Category)
 
