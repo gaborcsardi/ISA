@@ -318,15 +318,15 @@ in a bicluster are associated with a chromosome. See the
 \Rfunction{ISA.CHR} function:
 <<CHR enrichment>>=
 CHR <- ISA.CHR(modules)
-summary(CHR,p=0.05)[[11]][,-6]
+summary(CHR,p=0.05)[[2]][,-6]
 @ 
 
-The eleventh bicluster has \Sexpr{summary(CHR,p=0.05)[[11]]$Count[1]} % $
+The second bicluster has \Sexpr{summary(CHR,p=0.05)[[2]]$Count[1]} % $
 genes on chromosome
-\Sexpr{rownames(summary(CHR,p=0.05)[[11]])[1]}. Here is a list of the
+\Sexpr{rownames(summary(CHR,p=0.05)[[2]])[1]}. Here is a list of the
 genes:
 <<CHR enrichment list>>=
-unlist(mget(geneIdsByCategory(CHR)[[11]][[1]], org.Hs.egSYMBOL))
+unlist(mget(geneIdsByCategory(CHR)[[2]][[1]], org.Hs.egSYMBOL))
 @
 
 The functions mentioned in the Gene ontology enrichment section can be
@@ -349,7 +349,7 @@ KEGG, but the \Rfunction{ISA.miRNA} function should be used:
 <<miRNA enrichment>>=
 if (require(targetscan.Hs.eg.db)) {
   miRNA <- ISA.miRNA(modules)
-  summary(miRNA, p=0.05)[[11]]
+  summary(miRNA, p=0.1)[[7]]
 }
 @ 
 
@@ -470,7 +470,7 @@ categories to plot and their enrichment $p$-values. (Additional
 columns are silently ignored.) Here is how to use
 it on the previously calculated enrichment scores:
 <<goplot1>>=
-goplot.2 <- gograph(summary(GO[[1]], p=0.05)[[2]])
+goplot.2 <- gograph(summary(GO[[1]], p=0.05)[[1]])
 @ 
 
 \Rfunction{goplot} uses the \Rpackage{igraph} package to create a
