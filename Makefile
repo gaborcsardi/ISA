@@ -30,10 +30,12 @@ vignettes/ISA_tutorial.tex: $(ISA2FILES) vignettes/ISA_tutorial.Rnw
 isa2/inst/doc/ISA_tutorial.vignette: vignettes/ISA_tutorial.Rnw
 	cp $< $@
 
-isa2/inst/doc/ISA_tutorial.pdf: vignettes/ISA_tutorial.tex
+isa2/inst/doc/ISA_tutorial.pdf: vignettes/ISA_tutorial.pdf
+	cp $< $@
+
+vignettes/ISA_tutorial.pdf: vignettes/ISA_tutorial.tex
 	cd vignettes && pdflatex ISA_tutorial.tex && pdflatex ISA_tutorial.tex && \
 		pdflatex ISA_tutorial.tex
-	cp vignettes/ISA_tutorial.pdf isa2/inst/doc/
 
 vignettes/ISA_parallel.tex: $(ISA2FILES) vignettes/ISA_parallel.Rnw
 	R CMD build --no-vignettes isa2
@@ -43,10 +45,12 @@ vignettes/ISA_parallel.tex: $(ISA2FILES) vignettes/ISA_parallel.Rnw
 isa2/inst/doc/ISA_parallel.vignette: vignettes/ISA_parallel.Rnw
 	cp $< $@
 
-isa2/inst/doc/ISA_parallel.pdf: vignettes/ISA_parallel.tex
+isa2/inst/doc/ISA_parallel.pdf: vignettes/ISA_parallel.pdf
+	cp $< $@
+
+vignettes/ISA_parallel.pdf: vignettes/ISA_parallel.tex
 	cd vignettes && pdflatex ISA_parallel.tex && pdflatex ISA_parallel.tex \
 		&& pdflatex ISA_parallel.tex
-	cp vignettes/ISA_parallel.pdf isa2/inst/doc/
 
 # eisa
 
@@ -68,10 +72,12 @@ vignettes/EISA_tutorial.tex: $(EISAFILES) vignettes/EISA_tutorial.Rnw
 eisa/inst/doc/EISA_tutorial.vignette: vignettes/EISA_tutorial.Rnw
 	cp $< $@
 
-eisa/inst/doc/EISA_tutorial.pdf: vignettes/EISA_tutorial.tex
+eisa/inst/doc/EISA_tutorial.pdf: vignettes/EISA_tutorial.pdf
+	cp $< $@
+
+vignettes/EISA_tutorial.pdf: vignettes/EISA_tutorial.tex
 	cd vignettes && pdflatex EISA_tutorial.tex && pdflatex EISA_tutorial.tex && \
 		pdflatex EISA_tutorial.tex
-	cp vignettes/EISA_tutorial.pdf eisa/inst/doc/
 
 # ExpressionView
 
@@ -108,7 +114,10 @@ vignettes/ExpressionView.tex: $(REVFILES) vignettes/ExpressionView.Rnw
 RExpressionView/inst/doc/ExpressionView.vignette: vignettes/ExpressionView.Rnw
 	cp $< $@
 
-RExpressionView/inst/doc/ExpressionView.pdf: vignettes/ExpressionView.tex
+RExpressionView/inst/doc/ExpressionView.pdf: vignettes/ExpressionView.pdf
+	cp $< $@
+
+vignettes/ExpressionView.pdf: vignettes/ExpressionView.tex
 	cd vignettes && pdflatex ExpressionView.tex && pdflatex ExpressionView.tex && \
 		pdflatex ExpressionView.tex
 	cp vignettes/ExpressionView.pdf RExpressionView/inst/doc/
