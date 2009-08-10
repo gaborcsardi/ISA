@@ -118,7 +118,7 @@ RExpressionView/inst/doc/ExpressionView.pdf: vignettes/ExpressionView.tex
 
 .PHONY: htmlfiles vignettes
 
-homepage: vignettes # htmlfiles
+homepage: vignettes htmlfiles
 
 htmlfiles: homepage/*.in
 	cd homepage && ./generate.py
