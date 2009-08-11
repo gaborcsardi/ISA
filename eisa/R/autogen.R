@@ -303,10 +303,11 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
 
   isa2:::isa.status(paste("Generating HTML page for module", module), "in")
 
-  require(Cairo)
-  require(affy)
+  if (require(Cairo)) { png <- CairoPNG }
+  require(Biobase)
   require(TeachingDemos)
   require(igraph)
+  require(xtable)
 
   nexp <- nm@assayData$ec.exprs
 
@@ -714,20 +715,20 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
 
   print(paste("Module", m, "expression graph"))
 
-  ep <- exp.plot.create(nexp, getFeatureMatrix(isares, m),
-                        getSampleMatrix(isares, m), normalize=FALSE)
-  CairoPNG(file=paste(sep="", target.dir, "/expression-", m, ".png"),
-           width=ep$width, height=ep$height)
+  ep <- expPlotCreate(nexp, getFeatureMatrix(isares, m),
+                      getSampleMatrix(isares, m), normalize=FALSE)
+  png(file=paste(sep="", target.dir, "/expression-", m, ".png"),
+      width=ep$width, height=ep$height)
   ## returns the box coordinates of the expression image
-  bbox <- exp.plot(ep)
+  bbox <- expPlot(ep)
   bbox$coords <- cbind( bbox$coords$x * ep$width,
                         rev(ep$height - bbox$coords$y * ep$height + 1))
   dev.off() 
 
   ## Color bar
-  CairoPNG(file=paste(sep="", target.dir, "/expcolbar-", m, ".png"),
-           width=840, height=56)
-  exp.plot.colbar(ep)
+  png(file=paste(sep="", target.dir, "/expcolbar-", m, ".png"),
+      width=840, height=56)
+  expPlotColbar(ep)
   dev.off()
   
   #################################
@@ -846,7 +847,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
     gop <- gograph(data.frame(names(pval), pval),
                    colbar.length=20, label.cex=1,
                    go.terms=go.terms, GOGRAPHS=GOGRAPHS)
-    CairoPNG(file=filename, width=gop$width*4, height=gop$height*4)
+    png(file=filename, width=gop$width*4, height=gop$height*4)
     co <- gograph.plot(gop, coords=TRUE)
     dev.off()
     list(graph=gop, coords=co)
@@ -1015,8 +1016,8 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
 
   ## Create the condition plot
   
-  CairoPNG(file=paste(sep="", target.dir, "/condplot-", m, ".png"),
-           width=1200, height=400)
+  png(file=paste(sep="", target.dir, "/condplot-", m, ".png"),
+      width=1200, height=400)
   cond.plot(isares, number=m, nm=nm,
             cond.col=cond.col, sep=sep)
   dev.off()

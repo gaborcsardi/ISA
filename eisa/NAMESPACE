@@ -8,9 +8,9 @@ export(ISA, ISA.normalize, ISA.iterate, ISA.unique, ISA.sweep,
 
 export(ISA.GO, ISA.KEGG, ISA.CHR, ISA.miRNA, ISA.DBD)
 
-export(gograph, gograph.plot, exp.plot.create, exp.plot.colbar,
-       exp.plot, cond.plot, overlap, overlap.plot, mnplot, ISAmnplot,
-       ISA2heatmap, ISA.biclust, profile.plot)
+export(gograph, gograph.plot, expPlotCreate, expPlotColbar,
+       expPlot, cond.plot, overlap, overlap.plot, mnplot, ISAmnplot,
+       ISA2heatmap, ISA.biclust, profilePlot)
        
 export(ISA.html.table, ISA.html.modules, ISA.html)
 

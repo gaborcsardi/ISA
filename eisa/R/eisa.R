@@ -188,10 +188,10 @@ ISA.robustness <- function(data, isaresult) {
 }
 
 setMethod("isa.filter.robust", signature(data="ExpressionSet"),
-          function(data, ...) isa.filter.robust.ExpressionSet(data, ...))
+          function(data, ...) isa.filter.robust(data, ...))
 
 ISA.filter.robust <- function(data,
-                               isaresult, ...) {
+                              isaresult, ...) {
 
   isa2:::isa.status("Filtering ExpressionSet for robustness", "in")
 

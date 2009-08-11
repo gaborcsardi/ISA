@@ -203,19 +203,19 @@ gograph.plot <- function(graph, coords=FALSE, ...) {
 }
 
 
-exp.plot.create <- function(exp.matrix, genes, conditions,
-                            normalize) {
+expPlotCreate <- function(exp.matrix, genes, conditions,
+                          normalize) {
 
   isa2:::isa.status("Creating an expression plot", "in")
   
-  require(affy)
+  require(Biobase)
 
   if (is(exp.matrix, "ExpressionSet")) {
     exp.matrix <- exprs(exp.matrix)
   }
 
   if (normalize) {
-    exp.matrix <- t(isa::normalize(exp.matrix)[[1]])
+    exp.matrix <- t(isa2::normalize(exp.matrix)[[1]])
   }
   
   gg <- which(genes != 0)
@@ -257,7 +257,7 @@ exp.plot.create <- function(exp.matrix, genes, conditions,
        gene.width.px=gene.width.px, cond.height.px=cond.height.px)
 }
 
-exp.plot.colbar <- function(epo) {
+expPlotColbar <- function(epo) {
   par(mar=c(1,1,2,1))
   image( matrix((-30):30, nc=1), col=epo$colbar, axes=FALSE)
   at <- seq(0, 60, length=13)/60
@@ -267,7 +267,7 @@ exp.plot.colbar <- function(epo) {
   abline(h=c(-1,1))
 }
 
-exp.plot <- function(epo, scores=TRUE) {
+expPlot <- function(epo, scores=TRUE) {
 
   if (scores) {
   
@@ -345,15 +345,6 @@ exp.plot <- function(epo, scores=TRUE) {
   list(coords=bbox, gene.width=epo$gene.width.px,
        cond.height=epo$cond.height.px)
 }  
-
-######
-# require(Cairo)
-# ep <- exp.plot.create(exp.merged, stree$genes[,155],
-#                       stree$conditions[,155], TRUE)
-# CairoPNG(file="autogen/expression-155.png",
-#                    width=ep$width, height=ep$height)
-# coords <- exp.plot(ep)
-# dev.off()
 
 cond.plot <- function(modules, number, eset,
                       col="white", all=TRUE,
@@ -582,13 +573,13 @@ ISA2heatmap <- function(modules, module, eset,
   heatmap(dataM, scale=scale, ...)
 }
 
-profile.plot <- function(modules, module, eset,
-                         norm=c("raw", "feature", "sample"),
-                         plot=c("samples", "features", "both"),
-                         background=TRUE, col=gray(0.7), col.mod=1,
-                         type="l", type.mod=type, order=FALSE,
-                         xlabs=c("Features","Samples"),
-                         ylab="Expression", ...) {
+profilePlot <- function(modules, module, eset,
+                        norm=c("raw", "feature", "sample"),
+                        plot=c("samples", "features", "both"),
+                        background=TRUE, col=gray(0.7), col.mod=1,
+                        type="l", type.mod=type, order=FALSE,
+                        xlabs=c("Features","Samples"),
+                        ylab="Expression", ...) {
 
   data <- select.eset(eset, norm)
   
@@ -609,7 +600,7 @@ profile.plot <- function(modules, module, eset,
       stop("No features to plot")
     }
     
-    nyy <- if (length(yy)!=0) { -yy } else { seq_ncol(data) }
+    nyy <- if (length(yy)!=0) { -yy } else { seq(ncol(data)) }
     data <- data[xx,]
     
     xlim <- c(1, length(xx))

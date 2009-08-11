@@ -275,7 +275,6 @@ ISA.KEGG <- function(modules,
   
   require(paste(sep=".", "org", shortorg, "eg", "db"), character.only=TRUE)
   require(paste(sep="", ann, ".db"), character.only=TRUE)
-  require(annotate)
   require(Category)
   require(KEGG.db)
 
