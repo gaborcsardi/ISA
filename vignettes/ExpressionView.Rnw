@@ -21,6 +21,7 @@
 
 <<set width,echo=FALSE,print=FALSE>>=
 options(width=60)
+options(continue=" ")
 @ 
 
 <<load packages>>=

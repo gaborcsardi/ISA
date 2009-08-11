@@ -3,7 +3,11 @@ VERSION=0.1
 
 all: homepage isa2 eisa ExpressionView
 
-.PHONY: homepage isa2 eisa ExpressionView
+.PHONY: homepage isa2 eisa ExpressionView clean
+
+clean: 
+	bzr clean-tree --force
+	bzr clean-tree --ignored --force
 
 ####################################################
 ## R packages
@@ -65,7 +69,9 @@ eisa_$(VERSION).tar.gz:	$(EISAFILES) $(EISAVIGNETTES)
 	R CMD build eisa
 
 vignettes/EISA_tutorial.tex: $(EISAFILES) vignettes/EISA_tutorial.Rnw
+	R CMD build --no-vignettes isa2
 	R CMD build --no-vignettes eisa
+	R CMD INSTALL -l /tmp/ isa2_$(VERSION).tar.gz
 	R CMD INSTALL -l /tmp/ eisa_$(VERSION).tar.gz
 	cd vignettes && R_LIBS=/tmp/ R CMD Sweave EISA_tutorial.Rnw || rm EISA_tutorial.tex
 
@@ -107,7 +113,11 @@ ExpressionView_$(VERSION).tar.gz: $(REVFILES) $(REVVIGNETTES)
 	R CMD build RExpressionView
 
 vignettes/ExpressionView.tex: $(REVFILES) vignettes/ExpressionView.Rnw
+	R CMD build --no-vignettes isa2
+	R CMD build --no-vignettes eisa
 	R CMD build --no-vignettes RExpressionView
+	R CMD INSTALL -l /tmp/ isa2_$(VERSION).tar.gz
+	R CMD INSTALL -l /tmp/ eisa_$(VERSION).tar.gz
 	R CMD INSTALL -l /tmp/ ExpressionView_$(VERSION).tar.gz
 	cd vignettes && R_LIBS=/tmp/ R CMD Sweave ExpressionView.Rnw || rm ExpressionView.tex
 
@@ -125,6 +135,9 @@ vignettes/ExpressionView.pdf: vignettes/ExpressionView.tex
 ############################################
 ## Homepage
 
+SWEAVE2HTML = htlatex
+SWEAVE2HTMLOPTIONS = style,xhtml,graphics-,charset=utf-8 " -cunihtf -utf8" -cvalidate
+
 .PHONY: htmlfiles vignettes
 
 homepage: vignettes htmlfiles
@@ -135,35 +148,44 @@ htmlfiles: homepage/*.in
 vignettes: homepage/ISA_tutorial.html homepage/ISA_tutorial.pdf \
 	homepage/ISA_parallel.html homepage/ISA_parallel.pdf \
 	homepage/EISA_tutorial.html homepage/EISA_tutorial.pdf \
-	homepage/ExpressionView.html homepage/ExpressionView.pdf
+	homepage/ExpressionView.html homepage/ExpressionView.pdf \
+	vignettes/style.cfg
 
 homepage/ISA_tutorial.html: vignettes/ISA_tutorial.tex
-	cd vignettes && sweave2html ISA_tutorial
+	cd vignettes && $(SWEAVE2HTML) ISA_tutorial $(SWEAVE2HTMLOPTIONS)
 	cp vignettes/ISA_tutorial.html homepage
+	cp vignettes/ISA_tutorial.css homepage
+	cp vignettes/ISA_tutorial*.png homepage/
 	cp vignettes/graphics/*.png homepage/graphics/
 
 homepage/ISA_tutorial.pdf: vignettes/ISA_tutorial.pdf
 	cp $< $@
 
 homepage/ISA_parallel.html: vignettes/ISA_parallel.tex
-	cd vignettes && sweave2html ISA_parallel
+	cd vignettes && $(SWEAVE2HTML) ISA_parallel $(SWEAVE2HTMLOPTIONS)
 	cp vignettes/ISA_parallel.html homepage
+	cp vignettes/ISA_parallel.css homepage
+#	cp vignettes/ISA_parallel*.png homepage/
 	cp vignettes/graphics/*.png homepage/graphics/
 
 homepage/ISA_parallel.pdf: vignettes/ISA_parallel.pdf
 	cp $< $@
 
 homepage/EISA_tutorial.html: vignettes/EISA_tutorial.tex
-	cd vignettes && sweave2html EISA_tutorial
+	cd vignettes && $(SWEAVE2HTML) EISA_tutorial $(SWEAVE2HTMLOPTIONS)
 	cp vignettes/EISA_tutorial.html homepage
+	cp vignettes/EISA_tutorial.css homepage
+	cp vignettes/EISA_tutorial*.png homepage/
 	cp vignettes/graphics/*.png homepage/graphics/
 
 homepage/EISA_tutorial.pdf: vignettes/EISA_tutorial.pdf
 	cp $< $@
 
 homepage/ExpressionView.html: vignettes/ExpressionView.tex
-	cd vignettes && sweave2html ExpressionView
+	cd vignettes && $(SWEAVE2HTML) ExpressionView $(SWEAVE2HTMLOPTIONS)
 	cp vignettes/ExpressionView.html homepage
+	cp vignettes/ExpressionView.css homepage
+#	cp vignettes/ExpressionView*.png homepage/
 	cp vignettes/graphics/*.png homepage/graphics/
 
 homepage/ExpressionView.pdf: vignettes/ExpressionView.pdf

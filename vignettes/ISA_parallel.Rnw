@@ -21,6 +21,11 @@
 
 % \tableofcontents
 
+<<Roptions,echo=FALSE,results=hide>>=
+options(width=60)
+options(continue=" ")
+@ 
+
 \section{Running ISA in parallel}
 
 In this document we show a little example on how to speed up ISA

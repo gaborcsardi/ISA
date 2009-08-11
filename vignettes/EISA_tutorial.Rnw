@@ -25,6 +25,7 @@
 
 <<set width,echo=FALSE,print=FALSE>>=
 options(width=60)
+options(continue=" ")
 @ 
 
 \section{Introduction}
@@ -414,7 +415,7 @@ dev.off()
 @ 
 \begin{figure}
   \centering
-  \includegraphics[width=0.7\textwidth]{graphics/heatmap}
+  \includegraphics[width=0.7\textwidth]{graphics/heatmap.png}
   \caption{Heatmap of the first transcription module.}
   \label{fig:drawHeatmap}
 \end{figure}
@@ -441,7 +442,7 @@ dev.off()
 @ 
 \begin{figure}
 \centering
-\includegraphics[width=0.7\textwidth]{graphics/parallel}
+\includegraphics[width=0.7\textwidth]{graphics/parallel.png}
 \caption{Profile plots for the second bicluster found by ISA.}
 \label{fig:parallel}
 \end{figure}
