@@ -18,8 +18,7 @@ exportMethods("feat.exprs", "samp.exprs",
               "prenormalized", "prenormalized<-",
               "hasNA", "hasNA<-")
 
-exportMethods("drive", "drive<-",
-              "seedData", "runData",
+exportMethods("seedData", "runData",
               "getFeatures", "getSamples",
               "getFeatureNames", "getSampleNames",
               "getFeatureMatrix", "getSampleMatrix",
@@ -28,3 +27,11 @@ exportMethods("drive", "drive<-",
               "getNoFeatures", "getNoSamples",
               "featureThreshold", "sampleThreshold",
               "getOrganism")
+
+exportMethods("makeValidParams", "ontology", "ontology<-", "conditional",
+              "conditional<-", "drive", "drive<-", "hyperGTest")
+
+exportMethods("summary", "htmlReport", "pvalues", "geneCounts",
+              "oddsRatios", "expectedCounts", "universeCounts",
+              "universeMappedCount", "geneMappedCount", "geneIdUniverse",
+              "condGeneIdUniverse", "geneIdsByCategory", "sigCategories")
