@@ -553,7 +553,7 @@ select.eset <- function(eset, norm=c("raw", "feature", "sample")) {
 
 ISAmnplot <- function(modules, number, eset,
                       norm=c("raw", "feature", "sample"),
-                      data=annotation(x), group, ...) {
+                      data=annotation(modules), group, ...) {
   x <- getFeatureNames(modules, number)[[1]]
   eset <- select.eset(eset, norm)
   mnplot(x, eset, data, group, ...)
