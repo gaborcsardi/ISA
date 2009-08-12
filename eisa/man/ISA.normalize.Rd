@@ -1,8 +1,6 @@
-\name{expPlot}
-\alias{expPlot}
-\alias{expPlotCreate}
-\alias{expPlotColbar}
-\title{Expression matrix plots}
+\name{ISA.normalize}
+\alias{ISA.normalize}
+\title{Normalize expression data for the Iterative Signature Algorithm}
 \description{}
 \usage{}
 \arguments{}

@@ -1,5 +1,5 @@
-\name{eisa.biclust}
-\alias{eisa.biclust}
+\name{ISA.biclust}
+\alias{ISA.biclust}
 \title{Convert ISA modules to a Biclust object}
 \description{}
 \usage{}

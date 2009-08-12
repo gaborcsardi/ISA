@@ -1,8 +1,7 @@
-\name{expPlot}
-\alias{expPlot}
-\alias{expPlotCreate}
-\alias{expPlotColbar}
-\title{Expression matrix plots}
+\name{overlap}
+\alias{overlap}
+\alias{overlap.plot}
+\title{Overlap of ISA biclusters}
 \description{}
 \usage{}
 \arguments{}

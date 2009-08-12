@@ -1,8 +1,6 @@
-\name{expPlot}
-\alias{expPlot}
-\alias{expPlotCreate}
-\alias{expPlotColbar}
-\title{Expression matrix plots}
+\name{ISA.iterate}
+\alias{ISA.iterate}
+\title{Perform the Iterative Signature Algorithm}
 \description{}
 \usage{}
 \arguments{}

@@ -1,8 +1,7 @@
-\name{expPlot}
-\alias{expPlot}
-\alias{expPlotCreate}
-\alias{expPlotColbar}
-\title{Expression matrix plots}
+\name{ISA.filter.robust}
+\alias{ISA.filter.robust}
+\alias{ISA.robustness}
+\title{Robustness of ISA biclusters}
 \description{}
 \usage{}
 \arguments{}

@@ -1,12 +1,18 @@
 \name{ISAExpressionSet-class}
 \docType{class}
+\alias{feat.exprs}
+\alias{samp.exprs}
 \alias{ISAExpressionSet-class}
-\alias{feat.exprs,ISAExpressionSet}
-\alias{samp.exprs,ISAExpressionSet}
-\alias{hasNA,ISAExpressionSet}
-\alias{hasNA<-,ISAExpressionSet}
-\alias{prenormalized,ISAExpressionSet}
-\alias{prenormalized<-,ISAExpressionSet}
+\alias{feat.exprs,ISAExpressionSet-method}
+\alias{samp.exprs,ISAExpressionSet-method}
+\alias{hasNA}
+\alias{hasNA<-}
+\alias{hasNA,ISAExpressionSet-method}
+\alias{hasNA<-,ISAExpressionSet-method}
+\alias{prenormalized}
+\alias{prenormalized,ISAExpressionSet-method}
+\alias{prenormalized<-}
+\alias{prenormalized<-,ISAExpressionSet-method}
 \title{Expression Set, normalized for using with ISA}
 \description{}
 \section{Methods}{

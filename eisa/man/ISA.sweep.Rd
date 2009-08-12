@@ -1,8 +1,7 @@
-\name{expPlot}
-\alias{expPlot}
-\alias{expPlotCreate}
-\alias{expPlotColbar}
-\title{Expression matrix plots}
+\name{ISA.sweep}
+\alias{ISA.sweep}
+\alias{ISA.sweep.graph}
+\title{Create an ISA module tree}
 \description{}
 \usage{}
 \arguments{}

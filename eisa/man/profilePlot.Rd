@@ -1,8 +1,6 @@
-\name{expPlot}
-\alias{expPlot}
-\alias{expPlotCreate}
-\alias{expPlotColbar}
-\title{Expression matrix plots}
+\name{profilePlot}
+\alias{profilePlot}
+\title{Profile plots for ISA biclusters}
 \description{}
 \usage{}
 \arguments{}

@@ -10,7 +10,7 @@ ISA (data, flist = filterfun(function(x) IQR(x) > 0.5),
     thr.cond = seq(1, 3, by = 0.5), no.seeds = 100) 
 }
 \arguments{
-  \item{exp.set}{The input, an ExpressionSet object.}
+  \item{data}{The input, an ExpressionSet object.}
   \item{flist}{A \sQuote{list} of filter functions to apply to the
     array. This is passed to the \code{\link[genefilter]{genefilter}}
     function without touching it. Supply \code{NA} here if you don't

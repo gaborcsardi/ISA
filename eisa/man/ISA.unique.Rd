@@ -1,8 +1,6 @@
-\name{expPlot}
-\alias{expPlot}
-\alias{expPlotCreate}
-\alias{expPlotColbar}
-\title{Expression matrix plots}
+\name{ISA.unique}
+\alias{ISA.unique}
+\title{Remove duplicated ISA modules}
 \description{}
 \usage{}
 \arguments{}
