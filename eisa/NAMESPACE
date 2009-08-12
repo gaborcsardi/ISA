@@ -6,7 +6,7 @@ import(Biobase)
 export(ISA, ISA.normalize, ISA.iterate, ISA.unique, ISA.sweep,
        ISA.sweep.graph, ISA.robustness, ISA.filter.robust)
 
-export(ISA.GO, ISA.KEGG, ISA.CHR, ISA.miRNA, ISA.DBD)
+export(ISA.GO, ISA.KEGG, ISA.CHR, ISA.miRNA)#, ISA.DBD)
 
 export(gograph, gograph.plot, expPlotCreate, expPlotColbar,
        expPlot, cond.plot, overlap, overlap.plot, mnplot, ISAmnplot,
