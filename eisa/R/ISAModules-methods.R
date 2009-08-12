@@ -61,7 +61,7 @@ setMethod("getOrganism", signature(object="ISAModules"),
 
 setMethod("getFeatures", signature(object="ISAModules"),
           function(object, mods) {
-            if (missing(mods)) { mods <- seq <- len(ncol(object@genes)) }
+            if (missing(mods)) { mods <- seq_len(ncol(object@genes)) }
             lapply(mods, function(x) which(object@genes[,x] != 0))
           })
 
@@ -74,7 +74,7 @@ setMethod("getFeatureNames", signature(object="ISAModules"),
 
 setMethod("getSamples", signature(object="ISAModules"),
           function(object, mods) {
-            if (missing(mods)) { mods <- seq <- len(ncol(object@genes)) }
+            if (missing(mods)) { mods <- seq_len(ncol(object@genes)) }
             lapply(mods, function(x) which(object@conditions[,x] != 0))
           })
 
