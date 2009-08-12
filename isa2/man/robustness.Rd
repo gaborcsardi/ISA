@@ -78,8 +78,8 @@
   least one module in the scrambled data.
 
   You can think of \code{isa.filter.robust} as a permutation test, but
-  the input data is shuffled only once, because of the relatively high
-  computational demands of the ISA.
+  the input data is shuffled only once (at least by default), because of
+  the relatively high computational demands of the ISA.
 }
 \value{
   \code{robustness} returns a numeric vector, the robustness score of
