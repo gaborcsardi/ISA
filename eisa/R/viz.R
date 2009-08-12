@@ -348,7 +348,7 @@ expPlot <- function(epo, scores=TRUE) {
 
 cond.plot <- function(modules, number, eset,
                       col="white", all=TRUE,
-                      sep=NULL, sepcol=NULL, val=TRUE, srt=90,
+                      sep=NULL, sepcol="grey", val=TRUE, srt=90,
                       adj.above=c(0,0.5), adj.below=c(1,0.5),
                       plot.only=seq_len(ncol(eset)), ...) {
 
@@ -392,13 +392,7 @@ cond.plot <- function(modules, number, eset,
 
   if (!is.null(sep)) {
 
-    if (is.null(sepcol)) {
-      col <- "black"
-    } else {
-      col <- rep()
-    }
-    
-    abline(v=sep, lty=2, col="grey")
+    abline(v=sep, lty=2, col=sepcol)
     text(sep, ylim[2], pos=2, names(sep), font=3, srt=90, cex=0.8)
     points(to.plot, type="h")
     points(seq(along=to.plot)-1, to.plot, type="h")
