@@ -100,7 +100,8 @@ ISA.normalize <- function(data, prenormalize=TRUE) {
   data
 }
 
-ISA.iterate <- function(data, ...) {
+ISA.iterate <- function(data, feature.seeds, sample.seeds,
+                        thr.feat, thr.samp=thr.feat, ...) {
   
   isa2:::isa.status("Starting ISA iteration on an ExpressionSet", "in")
 
@@ -112,7 +113,20 @@ ISA.iterate <- function(data, ...) {
   attr(nm, "prenormalize") <- prenormalized(data)
   attr(nm, "hasNA") <- hasNA(data)
 
-  modules <- isa.iterate(nm, ...)
+  if (!missing(feature.seeds) && !missing(sample.seeds)) {
+    modules <- isa.iterate(nm, row.seeds=feature.seeds,
+                           col.seeds=sample.seeds,
+                           thr.row=thr.feat, thr.col=thr.samp, ...)
+  } else if (!missing(feature.seeds)) {
+    modules <- isa.iterate(nm, row.seeds=feature.seeds,
+                           thr.row=thr.feat, thr.col=thr.samp, ...)
+  } else if (!missing(sample.seeds)) {
+    modules <- isa.iterate(nm, col.seeds=sample.seeds,
+                           thr.row=thr.feat, thr.col=thr.samp, ...)
+  } else {
+    stop("Please give either some feature or some sample seeds")
+  }
+    
   modules <- isa.result.to.ISAModules(modules, data)
   
   isa2:::isa.status("DONE", "out")
