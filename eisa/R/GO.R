@@ -403,7 +403,7 @@ ISA.GO <- function(modules,
   cat(" -- Doing MF test\n")
   hgOverMF <- hyperGTest(paramsMF)
 
-  res <- list(hgOverBP, hgOverCC, hgOverMF)
+  res <- list(BP=hgOverBP, CC=hgOverCC, MF=hgOverMF)
 
   if (correction) {
     for (j in seq_along(res)) {
