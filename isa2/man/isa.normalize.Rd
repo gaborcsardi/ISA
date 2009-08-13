@@ -23,7 +23,6 @@
   \describe{
     \item{data}{A numeric matrix, the input data. It might contains
       \code{NA} and/or \code{NaN} values.}
-    \item{\dots}{Additional arguments, see details below.}
     \item{prenormalize}{Logical scalar, see details below.}
   }
   

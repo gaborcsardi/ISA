@@ -1,9 +1,26 @@
 \name{ListHyperGParams-class}
 \docType{class}
+
+\alias{CHRListHyperGParams}
+\alias{GOListHyperGParams}
+\alias{KEGGListHyperGParams}
+\alias{miRNAListHyperGParams}
+
+\alias{CHRListHyperGResult}
+\alias{GOListHyperGResult}
+\alias{KEGGListHyperGResult}
+\alias{miRNAListHyperGResult}
+
 \alias{CHRListHyperGParams-class}
 \alias{GOListHyperGParams-class}
 \alias{KEGGListHyperGParams-class}
 \alias{miRNAListHyperGParams-class}
+
+\alias{CHRListHyperGResult-class}
+\alias{GOListHyperGResult-class}
+\alias{KEGGListHyperGResult-class}
+\alias{miRNAListHyperGResult-class}
+
 \alias{drive}
 \alias{drive<-}
 \alias{drive,GOListHyperGParams,logical-method}
@@ -18,10 +35,12 @@
 \alias{drive<-,KEGGListHyperGParams,logical-method}
 \alias{drive<-,CHRListHyperGParams,logical-method}
 \alias{drive<-,miRNAListHyperGParams,logical-method}
+
 \alias{condGeneIdUniverse,CHRListHyperGResult-method}
 \alias{condGeneIdUniverse,KEGGListHyperGResult-method}
 \alias{condGeneIdUniverse,GOListHyperGResult-method}
 \alias{condGeneIdUniverse,miRNAListHyperGResult-method}
+
 \alias{conditional,GOListHyperGResult-method}
 \alias{conditional,GOListHyperGParams-method}
 \alias{conditional<-,GOListHyperGParams,logical-method}
@@ -100,10 +119,28 @@
 \alias{universeMappedCount,GOListHyperGResult-method}
 \alias{universeMappedCount,miRNAListHyperGResult-method}
 
-\title{Classes for GO/KEGG/CHR/miRNA enrichment of ISA modules}
-\description{}
-\section{Methods}{
+\title{Classes for quick GO/KEGG/CHR/miRNA target enrichment calculation
+  of multiple gene sets.}
+\description{
+  These classes extend the \code{HyperGParams} and \code{HyperGResult} 
+  classes from the \code{Category} package to perform enrichment
+  calculation for quickly for multiple gene sets.
 }
-\seealso{}
+\usage{
+
+}
+\arguments{
+}
+\details{
+}
+\value{
+}
+\author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
+\seealso{Functions for enrichment calculation of ISA modules:
+  \code{\link{ISA.GO}}, \code{\link{ISA.KEGG}}, \code{\link{ISA.CHR}},
+  \code{\link{ISA.miRNA}}.
+  
+  Perhaps see also the vignette in the \code{GOstats} package.
+}
 \examples{}
 \keyword{cluster}

@@ -11,8 +11,7 @@ ISA.filter.robust(data, isaresult, \dots)
 }
 \arguments{
   \item{data}{An \code{ExpressionSet} or \code{ISAExpressionSet}
-    object. This is needed for calculating the scores of the samples
-    that are not in the module. If an \code{ExpressionSet} object is
+    object. If an \code{ExpressionSet} object is
     supplied, then it is normalised by calling
     \code{\link{ISA.normalize}} on it.}
   \item{isaresult}{An \code{ISAModules} object, a set of modules.}

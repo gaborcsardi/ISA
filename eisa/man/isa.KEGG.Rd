@@ -2,7 +2,11 @@
 \alias{ISA.KEGG}
 \concept{Enrichment analysis}
 \title{Calculate KEGG Pathway enrichment for transcription modules}
-\description{}
+\description{
+  KEGG pathway enrichment is calculated for each ISA module
+  separately. In the end the result is corrected for multiple hypothesis
+  testing.
+}
 \usage{}
 \arguments{}
 \details{}

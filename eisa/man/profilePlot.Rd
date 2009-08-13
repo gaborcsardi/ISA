@@ -14,8 +14,7 @@ profilePlot (modules, module, eset, norm = c("raw", "feature", "sample"),
   \item{modules}{An \code{ISAModules} object.}
   \item{module}{Numeric scalar, the module to plot.}
   \item{eset}{An \code{ExpressionSet} or \code{ISAExpressionSet}
-    object. This is needed for calculating the scores of the samples
-    that are not in the module. If an \code{ExpressionSet} object is
+    object. If an \code{ExpressionSet} object is
     supplied (and the \code{norm} argument is not set to \sQuote{raw}),
     then it is normalised by calling \code{\link{ISA.normalize}} on it.
     A subset of \code{eset} is selected that corresponds to
