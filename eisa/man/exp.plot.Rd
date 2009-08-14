@@ -4,7 +4,8 @@
 \alias{expPlotColbar}
 \title{Expression matrix plots}
 \description{}
-\usage{}
+\usage{
+}
 \arguments{}
 \details{}
 \value{}
