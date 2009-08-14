@@ -45,55 +45,14 @@ setMethod("universeBuilder", signature=(p="CHRListHyperGParams"),
             entrezIds[ entrezIds %in% entrez ]
           })
 
-isa.CHRListHyperGTest <- function(p) {
-  p <- makeValidParams(p)
-  
-  ## Filter the universe to the genes that have at least one
-  ## annotation 
-  p@universeGeneIds <- universeBuilder(p)
-
-  ## We need the reverse mapping, the Entrez ids for all CHR
-  ## categories (in this subtree).
-  dbdcat.ent <- as.list(categoryToEntrezBuilder(p))
-  dbdcat.ent <- lapply(dbdcat.ent, intersect, p@universeGeneIds)  
-
-  ## Keep only genes that are in the universe
-  p@geneIds <- lapply(p@geneIds, intersect, p@universeGeneIds)
-
-  result <- lapply(p@geneIds, function(genes) {
-    count <- sapply(dbdcat.ent, function(x) sum(genes %in% x))
-    my.dbdcat.ent <- dbdcat.ent[ count != 0 ]
-    count <- count[ count != 0 ]
-    size <- sapply(my.dbdcat.ent, length)
-    res <- .doHyperGTest(p, my.dbdcat.ent, list(), genes)
-    res <- data.frame(Pvalue=res$p, OddsRatio=res$odds,
-                      ExpCount=res$expected, Count=count,
-                      Size=size, row.names=names(res$p))
-    if (p@drive) {
-      drive <- lapply(my.dbdcat.ent, intersect, genes)
-      drive <- lapply(drive, paste, collapse=";")
-      res$drive <- drive
-    }
-    res[ order(res$Pvalue), ]
-  })
-
-  new("CHRListHyperGResult",
-      reslist=result,
-      annotation=p@annotation,
-      geneIds=p@geneIds,
-      testName=c("CHR", "List"),
-      testDirection=p@testDirection,
-      pvalueCutoff=p@pvalueCutoff,
-      drive=p@drive,
-      universeGeneIds=p@universeGeneIds,
-      catToGeneId=dbdcat.ent)
-}
-
 #####################
 ## hyperGTest
 
 setMethod("hyperGTest",
-          signature(p="CHRListHyperGParams"), isa.CHRListHyperGTest)
+          signature(p="CHRListHyperGParams"), function(p) {
+            res <- isa.ListHyperGTest(p)
+            do.call(new, c("CHRListHyperGResult", res))
+          })
 
 ISA.CHR <- function(modules,
                     org=getOrganism(modules),

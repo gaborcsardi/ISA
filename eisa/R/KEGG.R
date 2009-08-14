@@ -41,56 +41,14 @@ setMethod("universeBuilder", signature=(p="KEGGListHyperGParams"),
             univ
           })
 
-isa.KEGGListHyperGTest <- function(p) {
-  p <- makeValidParams(p)
-  
-  ## Filter the universe to the genes that have at least one
-  ## annotation 
-  p@universeGeneIds <- universeBuilder(p)
-
-  ## We need the reverse mapping, the Entrez ids for all KEGG
-  ## categories (in this subtree).
-  keggcat.ent <- as.list(categoryToEntrezBuilder(p))
-  keggcat.ent <- lapply(keggcat.ent, intersect, p@universeGeneIds)  
-
-  ## Keep only genes that are in the universe
-  p@geneIds <- lapply(p@geneIds, intersect, p@universeGeneIds)
-
-  result <- lapply(p@geneIds, function(genes) {
-    count <- sapply(keggcat.ent, function(x) sum(genes %in% x))
-    my.keggcat.ent <- keggcat.ent[ count != 0 ]
-    count <- count[ count != 0 ]
-    size <- sapply(my.keggcat.ent, length)
-    res <- .doHyperGTest(p, my.keggcat.ent, list(), genes)
-    res <- data.frame(Pvalue=res$p, OddsRatio=res$odds,
-                      ExpCount=res$expected, Count=count,
-                      Size=size, row.names=names(res$p))
-    if (p@drive) {
-      drive <- lapply(my.keggcat.ent, intersect, genes)
-      drive <- lapply(drive, paste, collapse=";")
-      res$drive <- drive
-    }
-    
-    res[ order(res$Pvalue), ]
-  })
-
-  new("KEGGListHyperGResult",
-      reslist=result,
-      annotation=p@annotation,
-      geneIds=p@geneIds,
-      testName=c("KEGG", "List"),
-      testDirection=p@testDirection,
-      pvalueCutoff=p@pvalueCutoff,
-      drive=p@drive,
-      universeGeneIds=p@universeGeneIds,
-      catToGeneId=keggcat.ent)
-}
-
 #####################
 ## hyperGTest
 
 setMethod("hyperGTest",
-          signature(p="KEGGListHyperGParams"), isa.KEGGListHyperGTest)
+          signature(p="KEGGListHyperGParams"), function(p) {
+            res <- isa.ListHyperGTest(p)
+            do.call(new, c("KEGGListHyperGResult", res))
+          })
 
 ISA.KEGG <- function(modules,
                      org=getOrganism(modules),

@@ -1,4 +1,8 @@
 
+##################################################
+## ListHyperGParams
+##################################################
+
 ##################
 ## makeValidParams
 
@@ -37,7 +41,7 @@ setMethod("show", signature(object="ListHyperGParams"),
           })
 
 ##################################################
-## KEGGListHyperGResult
+## ListHyperGResult
 ##################################################
 
 setMethod("show", signature(object="ListHyperGResult"),
@@ -149,3 +153,50 @@ setMethod("sigCategories", signature(r="ListHyperGResult"),
               rownames(x)[x$Pvalue < p]
             })
           })
+
+#####################################
+## Common function to do the enrichment
+
+isa.ListHyperGTest <- function(p) {
+  p <- makeValidParams(p)
+  
+  ## Filter the universe to the genes that have at least one
+  ## annotation 
+  p@universeGeneIds <- universeBuilder(p)
+
+  ## We need the reverse mapping, the Entrez ids for all 
+  ## categories (in this subtree).
+  cat.ent <- as.list(categoryToEntrezBuilder(p))
+  cat.ent <- lapply(cat.ent, intersect, p@universeGeneIds)  
+
+  ## Keep only genes that are in the universe
+  p@geneIds <- lapply(p@geneIds, intersect, p@universeGeneIds)
+
+  result <- lapply(p@geneIds, function(genes) {
+    count <- sapply(cat.ent, function(x) sum(genes %in% x))
+    my.cat.ent <- cat.ent[ count != 0 ]
+    count <- count[ count != 0 ]
+    size <- sapply(my.cat.ent, length)
+    res <- .doHyperGTest(p, my.cat.ent, list(), genes)
+    res <- data.frame(Pvalue=res$p, OddsRatio=res$odds,
+                      ExpCount=res$expected, Count=count,
+                      Size=size, row.names=names(res$p))
+    if (p@drive) {
+      drive <- lapply(my.cat.ent, intersect, genes)
+      drive <- lapply(drive, paste, collapse=";")
+      res$drive <- drive
+    }
+    
+    res[ order(res$Pvalue), ]
+  })
+
+  list(reslist=result,
+       annotation=p@annotation,
+       geneIds=p@geneIds,
+       testDirection=p@testDirection,
+       pvalueCutoff=p@pvalueCutoff,
+       drive=p@drive,
+       universeGeneIds=p@universeGeneIds,
+       catToGeneId=cat.ent)
+}
+ 
