@@ -1,34 +1,3 @@
-
-##################################################
-## GOListHyperGParams
-##################################################
-
-setClass("GOListHyperGParams",
-         representation(ontology="character",
-                        conditional="logical",
-                        drive="logical"),
-         contains="HyperGParams",
-         prototype=prototype(categoryName=c("GO", "List"),
-           conditional=FALSE, drive=FALSE))
-
-##################
-## makeValidParams
-
-setMethod("makeValidParams", "GOListHyperGParams",
-          function(object) {
-            ## TODO: proper checks
-            if (!is.list(object@geneIds)) {
-              object@geneIds <- list(object@geneIds)
-            }
-            if (object@conditional) {
-              stop("Conditional GO test is not implemented yet")
-            }
-            if (object@testDirection != "over") {
-              stop("Only overrepresentation test is implemented yet")
-            }
-            object
-          })
-
 ##################
 ## ontology
 
@@ -51,11 +20,6 @@ setReplaceMethod("ontology", c("GOListHyperGParams", "character"),
 setMethod("conditional", "GOListHyperGParams", function(r) r@conditional)
 
 ##################
-## drive
-
-setMethod("drive", signature("GOListHyperGParams"), function(r) { r@drive })
-
-##################
 ## conditional<-
 
 setReplaceMethod("conditional", c("GOListHyperGParams", "logical"),
@@ -63,17 +27,6 @@ setReplaceMethod("conditional", c("GOListHyperGParams", "logical"),
                      if (is.na(value))
                        stop("value must be TRUE or FALSE")
                      r@conditional <- value
-                     r
-                 })
-
-##################
-## drive<-
-
-setReplaceMethod("drive", c("GOListHyperGParams", "logical"),
-                 function(r, value) {
-                     if (is.na(value))
-                       stop("value must be TRUE or FALSE")
-                     r@drive <- value
                      r
                  })
 
@@ -222,142 +175,6 @@ isa.GOListHyperGTest <- function(p) {
 
 setMethod("hyperGTest",
           signature(p="GOListHyperGParams"), isa.GOListHyperGTest)
-
-setMethod("show", signature(object="GOListHyperGParams"),
-          function(object) {
-              cat("A", class(object), "instance\n")
-              cat("  category:", object@categoryName, "\n")
-              cat("  ontology:", object@ontology, "\n")
-              cat("annotation:", object@annotation, "\n")
-          })
-
-##################################################
-## GOListHyperGResult
-##################################################
-
-setClass("GOListHyperGResult",
-         contains="HyperGResultBase",
-         representation=representation(
-           reslist="list",
-           conditional="logical",
-           drive="logical",
-           universeGeneIds="character",
-           catToGeneId="list"),
-         prototype=prototype(
-           testName="GO",
-           reslist=list(),
-           universeGeneIds=character(),
-           catToGeneId=list()))
-
-setMethod("show", signature(object="GOListHyperGResult"),
-          function(object) {
-            no.sign <- sapply(object@reslist, function(x) {
-              sum(x$Pvalue < object@pvalueCutoff[1])
-            })
-            no.sign <- paste(min(no.sign), sep="-", max(no.sign))
-            tested <- sum(sapply(object@reslist, function(x) {
-              nrow(x)
-            }))
-
-            gs <- range(geneMappedCount(object))
-            gs <- paste(gs[1], sep="-", gs[2])
-            
-            cat(description(object), "\n")
-            cat(tested, testName(object), "ids tested ")
-            cat("(", no.sign, " have p < ", object@pvalueCutoff[1],
-                ")\n", sep="")
-            cat("Selected gene set sizes:", gs, "\n")
-            cat("     Gene universe size:", universeMappedCount(object), "\n")
-            cat("     Annotation package:", annotation(object), "\n")
-          })
-
-setMethod("summary", signature(object="GOListHyperGResult"),
-          function(object, pvalue=pvalueCutoff(object), categorySize=NULL) {
-
-            if (! is.null(categorySize)) {
-              lapply(object@reslist, function(x) {
-                show <- x$Pvalue < pvalue & x$Size >= categorySize
-                x[show,]
-              })
-            } else {
-              lapply(object@reslist, function(x) {
-                show <- x$Pvalue < pvalue
-                x[show,]
-              })
-            }
-          })
-
-setMethod("htmlReport", signature=(r="GOListHyperGResult"),
-          function(r, file="", append=FALSE, label="", digits=3,
-                   summary.args=NULL) {
-            callNextMethod(r=r, file=file, append=append,
-                           label=label, digits=digits,
-                           summary.args=summary.args)            
-          })
-
-setMethod("pvalues", signature(r="GOListHyperGResult"),
-          function(r) lapply(r@reslist, function(x) {
-            structure(x$Pvalue, names=rownames(x))
-          }))
-
-setMethod("geneCounts", signature(r="GOListHyperGResult"),
-          function(r) lapply(r@reslist, function(x) {
-            structure(x$Count, names=rownames(x))
-          }))
-
-setMethod("oddsRatios", signature(r="GOListHyperGResult"),
-          function(r) lapply(r@reslist, function(x) {
-            structure(x$OddsRatio, names=rownames(x))
-          }))
-
-setMethod("expectedCounts", signature(r="GOListHyperGResult"),
-          function(r) lapply(r@reslist, function(x) {
-            structure(x$ExpCount, names=rownames(x))
-          }))
-
-setMethod("universeCounts", signature(r="GOListHyperGResult"),
-          function(r) lapply(r@reslist, function(x) {
-            structure(x$Size, names=rownames(x))
-          }))
-
-setMethod("universeMappedCount", signature(r="GOListHyperGResult"),
-          function(r) length(r@universeGeneIds))
-
-setMethod("geneMappedCount", signature(r="GOListHyperGResult"),
-          function(r) sapply(r@geneIds, length))
-
-setMethod("geneIdUniverse", signature(r="GOListHyperGResult"),
-          function(r, cond=FALSE) r@catToGeneId)
-
-setMethod("condGeneIdUniverse", signature(r="GOListHyperGResult"),
-          function(r) geneIdUniverse(r, cond=TRUE))
-
-## This function gives all the hits for the tested categories.
-setMethod("geneIdsByCategory", signature(r="GOListHyperGResult"),
-          function(r, catids=NULL) {
-            lapply(seq_along(r@geneIds), function(x) {
-              if ("drive" %in% names(r@reslist[[x]])) {
-                drive <- as.character(r@reslist[[x]]$drive)
-                strsplit(drive, ";")
-              } else {
-                genes <- r@geneIds[[x]]
-                tmp <- lapply(r@catToGeneId, function(y) {
-                  genes [ genes %in% y ]
-                })
-                tmp <- tmp[ sapply(tmp, length) != 0 ]
-                ord <- order(names(tmp))
-                tmp[ord]
-              }
-            })
-          })
-
-setMethod("sigCategories", signature(r="GOListHyperGResult"),
-          function(r, p) {
-            if (missing(p)) { p <- pvalueCutoff(r) }
-            lapply(r@reslist, function(x) {
-              rownames(x)[x$Pvalue < p]
-            })
-          })
 
 ISA.GO <- function(modules,
                    org=getOrganism(modules),
