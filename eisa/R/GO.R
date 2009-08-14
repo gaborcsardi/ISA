@@ -138,8 +138,6 @@ setMethod("hyperGTest",
           })
 
 ISA.GO <- function(modules,
-                   org=getOrganism(modules),
-                   shortorg=abbreviate(org, 2),
                    ann=annotation(modules),
                    features=featureNames(modules),
                    hgCutoff=0.001,
@@ -148,7 +146,6 @@ ISA.GO <- function(modules,
   isa2:::isa.status("Calculating GO enrichment", "in")
   
   require(paste(sep="", ann, ".db"), character.only=TRUE)
-  require(paste(sep=".", "org", shortorg, "eg", "db"), character.only=TRUE)
   
   ENTREZ <- get(paste(sep="", ann, "ENTREZID"))
 
@@ -171,9 +168,6 @@ ISA.GO <- function(modules,
   ontology(paramsCC) <- "CC"
   ontology(paramsMF) <- "MF"
   
-  hgOverBP <- hgOverCC <- hgOverMF <-
-    vector(mode="list", length=length(selectedEntrezIds))
-
   cat(" -- Doing BP test\n")
   hgOverBP <- hyperGTest(paramsBP)
   cat(" -- Doing CC test\n")

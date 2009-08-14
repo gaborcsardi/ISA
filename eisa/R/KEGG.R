@@ -51,8 +51,6 @@ setMethod("hyperGTest",
           })
 
 ISA.KEGG <- function(modules,
-                     org=getOrganism(modules),
-                     shortorg=abbreviate(org, 2),
                      ann=annotation(modules),
                      features=featureNames(modules),
                      hgCutoff=0.001,
@@ -60,7 +58,6 @@ ISA.KEGG <- function(modules,
 
   isa2:::isa.status("Calculating KEGG enrichment", "in")
   
-  require(paste(sep=".", "org", shortorg, "eg", "db"), character.only=TRUE)
   require(paste(sep="", ann, ".db"), character.only=TRUE)
   require(Category)
   require(KEGG.db)

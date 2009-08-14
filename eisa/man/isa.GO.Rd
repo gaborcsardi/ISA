@@ -9,17 +9,11 @@
   testing.
 }
 \usage{
-ISA.GO (modules, org = getOrganism(modules), shortorg = abbreviate(org, 2),
-    ann = annotation(modules), features = featureNames(modules),      
+ISA.GO (modules, ann = annotation(modules), features = featureNames(modules),      
     hgCutoff = 0.001, correction = TRUE, correction.method = "holm")      
 }
 \arguments{
   \item{modules}{An \code{ISAModules} object, a set of ISA modules.}
-  \item{org}{Character scalar. The scientific name of the organism, by
-    default this is taken from the \code{modules} argument.}
-  \item{shortorg}{Character scalar. The two-letter code of the organism,
-    this is needed to load the appropriate annotation package. By
-    default it is calculated from \code{organism}.}
   \item{ann}{Character scalar. The annotation package to be used. By
     default it is taken from the \code{modules} argument.}
   \item{features}{Character vector. The names of the features. By
@@ -54,8 +48,7 @@ ISA.GO (modules, org = getOrganism(modules), shortorg = abbreviate(org, 2),
   
   \code{ISA.GO} performs the hypergeometric test for every module, for
   all GO terms of the three GO ontologies. The GO data is taken from the
-  \code{GO.db} package and the organism specific annotation packages:
-  \code{org.**.eg.db}, where \sQuote{**} is a two-letter organism code.
+  \code{GO.db} package and the annotation package of the chip.
 
   \code{ISA.GO} currently cannot test for under-representation and the
   conditional test, as implemented in the \code{GOstats} package, is not

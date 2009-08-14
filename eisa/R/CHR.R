@@ -55,8 +55,6 @@ setMethod("hyperGTest",
           })
 
 ISA.CHR <- function(modules,
-                    org=getOrganism(modules),
-                    shortorg=abbreviate(org,2),
                     ann=annotation(modules),
                     features=featureNames(modules),
                     hgCutoff=0.001,
@@ -65,7 +63,6 @@ ISA.CHR <- function(modules,
   isa2:::isa.status("Calculating chromosome enrichment", "in")
   
   require(paste(sep="", ann, ".db"), character.only=TRUE)
-  require(paste(sep=".", "org", shortorg, "eg", "db"), character.only=TRUE)
 
   ENTREZ <- get(paste(sep="", ann, "ENTREZID"))
 

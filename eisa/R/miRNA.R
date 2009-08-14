@@ -64,8 +64,6 @@ setMethod("hyperGTest",
           })
 
 ISA.miRNA <- function(modules,
-                      org=getOrganism(modules),
-                      shortorg=abbreviate(org, 2),
                       ann=annotation(modules),
                       features=featureNames(modules),
                       hgCutoff=0.001,
@@ -73,10 +71,7 @@ ISA.miRNA <- function(modules,
 
   isa2:::isa.status("Calculating miRNA enrichment", "in")
 
-  if (! org %in% c("Mus musculus", "Homo sapiens")) {
-    stop("This method is only implemented for `Mus musculus' and 'Homo sapiens'")
-  }
-
+  org <- getOrganism(modules)
   short.organism <- abbreviate(org, 2)
   require(paste(sep=".", "targetscan", short.organism, "eg.db"),
                 character.only=TRUE)

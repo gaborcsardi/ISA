@@ -9,17 +9,11 @@
   predicted miRNA targets to check whether an ISA module contains many
   genes that are targets of the same miRNA.}
 \usage{
-ISA.miRNA (modules, org = getOrganism(modules), shortorg = abbreviate(org, 2),
-    ann = annotation(modules), features = featureNames(modules), 
+ISA.miRNA (modules, ann = annotation(modules), features = featureNames(modules), 
     hgCutoff = 0.001, correction = TRUE, correction.method = "holm") 
 }
 \arguments{
   \item{modules}{An \code{ISAModules} object, a set of ISA modules.}
-  \item{org}{Character scalar. The scientific name of the organism, by
-    default this is taken from the \code{modules} argument.}
-  \item{shortorg}{Character scalar. The two-letter code of the organism,
-    this is needed to load the appropriate annotation package. By
-    default it is calculated from \code{organism}.}
   \item{ann}{Character scalar. The annotation package to be used. By
     default it is taken from the \code{modules} argument.}
   \item{features}{Character vector. The names of the features. By
