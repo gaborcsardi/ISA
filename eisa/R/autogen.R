@@ -3,22 +3,52 @@ ISA.html <- function(...) {
   ## TODO: call ISA.html.table and ISA.html.modules
 }
 
-ISA.html.table <- function(nm, isares, target.dir,
-                           modules=seq_len(length(isares)),
+isa.autogen.create.dirs <- function(template, target.dir) {
+  
+  if (file.exists(target.dir)) {
+    if (!file.info(target.dir)$isdir) {
+      stop("Target exists and it is not a directory")
+    }
+  } else {
+    dir.create(target.dir)
+  }
+
+  imagedir <- paste(target.dir, sep="/", "images")
+  if (file.exists(imagedir)) {
+    if (!file.info(imagedir)$isdir) {
+      stop("Target (images) exists and it is not a directory")
+    }
+  } else {
+    dir.create(imagedir)    
+  }
+
+  ff <- list.files(template)
+  
+  for (f in ff) {
+    file.copy(paste(sep="", template, "/", f),
+              paste(sep="", target.dir, "/", f) )
+  }
+  ff <- list.files(paste(sep="/", template, "images"))
+
+  for (f in ff) {
+    file.copy(paste(sep="", template, "/images/", f),
+              paste(sep="", target.dir, "/images/", f) )
+  }
+}
+
+ISA.html.table <- function(modules, target.dir,
+                           which=seq_len(length(modules)),
                            template=system.file("autogen", package="eisa"),
                            GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL, DBD=NULL,
                            htmltitle=NULL, notes=NULL, seed=NULL) {
 
   isa2:::isa.status("Creating HTML module table", "in")
+
+  require(GO.db)
+  require(KEGG.db)
+
+  isa.autogen.create.dirs(template, target.dir)
   
-  chip <- annotation(isares)
-  library(paste(sep="", chip, ".db"), character.only=TRUE)
-  organism <- getOrganism(isares)
-
-  ################################################
-  ## GO
-
-  library(GO.db)
   db <- GO_dbconn()
   query <- "SELECT go_id, term, definition FROM go_term"
   go.terms <- dbGetQuery(db, query)
@@ -27,118 +57,35 @@ ISA.html.table <- function(nm, isares, target.dir,
   
   options(digits=2)
   
-  f <- function(obj, pvalue=0.05) {
-    
-    if (class(obj)=="NULL") {
-      return("")
-    } else {
-      if (length(obj$Pvalue)==0) { return("") }
-      pval <- obj$Pvalue[1]
-      if (pval > pvalue) { return("") }
-      uc <- obj$Size[1]
-      ec <- obj$ExpCount[1]
-      gc <- obj$Count[1]
-      ca <- rownames(obj)[1]
-    }
-    
-    nn <- go.terms[ca,]$term
-    paste(sep="", nn, " <span class=\"pvalue\"><br/>(", format(pval), "/", format(ec),
-          "/", gc, "/", uc, ")</span>")
+  f <- function(obj, pvalue=0.05, type) {
+
+    pv <- sapply(pvalues(obj), function(x) if (length(x) >= 1) x[1] else 1.0)
+    uc <- ifelse(pv <= pvalue, format(sapply(universeCounts(obj), "[", 1)), "")
+    ec <- ifelse(pv <= pvalue, format(sapply(expectedCounts(obj), "[", 1)), "")
+    gc <- ifelse(pv <= pvalue, format(sapply(geneCounts(obj), "[", 1)), "")
+    ca <- names(pv)
+    ca <- switch(type,
+         "GO"=go.terms$term[ match(ca,rownames(go.terms)) ],
+         "KEGG"=as.character(mget(ca, KEGGPATHID2NAME)),
+                 ca)
+
+    res <- paste(sep="", ca, " <span class=\"pvalue\"><br/>(", format(pv), "/", ec,
+                 "/", gc, "/", uc, ")</span>")
+    ifelse(pv <= pvalue, res, "")
   }
   
-  print("  -- GO BP")
-  tables.BP <- lapply(GO[[1]]@reslist[modules], function(x) f(x))
-  print("  -- GO CC")
-  tables.CC <- lapply(GO[[2]]@reslist[modules], function(x) f(x))
-  print("  -- GO MF")
-  tables.MF <- lapply(GO[[3]]@reslist[modules], function(x) f(x))
+  tables.BP <- f(GO$BP, type="GO")[which]
+  tables.CC <- f(GO$CC, type="GO")[which]
+  tables.MF <- f(GO$MF, type="GO")[which]
+  tables.KEGG <- f(KEGG, type="KEGG")[which]
+  tables.miRNA <- if (!is.null(miRNA)) f(miRNA, type="miRNA")[which] else ""
+  tables.DBD <- if (!is.null(DBD)) f(DBD, type="DBD")[which] else ""
+  tables.CHR <- if (!is.null(CHR)) f(CHR, type="CHR")[which] else ""
 
-  g <- function(obj, pvalue=0.05) {
-    
-    if (class(obj)=="NULL") {
-      return("")
-    } else {
-      if (length(obj$Pvalue)==0) { return("") }
-      pval <- obj$Pvalue[1]
-      if (pval > pvalue) { return("") }
-      uc <- obj$Size[1]
-      ec <- obj$ExpCount[1]
-      gc <- obj$Count[1]
-      ca <- rownames(obj)[1]
-    }
-
-    nn <- as.character(mget(ca, KEGGPATHID2NAME))
-    paste(sep="", nn, " <span class=\"pvalue\"><br/>(", format(pval), "/",
-          format(ec), "/", gc, "/", uc, ")</span>")
-  }
-  
-  require(KEGG.db)
-  print("  -- KEGG")
-  tables.KEGG <- sapply(KEGG@reslist[modules], g, pvalue=0.05)
-  
-  if (!is.null(miRNA)) {
-    
-    h <- function(obj, pvalue=0.05) {
-      if (nrow(obj)==0) { return("") }
-      pval <- obj$Pvalue[1]
-      if (pval > pvalue) { return("") }
-      uc <- obj$Size[1]
-      ec <- obj$ExpCount[1]
-      gc <- obj$Count[1]
-      ca <- rownames(obj)[1]
-      paste(sep="", ca, " <span class=\"pvalue\"><br/>(", format(pval), "/", format(ec),
-            "/", gc, "/", uc, ")</span>")
-    }
-    
-    print("  -- miRNA")
-    tables.miRNA <- lapply(miRNA@reslist[modules], h, pvalue=0.05)
-  } else {
-    tables.miRNA <- ""
-  }
-
-  if (!is.null(DBD)) {
-
-    dbd <- function(obj, pvalue=0.05) {
-      if (nrow(obj)==0) { return(""); }
-      pval <- obj$Pvalue[1]
-      if (pval > pvalue) { return("") }
-      uc <- obj$Size[1]
-      ec <- obj$ExpCount[1]
-      gc <- obj$Count[1]
-      ca <- rownames(obj)[1]
-      paste(sep="", ca, " <span class=\"pvalue\"><br/>(", format(pval), "/", format(ec),
-            "/", gc, "/", uc, ")</span>")
-    }
-    
-    print("  -- DBD")
-    tables.DBD <- lapply(DBD@reslist[modules], h, pvalue=0.05)
-  } else {
-    tables.DBD <- ""
-  }
-    
-  if (!is.null(CHR)) {
-    
-    chr <- function(obj, pvalue=0.05) {
-      if (nrow(obj)==0) { return("") }
-      pval <- obj$Pvalue[1]
-      if (pval > pvalue) { return("") }
-      uc <- obj$Size[1]
-      ec <- obj$ExpCount[1]
-      gc <- obj$Count[1]
-      ca <- rownames(obj)[1]
-      paste(sep="", ca, " <span class=\"pvalue\"><br/>(", format(pval), "/", format(ec),
-            "/", gc, "/", uc, ")</span>")
-    }
-    print("  -- CHR")
-    tables.CHR <- lapply(CHR@reslist[modules], chr, pvalue=0.05)
-  } else {
-    tables.CHR <- ""
-  }
-
-  thr <- paste(sep="", seedData(isares)$thr.row[modules], "/",
-               seedData(isares)$thr.col[modules])
-  no.genes <- getNoFeatures(isares)
-  no.conds <- getNoSamples(isares)
+  thr <- paste(sep="/", featureThreshold(modules)[which],
+               sampleThreshold(modules)[which])
+  no.genes <- getNoFeatures(modules)
+  no.conds <- getNoSamples(modules)
 
   #############
 
@@ -167,8 +114,8 @@ ISA.html.table <- function(nm, isares, target.dir,
   head <- paste(sep="", collapse="", "<td>", head, "</td>")
   head <- paste(collapse="", "<tr>", head, "</tr>")
   table <- paste(sep="",
-                 '<tr onclick="location.href=\'module-', modules, '.html\'">',
-                 '<td><a href="module-', modules, '.html">', modules, "</a></td>",
+                 '<tr onclick="location.href=\'module-', which, '.html\'">',
+                 '<td><a href="module-', which, '.html">', which, "</a></td>",
                  seed,
                  "<td>", thr, "</td>",
                  "<td>", no.genes, "</td>",
@@ -229,54 +176,35 @@ ISA.html.table <- function(nm, isares, target.dir,
 }  
                           
 
-ISA.html.modules <- function(nm, isares, modules=seq_len(length(isares)),
+ISA.html.modules <- function(eset, modules, which=seq_len(length(modules)),
                              target.dir,
                              template=system.file("autogen", package="eisa"),
                              GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL, DBD=NULL,
                              cond.to.include=NULL,
                              cond.col="white",
-                             sep=NULL, seed=NULL, drive.BP=NULL,
-                             drive.CC=NULL, drive.MF=NULL, drive.KEGG=NULL,
-                             drive.miRNA=NULL, drive.DBD=NULL, drive.CHR=NULL) {
+                             sep=NULL, seed=NULL) {
 
   isa2:::isa.status("Generating module pages", "in")
   
-  if (!file.exists(target.dir)) {
-    dir.create(target.dir)
-  }  
-  if (!file.exists(paste(sep="", target.dir, "/images"))) {
-    dir.create(paste(sep="", target.dir, "/images"))
-  }  
-  
-  ## Copy all files first
+  isa.autogen.create.dirs(template, target.dir)
 
-  ff <- list.files(template)
-  
-  for (f in ff) {
-    file.copy(paste(sep="", template, "/", f),
-              paste(sep="", target.dir, "/", f) )
-  }
-  ff <- list.files(paste(sep="/", template, "images"))
-
-  for (f in ff) {
-    file.copy(paste(sep="", template, "/images/", f),
-              paste(sep="", target.dir, "/images/", f) )
-  }
-  
-  if (is.null(drive.BP) && !is.null(GO)) drive.BP <- geneIdsByCategory(GO[[1]])
-  if (is.null(drive.CC) && !is.null(GO)) drive.CC <- geneIdsByCategory(GO[[2]])
-  if (is.null(drive.MF) && !is.null(GO)) drive.MF <- geneIdsByCategory(GO[[3]])
-  if (is.null(drive.KEGG) && !is.null(KEGG)) drive.KEGG <- geneIdsByCategory(KEGG)
-  if (is.null(drive.miRNA) && !is.null(miRNA)) drive.miRNA <- geneIdsByCategory(miRNA) 
-  if (is.null(drive.DBD) && !is.null(DBD)) drive.DBD <- geneIdsByCategory(DBD) 
-  if (is.null(drive.CHR) && !is.null(CHR)) drive.CHR <- geneIdsByCategory(CHR) 
+  drive.BP <- drive.CC <- drive.MF <- drive.KEGG <- drive.miRNA <-
+    drive.DBD <- drive.CHR <- NULL
+  if (!is.null(GO)) drive.BP <- geneIdsByCategory(GO$BP)
+  if (!is.null(GO)) drive.CC <- geneIdsByCategory(GO$CC)
+  if (!is.null(GO)) drive.MF <- geneIdsByCategory(GO$MF)
+  if (!is.null(KEGG)) drive.KEGG <- geneIdsByCategory(KEGG)
+  if (!is.null(miRNA)) drive.miRNA <- geneIdsByCategory(miRNA) 
+  if (!is.null(DBD)) drive.DBD <- geneIdsByCategory(DBD) 
+  if (!is.null(CHR)) drive.CHR <- geneIdsByCategory(CHR) 
   
   ## Then generate modules
-  for (i in seq_along(modules)) {
-    x <- modules[i]
-    nx <- if (i!=length(modules)) modules[i+1] else modules[1]
-    px <- if (i!=1) modules[i-1] else modules[length(modules)]
-    isa.autogen.module(nm, isares, x, target.dir=target.dir, template=template,
+  for (i in seq_along(which)) {
+    x <- which[i]
+    nx <- if (i!=length(which)) which[i+1] else which[1]
+    px <- if (i!=1) which[i-1] else which[length(which)]
+    isa.autogen.module(eisa.get.nm(eset, modules), modules, x,
+                       target.dir=target.dir, template=template,
                        GO=GO, KEGG=KEGG, miRNA=miRNA, DBD=DBD, CHR=CHR,
                        cond.to.include=cond.to.include,
                        cond.col=cond.col, sep=sep,
@@ -292,7 +220,7 @@ ISA.html.modules <- function(nm, isares, modules=seq_len(length(isares)),
   invisible(NULL)
 }
 
-isa.autogen.module <- function(nm, isares, module, target.dir, template,
+isa.autogen.module <- function(eset, modules, which, target.dir, template,
                                GO, KEGG, miRNA, CHR, DBD, cond.to.include,
                                cond.col="white", sep=NULL,
                                seed=NULL, drive.BP=NULL, drive.CC=NULL,
@@ -301,7 +229,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
                                drive.CHR=NULL,
                                next.module=NULL, prev.module=NULL) {
 
-  isa2:::isa.status(paste("Generating HTML page for module", module), "in")
+  isa2:::isa.status(paste("Generating HTML page for module", which), "in")
 
   if (require(Cairo)) { png <- CairoPNG }
   require(Biobase)
@@ -309,11 +237,23 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   require(igraph)
   require(xtable)
 
-  nexp <- nm@assayData$ec.exprs
+  nm <- list(Er=t(feat.exprs(eset)),
+             Ec=samp.exprs(eset))
+  
+  nexp <- nm$Ec
 
-  chip <- annotation(isares)
+  if (is.null(drive.BP) && !is.null(GO)) drive.BP <- geneIdsByCategory(GO$BP)
+  if (is.null(drive.CC) && !is.null(GO)) drive.CC <- geneIdsByCategory(GO$CC)
+  if (is.null(drive.MF) && !is.null(GO)) drive.MF <- geneIdsByCategory(GO$MF)
+  if (is.null(drive.KEGG) && !is.null(KEGG)) drive.KEGG <- geneIdsByCategory(KEGG)
+  if (is.null(drive.miRNA) && !is.null(miRNA)) drive.miRNA <-
+    geneIdsByCategory(miRNA) 
+  if (is.null(drive.DBD) && !is.null(DBD)) drive.DBD <- geneIdsByCategory(DBD) 
+  if (is.null(drive.CHR) && !is.null(CHR)) drive.CHR <- geneIdsByCategory(CHR) 
+  
+  chip <- annotation(modules)
   library(paste(sep="", chip, ".db"),  character.only=TRUE)
-  organism <- getOrganism(isares)
+  organism <- getOrganism(modules)
   short.organism <- organism
   require(paste(sep="", "org.", abbreviate(organism, 2), ".eg.db"),
           character.only=TRUE)
@@ -381,7 +321,11 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
                      Term=nn)
 
     drive <- drive[v]
-    drive <- lapply(drive, function(x) unname(unlist(mget(x, SYMBOL))))
+    drive <- lapply(drive, function(x) unname(unlist(mget(x, SYMBOL, ifnotfound=NA))))
+    if (any(sapply(drive, function(x) any(is.na(x))))) {
+      warning("Some genes not found, inconsistent annotation packages")
+      drive <- lapply(drive, function(x) x[!is.na(x)])
+    }
     drive <- lapply(drive, sort)
     drive <- lapply(drive, paste, collapse=", ")
     df$Count <- paste(sep="", '<a href="#" onclick="togglestuff2(\'d.', cat, '.', seq(along=df[,1]),
@@ -421,12 +365,12 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
     paste(foo, collapse="\n")
   }
 
-  tables.BP <- f(GO[[1]]@reslist[[module]], pvalue=0.05, maxlines=NA,
-                 drive=drive.BP[[module]], cat="BP")
-  tables.CC <- f(GO[[2]]@reslist[[module]], pvalue=0.05, maxlines=NA,
-                 drive=drive.CC[[module]], cat="CC")
-  tables.MF <- f(GO[[3]]@reslist[[module]], pvalue=0.05, maxlines=NA,
-                 drive=drive.MF[[module]], cat="MF")
+  tables.BP <- f(GO[[1]]@reslist[[which]], pvalue=0.05, maxlines=NA,
+                 drive=drive.BP[[which]], cat="BP")
+  tables.CC <- f(GO[[2]]@reslist[[which]], pvalue=0.05, maxlines=NA,
+                 drive=drive.CC[[which]], cat="CC")
+  tables.MF <- f(GO[[3]]@reslist[[which]], pvalue=0.05, maxlines=NA,
+                 drive=drive.MF[[which]], cat="MF")
 
   g <- function(obj, pvalue=0.05, maxlines=NA, drive=NULL) {
     if (class(obj)=="NULL") {
@@ -501,8 +445,8 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   }
 
   require(KEGG.db)
-  tables.KEGG <- g(KEGG@reslist[[module]], pvalue=0.05, maxlines=NA,
-                   drive=drive.KEGG[[module]])
+  tables.KEGG <- g(KEGG@reslist[[which]], pvalue=0.05, maxlines=NA,
+                   drive=drive.KEGG[[which]])
   
   if (!is.null(miRNA)) {
 
@@ -565,8 +509,8 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
       paste(foo, collapse="\n")
     }
     
-    tables.miRNA <- h(miRNA@reslist[[module]], pvalue=0.05, maxlines=NA,
-                      drive=drive.miRNA[[module]])
+    tables.miRNA <- h(miRNA@reslist[[which]], pvalue=0.05, maxlines=NA,
+                      drive=drive.miRNA[[which]])
   } else {
     tables.miRNA <- "<p>Not tested</p>"
   }
@@ -632,8 +576,8 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
       paste(foo, collapse="\n")
     }
     
-    tables.DBD <- h(DBD@reslist[[module]], pvalue=0.05, maxlines=NA,
-                      drive=drive.DBD[[module]])
+    tables.DBD <- h(DBD@reslist[[which]], pvalue=0.05, maxlines=NA,
+                      drive=drive.DBD[[which]])
   } else {
     tables.DBD <- "<p>Not tested</p>"
   }
@@ -701,8 +645,8 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
       paste(foo, collapse="\n")
     }
   
-    tables.CHR <- chr(CHR@reslist[[module]], pvalue=0.05, maxlines=NA,
-                      drive=drive.CHR[[module]])
+    tables.CHR <- chr(CHR@reslist[[which]], pvalue=0.05, maxlines=NA,
+                      drive=drive.CHR[[which]])
   } else {
     tables.CHR <- "<p>Not tested.</p>"
   }
@@ -711,12 +655,12 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   clines.orig <- readLines(paste(sep="", template, "/style-mod.css.in"))
   jlines.orig <- readLines(paste(sep="", template, "/module.js.in"))
 
-  m <- module
+  m <- which
 
   print(paste("Module", m, "expression graph"))
 
-  ep <- expPlotCreate(nexp, getFeatureMatrix(isares, m),
-                      getSampleMatrix(isares, m), normalize=FALSE)
+  ep <- expPlotCreate(nexp, getFeatureMatrix(modules, mods=m),
+                      getSampleMatrix(modules, mods=m), normalize=FALSE)
   png(file=paste(sep="", target.dir, "/expression-", m, ".png"),
       width=ep$width, height=ep$height)
   ## returns the box coordinates of the expression image
@@ -737,8 +681,8 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   clines <- clines.orig
   jlines <- jlines.orig
 
-  my.gth <- seedData(isares)$thr.row[m]
-  my.cth <- seedData(isares)$thr.col[m]
+  my.gth <- seedData(modules)$thr.row[m]
+  my.cth <- seedData(modules)$thr.col[m]
 
   ## Write the coordinates to the javascript file, to have
   ## the cross
@@ -750,12 +694,12 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   
   ## title
   print("  -- title")
-  entr <- unique(unlist(mget(getFeatureNames(isares, m)[[1]], ENTREZ)))
+  entr <- unique(unlist(mget(getFeatureNames(modules, m)[[1]], ENTREZ)))
   entr <- entr[!is.na(entr)]
   title <- paste(sep="", "Module #", m, ", TG: ", my.gth,
-                 ", TC: ", my.cth, ", ", getNoFeatures(isares,m), " probes, ",
+                 ", TC: ", my.cth, ", ", getNoFeatures(modules,m), " probes, ",
                  length(entr), " Entrez genes, ",
-                 getNoSamples(isares, m), " conditions")
+                 getNoSamples(modules, m), " conditions")
   lines[ grep("<!-- title -->", lines) ] <- title
 
   ## gth
@@ -771,13 +715,13 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
 
   to.sub <- grep("<!--prev.no-->", lines, fixed=TRUE)
   if (is.null(prev.module)) {
-    prev.module <- if (m!=1) m-1 else dim(isares)[1]
+    prev.module <- if (m!=1) m-1 else dim(modules)[1]
   }
   lines[to.sub] <- gsub("<!--prev.no-->", as.character(prev.module), lines[to.sub])
   
   to.sub <- grep("<!--next.no-->", lines, fixed=TRUE)
   if (is.null(next.module)) {
-    next.module <- if (m!=length(isares)) m+1 else 1
+    next.module <- if (m!=length(modules)) m+1 else 1
   }
   lines[to.sub] <- gsub("<!--next.no-->", as.character(next.module), lines[to.sub])
 
@@ -844,7 +788,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
       return(list(graph=g,
                   coords=list(x=numeric(), y=numeric())))
     }
-    gop <- gograph(data.frame(names(pval), pval),
+    gop <- gograph(data.frame(pval),
                    colbar.length=20, label.cex=1,
                    go.terms=go.terms, GOGRAPHS=GOGRAPHS)
     png(file=filename, width=gop$width*4, height=gop$height*4)
@@ -915,8 +859,8 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   
   # Gene cloud
   print("  -- Gene cloud")
-  nam <- getFeatureNames(isares, m)[[1]]
-  orig.val <- getFeatureScores(isares, m)[[1]]
+  nam <- getFeatureNames(modules, m)[[1]]
+  orig.val <- getFeatureScores(modules, m)[[1]]
   val <- round(orig.val*10)
   entrezNums <- mget(nam, envir = get(paste(sep="", chip, "ENTREZID"))) 
   entrezIds <- mget(nam, envir = get(paste(sep="", chip, "SYMBOL")))
@@ -940,7 +884,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   
   valid <- !is.na(entrezIds)
 
-  if (getOrganism(isares) == "Homo sapiens") {
+  if (getOrganism(modules) == "Homo sapiens") {
     html <- paste(sep="", "<a href=\"http://www.genecards.org/cgi-bin/carddisp.pl?gene=", entrezIds[valid],
                   "\" class=\"tag", val[valid],
                   "\">", entrezIds[valid], "<span>", longname[valid], ", score: ", orig.val[valid], "</span></a>")
@@ -967,10 +911,10 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
     cond.to.include <- 1:6
   }
 
-  score <- round(getSampleMatrix(isares, m), 2)
+  score <- round(getSampleMatrix(modules, mods=m), 2)
   seq <- which(score != 0)
-  ord <- order(getSampleScores(isares, m)[[1]], decreasing=TRUE)
-  pd <- pData(isares)[seq,,drop=FALSE][ ord,,drop=FALSE]
+  ord <- order(getSampleScores(modules, mods=m)[[1]], decreasing=TRUE)
+  pd <- pData(modules)[seq,,drop=FALSE][ ord,,drop=FALSE]
   pd <- pd[, cond.to.include,drop=FALSE]
 
   ## workaround for NAs
@@ -978,7 +922,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
     pd[[i]] <- as.character(pd[[i]])
   }
 
-  pd <- cbind("No"=rev(seq(nrow(pd))), "Score"=score[ord], pd)
+  pd <- cbind("No"=rev(seq(nrow(pd))), "Score"=score[seq][ord], pd)
   xt.pd <- xtable(pd)
   tfname <- tempfile()
   zz <- file(tfname, "w")
@@ -1018,13 +962,13 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
   
   png(file=paste(sep="", target.dir, "/condplot-", m, ".png"),
       width=1200, height=400)
-  cond.plot(isares, number=m, nm=nm,
-            cond.col=cond.col, sep=sep)
+  cond.plot(modules, number=m, eset=eset,
+            col=cond.col, sep=sep)
   dev.off()
   
   ## Gene names for expression matrix cross
   print("  -- Gene names for cross")
-  nam <- getFeatureNames(isares, m)[[1]]
+  nam <- getFeatureNames(modules, m)[[1]]
   entrezIds <- mget(nam, envir = get(paste(sep="", chip, "SYMBOL")))
 #  longname <- mget(nam, envir = get(paste(sep="", chip, "GENENAME")))
   haveEntrezId <- names(entrezIds)[sapply(entrezIds, function(x) !is.na(x))]
@@ -1035,7 +979,7 @@ isa.autogen.module <- function(nm, isares, module, target.dir, template,
     entrezIds <- unlist(entrezIds)
   }
 
-  ord <- order(getFeatureScores(isares, m)[[1]], decreasing=TRUE)
+  ord <- order(getFeatureScores(modules, m)[[1]], decreasing=TRUE)
   nam <- nam[ ord ]
   entrezIds <- unname(entrezIds[ ord ])
 #  longname <- longname[ ord ]

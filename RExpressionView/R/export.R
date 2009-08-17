@@ -109,37 +109,37 @@ toExpressionView <- function(eisamodules, gedata, order, filename="") {
 			xmldata$addNode("annotation", gedata@annotation)
 		xmldata$closeTag()
 
+		# get gene info
+		ann <- annotation(gedata)
+		library(paste(ann, sep="", ".db"), character.only=TRUE)
+		symbol.table <- toTable(get(paste(ann, "SYMBOL", sep="")))
+		entrez.table <- toTable(get(paste(ann, "ENTREZID", sep="")))
+		organism <- get(paste(ann, "ORGANISM", sep=""))
+		url <- "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=Retrieve&dopt=full_report&list_uids="
+		if ( organism == "Homo sapiens" ) { url <- "http://www.genecards.org/cgi-bin/carddisp.pl?gene=" }
+
 		xmldata$addNode("genes", close = FALSE)
 			xmldata$addNode("shortgenetags", close = FALSE)
 			xmldata$addNode("tag", "id")
 			xmldata$addNode("tag", "name")
-			temp <- rownames(featureData(gedata)@varMetadata)
-			if ( length(temp) >= 2 ) {
-				for ( i in 2:length(temp) ) {
-					xmldata$addNode("tag", temp[i])
-				}
-			}
+			xmldata$addNode("tag", "symbol")
+			xmldata$addNode("tag", "entrezid")
 			xmldata$closeTag()		
+
 			xmldata$addNode("longgenetags", close = FALSE)
 			xmldata$addNode("tag", "id")
 			xmldata$addNode("tag", "name")
-			if ( length(temp) >= 2 ) {
-				for ( i in 2:length(temp) ) {
-					xmldata$addNode("tag", featureData(ALL)@varMetadata[[1]][i])
-				}
-			}
+			xmldata$addNode("tag", "symbol")
+			xmldata$addNode("tag", "entrezid")
 			xmldata$closeTag()
 
 			for ( gene in 1:nGenes ) {
 				xmldata$addNode("gene", close = FALSE)
 					xmldata$addNode("tag0", gene)
-					xmldata$addNode("tag1", Genes[geneMaps[[1]][gene]])
-					if ( dim(gedata@featureData@data)[2] != 0 ) {
-						temp <- gedata@featureData@data[geneMaps[[1]][gene],]
-						for ( i in 2:length(temp) ) {
-							xmldata$addNode(paste("tag", i, sep=""), temp[i])
-						}
-					}
+					genep <- Genes[geneMaps[[1]][gene]]
+					xmldata$addNode("tag1", genep)
+					xmldata$addNode("tag2", paste("", symbol.table[which(symbol.table==genep),2], sep=""))
+					xmldata$addNode("tag3", paste("", entrez.table[which(entrez.table==genep),2], sep=""))
 				xmldata$closeTag()
 			}
 		xmldata$closeTag()	
@@ -279,7 +279,8 @@ toExpressionView <- function(eisamodules, gedata, order, filename="") {
 		# to get rid of In xmlRoot.XMLInternalDocument(currentNodes[[1]]) : empty XML document use
 		# options(warn=-1)
 
-		cat(saveXML(xmldata))
+		# show XML data
+		# cat(saveXML(xmldata))
 		writeBin(saveXML(xmldata), con, 1, endian="big")
 		
 	close(con)

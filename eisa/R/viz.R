@@ -6,7 +6,7 @@ gograph <- function(table, colbar.length=30, label.cex=1, GOGRAPHS=NULL,
   
   require(GO.db)
   require(igraph)
-
+  
   terms <- rownames(table)
   pval <- table[,1]
 
@@ -354,8 +354,7 @@ cond.plot <- function(modules, number, eset,
 
   isa2:::isa.status("Creating a condition plot", "in")
 
-  eset <- eisa.get.nm(eset)
-  eset <- eset[featureNames(modules),]
+  eset <- eisa.get.nm(eset, modules)
   nm <- list(t(feat.exprs(eset)), samp.exprs(eset))
 
   genes <- getFeatureMatrix(modules, mods=number)
@@ -530,15 +529,15 @@ mnplot <- function(x, eset, data, group, ...) {
   invisible(tts)
 }
 
-select.eset <- function(eset, norm=c("raw", "feature", "sample")) {
+select.eset <- function(eset, modules, norm=c("raw", "feature", "sample")) {
   norm <- match.arg(norm)
   if (norm=="raw") {
     eset <- exprs(eset)
   } else if (norm=="feature") {
-    eset <- eisa.get.nm(eset)
+    eset <- eisa.get.nm(eset, modules)
     eset <- feat.exprs(eset)
   } else if (norm=="sample") {
-    eset <- eisa.get.nm(eset)
+    eset <- eisa.get.nm(eset, modules)
     eset <- samp.exprs(eset)
   }
   eset
@@ -549,7 +548,7 @@ ISAmnplot <- function(modules, number, eset,
                       norm=c("raw", "feature", "sample"),
                       data=annotation(modules), group, ...) {
   x <- getFeatureNames(modules, number)[[1]]
-  eset <- select.eset(eset, norm)
+  eset <- select.eset(eset, modules, norm)
   mnplot(x, eset, data, group, ...)
 }
 
@@ -557,7 +556,7 @@ ISA2heatmap <- function(modules, module, eset,
                         norm=c("raw", "feature", "sample"),
                         scale="none", ...) {
 
-  eset <- select.eset(eset, norm)
+  eset <- select.eset(eset, modules, norm)
   x <- getFeatureNames(modules, module)[[1]]
   y <- getSampleNames (modules, module)[[1]]
   dataM <- eset[x,y]
@@ -575,7 +574,7 @@ profilePlot <- function(modules, module, eset,
                         xlabs=c("Features","Samples"),
                         ylab="Expression", ...) {
 
-  data <- select.eset(eset, norm)
+  data <- select.eset(eset, modules, norm)
   
   if (is(data, "ExpressionSet") || !is.null(rownames(data))) {
     data <- data[featureNames(modules),]

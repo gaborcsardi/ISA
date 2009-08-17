@@ -20,8 +20,9 @@ package ch.unil.cbg.ExpressionView.view {
 	import mx.controls.Alert;
 	import mx.controls.TextArea;
 	import mx.controls.dataGridClasses.DataGridColumn;
-	import mx.utils.ObjectUtil;
+	import mx.core.ClassFactory;
 	import mx.events.IndexChangedEvent;
+	import mx.utils.ObjectUtil;
 	
 	import org.alivepdf.colors.RGBColor;
 	import org.alivepdf.fonts.FontFamily;
@@ -514,8 +515,14 @@ package ch.unil.cbg.ExpressionView.view {
 				} else {
 					column.headerText = "#";
 				}
+				// show hyperlinks
+				var linkRenderer:ClassFactory = new ClassFactory(LinkRenderer);
+				if ( ged.shortLabelsGene[i] == "symbol" || ged.shortLabelsGene[i] == "entrezid" ) {
+					linkRenderer.properties = {url : "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=Retrieve&dopt=full_report&list_uids="};
+					column.itemRenderer = linkRenderer;	
+				}
 				column.sortCompareFunction = sortFunction(i);
-				temp.push(column)
+				temp.push(column);
 			}
 			genesSearchableDataGrid.columns = temp;
 			temp = [];
@@ -574,8 +581,6 @@ package ch.unil.cbg.ExpressionView.view {
 				} else {
 					result = ObjectUtil.numericCompare(Number(obj1.child(childname)),Number(obj2.child(childname)));
 				}        		
-				//var num:Number = Number(obj1.child(childname)) - Number(obj2.child(childname));
-	    	    //return (num > 0) ? 1 : ((num < 0) ? -1 : 0);
 	    	    return result;
     		}
 		}
