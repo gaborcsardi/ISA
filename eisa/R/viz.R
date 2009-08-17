@@ -6,7 +6,7 @@ gograph <- function(table, colbar.length=30, label.cex=1, GOGRAPHS=NULL,
   
   require(GO.db)
   require(igraph)
-
+  
   terms <- rownames(table)
   pval <- table[,1]
 
