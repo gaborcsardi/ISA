@@ -1,0 +1,245 @@
+\name{ListHyperGResult-class}
+\docType{class}
+
+\alias{ListHyperGResult}
+\alias{CHRListHyperGResult}
+\alias{GOListHyperGResult}
+\alias{KEGGListHyperGResult}
+\alias{miRNAListHyperGResult}
+
+\alias{ListHyperGResult-class}
+\alias{CHRListHyperGResult-class}
+\alias{GOListHyperGResult-class}
+\alias{KEGGListHyperGResult-class}
+\alias{miRNAListHyperGResult-class}
+
+\alias{condGeneIdUniverse,ListHyperGResult-method}
+\alias{condGeneIdUniverse,CHRListHyperGResult-method}
+\alias{condGeneIdUniverse,KEGGListHyperGResult-method}
+\alias{condGeneIdUniverse,GOListHyperGResult-method}
+\alias{condGeneIdUniverse,miRNAListHyperGResult-method}
+
+\alias{conditional,GOListHyperGResult-method}
+
+\alias{expectedCounts,ListHyperGResult-method}
+\alias{expectedCounts,CHRListHyperGResult-method}
+\alias{expectedCounts,KEGGListHyperGResult-method}
+\alias{expectedCounts,GOListHyperGResult-method}
+\alias{expectedCounts,miRNAListHyperGResult-method}
+
+\alias{geneCounts,ListHyperGResult-method}
+\alias{geneCounts,CHRListHyperGResult-method}
+\alias{geneCounts,KEGGListHyperGResult-method}
+\alias{geneCounts,GOListHyperGResult-method}
+\alias{geneCounts,miRNAListHyperGResult-method}
+
+\alias{geneIdsByCategory,ListHyperGResult-method}
+\alias{geneIdsByCategory,CHRListHyperGResult-method}
+\alias{geneIdsByCategory,KEGGListHyperGResult-method}
+\alias{geneIdsByCategory,GOListHyperGResult-method}
+\alias{geneIdsByCategory,miRNAListHyperGResult-method}
+
+\alias{geneIdUniverse,ListHyperGResult-method}
+\alias{geneIdUniverse,CHRListHyperGResult-method}
+\alias{geneIdUniverse,KEGGListHyperGResult-method}
+\alias{geneIdUniverse,GOListHyperGResult-method}
+\alias{geneIdUniverse,miRNAListHyperGResult-method}
+
+\alias{geneMappedCount,ListHyperGResult-method}
+\alias{geneMappedCount,CHRListHyperGResult-method}
+\alias{geneMappedCount,KEGGListHyperGResult-method}
+\alias{geneMappedCount,GOListHyperGResult-method}
+\alias{geneMappedCount,miRNAListHyperGResult-method}
+
+\alias{htmlReport,ListHyperGResult-method}
+\alias{htmlReport,CHRListHyperGResult-method}
+\alias{htmlReport,KEGGListHyperGResult-method}
+\alias{htmlReport,GOListHyperGResult-method}
+\alias{htmlReport,miRNAListHyperGResult-method}
+
+\alias{oddsRatios,ListHyperGResult-method}
+\alias{oddsRatios,CHRListHyperGResult-method}
+\alias{oddsRatios,KEGGListHyperGResult-method}
+\alias{oddsRatios,GOListHyperGResult-method}
+\alias{oddsRatios,miRNAListHyperGResult-method}
+
+\alias{ontology,GOListHyperGResult-method}
+
+\alias{pvalues,ListHyperGResult-method}
+\alias{pvalues,CHRListHyperGResult-method}
+\alias{pvalues,KEGGListHyperGResult-method}
+\alias{pvalues,GOListHyperGResult-method}
+\alias{pvalues,miRNAListHyperGResult-method}
+
+\alias{sigCategories,ListHyperGResult-method}
+\alias{sigCategories,CHRListHyperGResult-method}
+\alias{sigCategories,KEGGListHyperGResult-method}
+\alias{sigCategories,GOListHyperGResult-method}
+\alias{sigCategories,miRNAListHyperGResult-method}
+
+\alias{summary,ListHyperGResult-method}
+\alias{summary,CHRListHyperGResult-method}
+\alias{summary,KEGGListHyperGResult-method}
+\alias{summary,GOListHyperGResult-method}
+\alias{summary,miRNAListHyperGResult-method}
+
+\alias{universeCounts,ListHyperGResult-method}
+\alias{universeCounts,CHRListHyperGResult-method}
+\alias{universeCounts,KEGGListHyperGResult-method}
+\alias{universeCounts,GOListHyperGResult-method}
+\alias{universeCounts,miRNAListHyperGResult-method}
+
+\alias{universeMappedCount,ListHyperGResult-method}
+\alias{universeMappedCount,CHRListHyperGResult-method}
+\alias{universeMappedCount,KEGGListHyperGResult-method}
+\alias{universeMappedCount,GOListHyperGResult-method}
+\alias{universeMappedCount,miRNAListHyperGResult-method}
+
+\title{Classes for quick GO/KEGG/CHR/miRNA target enrichment
+  calculation for multiple gene sets}
+\description{
+}
+\usage{
+\S4method{summary}{ListHyperGResult}(object, pvalue = pvalueVutoff(object), 
+  categorySize = NULL)
+\S4method{htmlReport}{ListHyperGResult}(r, file = "", append = FALSE,
+  label = "", digits = 3, summary.args = NULL)
+\S4method{pvalues}{ListHyperGResult}(r)
+\S4method{sigCategories}{ListHyperGResult}(r, p)
+
+\S4method{geneCounts}{ListHyperGResult}(r)
+\S4method{expectedCounts}{ListHyperGResult}(r)
+\S4method{oddsRatios}{ListHyperGResult}(r)
+\S4method{universeCounts}{ListHyperGResult}(r)
+\S4method{geneMappedCount}{ListHyperGResult}(r)
+\S4method{universeMappedCount}{ListHyperGResult}(r)
+\S4method{geneIdsByCategory}{ListHyperGResult}(r, catids = NULL)
+
+\S4method{geneIdUniverse}{ListHyperGResult}(r, cond = FALSE)
+\S4method{condGeneIdUniverse}{ListHyperGResult}(r)
+}
+\arguments{
+  \item{object,r}{}
+  \item{pvalue}{}
+  \item{categorySize}{}
+  \item{file}{}
+  \item{append}{}
+  \item{label}{}
+  \item{digits}{}
+  \item{summary.args}{}
+  \item{p}{}
+  \item{catids}{}
+  \item{cond}{}
+}
+\details{
+  A \code{ListHyperGResult} object can store the results of
+  hypergeometric tests, several gene sets against the same
+  universe. \code{ListHyperGRresult} is an extension of
+  \code{HyperGResult}, as defined in the \code{Category} package.
+
+  More precisely, \code{ListHyperGResult} is an abstract class, it is
+  not possible to instantiate objects from it. Its extensions should be
+  used instead:
+  \code{GOListHyperGResult}, \code{KEGGListHyperGResult},
+  \code{CHRListHyperGResult} and \code{miRNAListHyperGResult}.  
+}
+\section{Member functions}{
+  Most of the member functions are analogous to the ones defined for
+  \code{HyperGResult} in the \code{Category} package. Usually the only
+  difference is that they return a list of vectors, with one entry for
+  each gene set, instead of just a single vector.
+
+  \code{pvalues} returns the \eqn{p}-values of the hypergeomatric
+  tests. A list is returned, with one numeric vector entry for each
+  input gene set. The \eqn{p}-values for each gene set are ordered
+  according to decreasing significance.
+
+  \code{geneCounts} returns the number of genes from the gene set that
+  are annotated with the given term. This is returned for all input gene
+  sets, in a list.
+  
+  \code{expectedCounts} returns the number of genes that are expected to
+  be annotated wit hthe given term, just by chance. This is calculated
+  for all input gene sets, and returned as a list.
+  
+  \code{oddsRatios} returns the odds ratios for each term tested, for
+  all gene sets, in a list of numeric vectors.
+  
+  \code{universeCounts} returns the number of genes from the universe
+  that are annotated with the given term, for all gene sets, in a list.
+
+  \code{geneMappedCount} gives the size of the gene sets, as used in the
+  algorithm. This can be different than the size of the input gene sets,
+  because of the elimination of duplicates and genes that are not in the
+  universe, before the actual computation.
+  
+  \code{universeMappedCount} gives the size of the gene universe, as
+  used in the computation. This can be different than the size given by
+  the user, because duplicates are eliminated before the computation.
+  
+  \code{sigCategories} returns the significant terms, at the given
+  \eqn{p}-value threshold, for all gene sets, as a list.
+  
+  \code{geneIdsByCategory} returns a list of lists, one entry for each
+  input gene set. Every entry is a list itself and for each tested term
+  it gives the gene ids from the gene set that are annotated with the
+  given term.
+
+  \code{geneIdUniverse} returns a list of character vectors, one for
+  each term that was tested, giving the ids of the genes from the
+  universe that are annotated with that term.
+  
+  \code{summary} returns a list of data frames, one for each input gene
+  set. Each data frame has columns: 
+  \sQuote{Pvalue}, \sQuote{OddsRatio}, \sQuote{ExpCount},
+  \sQuote{Count}, \sQuote{Size} and optionally \sQuote{drive}.
+  Each row of the data frame corresponds to a tested term.
+  
+  \code{htmlReport} TODO
+
+  The following functions are defined for \code{GOListHyperGResult}
+  objects only.
+  
+  \code{conditional} returns a logical vector of length one, whether the
+  test was conditional or not. Conditional testing is currently not
+  implemented, please see the \code{GOstats} package for a working
+  implementation.
+  
+  \code{ontology} returns a chracter vector of length one, the name of
+  the ontology for the GO test.
+  
+  \code{condGeneIdUniverse} TODO
+}
+\value{
+  \code{pvalues}, \code{geneCounts}, \code{expectedCounts},
+  \code{oddsRatios} and \code{universeCounts} return a list of named
+  numeric vectors.
+
+  \code{geneMappedCount} returns a numeric vector,
+  \code{universeMappedCount} returns a numeric vector of length one.
+
+  \code{sigCategories} returns a list of character vectors.
+
+  \code{geneIdsByCategory} returns a list of lists of character vectors.
+
+  \code{geneIdUniverse} and \code{condGeneIdUniverse} return a list of
+  character vectors.
+
+  \code{summary} returns a list of data frames with columns:
+  \sQuote{Pvalue}, \sQuote{OddsRatio}, \sQuote{ExpCount},
+  \sQuote{Count}, \sQuote{Size} and optionally \sQuote{drive}.
+
+  \code{htmlReport} TODO
+
+  \code{conditional} returns a logical vector of length one.
+  \code{ontology} returns a character vector of length one.
+}
+\author{ Gabor Csardi \email{Gabor.Csardi@gmail.com} }
+\seealso{Functions for enrichment calculation of ISA modules:
+  \code{\link{ISA.GO}}, \code{\link{ISA.KEGG}}, \code{\link{ISA.CHR}},
+  \code{\link{ISA.miRNA}}.
+  
+  Perhaps see also the vignette in the \code{GOstats} package.
+}
+\examples{}
+\keyword{cluster}

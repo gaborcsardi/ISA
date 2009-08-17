@@ -1,123 +1,48 @@
 \name{ListHyperGParams-class}
 \docType{class}
 
+\alias{ListHyperGParams}
 \alias{CHRListHyperGParams}
 \alias{GOListHyperGParams}
 \alias{KEGGListHyperGParams}
 \alias{miRNAListHyperGParams}
 
-\alias{CHRListHyperGResult}
-\alias{GOListHyperGResult}
-\alias{KEGGListHyperGResult}
-\alias{miRNAListHyperGResult}
-
+\alias{ListHyperGParams-class}
 \alias{CHRListHyperGParams-class}
 \alias{GOListHyperGParams-class}
 \alias{KEGGListHyperGParams-class}
 \alias{miRNAListHyperGParams-class}
 
-\alias{CHRListHyperGResult-class}
-\alias{GOListHyperGResult-class}
-\alias{KEGGListHyperGResult-class}
-\alias{miRNAListHyperGResult-class}
-
 \alias{drive}
 \alias{drive<-}
-\alias{drive,GOListHyperGParams,logical-method}
-\alias{drive,KEGGListHyperGParams,logical-method}
-\alias{drive,CHRListHyperGParams,logical-method}
-\alias{drive,miRNAListHyperGParams,logical-method}
+\alias{drive,ListHyperGParams-method}
 \alias{drive,GOListHyperGParams-method}
 \alias{drive,KEGGListHyperGParams-method}
 \alias{drive,CHRListHyperGParams-method}
 \alias{drive,miRNAListHyperGParams-method}
+\alias{drive<-,ListHyperGParams,logical-method}
 \alias{drive<-,GOListHyperGParams,logical-method}
 \alias{drive<-,KEGGListHyperGParams,logical-method}
 \alias{drive<-,CHRListHyperGParams,logical-method}
 \alias{drive<-,miRNAListHyperGParams,logical-method}
 
-\alias{condGeneIdUniverse,CHRListHyperGResult-method}
-\alias{condGeneIdUniverse,KEGGListHyperGResult-method}
-\alias{condGeneIdUniverse,GOListHyperGResult-method}
-\alias{condGeneIdUniverse,miRNAListHyperGResult-method}
-
-\alias{conditional,GOListHyperGResult-method}
-\alias{conditional,GOListHyperGParams-method}
-\alias{conditional<-,GOListHyperGParams,logical-method}
-
-\alias{expectedCounts,CHRListHyperGResult-method}
-\alias{expectedCounts,KEGGListHyperGResult-method}
-\alias{expectedCounts,GOListHyperGResult-method}
-\alias{expectedCounts,miRNAListHyperGResult-method}
-
-\alias{geneCounts,CHRListHyperGResult-method}
-\alias{geneCounts,KEGGListHyperGResult-method}
-\alias{geneCounts,GOListHyperGResult-method}
-\alias{geneCounts,miRNAListHyperGResult-method}
-
-\alias{geneIdsByCategory,CHRListHyperGResult-method}
-\alias{geneIdsByCategory,KEGGListHyperGResult-method}
-\alias{geneIdsByCategory,GOListHyperGResult-method}
-\alias{geneIdsByCategory,miRNAListHyperGResult-method}
-
-\alias{geneIdUniverse,CHRListHyperGResult-method}
-\alias{geneIdUniverse,KEGGListHyperGResult-method}
-\alias{geneIdUniverse,GOListHyperGResult-method}
-\alias{geneIdUniverse,miRNAListHyperGResult-method}
-
-\alias{geneMappedCount,CHRListHyperGResult-method}
-\alias{geneMappedCount,KEGGListHyperGResult-method}
-\alias{geneMappedCount,GOListHyperGResult-method}
-\alias{geneMappedCount,miRNAListHyperGResult-method}
-
-\alias{htmlReport,CHRListHyperGResult-method}
-\alias{htmlReport,KEGGListHyperGResult-method}
-\alias{htmlReport,GOListHyperGResult-method}
-\alias{htmlReport,miRNAListHyperGResult-method}
-
+\alias{hyperGTest,ListHyperGParams-method}
 \alias{hyperGTest,CHRListHyperGParams-method}
 \alias{hyperGTest,KEGGListHyperGParams-method}
 \alias{hyperGTest,GOListHyperGParams-method}
 \alias{hyperGTest,miRNAListHyperGParams-method}
 
+\alias{makeValidParams,ListHyperGParams-method}
 \alias{makeValidParams,CHRListHyperGParams-method}
 \alias{makeValidParams,KEGGListHyperGParams-method}
 \alias{makeValidParams,GOListHyperGParams-method}
 \alias{makeValidParams,miRNAListHyperGParams-method}
 
-\alias{oddsRatios,CHRListHyperGResult-method}
-\alias{oddsRatios,KEGGListHyperGResult-method}
-\alias{oddsRatios,GOListHyperGResult-method}
-\alias{oddsRatios,miRNAListHyperGResult-method}
+\alias{conditional,GOListHyperGParams-method}
+\alias{conditional<-,GOListHyperGParams,logical-method}
 
-\alias{ontology,GOListHyperGResult-method}
 \alias{ontology<-,GOListHyperGParams,character-method}
 \alias{ontology,GOListHyperGParams-method}
-
-\alias{pvalues,CHRListHyperGResult-method}
-\alias{pvalues,KEGGListHyperGResult-method}
-\alias{pvalues,GOListHyperGResult-method}
-\alias{pvalues,miRNAListHyperGResult-method}
-
-\alias{sigCategories,CHRListHyperGResult-method}
-\alias{sigCategories,KEGGListHyperGResult-method}
-\alias{sigCategories,GOListHyperGResult-method}
-\alias{sigCategories,miRNAListHyperGResult-method}
-
-\alias{summary,CHRListHyperGResult-method}
-\alias{summary,KEGGListHyperGResult-method}
-\alias{summary,GOListHyperGResult-method}
-\alias{summary,miRNAListHyperGResult-method}
-
-\alias{universeCounts,CHRListHyperGResult-method}
-\alias{universeCounts,KEGGListHyperGResult-method}
-\alias{universeCounts,GOListHyperGResult-method}
-\alias{universeCounts,miRNAListHyperGResult-method}
-
-\alias{universeMappedCount,CHRListHyperGResult-method}
-\alias{universeMappedCount,KEGGListHyperGResult-method}
-\alias{universeMappedCount,GOListHyperGResult-method}
-\alias{universeMappedCount,miRNAListHyperGResult-method}
 
 \title{Classes for quick GO/KEGG/CHR/miRNA target enrichment calculation
   of multiple gene sets.}
@@ -127,13 +52,73 @@
   calculation for quickly for multiple gene sets.
 }
 \usage{
+\S4method{makeValidParams}{ListHyperGParams}(p)
+\S4method{drive}{ListHyperGParams}(p)
+\S4method{drive}{ListHyperGParams,logical}(p) <- dri
 
+\S4method{ontology}{GOListHyperGParams}(p)
+\S4method{ontology}{GOListHyperGParams,character}(p) <- go
+\S4method{conditional}{GOListHyperGParams}(p)
+\S4method{conditional}{GOListHyperGParams,logical}(p) <- cond
+
+\S4method{hyperGTest}{ListHyperGParams}(p)
 }
 \arguments{
+  \item{p}{A \code{ListHyperGParams} object.}
+  \item{dri}{Logical scalar, whether to store the genes that are in the
+    intersection of the specified gene set and the annotation category.}
+  \item{go}{Character scalar, the ontology for GO, possible values:
+    \sQuote{BP}, \sQuote{CC}, \sQuote{MF}.}
+  \item{cond}{Logical scalar, whether to perform conditional enrichment
+    calculation. Currently this option is ignored.}
 }
 \details{
+  The \code{ListHyperGParams} abstract class extends \code{HyperGParams}
+  and allows to specify a list of gene sets for the enrichment
+  calculation instead of a single set.
+
+  \code{ListHyperGParams} calculates the enrichment must faster than the
+  original \code{\link[Category]{HyperGParams}} classes, especially if
+  the calculation is performed against the same gene universe for many
+  gene sets.
+
+  \code{ListHyperGParams} is an abstract class, it is not possible to
+  instantiate objects from it. Instead, its various extensions must be
+  used: \code{GOListHyperGParams}, \code{KEGGListHyperGParams},
+  \code{CHRListHyperGParams} and \code{miRNAListHyperGParams}.
+}
+\section{Member functions}{
+  Most of these functions are analogous to the ones defined in the
+  \code{Category} package, the only difference is that they handle
+  \code{ListHyperGParams} objects.
+
+  \code{makeValidParams} validates \code{ListHyperGParams} object, in
+  particular, it removed duplicate genes, both from the gene universe
+  and the specified gene sets; and it also makes sure that all genes in
+  the gene sets are included in the universe.
+
+  \code{ontology} can be used to query or set the ontology for
+  enrichment calculated against the GO database.
+
+  \code{conditional} queries or sets whether conditional GO enrichment
+  will be performed. This feature is not implemented yet, see the
+  \code{Category} and \code{GOstats} packages for a working
+  implementation and more information.
+
+  \code{drive} queries or sets whether the intersections of the gene sets
+  and the universe are stored in the result object. This information can
+  be calculated later as well, but it is faster to store it at the same
+  time when the hypergeometric test is performed.
 }
 \value{
+  \code{makeValidParmas} returns another \code{ListHyperGParams}
+  instance that has the same class as its arguments'.
+
+  \code{ontology} returns a character vector of length one.
+
+  \code{conditional} returns a logical vector of length one.
+  
+  \code{drive} returns a logical vector of length one.  
 }
 \author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
 \seealso{Functions for enrichment calculation of ISA modules:

@@ -16,15 +16,15 @@
 \alias{prenormalized<-,ISAExpressionSet-method}
 \title{Expression Set, normalized for using with ISA}
 \description{
-  An \code{\link{ExpressionSet}} object that contains expression values
+  An \code{\link[Biobase]{ExpressionSet}} object that contains expression values
   normalized for use with the Iterative Signature Algorithm.
 }
 \usage{
 \S4method{feat.exprs}{ISAExpressionSet}(object)
 \S4method{samp.exprs}{ISAExpressionSet}(object)
 
-\S4method{has.NA}{ISAExpressionSet}(object)
-\S4method{has.NA}{ISAExpressionSet}(object) <- value
+\S4method{hasNA}{ISAExpressionSet}(object)
+\S4method{hasNA}{ISAExpressionSet}(object) <- value
 
 \S4method{prenormalized}{ISAExpressionSet}(object)
 \S4method{prenormalized}{ISAExpressionSet}(object) <- value

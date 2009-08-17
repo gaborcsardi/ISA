@@ -52,7 +52,7 @@ ISA.miRNA (modules, ann = annotation(modules), features = featureNames(modules),
   Musculus and they can be downloaded from
   \url{http://www2.unil.ch/cbg/index.php?title=Building_BioConductor_Annotation_Packages}.
 }
-\value{A \code{\link{miRNAListHyperGResult} object.}
+\value{A \code{\link{miRNAListHyperGResult}} object.}
 \author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
 \references{
   Conserved Seed Pairing, Often Flanked by Adenosines, Indicates that

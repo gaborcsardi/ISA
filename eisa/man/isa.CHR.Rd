@@ -55,6 +55,6 @@ ISA.CHR (modules,ann = annotation(modules), features = featureNames(modules),
   \code{\link{ISA.miRNA}} for other enrichment calculations.
 
   The \code{Category} package.
-
+}
 \examples{}
 \keyword{cluster}
