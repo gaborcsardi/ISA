@@ -1,12 +1,17 @@
 
-ISA.biclust <- function(modules) {
+setAs(from="Biclust", to="ISAModules", def=function(from) {
+  require(biclust)
+  new("ISAModules",
+      genes=from@RowxNumber,
+      conditions=t(from@NumberxCol),
+      rundata=from@Parameters,
+      seeddata=data.frame())
+})
 
-  if (!require(biclust)) {
-    stop("The `biclust' package is required for this")
-  }
-
-  new("Biclust", Parameters=list(seeddata=modules@seeddata,
-                   rundata=modules@rundata),
-      RowxNumber=modules@genes != 0,
-      NumberxCol=t(modules@conditions != 0), Number=ncol(modules@genes))
-}
+setAs(from="ISAModules", to="Biclust", def=function(from) {
+  require(biclust)
+  new("Biclust", Parameters=list(seeddata=from@seeddata,
+                   rundata=from@rundata),
+      RowxNumber=from@genes != 0,
+      NumberxCol=t(from@conditions != 0), Number=ncol(from@genes))
+})

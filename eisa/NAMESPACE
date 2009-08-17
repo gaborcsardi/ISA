@@ -10,7 +10,7 @@ export(ISA.GO, ISA.KEGG, ISA.CHR, ISA.miRNA)#, ISA.DBD)
 
 export(gograph, gograph.plot, expPlotCreate, expPlotColbar,
        expPlot, cond.plot, overlap, overlap.plot, mnplot, ISAmnplot,
-       ISA2heatmap, ISA.biclust, profilePlot)
+       ISA2heatmap, profilePlot)
        
 export(ISA.html.table, ISA.html.modules, ISA.html)
 
@@ -35,3 +35,5 @@ exportMethods("summary", "htmlReport", "pvalues", "geneCounts",
               "oddsRatios", "expectedCounts", "universeCounts",
               "universeMappedCount", "geneMappedCount", "geneIdUniverse",
               "condGeneIdUniverse", "geneIdsByCategory", "sigCategories")
+
+exportMethods("coerce")
