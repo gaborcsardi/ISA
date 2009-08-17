@@ -203,7 +203,7 @@ ISA.html.modules <- function(eset, modules, which=seq_len(length(modules)),
     x <- which[i]
     nx <- if (i!=length(which)) which[i+1] else which[1]
     px <- if (i!=1) which[i-1] else which[length(which)]
-    isa.autogen.module(eisa.get.nm(eset), modules, x,
+    isa.autogen.module(eisa.get.nm(eset, modules), modules, x,
                        target.dir=target.dir, template=template,
                        GO=GO, KEGG=KEGG, miRNA=miRNA, DBD=DBD, CHR=CHR,
                        cond.to.include=cond.to.include,
@@ -237,9 +237,8 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   require(igraph)
   require(xtable)
 
-  nm <- eisa.get.nm(eset)
-  nm <- list(Er=t(feat.exprs(nm)),
-             Ec=samp.exprs(nm))
+  nm <- list(Er=t(feat.exprs(eset)),
+             Ec=samp.exprs(eset))
   
   nexp <- nm$Ec
 
