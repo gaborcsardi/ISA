@@ -355,15 +355,15 @@ cond.plot <- function(modules, number, eset,
   isa2:::isa.status("Creating a condition plot", "in")
 
   eset <- eisa.get.nm(eset, modules)
-  nm <- list(t(feat.exprs(eset)), samp.exprs(eset))
+  nm1 <- t(feat.exprs(eset))
 
   genes <- getFeatureMatrix(modules, mods=number)
   samp <- getSampleMatrix(modules, mods=number)
-  thr <- seedData(modules)$thr.col[number]
+  thr <- sampleThreshold(modules)[number]
   
   ## Calculate all condition scores, might not be correct for
   ## oscillating modules
-  scores <- as.vector(nm[[1]] %*% genes)
+  scores <- as.vector(nm1 %*% genes)
   msc <- mean(scores)
   ssc <- sd(scores)
   thr1 <- msc + thr * ssc
@@ -371,7 +371,7 @@ cond.plot <- function(modules, number, eset,
 
   n.scores <- ifelse(samp != 0, scores, 0)
   fact <- max(abs(n.scores))
-  if (any(scores != 0)) scores <- scores / fact
+  if (fact != 0) scores <- scores / fact
   msc <- msc / fact
   thr1 <- thr1 / fact
   thr2 <- thr2 / fact
