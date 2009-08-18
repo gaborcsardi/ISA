@@ -176,8 +176,11 @@
     \item{cor.limit}{Correlation limit for the \dQuote{\code{cor}}
        convergence criterium, see \code{\link{ISA.iterate}} for
        details.}
-    \item{eps}{Difference limit for the \dQuote{code{eps}} convergence
+    \item{eps}{Difference limit for the \dQuote{\code{eps}} convergence
        criterium, see \code{\link{ISA.iterate}} for details.}
+    \item{corx}{Size of the time window for the \dQuote{\code{corx}}
+       convergence criterium, see \code{\link{ISA.iterate}} for
+       details.}
     \item{maxiter}{The maximum number of ISA iterations that was
        allowed.}
     \item{oscillation}{Logical, whether oscillating modules were

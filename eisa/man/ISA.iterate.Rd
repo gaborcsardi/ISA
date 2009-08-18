@@ -42,7 +42,7 @@ ISA.iterate(data, feature.seeds, sample.seeds, thr.feat,
   The \code{\link[isa2]{isa.iterate}} function of the \code{isa2}
   package is called to do all the work, this has the following extra
   parameters: \code{direction}, \code{convergence}, \code{cor.limit},
-  \code{eps}, \code{oscillation}, \code{maxiter}. Please see the
+  \code{eps}, \code{corx}, \code{oscillation}, \code{maxiter}. Please see the
   \code{\link[isa2]{isa.iterate}} manual for details about them.
 }
 \value{An \code{\link{ISAModules}} object.}
