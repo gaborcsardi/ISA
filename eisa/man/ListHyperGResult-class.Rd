@@ -239,7 +239,7 @@
   \sQuote{Pvalue}, \sQuote{OddsRatio}, \sQuote{ExpCount},
   \sQuote{Count}, \sQuote{Size} and optionally \sQuote{drive}.
 
-  \code{htmlReport} TODO
+  \code{htmlReport} returns a list of chracter vectors, invisibly.
 
   \code{conditional} returns a logical vector of length one.
   \code{ontology} returns a character vector of length one.
