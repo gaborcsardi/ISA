@@ -50,6 +50,24 @@ setMethod("hyperGTest",
             do.call(new, c("KEGGListHyperGResult", res))
           })
 
+setMethod("htmlReport", signature(r="KEGGListHyperGResult"),
+          function(r, file="", append=FALSE, label="", digits=3, summary.args=NULL) {
+            library(xtable)
+            library(KEGG.db)
+            summ <- do.call("summary", c(list(r), summary.args))
+            for (i in seq_along(summ)) {
+              summ[[i]]$Pathway <- unlist(mget(rownames(summ[[i]]), KEGGPATHID2NAME))
+            }
+            res <- lapply(summ, html.df, label=label, digits=digits,
+                          display=c("s", "g", "g", "g", "g", "g", "s"))
+            if (!is.null(file)) {
+              do.call("cat", c(res, list(file=file, sep="\n\n", append=append)))
+              invisible(res)
+            } else {
+              res
+            }
+          })  
+
 ISA.KEGG <- function(modules,
                      ann=annotation(modules),
                      features=featureNames(modules),
