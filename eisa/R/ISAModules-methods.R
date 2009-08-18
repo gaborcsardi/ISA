@@ -122,17 +122,17 @@ setMethod("getSampleMatrix", signature(object="ISAModules"),
 setMethod("getFullFeatureMatrix", signature(object="ISAModules"),
           function(object, eset, mods) {
             eset <- eisa.get.nm(eset, object)
-            nm <- list(t(feat.exprs(eset)), samp.exprs(eset))
+            nm2 <- samp.exprs(eset)
             if (missing(mods)) {
               genes <- getFeatureMatrix(object)
               samp  <- getSampleMatrix(object)
-              thr <- seedData(object)$thr.col
+              thr <- featureThreshold(object)
             } else {
               genes <- getFeatureMatrix(object, mods=mods)
               samp <- getSampleMatrix(object, mods=mods)
-              thr <- seedData(object)$thr.col[mods]
+              thr <- featureThreshold(object)[mods]
             }
-            scores <- nm[[2]] %*% samp
+            scores <- nm2 %*% samp
             n.scores <- ifelse(genes != 0, scores, 0)
             for (i in seq_len(ncol(scores))) {
               m <- max(abs(n.scores[,i]))
@@ -146,17 +146,17 @@ setMethod("getFullFeatureMatrix", signature(object="ISAModules"),
 setMethod("getFullSampleMatrix", signature(object="ISAModules"),
           function(object, eset, mods) {
             eset <- eisa.get.nm(eset, object)
-            nm <- list(t(feat.exprs(eset)), samp.exprs(eset))
+            nm1 <- t(feat.exprs(eset))
             if (missing(mods)) {
               genes <- getFeatureMatrix(object)
               samp  <- getSampleMatrix(object)
-              thr <- seedData(object)$thr.col
+              thr <- sampleThreshold(object)
             } else {
               genes <- getFeatureMatrix(object, mods=mods)
               samp <- getSampleMatrix(object, mods=mods)
-              thr <- seedData(object)$thr.col[mods]
+              thr <- sampleThreshold(object)[mods]
             }
-            scores <- nm[[1]] %*% genes
+            scores <- nm1 %*% genes
             n.scores <- ifelse(samp != 0, scores, 0)
             for (i in seq_len(ncol(scores))) {
               m <- max(abs(n.scores[,i]))

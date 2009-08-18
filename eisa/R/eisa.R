@@ -35,7 +35,11 @@ eisa.get.nm <- function(data, modules) {
   if (is(data, "ISAExpressionSet")) {
     data
   } else {
-    ISA.normalize(data)
+    if (!is.null(modules)) {
+      ISA.normalize(data, prenormalize=runData(modules)$prenormalize)
+    } else {
+      ISA.normalize(data)
+    }
   }
 }
 
@@ -81,7 +85,7 @@ ISA <- function(data,
   modules
 }
 
-ISA.normalize <- function(data, prenormalize=TRUE) {
+ISA.normalize <- function(data, prenormalize=FALSE) {
 
   isa2:::isa.status("Normalizing ExpressionSet", "in")
   

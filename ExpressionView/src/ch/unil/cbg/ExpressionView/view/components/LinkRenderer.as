@@ -10,11 +10,11 @@ package ch.unil.cbg.ExpressionView.view.components {
 
 	public class LinkRenderer extends Label implements IDataRenderer, IDropInListItemRenderer {
 
-		public var url:String;
+		public var dataProvider:String;
 				
 		public function LinkRenderer() {
 			super();
-			url = new String();
+			dataProvider = new String();
 		}
 
 		override protected function createChildren():void {
@@ -35,11 +35,13 @@ package ch.unil.cbg.ExpressionView.view.components {
 		}
  
 		private function mouseClickHandler(event:MouseEvent):void {
-			//trace(listData.columnIndex);
-			//trace(listData.label);
-			//var request:URLRequest = new URLRequest(url + listData.label);
-			//trace(event.currentTarget.data);
-			var request:URLRequest = new URLRequest(url + event.currentTarget.data.tag3);
+			var url:String = new String();
+			if ( dataProvider == "genecard" ) {
+				url = "http://www.genecards.org/cgi-bin/carddisp.pl?gene=" + event.currentTarget.data.tag2;
+			} else if ( dataProvider == "entrez" ) {
+				url = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=Retrieve&dopt=full_report&list_uids=" + event.currentTarget.data.tag3; 
+			}
+			var request:URLRequest = new URLRequest(url);
 			navigateToURL(request, "_blank");
 		}
 				

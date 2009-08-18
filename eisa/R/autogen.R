@@ -220,6 +220,18 @@ ISA.html.modules <- function(eset, modules, which=seq_len(length(modules)),
   invisible(NULL)
 }
 
+fix.xtable <- function(str) {
+  str <- gsub("&lt ", "<", str, fixed=TRUE)
+  str <- gsub("&gt ", ">", str, fixed=TRUE)
+  str <- gsub("<TR>", "<tr>", str, fixed=TRUE)
+  str <- gsub("</TR>", "</tr>", str)
+  str <- gsub("<TD", "<td", str)
+  str <- gsub("</TD>", "</td>", str)
+  str <- gsub("<TH", "<th", str)
+  str <- gsub("</TH>", "</th>", str)
+  str
+}
+
 isa.autogen.module <- function(eset, modules, which, target.dir, template,
                                GO, KEGG, miRNA, CHR, DBD, cond.to.include,
                                cond.col="white", sep=NULL,
@@ -233,7 +245,6 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
 
   if (require(Cairo)) { png <- CairoPNG }
   require(Biobase)
-  require(TeachingDemos)
   require(igraph)
   require(xtable)
 
@@ -342,15 +353,9 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
     foo <- readLines(tfname)
     unlink(tfname)
     foo <- foo[4:(length(foo)-1)]
+
+    foo <- fix.xtable(foo)
     
-    foo <- gsub("&lt ", "<", foo, fixed=TRUE)
-    foo <- gsub("&gt ", ">", foo, fixed=TRUE)
-    foo <- gsub("<TR>", "<tr>", foo, fixed=TRUE)
-    foo <- gsub("</TR>", "</tr>", foo)
-    foo <- gsub("<TD", "<td", foo)
-    foo <- gsub("</TD>", "</td>", foo)
-    foo <- gsub("<TH", "<th", foo)
-    foo <- gsub("</TH>", "</th>", foo)  
     link <- "http://www.godatabase.org/cgi-bin/amigo/go.cgi?view=details&amp;search_constraint=terms&amp;depth=0&amp;query="
     foo <- sub("(<td[^>]*>[ ]*)(GO:[0-9]+)",
                paste(sep="", '\\1<a href="', link, '\\2"> \\2 </a>'), foo)
@@ -414,14 +419,8 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
 
     keggorg <- switch(organism, "Homo sapiens"="hsa", "Mus musculus"="mmu")
     
-    foo <- gsub("&lt ", "<", foo, fixed=TRUE)
-    foo <- gsub("&gt ", ">", foo, fixed=TRUE)
-    foo <- gsub("<TR>", "<tr>", foo)
-    foo <- gsub("</TR>", "</tr>", foo)
-    foo <- gsub("<TD", "<td", foo)
-    foo <- gsub("</TD>", "</td>", foo)
-    foo <- gsub("<TH", "<th", foo)
-    foo <- gsub("</TH>", "</th>", foo)
+    foo <- fix.xtable(foo)
+
     link <- c("http://www.genome.jp/kegg-bin/mark_pathway_www?@", "/default%3dyellow/")
     foo <- sub("(<td[^>]*>[ ]*)([0-9]+)",
                paste(sep="", '\\1<a href="', link[1], keggorg,
@@ -485,15 +484,9 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
       foo <- readLines(tfname)
       unlink(tfname)
       foo <- foo[4:(length(foo)-1)]
-      
-      foo <- gsub("&lt ", "<", foo, fixed=TRUE)
-      foo <- gsub("&gt ", ">", foo, fixed=TRUE)
-      foo <- gsub("<TR>", "<tr>", foo)
-      foo <- gsub("</TR>", "</tr>", foo)
-      foo <- gsub("<TD", "<td", foo)
-      foo <- gsub("</TD>", "</td>", foo)
-      foo <- gsub("<TH", "<th", foo)
-      foo <- gsub("</TH>", "</th>", foo)
+
+      foo <- fix.xtable(foo)
+
       link <- c("http://www.targetscan.org/cgi-bin/targetscan/vert_40/targetscan.cgi?species=", "&amp;gid=&amp;mir_c=", "&amp;mir_sc=&amp;mir_nc=&amp;mirg=")
       foo <- sub("(<td[^>]*>[ ]*)([^< ]+)",
                  paste(sep="", '\\1<a href="', link[1], short.organism, link[2],
@@ -552,15 +545,9 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
       foo <- readLines(tfname)
       unlink(tfname)
       foo <- foo[4:(length(foo)-1)]
-      
-      foo <- gsub("&lt ", "<", foo, fixed=TRUE)
-      foo <- gsub("&gt ", ">", foo, fixed=TRUE)
-      foo <- gsub("<TR>", "<tr>", foo)
-      foo <- gsub("</TR>", "</tr>", foo)
-      foo <- gsub("<TD", "<td", foo)
-      foo <- gsub("</TD>", "</td>", foo)
-      foo <- gsub("<TH", "<th", foo)
-      foo <- gsub("</TH>", "</th>", foo)
+
+      foo <- fix.xtable(foo)
+
       link <- c("http://dbd.mrc-lmb.cam.ac.uk/DBD/index.cgi?Search/Domain=")
       foo <- sub("(<td[^>]*>[ ]*)([^< ]+)",
                  paste(sep="", '\\1<a href="', link[1], short.organism, link[2],
@@ -621,15 +608,9 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
       foo <- readLines(tfname)
       unlink(tfname)
       foo <- foo[4:(length(foo)-1)]
-      
-      foo <- gsub("&lt ", "<", foo, fixed=TRUE)
-      foo <- gsub("&gt ", ">", foo, fixed=TRUE)
-      foo <- gsub("<TR>", "<tr>", foo)
-      foo <- gsub("</TR>", "</tr>", foo)
-      foo <- gsub("<TD", "<td", foo)
-      foo <- gsub("</TD>", "</td>", foo)
-      foo <- gsub("<TH", "<th", foo)
-      foo <- gsub("</TH>", "</th>", foo)
+
+      foo <- fix.xtable(foo)
+
       link <- c("", "", "")
       foo <- sub("(<td[^>]*>[ ]*)([^< ]+)",
                  paste(sep="", '\\1<a href="', link[1], short.organism, link[2],

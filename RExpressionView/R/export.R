@@ -100,6 +100,12 @@ toExpressionView <- function(eisamodules, gedata, order, filename="") {
 	#</isadata> 
 	xmldata = xmlTree("isadata")
 	
+		# get gene info
+		ann <- annotation(gedata)
+		library(paste(ann, sep="", ".db"), character.only=TRUE)
+		symbol.table <- toTable(get(paste(ann, "SYMBOL", sep="")))
+		entrez.table <- toTable(get(paste(ann, "ENTREZID", sep="")))
+
 		xmldata$addNode("experimentdata", close = FALSE)
 			xmldata$addNode("title", gedata@experimentData@title)
 			xmldata$addNode("name", gedata@experimentData@name)
@@ -107,16 +113,9 @@ toExpressionView <- function(eisamodules, gedata, order, filename="") {
 			xmldata$addNode("abstract", gedata@experimentData@abstract)
 			xmldata$addNode("url", gedata@experimentData@url)
 			xmldata$addNode("annotation", gedata@annotation)
+			organism <- get(paste(ann, "ORGANISM", sep=""))
+			xmldata$addNode("organism", organism)
 		xmldata$closeTag()
-
-		# get gene info
-		ann <- annotation(gedata)
-		library(paste(ann, sep="", ".db"), character.only=TRUE)
-		symbol.table <- toTable(get(paste(ann, "SYMBOL", sep="")))
-		entrez.table <- toTable(get(paste(ann, "ENTREZID", sep="")))
-		organism <- get(paste(ann, "ORGANISM", sep=""))
-		url <- "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=Retrieve&dopt=full_report&list_uids="
-		if ( organism == "Homo sapiens" ) { url <- "http://www.genecards.org/cgi-bin/carddisp.pl?gene=" }
 
 		xmldata$addNode("genes", close = FALSE)
 			xmldata$addNode("shortgenetags", close = FALSE)

@@ -119,6 +119,9 @@
 	\sQuote{eps} convergence criteria was used.}
       \item{\code{cor.limit}}{Numeric scalar. The threshold for convergence, if
 	the \sQuote{cor} convergence criteria was used.}
+      \item{\code{corx}}{Numeric scalar, the shift in number of
+	iterations, to check convergence. See the \code{convergence}
+	argument of \code{\link{isa.iterate}} for details.}
       \item{\code{maxiter}}{Numeric scalar. The maximum number of iterations
 	that were allowed for an input seed.}
       \item{\code{N}}{Numeric scalar. The total number of seeds that were used

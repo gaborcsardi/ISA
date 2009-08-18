@@ -5,6 +5,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 	import flash.events.Event;
 	import flash.events.IEventDispatcher;
 	import flash.events.KeyboardEvent;
+	import flash.events.MouseEvent;
 	
 	import mx.collections.XMLListCollection;
 	import mx.containers.Canvas;
@@ -13,6 +14,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 	import mx.controls.Text;
 	import mx.controls.TextInput;
 	import mx.controls.dataGridClasses.DataGridColumn;
+	import mx.events.DataGridEvent;
 	import mx.events.ListEvent;
 
 	//[Event(name='ITEM_CLICK', type='ListEvent')]
@@ -29,8 +31,13 @@ package ch.unil.cbg.ExpressionView.view.components {
 		protected var searchField:TextInput;
 		private var searchText:Text;
 		
+		private var alt:Boolean;
+		private var searchColumn:int;
+		
 		public function SearchableDataGrid() {
 			super();
+			searchColumn = -1;
+			alt = false;
 		}
 
 		override protected function createChildren() : void{
@@ -63,7 +70,10 @@ package ch.unil.cbg.ExpressionView.view.components {
 				dataGrid.doubleClickEnabled = true;
 				dataGrid.addEventListener(ListEvent.ITEM_CLICK, clickHandler);
 				dataGrid.addEventListener(ListEvent.ITEM_DOUBLE_CLICK, doubleClickHandler);
-				dataGrid.addEventListener(KeyboardEvent.KEY_UP, keyHandler);
+				dataGrid.addEventListener(MouseEvent.MOUSE_DOWN, mouseDownHandler);
+				dataGrid.addEventListener(MouseEvent.MOUSE_UP, mouseUpHandler);
+				dataGrid.addEventListener(KeyboardEvent.KEY_UP, keyUHandler);
+				dataGrid.addEventListener(DataGridEvent.HEADER_RELEASE, headerReleaseHandler);
 				addChild(dataGrid);
 			}
 		}
@@ -76,6 +86,26 @@ package ch.unil.cbg.ExpressionView.view.components {
 			return selection;
 		}
 		
+		private function headerReleaseHandler(event:DataGridEvent):void {
+			if ( alt ) {
+				event.preventDefault();
+				if ( event.columnIndex != searchColumn ) {
+					if ( searchColumn != -1 ) {
+						dataGrid.columns[searchColumn].headerText = dataGrid.columns[searchColumn].headerText.slice(0,
+																		dataGrid.columns[searchColumn].headerText.length-1);
+					}
+					searchColumn = event.columnIndex;
+					searchText.text = "Find in " + dataGrid.columns[searchColumn].headerText;
+					dataGrid.columns[searchColumn].headerText = dataGrid.columns[searchColumn].headerText + "*"; 
+				} else {
+					dataGrid.columns[searchColumn].headerText = dataGrid.columns[searchColumn].headerText.slice(0,
+																		dataGrid.columns[searchColumn].headerText.length-1);
+					searchColumn = -1;
+					searchText.text = "Find";
+				}
+			}
+		}
+		
 		private function clickHandler(event:ListEvent): void {
 			dispatchEvent(new SearchableDataGridSelectionEvent(SearchableDataGridSelectionEvent.ITEM_CLICK, getSelection(dataGrid.selectedIndices)));
 		}
@@ -83,8 +113,17 @@ package ch.unil.cbg.ExpressionView.view.components {
 		private function doubleClickHandler(event:ListEvent): void {
 			dispatchEvent(new SearchableDataGridSelectionEvent(SearchableDataGridSelectionEvent.ITEM_DOUBLE_CLICK, getSelection(dataGrid.selectedIndices)));
 		}
-		
-		private function keyHandler(event:KeyboardEvent): void {
+
+		private function mouseDownHandler(event:MouseEvent): void {
+			if ( event.altKey ) {
+				alt = true;
+			}
+		}		
+		private function mouseUpHandler(event:MouseEvent): void {
+			alt = false;
+		}		
+
+		private function keyUHandler(event:KeyboardEvent): void {
 			// 40 = down arrow, 38 = up arrow
 			if ( event.keyCode == 40  || event.keyCode == 38) {
 				dispatchEvent(new SearchableDataGridSelectionEvent(SearchableDataGridSelectionEvent.ITEM_CLICK, getSelection(dataGrid.selectedIndices)));
@@ -147,13 +186,21 @@ package ch.unil.cbg.ExpressionView.view.components {
             var f:String = "ig";
             var i:int = 0;
             var regExp:RegExp = new RegExp(searchField.text, f);
-            for ( i; i < dataGrid.columns.length; ++i ) {
-				var column:String = dataGrid.columns[i].dataField;
+            if ( searchColumn != -1 ) {
+				var column:String = dataGrid.columns[searchColumn].dataField;
 				var match:Boolean = regExp.test(item.descendants(column))
 				if ( match ) {
 					return true;
 				}
-            }
+            } else {
+	            for ( i; i < dataGrid.columns.length; ++i ) {
+					column = dataGrid.columns[i].dataField;
+					match = regExp.test(item.descendants(column))
+					if ( match ) {
+						return true;
+					}
+	            }
+			}
             return false;
 		}
 		

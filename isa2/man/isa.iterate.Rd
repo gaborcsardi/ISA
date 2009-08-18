@@ -20,8 +20,8 @@
     isa.iterate(normed.data, row.seeds, col.seeds,
                 thr.row, thr.col = thr.row,
 		direction = c("updown", "updown"),
-		convergence = c("cor", "eps"),
-		cor.limit = 0.99, eps = 1e-04,
+		convergence = c("corx", "cor", "eps"),
+		cor.limit = 0.99, eps = 1e-04, corx=3,
 		oscillation = FALSE, maxiter = 100)
 	      }
   where the arguments are:
@@ -53,11 +53,19 @@
       argument below) of the subsequent row and
       column vectors. If it is \sQuote{\code{eps}}, then all entries of
       the subsequent row and column vectors must be close to each other,
-      see the \code{eps} argument below.}
+      see the \code{eps} argument below.
+
+      \sQuote{\code{corx}} is similar to \sQuote{\code{cor}}, but the
+      current row/column vectors are compared to the ones \code{corx}
+      steps ago, instead of the ones in the previous step. See the
+      \code{corx} argument below, that gives the size of the shift.
+    }
     \item{cor.limit}{The correlation limit for convergence if the
       \sQuote{\code{cor}} method is used.}
     \item{eps}{Limit for convergence if the \sQuote{\code{eps}} method is
       used.}
+    \item{corx}{The number of iterations to use as a shift, for checking
+      convergence with the \sQuote{\code{corx}} method.}
     \item{oscillation}{Logical scalar, whether to look for oscillating
       seeds. Usually there are not too many oscillating seeds, so it is
       safe to leave this on \code{FALSE}.}

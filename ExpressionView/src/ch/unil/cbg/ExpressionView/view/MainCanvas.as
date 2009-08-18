@@ -518,7 +518,11 @@ package ch.unil.cbg.ExpressionView.view {
 				// show hyperlinks
 				var linkRenderer:ClassFactory = new ClassFactory(LinkRenderer);
 				if ( ged.shortLabelsGene[i] == "symbol" || ged.shortLabelsGene[i] == "entrezid" ) {
-					linkRenderer.properties = {url : "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=Retrieve&dopt=full_report&list_uids="};
+					var database:String = "entrez";
+					if ( ged.XMLData.experimentdata.organism == "Homo sapiens" ) {
+						database = "genecard";
+					}
+					linkRenderer.properties = { dataProvider : database }
 					column.itemRenderer = linkRenderer;	
 				}
 				column.sortCompareFunction = sortFunction(i);
