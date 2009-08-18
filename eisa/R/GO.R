@@ -140,7 +140,7 @@ setMethod("hyperGTest",
 ISA.GO <- function(modules,
                    ann=annotation(modules),
                    features=featureNames(modules),
-                   hgCutoff=0.001,
+                   hgCutoff=0.05,
                    correction=TRUE, correction.method="holm") {
 
   isa2:::isa.status("Calculating GO enrichment", "in")
