@@ -400,14 +400,15 @@ cond.plot <- function(modules, number, eset,
   if (val) {
     above <- which(scores>=0)
     below <- which(scores<0)
+    font <- ifelse(scores>thr1 | scores<thr2, 2, 1)
     tt <- round(scores,2)*100
     if (length(above)>0) {
       text(seq(scores)[above]-0.5, scores[above]+0.05, tt[above],
-           adj=adj.above, cex=0.7, col="red", srt=srt)
+           adj=adj.above, cex=0.7, col="red", srt=srt, font=font[above])
     }
     if (length(below)>0) {
       text(seq(scores)[below]-0.5, scores[below]-0.05, tt[below],
-           adj=adj.below, cex=0.7, col="darkgreen", srt=srt)
+           adj=adj.below, cex=0.7, col="darkgreen", srt=srt, font=font[below])
     }
     par(xpd=TRUE)
     text(length(scores), thr1+0.1, round(thr1,2), pos=4, font=2)
