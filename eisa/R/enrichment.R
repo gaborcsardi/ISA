@@ -151,9 +151,9 @@ setMethod("geneIdsByCategory", signature(r="ListHyperGResult"),
             lapply(seq_along(r@geneIds), function(x) {
               if ("drive" %in% names(r@reslist[[x]])) {
                 if (is.null(catids)) {
-                  drive <- as.character(r@reslist[[x]]$drive)
+                  drive <- unlist(r@reslist[[x]]$drive)
                 } else {
-                  drive <- as.character(r@reslist[[x]]$drive[catids])
+                  drive <- unlist(r@reslist[[x]]$drive[catids])
                 }
                 strsplit(drive, ";")
               } else {
