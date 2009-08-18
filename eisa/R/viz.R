@@ -174,6 +174,8 @@ gograph <- function(table, colbar.length=30, label.cex=1, GOGRAPHS=NULL,
   g2
 }
 
+## This is from the TeachingDemos package, by Greg Snow. Thanks!
+
 "cnvrt.coords" <-
 function(x,y=NULL,input=c('usr','plt','fig','dev','tdev')) {
 

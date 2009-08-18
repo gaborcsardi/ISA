@@ -85,9 +85,27 @@ setMethod("summary", signature(object="ListHyperGResult"),
 setMethod("htmlReport", signature=(r="ListHyperGResult"),
           function(r, file="", append=FALSE, label="", digits=3,
                    summary.args=NULL) {
-            callNextMethod(r=r, file=file, append=append,
-                           label=label, digits=digits,
-                           summary.args=summary.args)            
+            require(xtable)
+
+            html <- function(df, label, digits) {
+              if (nrow(df)==0) return("")
+              if ("drive" %in% colnames(df)) { df <- df[,colnames(df) != "drive"] }
+              xt <- xtable(df, label=label, digits=digits,
+                           display=c("s", "g", "g", "g", "g", "g"))
+              tc <- textConnection("outp", open="w", local=TRUE)
+              print(xt, type="html", file=tc)
+              close(tc)
+              fix.xtable(outp)
+            }
+
+            summ <- do.call("summary", c(list(r), summary.args))
+            res <- lapply(summ, html, label=label, digits=digits)
+            if (!is.null(file)) {
+              do.call("cat", c(res, list(file=file, sep="\n\n", append=append)))
+              invisible(res)
+            } else {
+              res
+            }
           })
 
 setMethod("pvalues", signature(r="ListHyperGResult"),

@@ -116,20 +116,27 @@
 \S4method{geneIdsByCategory}{ListHyperGResult}(r, catids = NULL)
 
 \S4method{geneIdUniverse}{ListHyperGResult}(r, cond = FALSE)
-\S4method{condGeneIdUniverse}{ListHyperGResult}(r)
 }
 \arguments{
-  \item{object,r}{}
-  \item{pvalue}{}
-  \item{categorySize}{}
-  \item{file}{}
-  \item{append}{}
-  \item{label}{}
-  \item{digits}{}
-  \item{summary.args}{}
-  \item{p}{}
-  \item{catids}{}
-  \item{cond}{}
+  \item{object,r}{A \code{ListHyperGResult} object.}
+  \item{pvalue,p}{Numeric vector of length one, the \eqn{p}-value limit,
+    up to which the terms are listed.}
+  \item{categorySize}{A numeric vector of length one, or \code{NULL}. If
+    not \code{NULL}, then it gives the minimum number of annotated genes
+    in the universe, in order to list the term.}
+  \item{file}{A file name, or a connection object. The result is written
+    here. If it is \code{""}, then the result is written to the standard
+    output. If it is \code{NULL}, then the result is not written
+    anywhere. (But it is always returned, invisibly, see below.}
+  \item{append}{Logical scalar, whether to append the HTML code to the
+    given file, or remove its previous contents if it already exists.}
+  \item{label}{An HTML label (\code{<A LABEL="">} tag) to add.}
+  \item{digits}{The number of digits to use for the numeric columns.}
+  \item{summary.args}{A list of arguments to pass to the \code{summary}
+    method.}
+  \item{catids}{The categories for which the genes are listed. All
+    categories will be listed if this argument is \code{NULL}.}
+  \item{cond}{Currently not used.}
 }
 \details{
   A \code{ListHyperGResult} object can store the results of
@@ -195,7 +202,13 @@
   \sQuote{Count}, \sQuote{Size} and optionally \sQuote{drive}.
   Each row of the data frame corresponds to a tested term.
   
-  \code{htmlReport} TODO
+  \code{htmlReport} creates a HTML summary from a
+  \code{ListHyperGParams} object. This consists of one table for each
+  input gene get. The summary can be written to a file, but it is also
+  returned in a list of character vectors. There is one list entry for
+  each input gene set, and each element of the character vector
+  corresponds to one line of HTML code. You need the \code{xtable}
+  package to use this function.  
 
   The following functions are defined for \code{GOListHyperGResult}
   objects only.
@@ -207,8 +220,6 @@
   
   \code{ontology} returns a chracter vector of length one, the name of
   the ontology for the GO test.
-  
-  \code{condGeneIdUniverse} TODO
 }
 \value{
   \code{pvalues}, \code{geneCounts}, \code{expectedCounts},
@@ -222,8 +233,7 @@
 
   \code{geneIdsByCategory} returns a list of lists of character vectors.
 
-  \code{geneIdUniverse} and \code{condGeneIdUniverse} return a list of
-  character vectors.
+  \code{geneIdUniverse} returns a list of character vectors.
 
   \code{summary} returns a list of data frames with columns:
   \sQuote{Pvalue}, \sQuote{OddsRatio}, \sQuote{ExpCount},
