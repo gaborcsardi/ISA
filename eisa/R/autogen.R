@@ -245,7 +245,6 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
 
   if (require(Cairo)) { png <- CairoPNG }
   require(Biobase)
-  require(TeachingDemos)
   require(igraph)
   require(xtable)
 
