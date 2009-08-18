@@ -150,16 +150,26 @@ setMethod("geneIdsByCategory", signature(r="ListHyperGResult"),
           function(r, catids=NULL) {
             lapply(seq_along(r@geneIds), function(x) {
               if ("drive" %in% names(r@reslist[[x]])) {
-                drive <- as.character(r@reslist[[x]]$drive)
+                if (is.null(catids)) {
+                  drive <- as.character(r@reslist[[x]]$drive)
+                } else {
+                  drive <- as.character(r@reslist[[x]]$drive[catids])
+                }
                 strsplit(drive, ";")
               } else {
                 genes <- r@geneIds[[x]]
-                tmp <- lapply(r@catToGeneId, function(y) {
-                  genes [ genes %in% y ]
-                })
-                tmp <- tmp[ sapply(tmp, length) != 0 ]
-                ord <- order(names(tmp))
-                tmp[ord]
+                if (is.null(catids)) {
+                  tmp <- lapply(r@catToGeneId, function(y) {
+                    genes [ genes %in% y ]
+                  })
+                  tmp <- tmp[ sapply(tmp, length) != 0 ]
+                  ord <- order(names(tmp))
+                  tmp[ord]
+                } else {
+                  tmp <- lapply(r@catToGeneId[catids], function(y) {
+                    genes [ genes %in% y ]
+                  })
+                }
               }
             })
           })
