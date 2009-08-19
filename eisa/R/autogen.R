@@ -259,7 +259,7 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   short.organism <- organism
   require(paste(sep="", "org.", abbreviate(organism, 2), ".eg.db"),
           character.only=TRUE)
-  SYMBOL <- get( paste(sep="", "org.", abbreviate(organism, 2), ".egSYMBOL") )
+  SYMBOL <- toTable(get( paste(sep="", "org.", abbreviate(organism, 2), ".egSYMBOL")))
   ENTREZ <- get( paste(sep="", chip, "ENTREZID") )
 
   library(paste(sep="", "org.", abbreviate(organism,2), ".eg.db"),
@@ -291,7 +291,7 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   GOGRAPHS <- list(BP=go.graph("BP"),
                    CC=go.graph("CC"),
                    MF=go.graph("MF"))
-  
+
   color.table <- function(t) {
     ## colorify every second row, plus the first one
     t[1] <- sub('<tr>', '<tr class="head">', t[1])
@@ -302,323 +302,95 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
     t
   }
 
-  f <- function(obj, pvalue=0.05, maxlines=NA, cat=NULL, drive=NULL) {
-    if (class(obj)=="NULL") {
-      return ("No enriched GO categories")
-    } else {
-      pval <- obj$Pvalue
-      names(pval) <- rownames(obj)
-      v <- pval <= pvalue
-      if (sum(v)==0) { return("No enriched GO categories") }
-      if (is.na(maxlines) || maxlines>sum(v)) { maxlines <- sum(v) }
-      pval <- pval[v][1:maxlines]
-      uc <- unname(obj$Size)[v][1:maxlines]
-      ec <- unname(obj$ExpCount)[v][1:maxlines]
-      gc <- unname(obj$Count)[v][1:maxlines]
-      ca <- rownames(obj)[v][1:maxlines]
-      nn <- go.terms[ca,]$term
+  tabulate <- function(df, drive, pvalue, type, link=NA) {
+    df <- df[ df$Pvalue <= pvalue, ]
+
+    ## Do we have anything left?
+    if (nrow(df)==0) { return("No enriched terms") }
+    
+    ## Remove unwanted columns, add a term column
+    df <- df[, ! colnames(df) %in% c("drive", "OddsRatio")]
+    extra.display=character()
+    if (type %in% c("BP", "CC", "MF")) {
+      df$Term <- go.terms$term[ match(rownames(df), rownames(go.terms)) ]
+      extra.display=c(extra.display, "s")
+    }
+    if (type=="ke") {
+      df$Term <- as.character(mget(rownames(df), KEGGPATHID2NAME))
+      extra.display=c(extra.display, "s")
+    }
+
+    ## Add the driving genes
+    drive <- drive[ seq_len(nrow(df)) ]
+    drive1 <- lapply(drive, function(x) SYMBOL$symbol[ match(x,SYMBOL$gene_id)])
+    drive1 <- lapply(drive1, sort)
+    drive1 <- lapply(drive1, paste, collapse=", ")
+    df$Count <- paste(sep="", '<a href="#" onclick="togglestuff2(\'d.', type, '.',
+                      seq(along=df[,1]), '\'); return false;">', df$Count,
+                      '</a><br/><span id="d.', type, '.', seq(along=df[,1]),
+                      '" class="d.', type,
+                      '" style="font-size:0.8em;display:none;visibility:hidden;">',
+                      drive1, '</span>')
+
+    ## Add links
+    orig.link <- link
+    if (!is.na(link)) {
+      link <- rep(link, nrow(df))
+      if (grepl("<rn>", orig.link, fixed=TRUE)) {
+        link <- sapply(seq_len(nrow(df)), function(x)
+                       sub("<rn>", rownames(df)[x], link[x], fixed=TRUE))
+      }
+      if (grepl("<kegg>", orig.link, fixed=TRUE)) {
+        kegg <- sapply(drive, paste, collapse="/")
+        link <- sapply(seq_along(kegg), function(x)
+                       sub("<kegg>", kegg[x], link[x], fixed=TRUE))
+      }
     }
     
-    df <- data.frame(Pvalue=pval, ECount=round(ec, 2), Count=gc, Size=uc,
-                     Term=nn)
-
-    drive <- drive[v]
-    drive <- lapply(drive, function(x) unname(unlist(mget(x, SYMBOL, ifnotfound=NA))))
-    if (any(sapply(drive, function(x) any(is.na(x))))) {
-      warning("Some genes not found, inconsistent annotation packages")
-      drive <- lapply(drive, function(x) x[!is.na(x)])
-    }
-    drive <- lapply(drive, sort)
-    drive <- lapply(drive, paste, collapse=", ")
-    df$Count <- paste(sep="", '<a href="#" onclick="togglestuff2(\'d.', cat, '.', seq(along=df[,1]),
-                      '\'); return false;">', df$Count, '</a><br/><span id="d.', cat, '.', seq(along=df[,1]),
-                      '" class="d.', cat, '" style="font-size:0.8em;display:none;visibility:hidden;">', drive,
-                      '</span>')
-  
-    xdf <- xtable(df, display=c("s", "e", "g", "g", "d", "s"),
-                  digits=c(NA, 3, 4, 4, 4, NA))
-    tfname <- tempfile()
-    zz <- file(tfname, "w")
-    print(xdf, type="html", file=zz)
-    close(zz)
-    foo <- readLines(tfname)
-    unlink(tfname)
+    ## Create HTML
+    foo <- html.df(df, link=link, display=c("s", "e", "g", "g", "d", extra.display),
+                   digits=c(NA, 3, 4, 4, 4, rep(NA, length(extra.display))))
     foo <- foo[4:(length(foo)-1)]
-
-    foo <- fix.xtable(foo)
-    
-    link <- "http://www.godatabase.org/cgi-bin/amigo/go.cgi?view=details&amp;search_constraint=terms&amp;depth=0&amp;query="
-    foo <- sub("(<td[^>]*>[ ]*)(GO:[0-9]+)",
-               paste(sep="", '\\1<a href="', link, '\\2"> \\2 </a>'), foo)
+    foo <- color.table(foo)
     
     foo <- sub("<th> Count </th>",
                paste(sep="",
-                     '<th> <a href="#" onclick="togglestuff3(\'d.', cat,
+                     '<th> <a href="#" onclick="togglestuff3(\'d.', type,
                      '\');return false;"> Count </a> </th>'),
                foo, fixed=TRUE)
     
-    foo <- color.table(foo)
     paste(foo, collapse="\n")
   }
 
-  tables.BP <- f(GO[[1]]@reslist[[which]], pvalue=0.05, maxlines=NA,
-                 drive=drive.BP[[which]], cat="BP")
-  tables.CC <- f(GO[[2]]@reslist[[which]], pvalue=0.05, maxlines=NA,
-                 drive=drive.CC[[which]], cat="CC")
-  tables.MF <- f(GO[[3]]@reslist[[which]], pvalue=0.05, maxlines=NA,
-                 drive=drive.MF[[which]], cat="MF")
+  link <- "http://www.godatabase.org/cgi-bin/amigo/go.cgi?view=details&amp;search_constraint=terms&amp;depth=0&amp;query=<rn>"
+  tables.BP <- tabulate(GO[[1]]@reslist[[which]], pvalue=0.05, link=link,
+                        drive=drive.BP[[which]], type="BP")
+  tables.CC <- tabulate(GO[[2]]@reslist[[which]], pvalue=0.05, link=link,
+                        drive=drive.CC[[which]], type="CC")
+  tables.MF <- tabulate(GO[[3]]@reslist[[which]], pvalue=0.05, link=link,
+                        drive=drive.MF[[which]], type="MF")
 
-  g <- function(obj, pvalue=0.05, maxlines=NA, drive=NULL) {
-    if (class(obj)=="NULL") {
-      return ("No enriched GO categories")
-    } else {
-      pval <- obj$Pvalue
-      names(pval) <- rownames(obj)
-      v <- pval <= pvalue
-      if (sum(v)==0) { return("No enriched KEGG pathways") }
-      if (is.na(maxlines) || maxlines>sum(v)) { maxlines <- sum(v) }
-      pval <- pval[v][1:maxlines]
-      uc <- unname(obj$Size)[v][1:maxlines]
-      ec <- unname(obj$ExpCount)[v][1:maxlines]
-      gc <- unname(obj$Count)[v][1:maxlines]
-      ca <- rownames(obj)[v][1:maxlines]
-      nn <- unname(unlist(mget(ca, KEGGPATHID2NAME)))
-    }
-
-    df <- data.frame(Pvalue=pval, ECount=round(ec, 2), Count=gc, Size=uc,
-                     Term=nn)
-    cat <- "ke"
-
-    drive0 <- drive[v]
-    drive <- lapply(drive0, function(x) unname(unlist(mget(x, SYMBOL))))
-    drive <- lapply(drive, sort)
-    drive2 <- lapply(drive, paste, collapse=", ")
-    df$Count <- paste(sep="", '<a href="#" onclick="togglestuff2(\'d.', cat, '.', seq(along=df[,1]),
-                      '\'); return false;">', df$Count, '</a><br/><span id="d.', cat, '.', seq(along=df[,1]),
-                      '" class="d.', cat, '" style="font-size:0.8em;display:none;visibility:hidden;">', drive2,
-                      '</span>')
-    
-    xdf <- xtable(df, display=c("s", "e", "g", "g", "d", "s"),
-                  digits=c(NA, 3, 4, 4, 4, NA))
-    tfname <- tempfile()
-    zz <- file(tfname, "w")
-    print(xdf, type="html", file=zz)
-    close(zz)
-    foo <- readLines(tfname)
-    unlink(tfname)
-    foo <- foo[4:(length(foo)-1)]
-
-    keggorg <- switch(organism, "Homo sapiens"="hsa", "Mus musculus"="mmu")
-    
-    foo <- fix.xtable(foo)
-
-    link <- c("http://www.genome.jp/kegg-bin/mark_pathway_www?@", "/default%3dyellow/")
-    foo <- sub("(<td[^>]*>[ ]*)([0-9]+)",
-               paste(sep="", '\\1<a href="', link[1], keggorg,
-                     '\\2', link[2], '"> \\2 </a>'), foo)
-
-    ## mark genes on pathway, we still have 'drive0'
-    drive2 <- sapply(drive0, paste, collapse="/")
-    for (i in seq_along(foo)[-1]) {
-      foo[[i]] <- sub(link[2], paste(sep="", link[2], drive2[[i-1]]),
-                      foo[[i]], fixed=TRUE)
-    }
-    
-    foo <- sub("<th> Count </th>",
-               paste(sep="",
-                     '<th> <a href="#" onclick="togglestuff3(\'d.', cat,
-                     '\');return false;"> Count </a> </th>'),
-               foo, fixed=TRUE)
-    
-    foo <- color.table(foo)
-    paste(foo, collapse="\n")
-  }
-
-  require(KEGG.db)
-  tables.KEGG <- g(KEGG@reslist[[which]], pvalue=0.05, maxlines=NA,
-                   drive=drive.KEGG[[which]])
+  keggorg <- switch(organism, "Homo sapiens"="hsa",
+                    "Mus musculus"="mmu", "map")
+  link <- paste(sep="", "http://www.genome.jp/kegg-bin/mark_pathway_www?@",
+                keggorg, "<rn>/default%3dyellow/<kegg>")
+  tables.KEGG <- tabulate(KEGG@reslist[[which]], pvalue=0.05, link=link,
+                          drive=drive.KEGG[[which]], type="ke")
   
   if (!is.null(miRNA)) {
-
-    h <- function(obj, pvalue=0.05, maxlines=NA, drive=NULL) {
-      if (nrow(obj)==0) { return("<tr><td>No enriched miRNA families</td></tr>") } 
-      pval <- obj$Pvalue
-      v <- pval <= pvalue
-      if (sum(v)==0) { return("<tr><td>No enriched miRNA families</td></tr>") }
-      if (is.na(maxlines) || maxlines>sum(v)) { maxlines <- sum(v) }
-      pval <- pval[v][1:maxlines]
-      uc <- unname(obj$Size)[v][1:maxlines]
-      ec <- unname(obj$ExpCount)[v][1:maxlines]
-      gc <- unname(obj$Count)[v][1:maxlines]
-      ca <- rownames(obj)[v][1:maxlines]
-      df <- data.frame(Pvalue=pval, ECount=round(ec, 2), Count=gc, Size=uc)
-      rownames(df) <- ca
-      
-      cat <- "mr"
-      drive <- drive[v]      
-      drive <- lapply(drive, function(x) unname(unlist(mget(x, SYMBOL))))
-      drive <- lapply(drive, sort)
-      drive <- lapply(drive, paste, collapse=", ")
-      df$Count <- paste(sep="", '<a href="#" onclick="togglestuff2(\'d.', cat, '.', seq(along=df[,1]),
-                        '\'); return false;">', df$Count, '</a><br/><span id="d.', cat, '.', seq(along=df[,1]),
-                        '" class="d.', cat, '" style="font-size:0.8em;display:none;visibility:hidden;">', drive,
-                          '</span>')
-      
-      xdf <- xtable(df, display=c("s", "e", "g", "d", "d"),
-                    digits=c(NA, 3, 4, 4, 4))
-      tfname <- tempfile()
-      zz <- file(tfname, "w")
-      sink(zz)
-      print(xdf, "html")
-      sink() 
-      close(zz)
-      foo <- readLines(tfname)
-      unlink(tfname)
-      foo <- foo[4:(length(foo)-1)]
-
-      foo <- fix.xtable(foo)
-
-      link <- c("http://www.targetscan.org/cgi-bin/targetscan/vert_40/targetscan.cgi?species=", "&amp;gid=&amp;mir_c=", "&amp;mir_sc=&amp;mir_nc=&amp;mirg=")
-      foo <- sub("(<td[^>]*>[ ]*)([^< ]+)",
-                 paste(sep="", '\\1<a href="', link[1], short.organism, link[2],
-                       '\\2', link[3], '"> ', '\\2 </a>'), foo)
-      
-      foo <- sub("<th> Count </th>",
-                 paste(sep="",
-                       '<th> <a href="#" onclick="togglestuff3(\'d.', cat,
-                       '\');return false;"> Count </a> </th>'),
-                 foo, fixed=TRUE)
-      
-      foo <- color.table(foo)
-      paste(foo, collapse="\n")
-    }
-    
-    tables.miRNA <- h(miRNA@reslist[[which]], pvalue=0.05, maxlines=NA,
-                      drive=drive.miRNA[[which]])
+    miRNA.org <- switch(organism, "Homo sapiens"="Human",
+                        "Mus musculus"="Mouse")
+    link <- paste(sep="", "http://www.targetscan.org/cgi-bin/targetscan/",
+                  "vert_50/targetscan.cgi?species=", miRNA.org, ";mir_c=<rn>")
+    tables.miRNA <- tabulate(miRNA@reslist[[which]], pvalue=0.05, link=link,
+                             drive=drive.miRNA[[which]], type="mr")
   } else {
     tables.miRNA <- "<p>Not tested</p>"
   }
 
-  if (!is.null(DBD)) {
-
-    h <- function(obj, pvalue=0.05, maxlines=NA, drive=NULL) {
-      if (nrow(obj)==0) { return("<tr><td>No enriched DBD TFs</td></tr>") } 
-      pval <- obj$Pvalue
-      v <- pval <= pvalue
-      if (sum(v)==0) { return("<tr><td>No enriched DBD TFs</td></tr>") }
-      if (is.na(maxlines) || maxlines>sum(v)) { maxlines <- sum(v) }
-      pval <- pval[v][1:maxlines]
-      uc <- unname(obj$Size)[v][1:maxlines]
-      ec <- unname(obj$ExpCount)[v][1:maxlines]
-      gc <- unname(obj$Count)[v][1:maxlines]
-      ca <- rownames(obj)[v][1:maxlines]
-      df <- data.frame(Pvalue=pval, ECount=round(ec, 2), Count=gc, Size=uc)
-      rownames(df) <- ca
-      
-      cat <- "mr"
-      drive <- drive[v]      
-      drive <- lapply(drive, function(x) unname(unlist(mget(x, SYMBOL))))
-      drive <- lapply(drive, sort)
-      drive <- lapply(drive, paste, collapse=", ")
-      df$Count <- paste(sep="", '<a href="#" onclick="togglestuff2(\'d.', cat, '.', seq(along=df[,1]),
-                        '\'); return false;">', df$Count, '</a><br/><span id="d.', cat, '.', seq(along=df[,1]),
-                        '" class="d.', cat, '" style="font-size:0.8em;display:none;visibility:hidden;">', drive,
-                          '</span>')
-      
-      xdf <- xtable(df, display=c("s", "e", "g", "d", "d"),
-                    digits=c(NA, 3, 4, 4, 4))
-      tfname <- tempfile()
-      zz <- file(tfname, "w")
-      sink(zz)
-      print(xdf, "html")
-      sink() 
-      close(zz)
-      foo <- readLines(tfname)
-      unlink(tfname)
-      foo <- foo[4:(length(foo)-1)]
-
-      foo <- fix.xtable(foo)
-
-      link <- c("http://dbd.mrc-lmb.cam.ac.uk/DBD/index.cgi?Search/Domain=")
-      foo <- sub("(<td[^>]*>[ ]*)([^< ]+)",
-                 paste(sep="", '\\1<a href="', link[1], short.organism, link[2],
-                       '\\2', link[3], '"> ', '\\2 </a>'), foo)
-      
-      foo <- sub("<th> Count </th>",
-                 paste(sep="",
-                       '<th> <a href="#" onclick="togglestuff3(\'d.', cat,
-                       '\');return false;"> Count </a> </th>'),
-                 foo, fixed=TRUE)
-      
-      foo <- color.table(foo)
-      paste(foo, collapse="\n")
-    }
-    
-    tables.DBD <- h(DBD@reslist[[which]], pvalue=0.05, maxlines=NA,
-                      drive=drive.DBD[[which]])
-  } else {
-    tables.DBD <- "<p>Not tested</p>"
-  }
-  
   if (!is.null(CHR)) {
-
-    chr <- function(obj, pvalue=0.05, maxlines=NA, drive=NULL) {
-      if (length(obj)==1 && is.na(obj)) {
-        return("<tr><td>No enriched chromosomes</td></tr>")
-      } 
-      pval <- obj$Pvalue
-      v <- pval <= pvalue
-      if (sum(v)==0) { return("<tr><td>No enriched chromosomes</td></tr>") }
-      if (is.na(maxlines) || maxlines>sum(v)) { maxlines <- sum(v) }
-      pval <- pval[v][1:maxlines]
-      uc <- unname(obj$Size)[v][1:maxlines]
-      ec <- unname(obj$ExpCount)[v][1:maxlines]
-      gc <- unname(obj$Count)[v][1:maxlines]
-      ca <- rownames(obj)[v][1:maxlines]
-      df <- data.frame(Pvalue=pval, ECount=round(ec, 2), Count=gc, Size=uc)
-      rownames(df) <- ca
-      
-      cat <- "ch"
-      drive <- drive[v]
-      drive <- lapply(drive, function(x) unname(unlist(mget(x, SYMBOL))))
-      drive <- lapply(drive, sort)
-      drive <- lapply(drive, paste, collapse=", ")
-      df$Count <- paste(sep="", '<a href="#" onclick="togglestuff2(\'d.', cat, '.', seq(along=df[,1]),
-                          '\'); return false;">', df$Count, '</a><br/><span id="d.', cat, '.', seq(along=df[,1]),
-                        '" class="d.', cat, '" style="font-size:0.8em;display:none;visibility:hidden;">', drive,
-                        '</span>')
-      
-      xdf <- xtable(df, display=c("s", "e", "g", "d", "d"),
-                    digits=c(NA, 3, 4, 4, 4))
-      tfname <- tempfile()
-      zz <- file(tfname, "w")
-      sink(zz)
-      print(xdf, "html")
-      sink() 
-      close(zz)
-      foo <- readLines(tfname)
-      unlink(tfname)
-      foo <- foo[4:(length(foo)-1)]
-
-      foo <- fix.xtable(foo)
-
-      link <- c("", "", "")
-      foo <- sub("(<td[^>]*>[ ]*)([^< ]+)",
-                 paste(sep="", '\\1<a href="', link[1], short.organism, link[2],
-                       '\\2', link[3], '"> ', '\\2 </a>'), foo)
-      
-      foo <- sub("<th> Count </th>",
-                 paste(sep="",
-                       '<th> <a href="#" onclick="togglestuff3(\'d.', cat,
-                       '\');return false;"> Count </a> </th>'),
-                 foo, fixed=TRUE)
-      
-      foo <- color.table(foo)
-      paste(foo, collapse="\n")
-    }
-  
-    tables.CHR <- chr(CHR@reslist[[which]], pvalue=0.05, maxlines=NA,
-                      drive=drive.CHR[[which]])
+    tables.CHR <- tabulate(CHR@reslist[[which]], pvalue=0.05, link=NA,
+                           drive=drive.CHR[[which]], type="ch")
   } else {
     tables.CHR <- "<p>Not tested.</p>"
   }

@@ -16,12 +16,17 @@ fix.xtable <- function(str) {
   str
 }
 
-html.df <- function(df, label, digits, display) {
+html.df <- function(df, link=NA, label=NULL, digits=NULL, display=NULL) {
   if (nrow(df)==0) return("")
   if ("drive" %in% colnames(df)) { df <- df[,colnames(df) != "drive"] }
-  xt <- xtable(df, label=label, digits=digits, display=display)
+  df <- cbind(Id=rownames(df), df)
+  if (length(link)!=1 || !is.na(link)) {
+    df$Id <- paste(sep="", '<a href="', link, '">', df$Id, '</a>')
+  }
+  xt <- xtable(df, label=label, digits=c(NA, digits), display=c("s", display))
   tc <- textConnection("outp", open="w", local=TRUE)
-  print(xt, type="html", file=tc)
+  print(xt, type="html", file=tc, include.rownames=FALSE)
   close(tc)
-  fix.xtable(outp)
+  outp <- fix.xtable(outp)
+  outp
 }
