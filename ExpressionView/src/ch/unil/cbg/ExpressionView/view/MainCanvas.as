@@ -169,7 +169,8 @@ package ch.unil.cbg.ExpressionView.view {
 			parentApplication.addEventListener(UpdateGEDataEvent.UPDATEGEDATAEVENT, updateGEDataHandler);
 			parentApplication.addEventListener(MenuEvent.MODE, modeChangeHandler);
 			parentApplication.addEventListener(MenuEvent.PANELS, setPanelVisibilityHandler);
-			parentApplication.addEventListener(BroadcastInspectPositionEvent.BROADCASTINSPECTPOSITIONEVENT, broadcastInspectPositionHandler);
+			parentApplication.addEventListener(BroadcastPositionEvent.MOUSE_OVER, broadcastPositionOverHandler);
+			parentApplication.addEventListener(BroadcastPositionEvent.MOUSE_CLICK, broadcastPositionClickHandler);
 			parentApplication.addEventListener(MenuEvent.PDF_EXPORT, pdfExportHandler);
 			parentApplication.addEventListener(ResizeBrowserEvent.RESIZEBROWSEREVENT, resizeBrowserHandler);
 		}
@@ -437,9 +438,22 @@ package ch.unil.cbg.ExpressionView.view {
 		private function doubleClickSamplesHandler(event:SearchableDataGridSelectionEvent): void {
 		}
 
-		private function broadcastInspectPositionHandler(event:BroadcastInspectPositionEvent): void {
-			var gene:int = event.gene;
-			var sample:int = event.sample;
+		private function broadcastPositionClickHandler(event:BroadcastPositionEvent): void {
+			var gene:int = event.data[0];
+			var sample:int = event.data[1];
+			var module:int = mapOpenTabs[modulesNavigator.selectedIndex]
+			// Array returned is Array(geneDescription, sampleDescription, modules, data, modulesRectangles);
+			var infoArray:Array = ged.getInfo(module, gene, sample);
+			var modules:Array = infoArray[2];
+			trace(modules)
+			if ( modules.length != 0 ) {
+				modulesSearchableDataGrid.dispatchEvent(new SearchableDataGridSelectionEvent(SearchableDataGridSelectionEvent.ITEM_DOUBLE_CLICK, modules));
+			}
+		}
+
+		private function broadcastPositionOverHandler(event:BroadcastPositionEvent): void {
+			var gene:int = event.data[0];
+			var sample:int = event.data[1];
 			
 			infoContent.text = "";
 			var module:int = mapOpenTabs[modulesNavigator.selectedIndex]
