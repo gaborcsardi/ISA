@@ -334,21 +334,20 @@ gograph.plot <- function(graph, coords=FALSE, ...) {
   }
 }
 
-
-expPlotCreate <- function(exp.matrix, genes, conditions,
-                          normalize) {
+expPlotCreate <- function(eset, modules, which,
+                          norm=c("sample", "raw", "feature")) {
 
   isa2:::isa.status("Creating an expression plot", "in")
+
+  if (length(which) != 1 || which < 1 || which > length(modules)) {
+    stop("Invalid `which' argument, should be a single method")
+  }
+
+  norm <- match.arg(norm)
   
-  require(Biobase)
-
-  if (is(exp.matrix, "ExpressionSet")) {
-    exp.matrix <- exprs(exp.matrix)
-  }
-
-  if (normalize) {
-    exp.matrix <- t(isa2::normalize(exp.matrix)[[1]])
-  }
+  exp.matrix <- select.eset(eset, modules, norm)
+  genes <- getFeatureMatrix(modules, mods=which)
+  conditions <- getSampleMatrix(modules, mods=which)
   
   gg <- which(genes != 0)
   cc <- which(conditions != 0)
@@ -382,11 +381,17 @@ expPlotCreate <- function(exp.matrix, genes, conditions,
 
   isa2:::isa.status("DONE", "out")
   
-  list(exp=em, width=full.width, height=full.height,
-       exp.width=exp.width, exp.height=exp.height, colbar=colbar,
-       zlim=zlim, gene.score=genes[gg][g.order],
-       cond.score=conditions[cc][c.order],
-       gene.width.px=gene.width.px, cond.height.px=cond.height.px)
+  res <- list(exp=em, width=full.width, height=full.height,
+              exp.width=exp.width, exp.height=exp.height, colbar=colbar,
+              zlim=zlim, gene.score=genes[gg][g.order],
+              cond.score=conditions[cc][c.order],
+              gene.width.px=gene.width.px, cond.height.px=cond.height.px)
+  class(res) <- "ISAexpPlot"
+  res
+}
+
+print.ISAexpPlot <- function(x, ...) {
+  cat("An expression plot for an ISA module, use 'expPlot' to plot it.\n")
 }
 
 expPlotColbar <- function(epo) {
@@ -397,6 +402,7 @@ expPlotColbar <- function(epo) {
   axis(3, at=at, label=label, tick=FALSE, line=-1, cex.axis=1.5)
   abline(v=(0:61-0.5)/60)
   abline(h=c(-1,1))
+  invisible(NULL)
 }
 
 expPlot <- function(epo, scores=TRUE) {

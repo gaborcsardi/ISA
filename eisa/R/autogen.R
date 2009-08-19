@@ -294,10 +294,6 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
 
   isa2:::isa.status(paste("Generating HTML page for module", which), "in")
 
-  nm <- list(Er=t(feat.exprs(eset)),
-             Ec=samp.exprs(eset))
-  nexp <- nm$Ec
-
   organism <- getOrganism(modules)
 
   if (is.null(drive.BP) && !is.null(GO)) drive.BP <- geneIdsByCategory(GO$BP)
@@ -413,8 +409,7 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
     
   m <- which
 
-  ep <- expPlotCreate(nexp, getFeatureMatrix(modules, mods=m),
-                      getSampleMatrix(modules, mods=m), normalize=FALSE)
+  ep <- expPlotCreate(eset, modules, m, norm="sample")
   png(file=paste(sep="", target.dir, "/expression-", m, ".png"),
       width=ep$width, height=ep$height)
   ## returns the box coordinates of the expression image

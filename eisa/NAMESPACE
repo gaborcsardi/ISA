@@ -18,6 +18,8 @@ exportMethods("feat.exprs", "samp.exprs",
               "prenormalized", "prenormalized<-",
               "hasNA", "hasNA<-")
 
+S3method(print, ISAexpPlot)
+
 exportMethods("seedData", "runData",
               "getFeatures", "getSamples",
               "getFeatureNames", "getSampleNames",
