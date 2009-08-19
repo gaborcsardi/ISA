@@ -112,11 +112,11 @@ package ch.unil.cbg.ExpressionView.view.components {
 				}
 			}
 	
-			initPos();
+			savePos();
 			addListeners();
 		}
 		
-		private function initPos():void {
+		private function savePos():void {			
 			oldWidth = width;
 			oldHeight = height;
 			oldX = x;
@@ -135,7 +135,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 			if ( enableClose ) {
 				x += closeButton.width + 8;
 				closeButton.x = unscaledWidth - x;
-				closeButton.y = ( resizableTitleBar.height - minimizeButton.height ) / 2;
+				closeButton.y = ( resizableTitleBar.height - closeButton.height ) / 2;
 			}
 			if ( enableMaximize ) {
 				x += maximizeButton.width + 8;
@@ -200,7 +200,6 @@ package ch.unil.cbg.ExpressionView.view.components {
 			resizableTitleBar.removeEventListener(MouseEvent.MOUSE_MOVE, titleBarMoveHandler);
 			alpha = 1.0;
 			stopDrag();
-			initPos();
 		}
 		
 		private function panelFocusCheckHandler():void {
@@ -236,7 +235,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 			downMotion.end();
 			
 			if ( !minimized ) {
-				initPos();
+				savePos();
 				upMotion.play();
 				resizeButton.visible = false;
 				minimized = true;
@@ -254,7 +253,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 		private function maximizeClickHandler(event:MouseEvent):void {
 			if ( maximizeButton.styleName == "maximizeButtonIncrease") {
 				if ( height > resizableTitleBar.height ) {
-					initPos();
+					savePos();
 					x = 0;
 					y = 0;
 					width = parent.width;
@@ -292,7 +291,6 @@ package ch.unil.cbg.ExpressionView.view.components {
 			resizeCur = CursorManager.setCursor(resizeCursor);
 			oPoint.x = parent.mouseX;
 			oPoint.y = parent.mouseY;
-			//initPos();	
 		}
 		
 		private function resizeMoveHandler(event:MouseEvent):void {
@@ -315,7 +313,6 @@ package ch.unil.cbg.ExpressionView.view.components {
 			parent.removeEventListener(MouseEvent.MOUSE_UP, resizeUpHandler);
 			CursorManager.removeCursor(CursorManager.currentCursorID);
 			resizeButton.addEventListener(MouseEvent.MOUSE_OVER, resizeOverHandler);
-			initPos();
 		}
 		
 	}

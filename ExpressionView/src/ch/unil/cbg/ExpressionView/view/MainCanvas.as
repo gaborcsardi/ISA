@@ -77,6 +77,7 @@ package ch.unil.cbg.ExpressionView.view {
 			if ( !gePanel ) {
 				gePanel = new ResizablePanel();
 				gePanel.enableClose = false;
+				gePanel.enableMinimize = false;
 				addChild(gePanel);
 				
 				if ( !modulesNavigator ) {
@@ -94,6 +95,7 @@ package ch.unil.cbg.ExpressionView.view {
 			
 			if ( !infoPanel ) {
 				infoPanel = new ResizablePanel();
+				infoPanel.enableMinimize = false;
 				infoPanel.title = "Info";
 				infoPanel.addEventListener(ResizablePanelEvent.CLOSE, infoPanelCloseHandler);
 				addChild(infoPanel);
@@ -108,6 +110,7 @@ package ch.unil.cbg.ExpressionView.view {
 		
 			if ( !modulesPanel ) {
 				modulesPanel = new ResizablePanel();
+				modulesPanel.enableMinimize = false;
 				modulesPanel.title = "Modules";
 				modulesPanel.addEventListener(ResizablePanelEvent.CLOSE, modulesPanelCloseHandler);
 				addChild(modulesPanel);
@@ -123,6 +126,7 @@ package ch.unil.cbg.ExpressionView.view {
 
 			if ( !genesPanel ) {
 				genesPanel = new ResizablePanel();
+				genesPanel.enableMinimize = false;
 				genesPanel.title = "Genes";
 				genesPanel.addEventListener(ResizablePanelEvent.CLOSE, genesPanelCloseHandler);
 				addChild(genesPanel);
@@ -137,6 +141,7 @@ package ch.unil.cbg.ExpressionView.view {
 			
 			if ( !samplesPanel ) {
 				samplesPanel = new ResizablePanel();
+				samplesPanel.enableMinimize = false;
 				samplesPanel.title = "Samples";
 				samplesPanel.addEventListener(ResizablePanelEvent.CLOSE, samplesPanelCloseHandler);
 				addChild(samplesPanel);
