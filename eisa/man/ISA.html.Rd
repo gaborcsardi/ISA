@@ -13,7 +13,7 @@ ISA.html.table (modules, target.dir, which = seq_len(length(modules)),
     KEGG = NULL, miRNA = NULL, CHR = NULL, htmltitle = NULL, 
     notes = NULL, seed = NULL) 
 
-ISA.html.modules1 (eset, modules, which = seq_len(length(modules)), target.dir, 
+ISA.html.modules (eset, modules, which = seq_len(length(modules)), target.dir, 
     template = system.file("autogen", package = "eisa"), GO = NULL,    
     KEGG = NULL, miRNA = NULL, CHR = NULL, cond.to.include = NULL,     
     cond.col = "white", sep = NULL, seed = NULL)                       
@@ -38,7 +38,7 @@ ISA.html (eset, modules, target.dir, template = system.file("autogen",
   \item{KEGG}{A \code{\link{KEGGListHyperGResult}} object, usually the
     output of the \code{\link{ISA.KEGG}} function.}
   \item{miRNA}{A \code{\link{miRNAListHyperGResult}} object, or
-    \code{NULL}. See also the \code{\link{isa.miRNA}} function.}
+    \code{NULL}. See also the \code{\link{ISA.miRNA}} function.}
   \item{CHR}{A \code{\link{CHRListHyperGResult}} object or \code{NULL},
     see also the \code{\link{ISA.CHR}} function. }
   \item{htmltitle}{Character vector of length one, the title of the HTML
@@ -74,7 +74,7 @@ ISA.html (eset, modules, target.dir, template = system.file("autogen",
     \item Overlap plot of all modules, see \code{\link{overlap.plot}}
     \item Gene Ontology tree plots for the enriched GO terms, separately
       for the three ontologies., These are produced by calling
-      \code{\link{goplot}}.
+      \code{\link{gograph}}.
     \item Tables for the enriched Gene Ontology terms, separately for
       the three ontologies.
     \item A table for the enriched KEGG pathways.
