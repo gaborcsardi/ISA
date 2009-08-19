@@ -94,6 +94,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 				if ( lastMode == INSPECT ) {
 					overlayCanvas.removeEventListener(MouseEvent.MOUSE_MOVE, inspectMouseMoveHandler);
 					overlayCanvas.removeEventListener(MouseEvent.MOUSE_OUT, inspectMouseOutHandler);
+					overlayCanvas.removeEventListener(MouseEvent.CLICK, inspectMouseClickHandler);
 				} else if ( lastMode == ZOOM ) {
 					overlayCanvas.removeEventListener(MouseEvent.MOUSE_DOWN, zoomMouseDownHandler);
 					overlayCanvas.removeEventListener(MouseEvent.MOUSE_MOVE, zoomMouseMoveHandler);
@@ -108,6 +109,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 				if ( mode == INSPECT ) {
 					overlayCanvas.addEventListener(MouseEvent.MOUSE_MOVE, inspectMouseMoveHandler);
 					overlayCanvas.addEventListener(MouseEvent.MOUSE_OUT, inspectMouseOutHandler);
+					overlayCanvas.addEventListener(MouseEvent.CLICK, inspectMouseClickHandler);
 				}
 				else if ( mode == ZOOM ) {
 					overlayCanvas.addEventListener(MouseEvent.MOUSE_DOWN, zoomMouseDownHandler);
@@ -141,10 +143,15 @@ package ch.unil.cbg.ExpressionView.view.components {
 		private function inspectMouseMoveHandler(event:MouseEvent):void {
 			var gene:int = currentRectangle.x + event.localX / canvaswidth * currentRectangle.width;
 			var sample:int = currentRectangle.y + event.localY / canvasheight * currentRectangle.height;
-			dispatchEvent(new BroadcastInspectPositionEvent(gene, sample));			
+			dispatchEvent(new BroadcastPositionEvent(BroadcastPositionEvent.MOUSE_OVER, [gene, sample]));			
 		}
 		private function inspectMouseOutHandler(event:MouseEvent):void {
-			dispatchEvent(new BroadcastInspectPositionEvent(-1, -1));			
+			dispatchEvent(new BroadcastPositionEvent(BroadcastPositionEvent.MOUSE_OVER, [-1, -1]));			
+		}
+		private function inspectMouseClickHandler(event:MouseEvent):void {
+			var gene:int = currentRectangle.x + event.localX / canvaswidth * currentRectangle.width;
+			var sample:int = currentRectangle.y + event.localY / canvasheight * currentRectangle.height;
+			dispatchEvent(new BroadcastPositionEvent(BroadcastPositionEvent.MOUSE_CLICK, [gene, sample]));
 		}
 
 		// zoom events
@@ -353,6 +360,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 				overlayCanvas.alpha = 1;
 				overlayCanvas.addEventListener(MouseEvent.MOUSE_MOVE, inspectMouseMoveHandler);
 				overlayCanvas.addEventListener(MouseEvent.MOUSE_OUT, inspectMouseOutHandler);
+				overlayCanvas.addEventListener(MouseEvent.CLICK, inspectMouseClickHandler);
 				addChild(overlayCanvas);
 			}
 						
