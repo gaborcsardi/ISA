@@ -137,7 +137,6 @@
 			private function toggleFullScreenHandler(event:MenuEvent):void {
 				var screen:String = event.data[0];
 				if ( screen == "normal" ) {
-					
 		            var regExp:RegExp = new RegExp("mac", "i");
             		var match:Boolean = regExp.test(Capabilities.os)
 					if ( match ) {
@@ -147,9 +146,20 @@
 						alert += "or zooming out is doomed. Sorry."; 
 						Alert.show(alert , 'Warning', mx.controls.Alert.OK)
 					}
+					oldStageWidth = stage.stageWidth;
+					oldStageHeight = stage.stageHeight;
 					stage.displayState = StageDisplayState.FULL_SCREEN;
+					var scalex:Number = stage.stageWidth / oldStageWidth;
+					var scaley:Number = (stage.stageHeight - statusBar.height - menuBar.height) / 
+										(oldStageHeight - statusBar.height - menuBar.height);
+					dispatchEvent(new ResizeBrowserEvent(scalex, scaley));
 				} else {
-					stage.displayState = StageDisplayState.NORMAL;					
+					scalex = stage.stageWidth / oldStageWidth;
+					scaley = (stage.stageHeight - statusBar.height - menuBar.height) / 
+										(oldStageHeight - statusBar.height - menuBar.height);
+					stage.displayState = StageDisplayState.NORMAL;
+					dispatchEvent(new ResizeBrowserEvent(scalex, scaley));
+			
 				}
 			}
 
