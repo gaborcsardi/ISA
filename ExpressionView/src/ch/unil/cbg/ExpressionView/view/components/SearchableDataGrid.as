@@ -31,7 +31,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 		protected var searchField:TextInput;
 		private var searchText:Text;
 		
-		private var alt:Boolean;
+		private var shift:Boolean;
 		private var searchColumn:int;
 		
 		private var optimalWidths:Array;
@@ -39,7 +39,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 		public function SearchableDataGrid() {
 			super();
 			searchColumn = -1;
-			alt = false;
+			shift = false;
 			optimalWidths = new Array();
 		}
 
@@ -92,7 +92,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 		}
 		
 		private function headerReleaseHandler(event:DataGridEvent):void {
-			if ( alt ) {
+			if ( shift ) {
 				event.preventDefault();
 				if ( event.columnIndex != searchColumn ) {
 					if ( searchColumn != -1 ) {
@@ -120,12 +120,12 @@ package ch.unil.cbg.ExpressionView.view.components {
 		}
 
 		private function mouseDownHandler(event:MouseEvent): void {
-			if ( event.altKey ) {
-				alt = true;
+			if ( event.shiftKey ) {
+				shift = true;
 			}
 		}		
 		private function mouseUpHandler(event:MouseEvent): void {
-			alt = false;
+			shift = false;
 		}		
 
 		private function keyUHandler(event:KeyboardEvent): void {

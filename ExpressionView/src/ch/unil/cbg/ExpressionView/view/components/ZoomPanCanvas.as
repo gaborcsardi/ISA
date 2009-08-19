@@ -111,7 +111,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 				}
 				else if ( mode == ZOOM ) {
 					overlayCanvas.addEventListener(MouseEvent.MOUSE_DOWN, zoomMouseDownHandler);
-					dispatchEvent(new UpdateStatusBarEvent("click to zoom in, alt-click to zoom out")); 
+					dispatchEvent(new UpdateStatusBarEvent("click to zoom in, shift-click to zoom out")); 
 				} else if ( mode == PAN ) {
 					overlayCanvas.addEventListener(MouseEvent.MOUSE_DOWN, dragMouseDownHandler);
 				}
@@ -198,7 +198,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 				lastRectangle = currentRectangle.clone();
 			} else {
 				var zoomfactor:Number = 0.5;
-				if ( event.altKey ) {
+				if ( event.shiftKey ) {
 					zoomfactor = 1. / zoomfactor;
 				}
 				var localPt:Point = new Point(event.localX, event.localY);
