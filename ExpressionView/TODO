@@ -2,7 +2,6 @@ ExpressionView:
 - fix PDF on Linux
 - add alternative to alt-click for zooming out and selecting columns
 - fix height problem when resizing
-- fix maximize button behavior
 - improve SuperTabNavigator behavior
 
 Ordering:

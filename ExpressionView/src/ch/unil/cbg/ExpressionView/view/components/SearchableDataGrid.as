@@ -14,11 +14,11 @@ package ch.unil.cbg.ExpressionView.view.components {
 	import mx.controls.Text;
 	import mx.controls.TextInput;
 	import mx.controls.dataGridClasses.DataGridColumn;
+	import mx.controls.dataGridClasses.DataGridItemRenderer;
+	import mx.core.ScrollPolicy;
 	import mx.events.DataGridEvent;
 	import mx.events.ListEvent;
 
-	//[Event(name='ITEM_CLICK', type='ListEvent')]
-	//[Event(name='ITEM_DOUBLE_CLICK', type='ListEvent')]
 	[Event(name='ITEM_CLICK', type='ch.unil.cbg.ExpressionView.events.SearchableDataGridSelectionEvent')]
 	[Event(name='ITEM_DOUBLE_CLICK', type='ch.unil.cbg.ExpressionView.events.SearchableDataGridSelectionEvent')]
 	public class SearchableDataGrid extends Canvas implements IEventDispatcher {
@@ -34,10 +34,13 @@ package ch.unil.cbg.ExpressionView.view.components {
 		private var alt:Boolean;
 		private var searchColumn:int;
 		
+		private var optimalWidths:Array;
+		
 		public function SearchableDataGrid() {
 			super();
 			searchColumn = -1;
 			alt = false;
+			optimalWidths = new Array();
 		}
 
 		override protected function createChildren() : void{
@@ -66,6 +69,8 @@ package ch.unil.cbg.ExpressionView.view.components {
 				
 			if ( !dataGrid ) {
 				dataGrid = new DataGrid();
+				dataGrid.verticalScrollPolicy = ScrollPolicy.AUTO;
+				dataGrid.horizontalScrollPolicy = ScrollPolicy.AUTO;
 				dataGrid.allowMultipleSelection = true;
 				dataGrid.doubleClickEnabled = true;
 				dataGrid.addEventListener(ListEvent.ITEM_CLICK, clickHandler);
@@ -163,9 +168,16 @@ package ch.unil.cbg.ExpressionView.view.components {
 			
 			dataGrid.x = 0;
 			dataGrid.y = headerBox.height;
-			dataGrid.percentWidth = 100;
-			dataGrid.height = parent.height - headerBox.height;
+			dataGrid.width = unscaledWidth;
+			dataGrid.height = unscaledHeight - headerBox.height;
 			
+			for ( var col:int = 0; col < optimalWidths.length; ++col ) {
+				var width:Number = optimalWidths[col]; 
+				if ( width > -1 ) {
+					dataGrid.columns[col].width = optimalWidths[col] + 20;
+				}
+			}
+						
 		}
 
 
@@ -209,9 +221,27 @@ package ch.unil.cbg.ExpressionView.view.components {
 			dataGrid.dataProvider = dataprovider;
 		}
 		
-		public function set columns(value:Object):void{
+		public function set columns(value:Object):void {
 			dataGrid.columns = value as Array;
+			calculateOptimalWidths();
 		}
-
+		
+		private function calculateOptimalWidths():void {
+			optimalWidths = new Array(dataGrid.columnCount);
+			for ( var col:int = 0; col < dataGrid.columnCount; ++col ) {
+				optimalWidths[col] = -1;
+			}
+			for ( col = 0; col < dataGrid.columnCount; ++col ) {
+				var renderer:DataGridItemRenderer = new DataGridItemRenderer();
+				for each ( var item:Object in dataprovider ) {
+					renderer.text = dataGrid.columns[col].itemToLabel(item);
+					optimalWidths[col] = Math.max(renderer.measuredWidth, optimalWidths[col]);
+				}
+				renderer.text = dataGrid.columns[col].headerText;
+				optimalWidths[col] = Math.max(renderer.measuredWidth, optimalWidths[col]);
+			}
+			invalidateDisplayList();
+		}
+		
 	}
 }
