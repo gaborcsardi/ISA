@@ -34,6 +34,8 @@ package ch.unil.cbg.ExpressionView.view.components {
 		private var fullmodulesimage:LargeBitmapData;
 		private var maximalWidth:int = 0;
 		private var maximalHeight:int = 0;
+		private var modulesWidth:int;
+		private var modulesHeight:int;
 		
 		private var currentgeimage:Bitmap;
 		private var currentmodulesimage:Bitmap;		
@@ -99,7 +101,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 					overlayCanvas.removeEventListener(MouseEvent.MOUSE_DOWN, zoomMouseDownHandler);
 					overlayCanvas.removeEventListener(MouseEvent.MOUSE_MOVE, zoomMouseMoveHandler);
 					overlayCanvas.removeEventListener(MouseEvent.MOUSE_UP, zoomMouseUpHandler);
-					overlayCanvas.removeEventListener(KeyboardEvent.KEY_UP, zoomKeyUpHandler);
+					parentApplication.removeEventListener(KeyboardEvent.KEY_UP, zoomKeyUpHandler);
 					dispatchEvent(new UpdateStatusBarEvent("")); 
 				} else if ( lastMode == PAN ) {
 					overlayCanvas.removeEventListener(MouseEvent.MOUSE_UP, dragMouseUpHandler);
@@ -114,7 +116,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 				}
 				else if ( mode == ZOOM ) {
 					overlayCanvas.addEventListener(MouseEvent.MOUSE_DOWN, zoomMouseDownHandler);
-					addEventListener(KeyboardEvent.KEY_UP, zoomKeyUpHandler);
+					parentApplication.addEventListener(KeyboardEvent.KEY_UP, zoomKeyUpHandler);
 					dispatchEvent(new UpdateStatusBarEvent("click to zoom in, shift-click to zoom out, a to autozoom")); 
 				} else if ( mode == PAN ) {
 					overlayCanvas.addEventListener(MouseEvent.MOUSE_DOWN, dragMouseDownHandler);
@@ -226,10 +228,34 @@ package ch.unil.cbg.ExpressionView.view.components {
 			overlayCanvas.addEventListener(MouseEvent.MOUSE_DOWN, zoomMouseDownHandler);
 		}
 		private function zoomKeyUpHandler(event:KeyboardEvent): void {
-			trace(event.keyCode);
-			if ( event.keyCode == 0 ) {
-				
-			} 
+			// a
+			if ( event.keyCode == 65 ) {
+				if ( modulesWidth > 0 && modulesHeight > 0 ) {
+					currentRectangle = new Rectangle(0, 0, modulesWidth, modulesHeight);
+					currentRectangle = adjustRectangle(currentRectangle);
+					drawImage();
+					lastRectangle = currentRectangle.clone();
+				}		
+			}
+			// g
+			if ( event.keyCode == 71 ) {
+				if ( modulesWidth > 0 ) {
+					currentRectangle = new Rectangle(0, 0, modulesWidth, currentRectangle.height);
+					currentRectangle = adjustRectangle(currentRectangle);
+					drawImage();
+					lastRectangle = currentRectangle.clone();
+				}		
+			}
+			// s
+			if ( event.keyCode == 83 ) {
+				if ( modulesHeight > 0 ) {
+					currentRectangle = new Rectangle(0, 0, currentRectangle.width, modulesHeight);
+					currentRectangle = adjustRectangle(currentRectangle);
+					drawImage();
+					lastRectangle = currentRectangle.clone();
+				}		
+			}
+			
 		}
 
 		// drag events
@@ -429,6 +455,8 @@ package ch.unil.cbg.ExpressionView.view.components {
 			fullmodulesimage = data[1];
 			modulesOutlines = data[2];
 			modulesColors = data[3];
+			modulesWidth = data[4][0];
+			modulesHeight = data[4][1];			
 			maximalWidth = fullgeimage.width;
 			maximalHeight = fullgeimage.height;
 			currentRectangle = new Rectangle(0, 0, maximalWidth, maximalHeight);

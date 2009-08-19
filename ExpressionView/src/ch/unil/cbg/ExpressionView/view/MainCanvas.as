@@ -341,7 +341,7 @@ package ch.unil.cbg.ExpressionView.view {
 			}
 			dispatchEvent(new HighlightingEvent(HighlightingEvent.MODULE, [highlightedRectangles]));
 		}
-		
+				
 		private function doubleClickModulesHandler(event:SearchableDataGridSelectionEvent): void {
 			
 			for ( var i:int = 0; i < event.selection.length; ++i ) {
@@ -355,14 +355,20 @@ package ch.unil.cbg.ExpressionView.view {
 
 					var largestRectangles:Array = new Array(ged.nModules + 1);
 					largestRectangles[0] = new Rectangle();
+					var maxwidth:int = 0;
+					var maxheight:int = 0;
 					for ( var module:int = 1; module <= ged.nModules; ++module ) {
 						if ( gem.ModulesRectangles[module] != null ) {
 							largestRectangles[module] = gem.ModulesRectangles[module][gem.ModulesOutlines[module]];
+							for ( var j:int = 0; j < gem.ModulesRectangles[module].length; ++j ) {
+								maxwidth = Math.max(maxwidth, gem.ModulesRectangles[module][j].bottomRight.x);
+								maxheight = Math.max(maxheight, gem.ModulesRectangles[module][j].bottomRight.y);
+							}
 						} else {
 							largestRectangles[module] = new Rectangle();
 						}
 					}
-					openTabs[selectedTab].dataProvider = new Array(gem.GEImage, gem.ModulesImage, largestRectangles, ged.ModulesColors);
+					openTabs[selectedTab].dataProvider = new Array(gem.GEImage, gem.ModulesImage, largestRectangles, ged.ModulesColors, [maxwidth, maxheight]);
 					genesSearchableDataGrid.dataProvider = gem.Genes;
 					samplesSearchableDataGrid.dataProvider = gem.Samples;	
 					mapOpenTabs.push(selectedModule);
@@ -585,11 +591,17 @@ package ch.unil.cbg.ExpressionView.view {
 
 			var largestRectangles:Array = new Array(ged.nModules + 1);
 			largestRectangles[0] = new Rectangle();
+			var maxwidth:int = 0;
+			var maxheight:int = 0;
 			for ( var module:int = 1; module <= ged.nModules; ++module ) {
 				largestRectangles[module] = gem.ModulesRectangles[module][gem.ModulesOutlines[module]];
+				for ( var j:int = 0; j < gem.ModulesRectangles[module].length; ++j ) {
+					maxwidth = Math.max(maxwidth, gem.ModulesRectangles[module][j].bottomRight.x);
+					maxheight = Math.max(maxheight, gem.ModulesRectangles[module][j].bottomRight.y);
+				}
 			}
 			openTabs[selectedTab].label = "Global";
-			openTabs[selectedTab].dataProvider = new Array(gem.GEImage, gem.ModulesImage, largestRectangles, ged.ModulesColors);
+			openTabs[selectedTab].dataProvider = new Array(gem.GEImage, gem.ModulesImage, largestRectangles, ged.ModulesColors, [maxwidth, maxheight]);
 			openTabs[selectedTab].addListener();
 			openTabs[selectedTab].addEventListener(MouseEvent.ROLL_OUT, rollOutHandler);
 
