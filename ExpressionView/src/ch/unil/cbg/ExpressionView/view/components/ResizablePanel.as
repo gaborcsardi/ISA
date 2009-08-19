@@ -291,6 +291,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 			resizeCur = CursorManager.setCursor(resizeCursor);
 			oPoint.x = parent.mouseX;
 			oPoint.y = parent.mouseY;
+			savePos();
 		}
 		
 		private function resizeMoveHandler(event:MouseEvent):void {
