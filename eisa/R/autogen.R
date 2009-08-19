@@ -223,23 +223,6 @@ ISA.html.modules <- function(eset, modules, which=seq_len(length(modules)),
   invisible(NULL)
 }
 
-fix.xtable <- function(str) {
-  str <- gsub("&lt ", "<", str, fixed=TRUE)
-  str <- gsub("&gt ", ">", str, fixed=TRUE)
-  str <- gsub("<TR>", "<tr>", str, fixed=TRUE)
-  str <- gsub("</TR>", "</tr>", str, fixed=TRUE)
-  str <- gsub("<TD", "<td", str, fixed=TRUE)
-  str <- gsub("</TD>", "</td>", str, fixed=TRUE)
-  str <- gsub("<TH", "<th", str, fixed=TRUE)
-  str <- gsub("</TH>", "</th>", str, fixed=TRUE)
-  str <- gsub("<TABLE", "<table", str, fixed=TRUE)
-  str <- gsub("</TABLE>", "</table>", str, fixed=TRUE)
-  str <- gsub("<A NAME", "<a name", str, fixed=TRUE)
-  str <- gsub("</A>", "</a>", str, fixed=TRUE)
-  
-  str
-}
-
 isa.autogen.module <- function(eset, modules, which, target.dir, template,
                                GO, KEGG, miRNA, CHR, DBD, cond.to.include,
                                cond.col="white", sep=NULL,
