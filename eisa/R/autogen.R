@@ -169,6 +169,9 @@ ISA.html.table <- function(modules, target.dir,
   if (!file.exists(paste(sep="", target.dir, "/maintree.html"))) {
     file.symlink("maintable.html", paste(sep="", target.dir, "/maintree.html"))
   }
+  if (!file.exists(paste(sep="", target.dir, "/index.html"))) {
+    file.symlink("maintable.html", paste(sep="", target.dir, "/index.html"))
+  }
 
   isa2:::isa.status("DONE", "out")
   
