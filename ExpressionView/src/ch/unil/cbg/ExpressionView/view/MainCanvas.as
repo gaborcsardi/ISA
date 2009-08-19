@@ -445,7 +445,6 @@ package ch.unil.cbg.ExpressionView.view {
 			// Array returned is Array(geneDescription, sampleDescription, modules, data, modulesRectangles);
 			var infoArray:Array = ged.getInfo(module, gene, sample);
 			var modules:Array = infoArray[2];
-			trace(modules)
 			if ( modules.length != 0 ) {
 				modulesSearchableDataGrid.dispatchEvent(new SearchableDataGridSelectionEvent(SearchableDataGridSelectionEvent.ITEM_DOUBLE_CLICK, modules));
 			}

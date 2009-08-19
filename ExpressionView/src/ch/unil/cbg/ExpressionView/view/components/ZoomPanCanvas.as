@@ -7,6 +7,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.Shape;
+	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.geom.ColorTransform;
 	import flash.geom.Point;
@@ -43,6 +44,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 		private var currentRectangle:Rectangle;
 		private var lastRectangle:Rectangle;
 		private var selectionRectangle:Rectangle;
+		private var selection:Shape;
 		
 		private var selectedGene:int;
 		private var selectedSample:int;
@@ -78,8 +80,6 @@ package ch.unil.cbg.ExpressionView.view.components {
 						
 			lastMode = 0;
 			
-			lastClick = getTimer();
-			
 			canvaswidth = this.width;
 			canvasheight = this.height;
 			
@@ -99,6 +99,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 					overlayCanvas.removeEventListener(MouseEvent.MOUSE_DOWN, zoomMouseDownHandler);
 					overlayCanvas.removeEventListener(MouseEvent.MOUSE_MOVE, zoomMouseMoveHandler);
 					overlayCanvas.removeEventListener(MouseEvent.MOUSE_UP, zoomMouseUpHandler);
+					overlayCanvas.removeEventListener(KeyboardEvent.KEY_UP, zoomKeyUpHandler);
 					dispatchEvent(new UpdateStatusBarEvent("")); 
 				} else if ( lastMode == PAN ) {
 					overlayCanvas.removeEventListener(MouseEvent.MOUSE_UP, dragMouseUpHandler);
@@ -113,7 +114,8 @@ package ch.unil.cbg.ExpressionView.view.components {
 				}
 				else if ( mode == ZOOM ) {
 					overlayCanvas.addEventListener(MouseEvent.MOUSE_DOWN, zoomMouseDownHandler);
-					dispatchEvent(new UpdateStatusBarEvent("click to zoom in, shift-click to zoom out")); 
+					addEventListener(KeyboardEvent.KEY_UP, zoomKeyUpHandler);
+					dispatchEvent(new UpdateStatusBarEvent("click to zoom in, shift-click to zoom out, a to autozoom")); 
 				} else if ( mode == PAN ) {
 					overlayCanvas.addEventListener(MouseEvent.MOUSE_DOWN, dragMouseDownHandler);
 				}
@@ -156,33 +158,29 @@ package ch.unil.cbg.ExpressionView.view.components {
 
 		// zoom events
 		private function zoomMouseDownHandler(event:MouseEvent): void {
-			if ( getTimer() - lastClick > 100 ) { 
-				lastClick = getTimer();
-				overlayCanvas.addEventListener(MouseEvent.MOUSE_MOVE, zoomMouseMoveHandler);
-				overlayCanvas.addEventListener(MouseEvent.MOUSE_UP, zoomMouseUpHandler);
-				var selection:Shape = new Shape();
-				selection.alpha = 0.3;
-				selectionRectangle = new Rectangle(event.localX, event.localY);
-				selection.graphics.drawRect(selectionRectangle.x, selectionRectangle.y, 0, 0);
-				overlayCanvas.rawChildren.addChildAt(selection, overlayCanvas.rawChildren.numChildren);
-			}
+			lastClick = getTimer();
+			overlayCanvas.addEventListener(MouseEvent.MOUSE_MOVE, zoomMouseMoveHandler);
+			overlayCanvas.addEventListener(MouseEvent.MOUSE_UP, zoomMouseUpHandler);
+			selectionRectangle = new Rectangle(event.localX, event.localY);
+			selection = new Shape();
+			overlayCanvas.rawChildren.addChild(selection);
 		}
 		private function zoomMouseMoveHandler(event:MouseEvent): void {
-			overlayCanvas.addEventListener(MouseEvent.MOUSE_DOWN, zoomMouseDownHandler);
-			overlayCanvas.rawChildren.removeChildAt(overlayCanvas.rawChildren.numChildren-1);
-			var selection:Shape = new Shape();
+			overlayCanvas.rawChildren.removeChild(selection);
+			selection = new Shape();
 			selection.alpha = 0.3;
 			selectionRectangle.bottomRight = new Point(event.localX, event.localY);
 			selection.graphics.beginFill(0x0000ff);
 			selection.graphics.drawRect(selectionRectangle.x, selectionRectangle.y, selectionRectangle.width, selectionRectangle.height); 
 			selection.graphics.endFill();
-			overlayCanvas.rawChildren.addChildAt(selection, overlayCanvas.rawChildren.numChildren);
+			overlayCanvas.rawChildren.addChild(selection);
 		}
 		private function zoomMouseUpHandler(event:MouseEvent): void {
 			overlayCanvas.removeEventListener(MouseEvent.MOUSE_MOVE, zoomMouseMoveHandler);
-			overlayCanvas.removeEventListener(MouseEvent.MOUSE_UP, zoomMouseUpHandler);	
-			if ( getTimer() - lastClick > 100 ) {
-				overlayCanvas.rawChildren.removeChildAt(overlayCanvas.rawChildren.numChildren-1);
+			overlayCanvas.removeEventListener(MouseEvent.MOUSE_UP, zoomMouseUpHandler);
+			overlayCanvas.removeEventListener(MouseEvent.MOUSE_DOWN, zoomMouseDownHandler);
+			if ( getTimer() - lastClick > 200 ) {
+				overlayCanvas.rawChildren.removeChild(selection);
 	
 				var x:Number = currentRectangle.x + selectionRectangle.x / canvaswidth * currentRectangle.width;
 				var y:Number = currentRectangle.y + selectionRectangle.y / canvasheight * currentRectangle.height;
@@ -198,11 +196,13 @@ package ch.unil.cbg.ExpressionView.view.components {
 					y -= height;
 				}
 				
-				currentRectangle = new Rectangle(int(x), int(y), int(width)+1, int(height)+1);
-				currentRectangle = adjustRectangle(currentRectangle);
+				if ( width != 0 && height != 0 ) { 				
+					currentRectangle = new Rectangle(int(x), int(y), int(width)+1, int(height)+1);
+					currentRectangle = adjustRectangle(currentRectangle);
 				
-				drawImage();
-				lastRectangle = currentRectangle.clone();
+					drawImage();
+					lastRectangle = currentRectangle.clone();
+				}
 			} else {
 				var zoomfactor:Number = 0.5;
 				if ( event.shiftKey ) {
@@ -224,7 +224,12 @@ package ch.unil.cbg.ExpressionView.view.components {
 				lastRectangle = currentRectangle.clone();		
 			}
 			overlayCanvas.addEventListener(MouseEvent.MOUSE_DOWN, zoomMouseDownHandler);
-			
+		}
+		private function zoomKeyUpHandler(event:KeyboardEvent): void {
+			trace(event.keyCode);
+			if ( event.keyCode == 0 ) {
+				
+			} 
 		}
 
 		// drag events
