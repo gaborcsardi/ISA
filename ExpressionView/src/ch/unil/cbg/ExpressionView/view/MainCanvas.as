@@ -12,10 +12,6 @@ package ch.unil.cbg.ExpressionView.view {
 	import flash.net.FileReference;
 	import flash.utils.ByteArray;
 	
-	import flexlib.containers.SuperTabNavigator;
-	import flexlib.events.SuperTabEvent;
-	import flexlib.events.TabReorderEvent;
-	
 	import mx.containers.Canvas;
 	import mx.controls.Alert;
 	import mx.controls.TextArea;
@@ -45,7 +41,7 @@ package ch.unil.cbg.ExpressionView.view {
 		private var lastHighlightedModules:Array;
 		
 		private var gePanel:ResizablePanel;
-		private var modulesNavigator:SuperTabNavigator;
+		private var modulesNavigator:ClosableTabNavigator;
 		private var openTabs:Vector.<ZoomPanCanvas>;
 		private var mapOpenTabs:Vector.<int>;
 		
@@ -81,10 +77,10 @@ package ch.unil.cbg.ExpressionView.view {
 				addChild(gePanel);
 				
 				if ( !modulesNavigator ) {
-					modulesNavigator = new SuperTabNavigator();
+					modulesNavigator = new ClosableTabNavigator();
 					modulesNavigator.addEventListener(IndexChangedEvent.CHANGE, tabChangeHandler);
-					modulesNavigator.addEventListener(SuperTabEvent.TAB_CLOSE, tabCloseHandler);
-					//modulesNavigator.addEventListener(TabReorderEvent.CHANGED, tabReorderHandler);
+					//modulesNavigator.addEventListener(ClosableTabNavigatorEvent.TAB_CLOSE, tabCloseHandler);
+					modulesNavigator.addEventListener(IndexChangedEvent.CHILD_INDEX_CHANGE, tabReorderHandler);
 					gePanel.addChild(modulesNavigator);
 					
 					openTabs = new Vector.<ZoomPanCanvas>;
@@ -307,7 +303,8 @@ package ch.unil.cbg.ExpressionView.view {
 			dispatchEvent(new MenuEvent(MenuEvent.MODE, [selectedMode]));
 		}
 		
-		private function tabCloseHandler(event:SuperTabEvent): void {
+		/*
+		private function tabCloseHandler(event:ClosableTabNavigatorEvent): void {
 			if ( event.tabIndex == 0 ) {
 				event.preventDefault();
 			} else {
@@ -317,8 +314,13 @@ package ch.unil.cbg.ExpressionView.view {
 				//mapOpenTabs.splice(event.tabIndex, 1);
 			}
 		}
-
-		private function tabReorderHandler(event:TabReorderEvent): void {
+		*/
+		
+		private function tabReorderHandler(event:IndexChangedEvent): void {
+			event.preventDefault();
+			Alert.show("Closing tabs is not yet supported.", 'Warning', mx.controls.Alert.OK)
+			/*
+			trace(event.oldIndex, event.newIndex);
 			if ( event.oldIndex == 0 ) {
 				event.preventDefault();
 			} else {
@@ -326,6 +328,7 @@ package ch.unil.cbg.ExpressionView.view {
 				mapOpenTabs[event.oldIndex] = mapOpenTabs[event.newIndex];
 				mapOpenTabs[event.newIndex] = temp;
 			}
+			*/
 		}
 
 		private function clickModulesHandler(event:SearchableDataGridSelectionEvent): void {
