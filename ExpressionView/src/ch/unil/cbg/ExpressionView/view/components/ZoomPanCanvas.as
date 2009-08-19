@@ -117,7 +117,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 				else if ( mode == ZOOM ) {
 					overlayCanvas.addEventListener(MouseEvent.MOUSE_DOWN, zoomMouseDownHandler);
 					parentApplication.addEventListener(KeyboardEvent.KEY_UP, zoomKeyUpHandler);
-					dispatchEvent(new UpdateStatusBarEvent("click to zoom in, shift-click to zoom out, a to autozoom")); 
+					dispatchEvent(new UpdateStatusBarEvent("click to zoom in, shift-click to zoom out, a to autozoom, g to autozoom genes, and s to autozoom samples.")); 
 				} else if ( mode == PAN ) {
 					overlayCanvas.addEventListener(MouseEvent.MOUSE_DOWN, dragMouseDownHandler);
 				}

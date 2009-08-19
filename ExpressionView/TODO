@@ -1,7 +1,6 @@
 ExpressionView:
 - fix PDF on Linux
-- fix height problem when resizing
-- improve SuperTabNavigator behavior
+- implement ClosableTabNavigator
 
 Ordering:
 - implement total time constraint

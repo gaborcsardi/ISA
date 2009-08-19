@@ -127,9 +127,9 @@
 						
 			private function resizeHandler(event:Event):void {
 				var scalex:Number = stage.stageWidth / oldStageWidth;
-				var scaley:Number = stage.stageHeight / oldStageHeight;
+				var scaley:Number = (stage.stageHeight - statusBar.height - menuBar.height) / 
+										(oldStageHeight - statusBar.height - menuBar.height);
 				dispatchEvent(new ResizeBrowserEvent(scalex, scaley));
-				invalidateDisplayList();
 				oldStageWidth = stage.stageWidth;
 				oldStageHeight = stage.stageHeight;
 			}
@@ -153,7 +153,6 @@
 				}
 			}
 
-			// initilize unlimited Bitmaps
 			private function processFileHandler(event:MenuEvent): void {
 				bytes = event.data[0];				
 				bytes.position = 0;
