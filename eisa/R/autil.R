@@ -23,7 +23,9 @@ html.df <- function(df, link=NA, label=NULL, digits=NULL, display=NULL) {
   if (length(link)!=1 || !is.na(link)) {
     df$Id <- paste(sep="", '<a href="', link, '">', df$Id, '</a>')
   }
-  xt <- xtable(df, label=label, digits=c(NA, digits), display=c("s", display))
+  if (!is.null(digits)) { digits <- c(NA, digits) }
+  if (!is.null(display)) { display <- c("s", display) }
+  xt <- xtable(df, label=label, digits=digits, display=display)
   tc <- textConnection("outp", open="w", local=TRUE)
   print(xt, type="html", file=tc, include.rownames=FALSE)
   close(tc)

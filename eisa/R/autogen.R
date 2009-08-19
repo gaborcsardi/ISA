@@ -1,6 +1,20 @@
 
-ISA.html <- function(...) {
-  ## TODO: call ISA.html.table and ISA.html.modules
+ISA.html <- function(eset, modules, target.dir,
+                     template=system.file("autogen", package="eisa"),
+                     GO, KEGG, miRNA=NULL, CHR=NULL, htmltitle=NULL,
+                     notes=NULL, seed=NULL,
+                     cond.to.include=NULL, cond.col="white", sep=NULL) {
+
+  ISA.html.table(modules=modules, target.dir=target.dir, template=template,
+                 GO=GO, KEGG=KEGG, miRNA=miRNA, CHR=CHR, htmltitle=htmltitle,
+                 notes=notes, seed=seed)
+
+  ISA.html.modules(eset=eset, modules=modules, target.dir=target.dir,
+                   template=template, GO=GO, KEGG=KEGG, miRNA=miRNA, CHR=CHR,
+                   cond.to.include=cond.to.include,
+                   cond.col=cond.col, sep=sep, seed=seed)
+
+  invisible(NULL)
 }
 
 isa.autogen.create.dirs <- function(template, target.dir) {
@@ -39,7 +53,7 @@ isa.autogen.create.dirs <- function(template, target.dir) {
 ISA.html.table <- function(modules, target.dir,
                            which=seq_len(length(modules)),
                            template=system.file("autogen", package="eisa"),
-                           GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL, DBD=NULL,
+                           GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL,
                            htmltitle=NULL, notes=NULL, seed=NULL) {
 
   isa2:::isa.status("Creating HTML module table", "in")
@@ -79,7 +93,6 @@ ISA.html.table <- function(modules, target.dir,
   tables.MF <- f(GO$MF, type="GO")[which]
   tables.KEGG <- f(KEGG, type="KEGG")[which]
   tables.miRNA <- if (!is.null(miRNA)) f(miRNA, type="miRNA")[which] else ""
-  tables.DBD <- if (!is.null(DBD)) f(DBD, type="DBD")[which] else ""
   tables.CHR <- if (!is.null(CHR)) f(CHR, type="CHR")[which] else ""
 
   thr <- paste(sep="/", featureThreshold(modules)[which],
@@ -102,10 +115,6 @@ ISA.html.table <- function(modules, target.dir,
     tables.miRNA <- paste(sep="", "<td>", tables.miRNA, "</td>")
     head <- c(head, "miRNA")
   }
-  if (length(tables.DBD) != 1 || tables.DBD != "") {
-    tables.DBD <- paste(sep="", "<td>", tables.DBD, "</td>")
-    head <- c(head, "DBD")
-  }
   if (length(tables.CHR) != 1 || tables.CHR != "") {
     tables.CHR <- paste(sep="", "<td>", tables.CHR, "</td>")
     head <- c(head, "CHR")
@@ -125,7 +134,6 @@ ISA.html.table <- function(modules, target.dir,
                  "<td>", tables.MF, "</td>",
                  "<td>", tables.KEGG, "</td>",
                  tables.miRNA,
-                 tables.DBD,
                  tables.CHR,
                  "</tr>")
 
@@ -182,7 +190,7 @@ ISA.html.table <- function(modules, target.dir,
 ISA.html.modules <- function(eset, modules, which=seq_len(length(modules)),
                              target.dir,
                              template=system.file("autogen", package="eisa"),
-                             GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL, DBD=NULL,
+                             GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL,
                              cond.to.include=NULL,
                              cond.col="white",
                              sep=NULL, seed=NULL) {
@@ -205,13 +213,12 @@ ISA.html.modules <- function(eset, modules, which=seq_len(length(modules)),
   isa.autogen.create.dirs(template, target.dir)
 
   drive.BP <- drive.CC <- drive.MF <- drive.KEGG <- drive.miRNA <-
-    drive.DBD <- drive.CHR <- NULL
+    drive.CHR <- NULL
   if (!is.null(GO)) drive.BP <- geneIdsByCategory(GO$BP)
   if (!is.null(GO)) drive.CC <- geneIdsByCategory(GO$CC)
   if (!is.null(GO)) drive.MF <- geneIdsByCategory(GO$MF)
   if (!is.null(KEGG)) drive.KEGG <- geneIdsByCategory(KEGG)
   if (!is.null(miRNA)) drive.miRNA <- geneIdsByCategory(miRNA) 
-  if (!is.null(DBD)) drive.DBD <- geneIdsByCategory(DBD) 
   if (!is.null(CHR)) drive.CHR <- geneIdsByCategory(CHR) 
 
   ## Read the templates only once
@@ -257,13 +264,12 @@ ISA.html.modules <- function(eset, modules, which=seq_len(length(modules)),
     px <- if (i!=1) which[i-1] else which[length(which)]
     isa.autogen.module(eset, modules, x,
                        target.dir=target.dir, template=template,
-                       GO=GO, KEGG=KEGG, miRNA=miRNA, DBD=DBD, CHR=CHR,
+                       GO=GO, KEGG=KEGG, miRNA=miRNA, CHR=CHR,
                        cond.to.include=cond.to.include,
                        cond.col=cond.col, sep=sep,
                        seed=seed, drive.BP=drive.BP, drive.CC=drive.CC,
                        drive.MF=drive.MF, drive.KEGG=drive.KEGG,
-                       drive.miRNA=drive.miRNA, drive.DBD=drive.DBD,
-                       drive.CHR=drive.CHR,
+                       drive.miRNA=drive.miRNA, drive.CHR=drive.CHR,
                        next.module=nx, prev.module=px,
                        lines=lines.orig, clines=clines.orig, jlines=jlines.orig,
                        go.terms=go.terms, GOGRAPHS=GOGRAPHS,
@@ -277,12 +283,11 @@ ISA.html.modules <- function(eset, modules, which=seq_len(length(modules)),
 }
 
 isa.autogen.module <- function(eset, modules, which, target.dir, template,
-                               GO, KEGG, miRNA, CHR, DBD, cond.to.include,
+                               GO, KEGG, miRNA, CHR, cond.to.include,
                                cond.col="white", sep=NULL,
                                seed=NULL, drive.BP=NULL, drive.CC=NULL,
                                drive.MF=NULL, drive.KEGG=NULL,
-                               drive.miRNA=NULL, drive.DBD=NULL,
-                               drive.CHR=NULL,
+                               drive.miRNA=NULL, drive.CHR=NULL,
                                next.module=NULL, prev.module=NULL,
                                lines, clines, jlines, go.terms, GOGRAPHS,
                                SYMBOL, ENTREZ, CHIPSYMBOL, GENENAME) {
@@ -301,7 +306,6 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   if (is.null(drive.KEGG) && !is.null(KEGG)) drive.KEGG <- geneIdsByCategory(KEGG)
   if (is.null(drive.miRNA) && !is.null(miRNA)) drive.miRNA <-
     geneIdsByCategory(miRNA) 
-  if (is.null(drive.DBD) && !is.null(DBD)) drive.DBD <- geneIdsByCategory(DBD) 
   if (is.null(drive.CHR) && !is.null(CHR)) drive.CHR <- geneIdsByCategory(CHR) 
   
   color.table <- function(t) {
@@ -409,8 +413,6 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
     
   m <- which
 
-  print(paste("Module", m, "expression graph"))
-
   ep <- expPlotCreate(nexp, getFeatureMatrix(modules, mods=m),
                       getSampleMatrix(modules, mods=m), normalize=FALSE)
   png(file=paste(sep="", target.dir, "/expression-", m, ".png"),
@@ -428,7 +430,6 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   dev.off()
   
   #################################
-  print(paste("Module", m, "HTML file"))
 
   my.gth <- seedData(modules)$thr.row[m]
   my.cth <- seedData(modules)$thr.col[m]
@@ -442,7 +443,6 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   jlines [ grep("// exppos", jlines, fixed=TRUE)[1] ] <- exppos
   
   ## title
-  print("  -- title")
   entr <- ENTREZ$gene_id[ match(getFeatureNames(modules, m)[[1]], ENTREZ$probe_id) ]
   entr <- entr[!is.na(entr)]
   title <- paste(sep="", "Module #", m, ", TG: ", my.gth,
@@ -453,12 +453,10 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
 
   ## gth
 
-  print("  -- gth")
   tmp <- grep("<!--gth-->", lines, fixed=TRUE)
   lines[tmp] <- sub("<!--gth-->", my.gth, lines[tmp], fixed=TRUE)
 
   ## no
-  print("  -- module number")
   to.sub <- grep("<!--no-->", lines, fixed=TRUE)
   lines[to.sub] <- gsub("<!--no-->", as.character(m), lines[to.sub])
 
@@ -481,7 +479,6 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   clines[to.sub] <- gsub("/*gth*/", my.gth, clines[to.sub], fixed=TRUE)
 
   ## expx, expy
-  print("  -- size of the expression plot")
   expx <- bbox$coords[2,1] - bbox$coords[1,1] + 1
   expy <- bbox$coords[2,2] - bbox$coords[1,2] + 1
   to.sub <- grep("<!--expx-->", lines, fixed=TRUE)
@@ -490,16 +487,12 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   lines[to.sub] <- gsub("<!--expy-->", as.character(expy), lines[to.sub])  
 
   # tableGO{BP,CC,MF}
-  print("  -- enrichment tables")
   t.BP <- paste(sep="\n","<!-- tableGOBP -->", tables.BP)
   t.CC <- paste(sep="\n","<!-- tableGOCC -->", tables.CC)
   t.MF <- paste(sep="\n","<!-- tableGOMF -->", tables.MF)
   t.KEGG <- paste(sep="\n","<!-- tableKEGG -->", tables.KEGG)
   if (!is.null(miRNA)) {
     t.miRNA <- paste(sep="\n","<!-- tablemiRNA -->", tables.miRNA)
-  }
-  if (!is.null(DBD)) {
-    t.DBD <- paste(sep="\n","<!-- tableDBD -->", tables.DBD)
   }
   if (!is.null(CHR)) {
     t.CHR <- paste(sep="\n","<!-- tableCHR -->", tables.CHR)
@@ -511,15 +504,11 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   if (!is.null(miRNA)) {
     lines[ grep("<!-- tablemiRNA -->", lines)[1] ] <- t.miRNA
   }
-  if (!is.null(DBD)) {
-    lines[ grep("<!-- tableDBD -->", lines)[1] ] <- t.DBD
-  }
   if (!is.null(CHR)) {
     lines[ grep("<!-- tableCHR -->", lines)[1] ] <- t.CHR
   }
 
   # GO plots
-  print("  -- Plot GO graphs")
   gp <- function(obj, pvalue=0.05, filename) {
     if (is(obj, "HyperGResult")) {
       pval <- pvalues(obj)
@@ -552,7 +541,6 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
              filename=paste(sep="", target.dir, "/go-MF-", m, ".png"))
 
   # Go tree annotation
-  print("  -- GO graph annotation")
   ann <- function(g, cat) {
     if (vcount(g)==0) { return("") }
     no <- seq(vcount(g))
@@ -572,7 +560,6 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   lines[ grep("<!-- GOtreeMF -->", lines)[1] ] <- a.MF
 
   # GO tree coordinates for the tooltips
-  print("  -- GO graph tooltips")
   c.coords <- function(coords, width, height, cat) {
     no <- seq(length(coords$x))
     res <- paste(sep="", 'dl#map', tolower(cat), '.map.on a#location', cat,
@@ -606,7 +593,6 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
                  clines, fixed=TRUE)
   
   # Gene cloud
-  print("  -- Gene cloud")
   nam <- getFeatureNames(modules, m)[[1]]
   orig.val <- getFeatureScores(modules, m)[[1]]
   val <- round(orig.val*10)
@@ -652,7 +638,6 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   lines[ grep("<!-- genecloud-noname -->", lines, fixed=TRUE)[1] ] <- html2
 
   ## Conditions
-  print("  -- conditions")
 
   ## rather arbitrary
   if (is.null(cond.to.include)) {
@@ -670,23 +655,7 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
     pd[[i]] <- as.character(pd[[i]])
   }
 
-  pd <- cbind("No"=rev(seq(nrow(pd))), "Score"=score[seq][ord], pd)
-  xt.pd <- xtable(pd)
-  tfname <- tempfile()
-  zz <- file(tfname, "w")
-  sink(zz)
-  print(xt.pd, "html")
-  sink() 
-  close(zz)
-  foo <- readLines(tfname)
-  unlink(tfname)
-  foo <- gsub("<TR>", "<tr>", foo)
-  foo <- gsub("</TR>", "</tr>", foo)
-  foo <- gsub("<TD", "<td", foo)
-  foo <- gsub("</TD>", "</td>", foo)
-  foo <- gsub("<TH", "<th", foo)
-  foo <- gsub("</TH>", "</th>", foo)
-  foo <- gsub("<NA>", "NA", foo)
+  foo <- html.df(pd)
   foo <- foo[4:(length(foo)-1)]
   head <- foo[1]
   foo <- foo[-1]
@@ -715,7 +684,6 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   dev.off()
   
   ## Gene names for expression matrix cross
-  print("  -- Gene names for cross")
   nam <- getFeatureNames(modules, m)[[1]]
   entrezIds <- CHIPSYMBOL$symbol[ match(nam, CHIPSYMBOL$probe_id) ]
 #  longname <- mget(nam, envir = get(paste(sep="", chip, "GENENAME")))
@@ -739,15 +707,11 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   jlines [ grep("// genes", jlines, fixed=TRUE)[1] ] <- to.print
 
   ## Conditions for cross, we still have pd
-  print("  -- Condition names for cross")
-
   to.print <- apply(cbind(rownames(pd), pd), 1, paste, collapse=", ")
   to.print <- paste(sep="", collapse=",\n", '"', to.print, '"')
   
   jlines[ grep("// conditions", jlines, fixed=TRUE)[1] ] <- to.print
 
-  print(" -- Write files")
-  
   ## finished, write to file
   fname <- paste(sep="", target.dir, "/module-", m, ".html")
   cat(lines, file=fname, sep="\n")
