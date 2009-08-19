@@ -44,11 +44,11 @@ ISA.html.table <- function(modules, target.dir,
 
   isa2:::isa.status("Creating HTML module table", "in")
 
-  require(GO.db)
-  require(KEGG.db)
-
-  isa.autogen.create.dirs(template, target.dir)
+  library(GO.db)
+  library(KEGG.db)
   
+  isa.autogen.create.dirs(template, target.dir)
+
   db <- GO_dbconn()
   query <- "SELECT go_id, term, definition FROM go_term"
   go.terms <- dbGetQuery(db, query)
@@ -188,6 +188,19 @@ ISA.html.modules <- function(eset, modules, which=seq_len(length(modules)),
                              sep=NULL, seed=NULL) {
 
   isa2:::isa.status("Generating module pages", "in")
+
+  library(Biobase)
+  library(GO.db)
+  library(KEGG.db)
+  library(igraph)
+  library(xtable)
+  if (require(Cairo)) { png <- CairoPNG }
+
+  chip <- annotation(modules)
+  library(paste(sep="", chip, ".db"),  character.only=TRUE)
+  organism <- getOrganism(modules)
+  library(paste(sep="", "org.", abbreviate(organism, 2), ".eg.db"),
+          character.only=TRUE)
   
   isa.autogen.create.dirs(template, target.dir)
 
@@ -200,83 +213,23 @@ ISA.html.modules <- function(eset, modules, which=seq_len(length(modules)),
   if (!is.null(miRNA)) drive.miRNA <- geneIdsByCategory(miRNA) 
   if (!is.null(DBD)) drive.DBD <- geneIdsByCategory(DBD) 
   if (!is.null(CHR)) drive.CHR <- geneIdsByCategory(CHR) 
-  
-  ## Then generate modules
-  for (i in seq_along(which)) {
-    x <- which[i]
-    nx <- if (i!=length(which)) which[i+1] else which[1]
-    px <- if (i!=1) which[i-1] else which[length(which)]
-    isa.autogen.module(eisa.get.nm(eset, modules), modules, x,
-                       target.dir=target.dir, template=template,
-                       GO=GO, KEGG=KEGG, miRNA=miRNA, DBD=DBD, CHR=CHR,
-                       cond.to.include=cond.to.include,
-                       cond.col=cond.col, sep=sep,
-                       seed=seed, drive.BP=drive.BP, drive.CC=drive.CC,
-                       drive.MF=drive.MF, drive.KEGG=drive.KEGG,
-                       drive.miRNA=drive.miRNA, drive.DBD=drive.DBD,
-                       drive.CHR=drive.CHR,
-                       next.module=nx, prev.module=px)
-  }
 
-  isa2:::isa.status("DONE", "out")
-  
-  invisible(NULL)
-}
+  ## Read the templates only once
+  lines.orig <- readLines(paste(sep="", template, "/module.html.in"))
+  clines.orig <- readLines(paste(sep="", template, "/style-mod.css.in"))
+  jlines.orig <- readLines(paste(sep="", template, "/module.js.in"))  
 
-isa.autogen.module <- function(eset, modules, which, target.dir, template,
-                               GO, KEGG, miRNA, CHR, DBD, cond.to.include,
-                               cond.col="white", sep=NULL,
-                               seed=NULL, drive.BP=NULL, drive.CC=NULL,
-                               drive.MF=NULL, drive.KEGG=NULL,
-                               drive.miRNA=NULL, drive.DBD=NULL,
-                               drive.CHR=NULL,
-                               next.module=NULL, prev.module=NULL) {
+  ## Normalize eset only once
+  eset <- eisa.get.nm(eset, modules)
 
-  isa2:::isa.status(paste("Generating HTML page for module", which), "in")
-
-  if (require(Cairo)) { png <- CairoPNG }
-  require(Biobase)
-  require(igraph)
-  require(xtable)
-
-  nm <- list(Er=t(feat.exprs(eset)),
-             Ec=samp.exprs(eset))
-  
-  nexp <- nm$Ec
-
-  if (is.null(drive.BP) && !is.null(GO)) drive.BP <- geneIdsByCategory(GO$BP)
-  if (is.null(drive.CC) && !is.null(GO)) drive.CC <- geneIdsByCategory(GO$CC)
-  if (is.null(drive.MF) && !is.null(GO)) drive.MF <- geneIdsByCategory(GO$MF)
-  if (is.null(drive.KEGG) && !is.null(KEGG)) drive.KEGG <- geneIdsByCategory(KEGG)
-  if (is.null(drive.miRNA) && !is.null(miRNA)) drive.miRNA <-
-    geneIdsByCategory(miRNA) 
-  if (is.null(drive.DBD) && !is.null(DBD)) drive.DBD <- geneIdsByCategory(DBD) 
-  if (is.null(drive.CHR) && !is.null(CHR)) drive.CHR <- geneIdsByCategory(CHR) 
-  
-  chip <- annotation(modules)
-  library(paste(sep="", chip, ".db"),  character.only=TRUE)
-  organism <- getOrganism(modules)
-  short.organism <- organism
-  require(paste(sep="", "org.", abbreviate(organism, 2), ".eg.db"),
-          character.only=TRUE)
-  SYMBOL <- toTable(get( paste(sep="", "org.", abbreviate(organism, 2), ".egSYMBOL")))
-  ENTREZ <- get( paste(sep="", chip, "ENTREZID") )
-
-  library(paste(sep="", "org.", abbreviate(organism,2), ".eg.db"),
-          character.only=TRUE)
-
-  ####################
-  # create go.terms object
-  
+  ## go.terms only once
   db <- GO_dbconn()
   query <- "SELECT go_id, term, definition FROM go_term"
   go.terms <- dbGetQuery(db, query)
   rownames(go.terms) <- go.terms[,1]
-  go.terms <- go.terms[,-1]
+  go.terms <- go.terms[,-1]  
 
-  ####################
-  # Create GOGRAPHS object
-
+  ## create GO graphs only once
   go.graph <- function(cats) {
     query <- paste("SELECT id1.go_id, id2.go_id, par.relationship_type FROM",
                    " go_", tolower(cats), "_parents AS par,",
@@ -292,6 +245,65 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
                    CC=go.graph("CC"),
                    MF=go.graph("MF"))
 
+  SYMBOL <- toTable(get( paste(sep="", "org.", abbreviate(organism, 2), ".egSYMBOL")))
+  ENTREZ <- toTable(get( paste(sep="", chip, "ENTREZID") ))
+  CHIPSYMBOL <- toTable(get( paste(sep="", chip, "SYMBOL") ))
+  GENENAME <- toTable(get( paste(sep="", chip, "GENENAME") ))
+  
+  ## Then generate modules
+  for (i in seq_along(which)) {
+    x <- which[i]
+    nx <- if (i!=length(which)) which[i+1] else which[1]
+    px <- if (i!=1) which[i-1] else which[length(which)]
+    isa.autogen.module(eset, modules, x,
+                       target.dir=target.dir, template=template,
+                       GO=GO, KEGG=KEGG, miRNA=miRNA, DBD=DBD, CHR=CHR,
+                       cond.to.include=cond.to.include,
+                       cond.col=cond.col, sep=sep,
+                       seed=seed, drive.BP=drive.BP, drive.CC=drive.CC,
+                       drive.MF=drive.MF, drive.KEGG=drive.KEGG,
+                       drive.miRNA=drive.miRNA, drive.DBD=drive.DBD,
+                       drive.CHR=drive.CHR,
+                       next.module=nx, prev.module=px,
+                       lines=lines.orig, clines=clines.orig, jlines=jlines.orig,
+                       go.terms=go.terms, GOGRAPHS=GOGRAPHS,
+                       SYMBOL=SYMBOL, ENTREZ=ENTREZ, CHIPSYMBOL=CHIPSYMBOL,
+                       GENENAME=GENENAME)
+  }
+
+  isa2:::isa.status("DONE", "out")
+  
+  invisible(NULL)
+}
+
+isa.autogen.module <- function(eset, modules, which, target.dir, template,
+                               GO, KEGG, miRNA, CHR, DBD, cond.to.include,
+                               cond.col="white", sep=NULL,
+                               seed=NULL, drive.BP=NULL, drive.CC=NULL,
+                               drive.MF=NULL, drive.KEGG=NULL,
+                               drive.miRNA=NULL, drive.DBD=NULL,
+                               drive.CHR=NULL,
+                               next.module=NULL, prev.module=NULL,
+                               lines, clines, jlines, go.terms, GOGRAPHS,
+                               SYMBOL, ENTREZ, CHIPSYMBOL, GENENAME) {
+
+  isa2:::isa.status(paste("Generating HTML page for module", which), "in")
+
+  nm <- list(Er=t(feat.exprs(eset)),
+             Ec=samp.exprs(eset))
+  nexp <- nm$Ec
+
+  organism <- getOrganism(modules)
+
+  if (is.null(drive.BP) && !is.null(GO)) drive.BP <- geneIdsByCategory(GO$BP)
+  if (is.null(drive.CC) && !is.null(GO)) drive.CC <- geneIdsByCategory(GO$CC)
+  if (is.null(drive.MF) && !is.null(GO)) drive.MF <- geneIdsByCategory(GO$MF)
+  if (is.null(drive.KEGG) && !is.null(KEGG)) drive.KEGG <- geneIdsByCategory(KEGG)
+  if (is.null(drive.miRNA) && !is.null(miRNA)) drive.miRNA <-
+    geneIdsByCategory(miRNA) 
+  if (is.null(drive.DBD) && !is.null(DBD)) drive.DBD <- geneIdsByCategory(DBD) 
+  if (is.null(drive.CHR) && !is.null(CHR)) drive.CHR <- geneIdsByCategory(CHR) 
+  
   color.table <- function(t) {
     ## colorify every second row, plus the first one
     t[1] <- sub('<tr>', '<tr class="head">', t[1])
@@ -395,10 +407,6 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
     tables.CHR <- "<p>Not tested.</p>"
   }
     
-  lines.orig <- readLines(paste(sep="", template, "/module.html.in"))
-  clines.orig <- readLines(paste(sep="", template, "/style-mod.css.in"))
-  jlines.orig <- readLines(paste(sep="", template, "/module.js.in"))
-
   m <- which
 
   print(paste("Module", m, "expression graph"))
@@ -421,9 +429,6 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   
   #################################
   print(paste("Module", m, "HTML file"))
-  lines <- lines.orig
-  clines <- clines.orig
-  jlines <- jlines.orig
 
   my.gth <- seedData(modules)$thr.row[m]
   my.cth <- seedData(modules)$thr.col[m]
@@ -438,7 +443,7 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   
   ## title
   print("  -- title")
-  entr <- unique(unlist(mget(getFeatureNames(modules, m)[[1]], ENTREZ)))
+  entr <- ENTREZ$gene_id[ match(getFeatureNames(modules, m)[[1]], ENTREZ$probe_id) ]
   entr <- entr[!is.na(entr)]
   title <- paste(sep="", "Module #", m, ", TG: ", my.gth,
                  ", TC: ", my.cth, ", ", getNoFeatures(modules,m), " probes, ",
@@ -525,7 +530,6 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
     v <- pval <= pvalue
     pval <- pval[v]
     if (length(pval) == 0) {
-      require(igraph)
       g <- graph.empty()
       g$width <- 0
       g$height <- 0
@@ -606,9 +610,9 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   nam <- getFeatureNames(modules, m)[[1]]
   orig.val <- getFeatureScores(modules, m)[[1]]
   val <- round(orig.val*10)
-  entrezNums <- mget(nam, envir = get(paste(sep="", chip, "ENTREZID"))) 
-  entrezIds <- mget(nam, envir = get(paste(sep="", chip, "SYMBOL")))
-  longname <- mget(nam, envir = get(paste(sep="", chip, "GENENAME")))
+  entrezNums <- ENTREZ$gene_id[ match(nam, ENTREZ$probe_id) ]
+  entrezIds <- CHIPSYMBOL$symbol[ match(nam, CHIPSYMBOL$probe_id) ]
+  longname <- GENENAME$gene_name[ match(nam, GENENAME$probe_id) ]
   longname <- paste(sep="", longname, " (", nam, ")")
   haveEntrezId <- names(entrezIds)[sapply(entrezIds, function(x) !is.na(x))]
   
@@ -628,7 +632,7 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   
   valid <- !is.na(entrezIds)
 
-  if (getOrganism(modules) == "Homo sapiens") {
+  if (organism == "Homo sapiens") {
     html <- paste(sep="", "<a href=\"http://www.genecards.org/cgi-bin/carddisp.pl?gene=", entrezIds[valid],
                   "\" class=\"tag", val[valid],
                   "\">", entrezIds[valid], "<span>", longname[valid], ", score: ", orig.val[valid], "</span></a>")
@@ -713,7 +717,7 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   ## Gene names for expression matrix cross
   print("  -- Gene names for cross")
   nam <- getFeatureNames(modules, m)[[1]]
-  entrezIds <- mget(nam, envir = get(paste(sep="", chip, "SYMBOL")))
+  entrezIds <- CHIPSYMBOL$symbol[ match(nam, CHIPSYMBOL$probe_id) ]
 #  longname <- mget(nam, envir = get(paste(sep="", chip, "GENENAME")))
   haveEntrezId <- names(entrezIds)[sapply(entrezIds, function(x) !is.na(x))]
   
@@ -741,6 +745,8 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   to.print <- paste(sep="", collapse=",\n", '"', to.print, '"')
   
   jlines[ grep("// conditions", jlines, fixed=TRUE)[1] ] <- to.print
+
+  print(" -- Write files")
   
   ## finished, write to file
   fname <- paste(sep="", target.dir, "/module-", m, ".html")
@@ -752,6 +758,8 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   jfname <- paste(sep="", target.dir, "/module-", m, ".js")
   cat(jlines, file=jfname, sep="\n")
 
+  print("Done.")
+  
   isa2:::isa.status("DONE", "out")
 }
 
