@@ -6,7 +6,7 @@
   scaled. \code{ISA.normalize} performs this transformation.
 }
 \usage{
-ISA.normalize (data, prenormalize = TRUE)
+ISA.normalize (data, prenormalize = FALSE)
 }
 \arguments{
   \item{data}{An \code{ExpressionSet} object.}

@@ -9,7 +9,7 @@
 }
 \usage{
 ISA.KEGG (modules,ann = annotation(modules), features = featureNames(modules), 
-    hgCutoff = 0.001, correction = TRUE, correction.method = "holm") 
+    hgCutoff = 0.05, correction = TRUE, correction.method = "holm") 
 }
 \arguments{
   \item{modules}{An \code{ISAModules} object, a set of ISA modules.}
