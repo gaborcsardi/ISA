@@ -48,7 +48,11 @@ ISAmnplot (modules, number, eset, norm = c("raw", "feature", "sample"),
   expression values for the two groups, for all the specified genes.
 }
 \author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
-\references{}
+\references{
+  Bergmann S, Ihmels J, Barkai N: Iterative signature algorithm for the
+  analysis of large-scale gene expression data \emph{Phys Rev E Stat
+    Nonlin Soft Matter Phys.} 2003 Mar;67(3 Pt 1):031902. Epub 2003 Mar 11.
+}
 \seealso{The \code{\link[annotate]{GOmnplot}} and
   \code{\link[annotate]{KEGGmnplot}} functions in the \code{annotate}
   package.}

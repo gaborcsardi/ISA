@@ -557,13 +557,13 @@ cond.plot <- function(modules, number, eset,
   isa2:::isa.status("DONE", "out")
 }
 
-overlap <- function(isares, algorithm=c("mds", "fr", "drl"), edge.limit=0.5) {
+overlap <- function(modules, algorithm=c("mds", "fr", "drl"), edge.limit=0.5) {
 
   isa2:::isa.status("Creating an overlap plot", "in")
   
   algorithm <- match.arg(algorithm)
 
-  genes <- isares$genes
+  genes <- getFeatureMatrix(modules)
 
   library(igraph)
 

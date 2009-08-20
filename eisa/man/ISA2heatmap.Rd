@@ -27,7 +27,7 @@ ISA2heatmap (modules, module, eset, norm = c("raw", "feature", "sample"),
   \item{scale}{Character scalar, passed to the
     \code{\link[stats]{heatmap}} function.}
   \item{\dots}{Additional arguments, they are passed to the
-    \code{\link[stats]{heatmap}} function.
+    \code{\link[stats]{heatmap}} function.}
 }
 %\details{}
 \value{The same as \code{\link[stats]{heatmap}}.}
