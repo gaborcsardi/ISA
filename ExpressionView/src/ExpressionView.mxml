@@ -55,6 +55,7 @@
 					mainCanvas.setStyle("borderStyle", "solid");
 					mainCanvas.horizontalScrollPolicy = "off";
 					mainCanvas.verticalScrollPolicy = "off";
+					mainCanvas.visible = false;
 					addChild(mainCanvas);
 				}
 
@@ -63,6 +64,7 @@
 					statusBar.setStyle("borderStyle", "solid");
 					statusBar.horizontalScrollPolicy = "off";
 					statusBar.verticalScrollPolicy = "off";
+					statusBar.visible = false;
 					addChild(statusBar);
 				}
 
@@ -77,6 +79,7 @@
 				
 				filename = Application.application.parameters.filename;
 				if ( filename != "" ) {
+					statusBar.visible = true;
 					var request:URLRequest = new URLRequest(filename);
 					loader = new URLLoader();
 					loader.dataFormat = URLLoaderDataFormat.BINARY;
@@ -142,10 +145,12 @@
 					if ( match ) {
 						var alert:String = "The fullscreen mode on " + Capabilities.os;
 						alert += " is NOT working properly due to a bug in the Flash Player. ";
-						alert += "For instance opening files, exporting PDFs, ";
-						alert += "or zooming out is doomed. Sorry."; 
-						Alert.show(alert , 'Warning', mx.controls.Alert.OK)
+						alert += "Opening files and exporting PDFs is not possible. ";
 					}
+					alert += "Due to security reasons, the fullscreen mode does not allow ";
+					alert += "to enter text or catch keyboard events. All keyboard shortcuts are thus "; 
+					alert += "disabled. Sorry."; 
+					Alert.show(alert , 'Warning', mx.controls.Alert.OK)
 					oldStageWidth = stage.stageWidth;
 					oldStageHeight = stage.stageHeight;
 					stage.displayState = StageDisplayState.FULL_SCREEN;
@@ -164,6 +169,7 @@
 			}
 
 			private function processFileHandler(event:MenuEvent): void {
+				statusBar.visible = true;
 				bytes = event.data[0];				
 				bytes.position = 0;
 				
@@ -180,6 +186,7 @@
 			}
 			
 			private function GEDCompleteHandler(event:GEDCompleteEvent): void {
+				mainCanvas.visible = true;
 				ged = rawged;
 				dispatchEvent(new UpdateGEDataEvent([rawged,ged]));
 				dispatchEvent(new UpdateStatusBarEvent("")); 			
