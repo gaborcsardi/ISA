@@ -77,7 +77,10 @@
 				stage.addEventListener(Event.RESIZE, resizeHandler);
 				stage.addEventListener(MenuEvent.FULLSCREEN, toggleFullScreenHandler);
 				
-				filename = Application.application.parameters.filename;
+				filename = "";
+				if ( Application.application.parameters.filename ) { 
+					filename = Application.application.parameters.filename;
+				}
 				if ( filename != "" ) {
 					statusBar.visible = true;
 					var request:URLRequest = new URLRequest(filename);
