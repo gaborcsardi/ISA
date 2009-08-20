@@ -5,23 +5,49 @@
 \description{Plot mean expression values for two sets of samples,
   against each other.}
 \usage{
-mnplot (x, eset, data, group, \dots)
+mnplot (x, expset, group, \dots)
 ISAmnplot (modules, number, eset, norm = c("raw", "feature", "sample"),
-     data = annotation(modules), group, \dots)
+     group, \dots)
 }
 \arguments{
-  \item{x}{}
-  \item{eset}{}
-  \item{data}{}
-  \item{group}{}
-  \item{\dots}{}
-  \item{modules}{}
-  \item{number}{}
-  \item{norm}{}
+  \item{x}{A character vector, the feature names for which the plot is
+    created.}
+  \item{expset}{An \code{\link[biobase]{ExpressionSet}} object, or an
+    expression matrix, with row names as feature names.}
+  \item{eset}{An \code{ExpressionSet} or \code{ISAExpressionSet}
+    object. If an \code{ExpressionSet} object is
+    supplied (and the \code{norm} argument is not set to \sQuote{raw}),
+    then it is normalised by calling \code{\link{ISA.normalize}} on it.
+    A subset of \code{eset} is selected that corresponds to
+    the features included in \code{modules}.
+  }
+  \item{norm}{Character constant, specifies whether and how to normalize
+    the expression values to plot. \sQuote{raw} plots the raw expression
+    values, \sQuote{feature} the expression values scaled and centered
+    for each feature (=gene) separately and if \sQuote{sample} is
+    specified then the expression values are centered and scaled
+    separately for each sample.}
+  \item{group}{A factor that defines two groups to plot one against the
+    other.}
+  \item{modules}{An \code{\link{ISAModules}} object.}
+  \item{number}{A numeric scalar, the number of the module for which the
+    plot is created.}
+  \item{\dots}{Additional arguments, they are passed to the
+    \code{\link[graphics]{plot}} function.}
 }
-\details{}
-\value{}
-\author{}
+\details{
+  \code{mnplot} plots two group-means against each other, the mean
+  expression of all the specified probes. The two groups are specified
+  as a factor with two levels.
+
+  \code{ISAmnplot} calls \code{mnplot} and plots the mean expression of
+  genes in an ISA module, again, for two groups.
+}
+\value{
+  Both functions return invisibly a matrix with two lines, the mean
+  expression values for the two groups, for all the specified genes.
+}
+\author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
 \references{}
 \seealso{The \code{\link[annotate]{GOmnplot}} and
   \code{\link[annotate]{KEGGmnplot}} functions in the \code{annotate}

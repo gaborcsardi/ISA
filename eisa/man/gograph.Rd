@@ -17,6 +17,10 @@ gograph.plot (graph, coords = FALSE, ...)
   \item{label.cex}{Numeric scalar, factor for the label sizes,
     e.g. \sQuote{2} means double size compared to the default.}
   \item{GOGRAPHS,go.terms}{These are for internal use only.}
+  \item{graph}{An \code{igraph} graph, as returned by the \code{gograph}
+    function.}
+  \item{coords}{Logical scalar, whether to return the coordinates of the
+    vertices on the plot.}
 }
 \details{
   A GO plot can be created in two steps. \code{gograph} creates an
