@@ -640,27 +640,27 @@ overlap.plot <- function(graph, xsize=400, ysize=400,
   coords
 }
 
-mnplot <- function(x, eset, data, group, ...) {
-  if (is(eset, "ExpressionSet")) {
-    cont <- x %in% featureNames(eset)
-    if (any(!cont)) {
-      warning("Some features were dropped.")
-      x <- x[cont]
-    }
-    dataM <- exprs(eset)[x,]
-  } else {
-    cont <- x %in% rownames(eset)
-    if (!any(cont)) {
-      warning("Some features were dropped.")
-      x <- x[cont]
-    }
-    dataM <- eset[x != 0,]
-  }
-  tts = apply(dataM, 1, function(x) sapply(split(x, group), 
-    mean))
-  rn = row.names(tts)
+mnplot <- function(x, expset, group, ...) {
   if (length(levels(factor(group))) != 2) 
     stop("only works for factors with two levels")
+  
+  if (is(expset, "ExpressionSet")) {
+    cont1 <- x %in% featureNames(expset)
+    if (any(!cont1)) {
+      warning("Some features were dropped.")
+      x <- x[cont1]
+    }
+    dataM1 <- exprs(expset)[x,,drop=FALSE]
+  } else {
+    cont1 <- x %in% rownames(expset)
+    if (!any(cont1)) {
+      warning("Some features were dropped.")
+      x <- x[cont1]
+    }
+    dataM1 <- expset[x,,drop=FALSE]
+  }
+  tts = apply(dataM1, 1, function(x) sapply(split(x, group), mean))
+  rn = row.names(tts)
   plot(tts[1, ], tts[2, ], xlab = rn[1], ylab = rn[2], ...)
   abline(a = 0, b = 1)
   invisible(tts)
@@ -679,19 +679,25 @@ select.eset <- function(eset, modules, norm=c("raw", "feature", "sample")) {
   }
   eset
 }
-  
 
 ISAmnplot <- function(modules, number, eset,
                       norm=c("raw", "feature", "sample"),
-                      data=annotation(modules), group, ...) {
-  x <- getFeatureNames(modules, number)[[1]]
+                      group, ...) {
+
+  if (length(levels(factor(group))) != 2) 
+    stop("only works for factors with two levels")
+  
+  x <- getFeatureMatrix(modules, mods=number)
+  xx <- rownames(x)[x > 0]
+  yy <- rownames(x)[x < 0]
   eset <- select.eset(eset, modules, norm)
-  mnplot(x, eset, data, group, ...)
+  mnplot(c(xx, yy), expset=eset, group=group,
+         col=c(rep("red", length(xx)), rep("green", length(yy))), ...)
 }
 
 ISA2heatmap <- function(modules, module, eset,
                         norm=c("raw", "feature", "sample"),
-                        scale="none", ...) {
+                        scale=c("none", "row", "column"), ...) {
 
   eset <- select.eset(eset, modules, norm)
   x <- getFeatureNames(modules, module)[[1]]
