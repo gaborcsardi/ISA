@@ -56,7 +56,7 @@ ISA <- function(data,
   }
 
   if (is.function(flist)) {
-    require(genefilter)
+    library(genefilter)
     selected <- genefilter(data, flist)
     data <- data[selected,]
   } else if (! is.na(flist)) {

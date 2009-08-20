@@ -96,7 +96,7 @@ setMethod("getFeatureMatrix", signature(object="ISAModules"),
               res <- res != 0
             }
             if (sparse) {
-              require(Matrix)
+              library(Matrix)
               res <- Matrix(res, sparse=TRUE)
             }
             res
@@ -113,7 +113,7 @@ setMethod("getSampleMatrix", signature(object="ISAModules"),
               res <- res != 0
             }
             if (sparse) {
-              require(Matrix)
+              library(Matrix)
               res <- Matrix(res, sparse=TRUE)
             }
             res

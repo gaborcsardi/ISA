@@ -76,9 +76,9 @@ ISA.KEGG <- function(modules,
 
   isa2:::isa.status("Calculating KEGG enrichment", "in")
   
-  require(paste(sep="", ann, ".db"), character.only=TRUE)
-  require(Category)
-  require(KEGG.db)
+  library(paste(sep="", ann, ".db"), character.only=TRUE)
+  library(Category)
+  library(KEGG.db)
 
   ENTREZ <- get(paste(sep="", ann, "ENTREZID"))
 

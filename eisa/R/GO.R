@@ -163,7 +163,7 @@ ISA.GO <- function(modules,
 
   isa2:::isa.status("Calculating GO enrichment", "in")
   
-  require(paste(sep="", ann, ".db"), character.only=TRUE)
+  library(paste(sep="", ann, ".db"), character.only=TRUE)
   
   ENTREZ <- get(paste(sep="", ann, "ENTREZID"))
 

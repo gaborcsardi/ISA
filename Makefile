@@ -105,7 +105,7 @@ REVVIGNETTES=RExpressionView/inst/doc/ExpressionView.vignette \
 
 RExpressionView/inst/ExpressionView.swf: $(EVFILES)
 	cd ExpressionView/src && \
-		mxmlc -compiler.library-path+=../libs/flexlib.swc,../libs/AlivePDF.swc \
+		mxmlc -compiler.library-path+=../libs/AlivePDF.swc \
 			-use-network=false ExpressionView.mxml
 	cp ExpressionView/src/$(@F) $(@)
 

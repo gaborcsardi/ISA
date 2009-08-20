@@ -85,7 +85,7 @@ setMethod("summary", signature(object="ListHyperGResult"),
 setMethod("htmlReport", signature(r="ListHyperGResult"),
           function(r, file="", append=FALSE, label="", digits=3,
                    summary.args=NULL) {
-            require(xtable)
+            library(xtable)
             summ <- do.call("summary", c(list(r), summary.args))
             res <- lapply(summ, html.df, label=label, digits=digits,
                           display=c("s", "g", "g", "g", "g", "g"))

@@ -4,8 +4,8 @@ gograph <- function(table, colbar.length=30, label.cex=1, GOGRAPHS=NULL,
 
   isa2:::isa.status("Creating a GO graph", "in")
   
-  require(GO.db)
-  require(igraph)
+  library(GO.db)
+  library(igraph)
   
   terms <- rownames(table)
   pval <- table[,1]
@@ -565,10 +565,10 @@ overlap <- function(isares, algorithm=c("mds", "fr", "drl"), edge.limit=0.5) {
 
   genes <- isares$genes
 
-  require(igraph)
+  library(igraph)
 
   if (algorithm=="mds") {
-    require(MASS)
+    library(MASS)
     B <- cor(genes)
     A <- abs(B)
     B [ A < edge.limit ] <- 0

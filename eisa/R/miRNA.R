@@ -73,10 +73,10 @@ ISA.miRNA <- function(modules,
 
   org <- getOrganism(modules)
   short.organism <- abbreviate(org, 2)
-  require(paste(sep=".", "targetscan", short.organism, "eg.db"),
+  library(paste(sep=".", "targetscan", short.organism, "eg.db"),
                 character.only=TRUE)
-  require(paste(sep="", ann, ".db"), character.only=TRUE)
-  require(Category)
+  library(paste(sep="", ann, ".db"), character.only=TRUE)
+  library(Category)
 
   ENTREZ <- get(paste(sep="", ann, "ENTREZID"))
 

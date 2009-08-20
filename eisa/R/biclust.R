@@ -1,6 +1,6 @@
 
 setAs(from="Biclust", to="ISAModules", def=function(from) {
-  require(biclust)
+  library(biclust)
   new("ISAModules",
       genes=from@RowxNumber,
       conditions=t(from@NumberxCol),
@@ -9,7 +9,7 @@ setAs(from="Biclust", to="ISAModules", def=function(from) {
 })
 
 setAs(from="ISAModules", to="Biclust", def=function(from) {
-  require(biclust)
+  library(biclust)
   new("Biclust", Parameters=list(seeddata=from@seeddata,
                    rundata=from@rundata),
       RowxNumber=from@genes != 0,

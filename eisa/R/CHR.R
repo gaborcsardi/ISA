@@ -16,7 +16,7 @@ setMethod("categoryToEntrezBuilder",
            annotation <- p@annotation
            org <- get(paste(sep="", annotation, "ORGANISM"))
            org <- abbreviate(org, 2)
-           require(paste(sep="", "org.", org, ".eg.db"), character.only=TRUE)
+           library(paste(sep="", "org.", org, ".eg.db"), character.only=TRUE)
            CHR <- get(paste(sep="", "org.", org, ".egCHR"))
            CHR <- as.matrix(toTable(CHR))
 
@@ -38,7 +38,7 @@ setMethod("universeBuilder", signature=(p="CHRListHyperGParams"),
             annotation <- p@annotation
             org <- get(paste(sep="", annotation, "ORGANISM"))
             org <- abbreviate(org, 2)
-            require(paste(sep="", "org.", org, ".eg.db"), character.only=TRUE)
+            library(paste(sep="", "org.", org, ".eg.db"), character.only=TRUE)
             CHR <- get(paste(sep="", "org.", org, ".egCHR"))
             CHR <- as.matrix(toTable(CHR))
             entrez <- unique(CHR[,1])
@@ -62,7 +62,7 @@ ISA.CHR <- function(modules,
 
   isa2:::isa.status("Calculating chromosome enrichment", "in")
   
-  require(paste(sep="", ann, ".db"), character.only=TRUE)
+  library(paste(sep="", ann, ".db"), character.only=TRUE)
 
   ENTREZ <- get(paste(sep="", ann, "ENTREZID"))
 
