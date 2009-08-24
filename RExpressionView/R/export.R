@@ -34,7 +34,9 @@ toExpressionView <- function(modules, eset, order, filename="",
 	writeBin(as.integer(nModules), con, 4, endian="big")
 
         norm <- match.arg(norm)
-        Data <- as.vector(eisa:::select.eset(eset, modules, norm))
+        Data <- eisa:::select.eset(eset, modules, norm)
+        Data <- Data[ geneMaps[[1]], sampleMaps[[1]] ]
+        Data <- as.vector(Data)
         
 	Data.min <- min(Data)
 	Data.max <- max(Data)
