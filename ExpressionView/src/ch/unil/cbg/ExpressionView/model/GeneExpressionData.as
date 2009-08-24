@@ -317,9 +317,10 @@ package ch.unil.cbg.ExpressionView.model {
 					samplep = SamplesLookup[module][sample];
 				}
 				var k:int = (genep-1) * nSamples + samplep - 1;
+				var k2:int = (samplep-1) * nGenes + genep - 1;
 				var modules:Array = [];
-				if ( k >= 0 && k < ModulesLookup.length ) {
-					modules = ModulesLookup[k];
+				if ( k2 >= 0 && k2 < ModulesLookup.length ) {
+					modules = ModulesLookup[k2];
 				}
 				Data.position = k * 8;
 				var data:Number = Data.readDouble();
