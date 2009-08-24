@@ -316,7 +316,7 @@ package ch.unil.cbg.ExpressionView.model {
 					genep = GenesLookup[module][gene];
 					samplep = SamplesLookup[module][sample];
 				}
-				var k:int = (samplep-1) * nGenes + genep - 1;
+				var k:int = (genep-1) * nSamples + samplep - 1;
 				var modules:Array = [];
 				if ( k >= 0 && k < ModulesLookup.length ) {
 					modules = ModulesLookup[k];
@@ -464,7 +464,7 @@ package ch.unil.cbg.ExpressionView.model {
 						
 				for ( var sample:int = 1; sample <= nSamples; ++sample ) {
 					var value:Number = Data.readDouble();
-					var red:Number; var green:Number;
+					var red:uint; var green:uint;
 					if ( value >= 0 ) {
 						red = value * 255;
 						green = 0;
