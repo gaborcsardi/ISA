@@ -1,13 +1,14 @@
-ExpressionView <- function(eisamodules, gedata, order) {
+ExpressionView <- function(modules, eset, order) {
 
   filename <- paste(tempfile(), sep="", ".ged")
-  toExpressionView(eisamodules, gedata, order, filename=filename)
+  toExpressionView(modules, eset, order, filename=filename)
   swf <- system.file("ExpressionView.html", package="ExpressionView")
   url <- URLencode(paste("file://", swf, sep="", "?filename=", filename))
   browseURL(url)
 }
 
-toExpressionView <- function(eisamodules, gedata, order, filename="") {
+toExpressionView <- function(modules, eset, order, filename="",
+                             norm=c("sample", "feature", "raw")) {
 	
 	library(XML)
 	
@@ -20,49 +21,28 @@ toExpressionView <- function(eisamodules, gedata, order, filename="") {
 	geneMaps <- order$genes
 	sampleMaps <- order$samples
 	
-	Genes <- featureNames(eisamodules);
-	Samples <- sampleNames(eisamodules);
+	Genes <- featureNames(modules);
+	Samples <- sampleNames(modules);
 		
-	nGenes <- (dim(eisamodules))[1]
-	nSamples <- (dim(eisamodules))[2]
-	nModules <- length(eisamodules)
+	nGenes <- (dim(modules))[1]
+	nSamples <- (dim(modules))[2]
+	nModules <- length(modules)
 
 	writeBin("ExpressionViewFile", con, endian="big")
-	writeBin(nGenes, con, 4, endian="big")
-	writeBin(nSamples, con, 4, endian="big")
-	writeBin(nModules, con, 4, endian="big")
+	writeBin(as.integer(nGenes), con, 4, endian="big")
+	writeBin(as.integer(nSamples), con, 4, endian="big")
+	writeBin(as.integer(nModules), con, 4, endian="big")
 
-	GenesLookup = c(0);
-	for ( gene in 1:nGenes ) {
-		GenesLookup[gene] <- which(featureNames(gedata)==Genes[gene])
-	}
-	SamplesLookup = c(0);
-	for ( sample in 1:nSamples ) {
-		SamplesLookup[sample] <- which(sampleNames(gedata)==Samples[sample])
-	}
-	
-	allData <- exprs(gedata)
-	Data <- mat.or.vec(nSamples, nGenes)
-	for ( sample in 1:nSamples ) {
-		for ( gene in 1:nGenes ) {
-			Data[sample, gene] <- allData[GenesLookup[geneMaps[[1]][gene]], SamplesLookup[sampleMaps[[1]][sample]]]
-		}
-	}		
-
-	Data <- t(isa.normalize(Data)[[1]])
+        norm <- match.arg(norm)
+        Data <- as.vector(eisa:::select.eset(eset, modules, norm))
+        
 	Data.min <- min(Data)
 	Data.max <- max(Data)
 	Data.delta <- Data.max - Data.min
 
-
-	for ( sample in 1:nSamples ) {
-		for ( gene in 1:nGenes ) {
-			value <- Data[sample, gene]
-			value <- (value - Data.min) / Data.delta * 2 - 1
-			writeBin(value, con, 4, endian="big")
-		}
-	}
-	
+        Data <- (Data - Data.min) / Data.delta * 2 -1
+        writeBin(Data, con, endian="big")
+        	
 	#<isadata>
 	
 	#	<experimentdata>
@@ -101,18 +81,18 @@ toExpressionView <- function(eisamodules, gedata, order, filename="") {
 	xmldata = xmlTree("isadata")
 	
 		# get gene info
-		ann <- annotation(gedata)
+		ann <- annotation(eset)
 		library(paste(ann, sep="", ".db"), character.only=TRUE)
 		symbol.table <- toTable(get(paste(ann, "SYMBOL", sep="")))
 		entrez.table <- toTable(get(paste(ann, "ENTREZID", sep="")))
 
 		xmldata$addNode("experimentdata", close = FALSE)
-			xmldata$addNode("title", gedata@experimentData@title)
-			xmldata$addNode("name", gedata@experimentData@name)
-			xmldata$addNode("lab", gedata@experimentData@lab)
-			xmldata$addNode("abstract", gedata@experimentData@abstract)
-			xmldata$addNode("url", gedata@experimentData@url)
-			xmldata$addNode("annotation", gedata@annotation)
+			xmldata$addNode("title", eset@experimentData@title)
+			xmldata$addNode("name", eset@experimentData@name)
+			xmldata$addNode("lab", eset@experimentData@lab)
+			xmldata$addNode("abstract", eset@experimentData@abstract)
+			xmldata$addNode("url", eset@experimentData@url)
+			xmldata$addNode("annotation", eset@annotation)
 			organism <- get(paste(ann, "ORGANISM", sep=""))
 			xmldata$addNode("organism", organism)
 		xmldata$closeTag()
@@ -148,7 +128,7 @@ toExpressionView <- function(eisamodules, gedata, order, filename="") {
 			xmldata$addNode("shortsampletags", close = FALSE)
 			xmldata$addNode("tag", "id")
 			xmldata$addNode("tag", "name")
-			temp <- rownames(phenoData(gedata)@varMetadata)
+			temp <- rownames(phenoData(eset)@varMetadata)
 			if ( length(temp) >= 2 ) {			
 				for ( i in 2:length(temp) ) {
 					xmldata$addNode("tag", temp[i])
@@ -159,7 +139,7 @@ toExpressionView <- function(eisamodules, gedata, order, filename="") {
 			xmldata$addNode("longsampletags", close = FALSE)
 			xmldata$addNode("tag", "id")
 			xmldata$addNode("tag", "name")
-			temp <- phenoData(gedata)@varMetadata[[1]]
+			temp <- phenoData(eset)@varMetadata[[1]]
 			if ( length(temp) >= 2 ) {
 				for ( i in 2:length(temp) ) {
 					xmldata$addNode("sampletag", temp[i])
@@ -171,8 +151,8 @@ toExpressionView <- function(eisamodules, gedata, order, filename="") {
 				xmldata$addNode("sample", close = FALSE)
 					xmldata$addNode("tag0", sample)
 					xmldata$addNode("tag1", Samples[sampleMaps[[1]][sample]])
-					if ( dim(gedata@phenoData@data)[2] != 0 ) {
-						temp <- gedata@phenoData@data[sampleMaps[[1]][sample],]
+					if ( dim(eset@phenoData@data)[2] != 0 ) {
+						temp <- eset@phenoData@data[sampleMaps[[1]][sample],]
 						for ( i in 2:length(temp) ) {
 							xmldata$addNode(paste("tag", i, sep=""), temp[i])
 						}
@@ -187,7 +167,7 @@ toExpressionView <- function(eisamodules, gedata, order, filename="") {
 			xmldata$addNode("shortmoduletags", close = FALSE)
 			xmldata$addNode("tag", "id")
 			xmldata$addNode("tag", "name")
-			temp <- colnames(eisamodules@seeddata)
+			temp <- colnames(modules@seeddata)
 			if ( length(temp) >= 1 ) {
 				for ( i in 1:length(temp) ) {
 					xmldata$addNode("tag", temp[i])
@@ -198,7 +178,7 @@ toExpressionView <- function(eisamodules, gedata, order, filename="") {
 			xmldata$addNode("longmoduletags", close = FALSE)
 			xmldata$addNode("tag", "id")
 			xmldata$addNode("tag", "name")
-			temp <- colnames(eisamodules@seeddata)
+			temp <- colnames(modules@seeddata)
 			if ( length(temp) >= 1 ) {
 				for ( i in 1:length(temp) ) {
 					xmldata$addNode("tag", temp[i])
@@ -210,16 +190,16 @@ toExpressionView <- function(eisamodules, gedata, order, filename="") {
 			xmldata$addNode("module", close = FALSE)
 				xmldata$addNode("tag0", module)
 				xmldata$addNode("tag1", paste("module", module))
-				if ( length(colnames(eisamodules@seeddata)) != 0 ) {
-					temp <- eisamodules@seeddata[module,]
+				if ( length(colnames(modules@seeddata)) != 0 ) {
+					temp <- modules@seeddata[module,]
 					for ( i in 1:length(temp) ) {
 						xmldata$addNode(paste("tag", i+1, sep=""), temp[i])
 					}
 				}
 				
-				genes = as.matrix(eisamodules@genes[,module]);
-				temp <- mat.or.vec(getNoFeatures(eisamodules)[module],1)
-				genesp <- mat.or.vec(getNoFeatures(eisamodules)[module],1)
+				genes = as.matrix(modules@genes[,module]);
+				temp <- mat.or.vec(getNoFeatures(modules)[module],1)
+				genesp <- mat.or.vec(getNoFeatures(modules)[module],1)
 				i = 1;
 				intersectingmodulesgenes = list();
 				for ( gene in 1:nGenes ) {
@@ -229,7 +209,7 @@ toExpressionView <- function(eisamodules, gedata, order, filename="") {
 						
 						for ( modulep in 1:nModules ) {
 							if ( module != modulep ) {
-								if ( eisamodules@genes[gene, modulep] != 0 ) {
+								if ( modules@genes[gene, modulep] != 0 ) {
 									intersectingmodulesgenes <- append(intersectingmodulesgenes, modulep)
 								}
 							}
@@ -242,9 +222,9 @@ toExpressionView <- function(eisamodules, gedata, order, filename="") {
 				}
 				xmldata$addNode("containedgenes", toString(genesp))
 
-				samples = as.matrix(eisamodules@conditions[,module]);
-				temp <- mat.or.vec(getNoSamples(eisamodules)[module],1)
-				samplesp <- mat.or.vec(getNoSamples(eisamodules)[module],1)
+				samples = as.matrix(modules@conditions[,module]);
+				temp <- mat.or.vec(getNoSamples(modules)[module],1)
+				samplesp <- mat.or.vec(getNoSamples(modules)[module],1)
 				i = 1;
 				intersectingmodulessamples = list();
 				for ( sample in 1:nSamples ) {
@@ -254,7 +234,7 @@ toExpressionView <- function(eisamodules, gedata, order, filename="") {
 						
 						for ( modulep in 1:nModules ) {
 							if ( module != modulep ) {
-								if ( eisamodules@conditions[sample, modulep] != 0 ) {
+								if ( modules@conditions[sample, modulep] != 0 ) {
 									intersectingmodulessamples <- append(intersectingmodulessamples, modulep)
 								}
 							}

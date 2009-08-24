@@ -79,11 +79,11 @@ package ch.unil.cbg.ExpressionView.model {
 			nSamples = bytes.readInt();
 			nModules = bytes.readInt();
 						
-			bytes.readBytes(Data, 0, (nGenes * nSamples)*4);
+			bytes.readBytes(Data, 0, (nGenes * nSamples)*8);
 			
 			// get XML Data
 			XML.ignoreWhitespace = true;
-			bytes.position = (nGenes * nSamples + 3) * 4 + 19;
+			bytes.position = (nGenes * nSamples) * 8 + 3 * 4 + 19;
 			var length:int = bytes.length - bytes.position;
 			XMLData = new XML(bytes.readUTFBytes(length));
 
@@ -321,8 +321,8 @@ package ch.unil.cbg.ExpressionView.model {
 				if ( k >= 0 && k < ModulesLookup.length ) {
 					modules = ModulesLookup[k];
 				}
-				Data.position = k * 4;
-				var data:Number = Data.readFloat();
+				Data.position = k * 8;
+				var data:Number = Data.readDouble();
 				return new Array(geneDescription, sampleDescription, modules, data);
 			}
 			return null;
@@ -463,7 +463,7 @@ package ch.unil.cbg.ExpressionView.model {
 				}
 						
 				for ( var sample:int = 1; sample <= nSamples; ++sample ) {
-					var value:Number = Data.readFloat();
+					var value:Number = Data.readDouble();
 					var red:Number; var green:Number;
 					if ( value >= 0 ) {
 						red = value * 255;
