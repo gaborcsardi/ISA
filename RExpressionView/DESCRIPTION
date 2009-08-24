@@ -9,7 +9,6 @@ Description: ExpressionView visualizes possibly overlapping biclusters
 	algorithm (eisa package) or the algorithms in the biclust
 	package. The program itself was developed using Adobe Flex and
 	runs in a flash-enabled web browser.
-Depends: 
-Suggests: isa2, eisa, biclust
+Depends: isa2, eisa
 License: GPL
 Packaged: Mon Jul 28 09:19:47 2008; csardi
