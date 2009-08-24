@@ -1,0 +1,133 @@
+% \VignetteIndexEntry{Running ISA on multiple CPUs}
+\documentclass{article}
+\usepackage{ragged2e}
+
+\newcommand{\Rfunction}[1]{\texttt{#1}}
+\newcommand{\Rpackage}[1]{\texttt{#1}}
+\newcommand{\Rclass}[1]{\texttt{#1}}
+\newcommand{\Rargument}[1]{\textsl{#1}}
+\newcommand{\filename}[1]{\texttt{#1}}
+\newcommand{\listentry}[1]{\texttt{#1}}
+
+\begin{document}
+
+\setkeys{Gin}{width=\textwidth}
+
+\title{Running ISA in parallel with the \Rpackage{snow} package}
+\author{G\'abor Cs\'ardi}
+\maketitle
+
+% \RaggedRight
+
+% \tableofcontents
+
+<<Roptions,echo=FALSE,results=hide>>=
+options(width=60)
+options(continue=" ")
+@ 
+
+\section{Running ISA in parallel}
+
+In this document we show a little example on how to speed up ISA
+analysis by running the ISA iterations in parallel, on a computer
+cluster, or a multiprocessor machine.
+
+Since a typical ISA analysis consists of using a range of row/column
+and these runs are independent of each other; it is trivial to
+parallelize the task by performing the iterations for different
+threshold parameters on different processors or computers. Here we
+show an example on how to do this easily with the \Rpackage{snow} and
+the \Rpackage{Rmpi} packages:
+<<parallelloadpackage>>=
+library(isa2)
+library(snow)
+library(Rmpi)
+@ 
+
+We generate some simple in-silico data.
+<<paralleldata>>=
+pdata <- isa.in.silico()
+@
+
+Next, we create the MPI cluster, with eight working nodes. You need to have a
+working MPI installation for this. See more in the documentation of
+the \Rpackage{Rmpi} and \Rpackage{snow} packages.
+<<createcluster>>=
+clu <- makeMPIcluster(8)
+invisible(clusterEvalQ(clu, library(isa2)))
+clusterExport(clu, "pdata")
+@ 
+
+Create a big matrix in which each row is a combination of the
+threshold parameters.
+<<parthr>>=
+thr <- seq(1,3,by=0.2)
+thr.list <- expand.grid(thr, thr)
+@ 
+
+First we run the ISA on a single processor only, and measure the
+running time.
+<<seqrun,cache=TRUE>>=
+system.time(modules <- isa(pdata[[1]], thr.row=thr, thr.col=thr))
+@ 
+
+Let us now do a parallel run, again, with measuring the running
+time. If you are really running this on multiple CPUs, then it is much
+faster.
+<<parrun,cache=TRUE>>=
+system.time(modules.par <- parApply(clu, thr.list, 1, function(x) {
+  isa(pdata[[1]], thr.row=x[1], thr.col=x[2])
+}))
+@
+
+Finally, stop the cluster.
+<<closecluster>>=
+stopCluster(clu)
+@ 
+
+\section{Session information}
+
+The version number of R and packages loaded for generating this
+vignette were:
+
+<<sessioninfo,results=tex,echo=FALSE>>=
+toLatex(sessionInfo())
+@ 
+
+\bibliographystyle{apalike}
+
+\begin{thebibliography}{}
+
+\bibitem[Bergmann et~al., 2003]{isa}
+Bergmann, S., Ihmels, J., and Barkai, N. (2003).
+\newblock Iterative signature algorithm for the analysis of large-scale gene
+  expression data.
+\newblock {\em Phys Rev E Nonlin Soft Matter Phys}, page 031902.
+
+\bibitem[Cs\'ardi, 2009]{isapackage}
+Cs\'ardi, G. (Apr 1, 2009).
+\newblock {\em isa2: The Iterative Signature Algorithm}.
+\newblock R package version 0.1.
+
+\bibitem[Ihmels, 2002]{sa}
+Ihmels, J., Friedlander, G., Bergmann, S., Sarig, O., Ziv, Y., 
+Barkai, N. (2002).
+\newblock Revealing modular organization in the yeast transcriptional
+  network.
+\newblock { \em Nat Genet }, page 370--7.
+
+\bibitem[Ihmels, 2004]{isamod}
+Ihmels, J., Bergmann, S., Barkai, N. (2004).
+\newblock Defining transcription modules using large-scale gene
+  expression data.
+\newblock { \em Bioinformatics}, page 1993--2003.
+
+\bibitem[Kaiser, 2009]{biclust}
+Sebastian Kaiser, Rodrigo Santamaria, Roberto Theron, Luis Quintales
+and Friedrich Leisch. (2009). 
+\newblock {\em biclust: BiCluster Algorithms}. 
+\newblock R package version 0.7.2.
+
+\end{thebibliography}
+
+\end{document}
