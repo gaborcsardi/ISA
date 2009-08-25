@@ -7,6 +7,13 @@
 
 #include "orderclusters.h"
 
+#ifdef STANDALONE
+	#define print printf
+#else
+	#include <Rdefines.h>
+	#define print Rprintf
+#endif
+
 using namespace std;
 
 int Clusters::random(int x, int y) {
@@ -17,17 +24,17 @@ int Clusters::elapsedtime() {
 	return (clock() - starttime) / CLOCKS_PER_SEC;
 }
 
-Clusters::Clusters(vector<vector<int> > _matrix) {
+Clusters::Clusters(vector<vector<int> > _data, vector<int> _order) {
 	
 	starttime = clock();
 	
-	matrix = _matrix;
-	nSlots = matrix.size();
-	nClusters = matrix[0].size();
+	data = _data;
+	nSlots = data.size();
+	nClusters = data[0].size();
 
 	order.resize(nSlots);
 	for ( int slot = 0; slot < nSlots; slot++ ) {
-		order[slot] = slot;
+		order[slot] = _order[slot];
 	}
 	
 	multiplicity.resize(nSlots, 1);
@@ -38,13 +45,14 @@ Clusters::Clusters(vector<vector<int> > _matrix) {
 Clusters::Clusters(int _nClusters, int _nSlots) {
 
 	starttime = clock();
+	status = 0;
 
 	nClusters = _nClusters;
 	nSlots = _nSlots;
 	
-	matrix.resize(nSlots);
+	data.resize(nSlots);
 	for ( int slot = 0; slot < nSlots; slot++ ) {
-		matrix[slot].resize(nClusters, 0);
+		data[slot].resize(nClusters, 0);
 	}
 
 	order.resize(nSlots);
@@ -60,14 +68,14 @@ Clusters::Clusters(int _nClusters, int _nSlots) {
 void Clusters::orderedsample() {
 
 	if ( debug > 0 ) {
-		printf("orderedsample()\n");
+		print("orderedsample()\n");
 	}
 
 	for ( int cluster = 0; cluster < nClusters; cluster++ ) {
 		int left = random(0, nSlots-1);
 		int right = random(left, nSlots-1);	
 		for ( int slot = left; slot <= right; slot++ ) {
-			matrix[slot][cluster] = 1;
+			data[slot][cluster] = 1;
 		}
 		optimallength[cluster] = right - left + 1;
 	}
@@ -77,56 +85,29 @@ void Clusters::orderedsample() {
 void Clusters::randomsample() {
 
 	if ( debug > 0 ) {
-		printf("randomsample()\n");
+		print("randomsample()\n");
 	}
 
 	for ( int cluster = 0; cluster < nClusters; cluster++ ) {
 		for ( int slot = 0; slot < nSlots; slot++ ) {
 			if ( random(1,10) > 6 ) {
-				matrix[slot][cluster] = 1;
+				data[slot][cluster] = 1;
 			}
 		}
 	}
 	
 };
 
-void Clusters::complexify() {
-	
-	if ( debug > 0 ) {
-		printf("complexify()\n");
-	}
-	
-	vector<int> neworder;
-	for ( int slot = 0; slot < nSlots; slot++ ) {
-		for ( set<int>::iterator slotp = redundantslots[order[slot]].begin(); slotp != redundantslots[order[slot]].end(); slotp++ ) {
-			neworder.push_back(*slotp);
-		}
-	}
-	if ( redundantslots.size() > nSlots ) {
-		for ( set<int>::iterator slotp = redundantslots[order[nSlots]].begin(); slotp != redundantslots[order[nSlots]].end(); slotp++ ) {
-			neworder.push_back(*slotp);
-		}
-	}
-	
-	nSlots = neworder.size();
-	order.clear();
-	order = neworder;
-	
-	matrix.clear();
-	matrix = initialmatrix;
-	
-	multiplicity.clear();
-	multiplicity.resize(nSlots, 1);
-}
-
 void Clusters::simplify() {
 
 	if ( debug > 0 ) {
-		printf("simplify()\n");
+		print("simplify()\n");
 	}
 	
-	initialmatrix = matrix;
-	vector<vector<int> > newmatrix;
+	initialdata = data;
+	vector<vector<int> > newdata;
+	vector<int> neworder;
+	map<int, int> temporder;
 	set<int> discard;
 	set<int> zeroes;
 	
@@ -139,19 +120,21 @@ void Clusters::simplify() {
 		int mult = 1;
 		set<int> redundant;
 		for ( int slot2 = slot1 + 1; slot2 < nSlots; slot2++ ) {
-			if ( matrix[slot1] == matrix[slot2] ) {
+			if ( data[slot1] == data[slot2] ) {
 				mult++;
 				redundant.insert(slot2);
 				discard.insert(slot2);
 			}
 		}
-		if ( accumulate(matrix[slot1].begin(), matrix[slot1].end(), 0) == 0 ) {
+		if ( accumulate(data[slot1].begin(), data[slot1].end(), 0) == 0 ) {
 			zeroes = redundant;
 			zeroes.insert(slot1);
 			discard.insert(slot1);
 		} else {
-			newmatrix.push_back(matrix[slot1]);
+			newdata.push_back(data[slot1]);
 			multiplicity.push_back(mult);
+			temporder.insert ( pair<int, int>(slot1,newdata.size()-1) );
+
 			redundant.insert(slot1);
 			redundantslots.push_back(redundant);
 		}
@@ -161,29 +144,63 @@ void Clusters::simplify() {
 		redundantslots.push_back(zeroes);
 	}
 	
-	matrix.resize(newmatrix.size());
-	matrix = newmatrix;
-	
-	nSlots = matrix.size();
-	order.resize(nSlots);
+	data.resize(newdata.size());
+	data = newdata;
+
 	for ( int slot = 0; slot < nSlots; slot++ ) {
-		order[slot] = slot;
+		if ( discard.find(order[slot]) == discard.end() ) {
+			neworder.push_back(temporder[order[slot]]);
+		}
 	}
+	order.resize(neworder.size());
+	order = neworder;
+	
+	nSlots = data.size();
 	
 	for ( int cluster = 0; cluster < nClusters; cluster++ ) {
 		int length = 0;
 		for ( int slot = 0; slot < nSlots; slot++ ) {
-			length += matrix[slot][cluster];
+			length += data[slot][cluster];
 		}
 		optimallength[cluster] = length;
 	}
 
 }
 
+void Clusters::complexify() {
+	
+	if ( debug > 0 ) {
+		print("complexify()\n");
+	}
+	
+	vector<int> neworder;
+	for ( int slot = 0; slot < nSlots; slot++ ) {
+		for ( set<int>::iterator slotp = redundantslots[order[slot]].begin(); slotp != redundantslots[order[slot]].end(); slotp++ ) {
+			neworder.push_back(*slotp);
+		}
+	}
+	if ( redundantslots.size() > nSlots ) {
+		for ( set<int>::iterator slotp = redundantslots[nSlots].begin(); slotp != redundantslots[nSlots].end(); slotp++ ) {
+			neworder.push_back(*slotp);
+		}
+	}
+	
+	nSlots = neworder.size();
+	order.clear();
+	order = neworder;
+	
+	data.clear();
+	data = initialdata;
+	
+	multiplicity.clear();
+	multiplicity.resize(nSlots, 1);
+}
+
+
 void Clusters::permute() {
 
 	if ( debug > 0 ) {
-		printf("permute()\n");
+		print("permute()\n");
 	}
 	
 	int slot1 = order.size();
@@ -200,9 +217,12 @@ void Clusters::permute() {
 void Clusters::prearrange() {
 
 	if ( debug > 0 ) {
-		printf("prearrange()\n");
+		print("prearrange()\n");
 	}
-
+	
+	vector<int> oldorder(order);
+	double initialfitness = getfitness();
+	
 	for ( int slot1 = 1; slot1 < nSlots; slot1++ ) {
 
 		double bestfitness = getfitness();
@@ -219,6 +239,13 @@ void Clusters::prearrange() {
 
 	}
 	
+	if ( getfitness() < initialfitness ) {
+		order = oldorder;
+		if ( debug > 1 ) {
+			print("\tinitial order better than prearrangement.\n");
+		}
+	}
+	
 }
 
 double Clusters::getfitness() {
@@ -226,10 +253,10 @@ double Clusters::getfitness() {
 	double result = 0.;
 	
 	for ( int cluster = 0; cluster < nClusters; cluster++ ) {
-		int length = matrix[order[0]][cluster] * multiplicity[order[0]];
+		int length = data[order[0]][cluster] * multiplicity[order[0]];
 		int maxlength = length;
 		for ( int slot = 1; slot < nSlots; slot++ ) {
-			if ( matrix[order[slot]][cluster] ) {
+			if ( data[order[slot]][cluster] ) {
 				length += multiplicity[order[slot]];
 				if ( slot == nSlots - 1 && length > maxlength ) {
 					maxlength = length;					
@@ -252,7 +279,7 @@ double Clusters::getoptimalfitness() {
 	double optimum = 0.;
 	for ( int slot = 0; slot < nSlots; slot++ ) {
 		for ( int cluster = 0; cluster < nClusters; cluster++ ) {
-			optimum += matrix[slot][cluster] * multiplicity[slot];
+			optimum += data[slot][cluster] * multiplicity[slot];
 		}
 	}
 	return optimum;
@@ -324,8 +351,8 @@ int Clusters::findbestposition(int start, int end) {
 		return 0;
 	} else {
 		if ( debug > 1 ) {
-			printf("\t\treposition [%d, %d] (%d)", start, end, (int) initialfitness);
-			printf(" --> [%d, %d] (%d)\n", beststart, beststart + length - 1, (int) bestfitness);
+			print("\t\treposition [%d, %d] (%d)", start, end, (int) initialfitness);
+			print(" --> [%d, %d] (%d)\n", beststart, beststart + length - 1, (int) bestfitness);
 		}
 	}
 	
@@ -343,12 +370,12 @@ int Clusters::reposition(int cluster) {
 		go = false;
 		
 		for ( int start = 0; start < nSlots; start++ ) {
-			if ( matrix[order[start]][cluster] ) {
+			if ( data[order[start]][cluster] ) {
 				continue;
 			}
 			int end;
 			for ( end = start; end < nSlots; end++ ) {
-				if ( !matrix[order[end]][cluster] ) {
+				if ( !data[order[end]][cluster] ) {
 					continue;
 				} else {
 					break;
@@ -390,11 +417,11 @@ int Clusters::exchange(int cluster, int what) {
 	vector<int> possibleslots;
 	for ( int slot = 0; slot < nSlots; slot++ ) {
 		if ( what ) {
-			if ( matrix[order[slot]][cluster] ) {
+			if ( data[order[slot]][cluster] ) {
 				possibleslots.push_back(slot);
 			}
 		} else {
-			if ( !matrix[order[slot]][cluster] ) {
+			if ( !data[order[slot]][cluster] ) {
 				possibleslots.push_back(slot);
 			}			
 		}	
@@ -449,9 +476,9 @@ int Clusters::exchange(int cluster, int what) {
 
 	if ( result && debug > 1 ) {
 		if ( what ) {
-			printf("\t\texchange zeroes: (%d) -> (%d)\n", (int) initialfitness, (int) bestfitness);
+			print("\t\texchange zeroes: (%d) -> (%d)\n", (int) initialfitness, (int) bestfitness);
 		} else {
-			printf("\t\texchange ones: (%d) -> (%d)\n", (int) initialfitness, (int) bestfitness);			
+			print("\t\texchange ones: (%d) -> (%d)\n", (int) initialfitness, (int) bestfitness);			
 		}
 	}
 	return result;
@@ -461,13 +488,14 @@ int Clusters::exchange(int cluster, int what) {
 void Clusters::arrange() {
 
 	if ( debug > 0 ) {
-		printf("arrange()\n");
+		print("arrange()\n");
 	}
 	
 	optimalfitness = getoptimalfitness();
 	double actualfitness;
 	
 	bool go;
+	
 	do {
 		
 		go = false;
@@ -477,13 +505,13 @@ void Clusters::arrange() {
 			if ( elapsedtime() > maxtime && maxtime != 0 ) {
 				go =  false;
 				if ( debug > 0 ) {
-					printf("reached time limit.\n");
+					print("reached time limit.\n");
 				}
 				break;
 			}
 
 			if ( debug > 1 ) {
-				printf("\tcluster %d\n", cluster);
+				print("\tcluster %d\n", cluster);
 			}
 			
 			if ( reposition(cluster) ) {
@@ -501,15 +529,19 @@ void Clusters::arrange() {
 		actualfitness = getfitness();
 		if ( actualfitness == optimalfitness ) {
 			if ( debug > 0 ) {
-				printf("optimal solution found.\n");
+				print("optimal solution found.\n");
 			}
 			break;
 		}
 		
 	} while ( go );
 	
+	if ( elapsedtime() < maxtime || maxtime == 0 ) {
+		status = 1;
+	}
+	
 	if ( debug > 0 ) {
-		printf("reached %4.2f of optimum.\n", actualfitness/optimalfitness);
+		print("reached %4.2f of optimum.\n", actualfitness/optimalfitness);
 	}
 	
 }
@@ -521,12 +553,12 @@ double Clusters::quality() {
 void Clusters::output() {
 	
 	for ( int slot = 0; slot < nSlots; slot++ ) {
-		printf("%3d %3d %3d: ", slot, order[slot], multiplicity[order[slot]]);
+		print("%3d %3d %3d: ", slot, order[slot], multiplicity[order[slot]]);
 		for ( int cluster = 0; cluster < nClusters; cluster++ ) {
-			printf("%d", matrix[order[slot]][cluster]);
+			print("%d", data[order[slot]][cluster]);
 		}
-		printf("\n");
+		print("\n");
 	}
-	printf("fitness: %d\n\n", (int) getfitness());
+	print("fitness: %d\n\n", (int) getfitness());
 	
 }
