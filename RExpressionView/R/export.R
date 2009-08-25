@@ -33,38 +33,26 @@ toExpressionView <- function(modules, eset, order, filename="",
 	writeBin(as.integer(nSamples), con, 4, endian="big")
 	writeBin(as.integer(nModules), con, 4, endian="big")
 
-        norm <- match.arg(norm)
-        Data <- eisa:::select.eset(eset, modules, norm)
-        Data <- Data[ geneMaps[[1]], sampleMaps[[1]] ]
-        Data <- as.vector(t(Data))
+	norm <- match.arg(norm)
+	Data <- eisa:::select.eset(eset, modules, norm)
+	Data <- Data[ geneMaps[[1]], sampleMaps[[1]] ]
+	Data <- as.vector(t(Data))
         
 	Data.min <- min(Data)
 	Data.max <- max(Data)
 	Data.delta <- Data.max - Data.min
 
-<<<<<<< TREE
-        Data <- (Data - Data.min) / Data.delta * 2 -1
-        writeBin(Data, con, endian="big")
-        	
-=======
-
-	for ( sample in 1:nSamples ) {
-		for ( gene in 1:nGenes ) {
-			value <- Data[sample, gene]
-			value <- (value - Data.min) / Data.delta * 2 - 1
-			writeBin(value, con, 4, endian="big")
-		}
-	}
+	Data <- (Data - Data.min) / Data.delta * 2 -1
+	writeBin(Data, con, endian="big")
 
 	library(GO.db)
 	go.table <- toTable(GOTERM)
-	gos <- ISA.GO(biclusts)
+	gos <- ISA.GO(modules)
 
 	library(KEGG.db)
 	kegg.table <- toTable(KEGGPATHID2NAME)
-	keggs <- ISA.KEGG(biclusts)
+	keggs <- ISA.KEGG(modules)
 	
->>>>>>> MERGE-SOURCE
 	#<isadata>
 	
 	#	<experimentdata>
@@ -115,7 +103,8 @@ toExpressionView <- function(modules, eset, order, filename="",
 	#			</keggs>
 	#		</module>
 	#	</modules>
-	#</isadata> 
+	#</isadata>
+	
 	xmldata = xmlTree("isadata")
 	
 		# get gene info
@@ -167,16 +156,10 @@ toExpressionView <- function(modules, eset, order, filename="",
 		xmldata$addNode("samples", close = FALSE)
 		
 			xmldata$addNode("shortsampletags", close = FALSE)
-<<<<<<< TREE
-			xmldata$addNode("tag", "id")
-			xmldata$addNode("tag", "name")
-			temp <- rownames(phenoData(eset)@varMetadata)
-=======
 			xmldata$addNode("tag", "id")		# 0
 			xmldata$addNode("tag", "score")		# 1
 			xmldata$addNode("tag", "name")		# 2
-			temp <- rownames(phenoData(gedata)@varMetadata)
->>>>>>> MERGE-SOURCE
+			temp <- rownames(phenoData(eset)@varMetadata)
 			if ( length(temp) >= 2 ) {			
 				for ( i in 2:length(temp) ) {
 					xmldata$addNode("tag", temp[i])
@@ -185,16 +168,10 @@ toExpressionView <- function(modules, eset, order, filename="",
 			xmldata$closeTag()
 			
 			xmldata$addNode("longsampletags", close = FALSE)
-<<<<<<< TREE
-			xmldata$addNode("tag", "id")
-			xmldata$addNode("tag", "name")
-			temp <- phenoData(eset)@varMetadata[[1]]
-=======
 			xmldata$addNode("tag", "id")		# 0
 			xmldata$addNode("tag", "score")		# 1
 			xmldata$addNode("tag", "name")		# 2
-			temp <- phenoData(gedata)@varMetadata[[1]]
->>>>>>> MERGE-SOURCE
+			temp <- phenoData(eset)@varMetadata[[1]]
 			if ( length(temp) >= 2 ) {
 				for ( i in 2:length(temp) ) {
 					xmldata$addNode("tag", temp[i])
@@ -205,16 +182,10 @@ toExpressionView <- function(modules, eset, order, filename="",
 			for ( sample in 1:nSamples ) {
 				xmldata$addNode("sample", close = FALSE)
 					xmldata$addNode("tag0", sample)
-<<<<<<< TREE
-					xmldata$addNode("tag1", Samples[sampleMaps[[1]][sample]])
-					if ( dim(eset@phenoData@data)[2] != 0 ) {
-						temp <- eset@phenoData@data[sampleMaps[[1]][sample],]
-=======
 					xmldata$addNode("tag1", "")
 					xmldata$addNode("tag2", Samples[sampleMaps[[1]][sample]])
-					if ( dim(gedata@phenoData@data)[2] != 0 ) {
-						temp <- gedata@phenoData@data[sampleMaps[[1]][sample],]
->>>>>>> MERGE-SOURCE
+					if ( dim(eset@phenoData@data)[2] != 0 ) {
+						temp <- eset@phenoData@data[sampleMaps[[1]][sample],]
 						for ( i in 2:length(temp) ) {
 							xmldata$addNode(paste("tag", i+1, sep=""), temp[i])
 						}
@@ -308,16 +279,10 @@ toExpressionView <- function(modules, eset, order, filename="",
 					}
 				}
 				
-<<<<<<< TREE
 				genes = as.matrix(modules@genes[,module]);
-				temp <- mat.or.vec(getNoFeatures(modules)[module],1)
-				genesp <- mat.or.vec(getNoFeatures(modules)[module],1)
-=======
-				genes = as.matrix(eisamodules@genes[,module]);
-				temp <- vector("numeric", getNoFeatures(eisamodules)[module])
-				genesp <- vector("numeric", getNoFeatures(eisamodules)[module])
-				scores <- vector("numeric", getNoFeatures(eisamodules)[module])
->>>>>>> MERGE-SOURCE
+				temp <- vector("numeric", getNoFeatures(modules)[module])
+				genesp <- vector("numeric", getNoFeatures(modules)[module])
+				scores <- vector("numeric", getNoFeatures(modules)[module])
 				i = 1;
 				intersectingmodulesgenes = list();
 				for ( gene in 1:nGenes ) {
@@ -343,18 +308,11 @@ toExpressionView <- function(modules, eset, order, filename="",
 				xmldata$addNode("genescores", toString(scores))
 				
 
-<<<<<<< TREE
 				samples = as.matrix(modules@conditions[,module]);
-				temp <- mat.or.vec(getNoSamples(modules)[module],1)
-				samplesp <- mat.or.vec(getNoSamples(modules)[module],1)
-				i = 1;
-=======
-				samples = as.matrix(eisamodules@conditions[,module]);
-				temp <- vector("numeric", getNoSamples(eisamodules)[module])
-				samplesp <- vector("numeric", getNoSamples(eisamodules)[module])
-				scores <- vector("numeric", getNoSamples(eisamodules)[module])
+				temp <- vector("numeric", getNoSamples(modules)[module])
+				samplesp <- vector("numeric", getNoSamples(modules)[module])
+				scores <- vector("numeric", getNoSamples(modules)[module])
 				i <- 1;
->>>>>>> MERGE-SOURCE
 				intersectingmodulessamples = list();
 				for ( sample in 1:nSamples ) {
 					if ( samples[sample] != 0 ) {
@@ -437,7 +395,7 @@ toExpressionView <- function(modules, eset, order, filename="",
 		# options(warn=-1)
 
 		# show XML data
-		cat(saveXML(xmldata))
+		# cat(saveXML(xmldata))
 		writeBin(saveXML(xmldata), con, 1, endian="big")
 		
 	close(con)
