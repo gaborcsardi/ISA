@@ -220,12 +220,16 @@ package ch.unil.cbg.ExpressionView.view.components {
 			dataprovider = value as XMLListCollection;
 			dataGrid.dataProvider = dataprovider;
 		}
-		
-		public function set columns(value:Object):void {
-			dataGrid.columns = value as Array;
+
+		public function get columns():Array {
+			return dataGrid.columns;
+		}
+
+		public function set columns(value:Array):void {
+			dataGrid.columns = value;
 			calculateOptimalWidths();
 		}
-		
+
 		private function calculateOptimalWidths():void {
 			optimalWidths = new Array(dataGrid.columnCount);
 			for ( var col:int = 0; col < dataGrid.columnCount; ++col ) {

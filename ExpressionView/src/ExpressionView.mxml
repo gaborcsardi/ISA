@@ -8,7 +8,8 @@
 	scriptTimeLimit = "60" 
 	horizontalScrollPolicy="off" 
 	verticalScrollPolicy="off" 
-	applicationComplete="applicationCompleteHandler()" viewSourceURL="srcview/index.html">
+	applicationComplete="applicationCompleteHandler()" 
+	viewSourceURL="srcview/index.html" >
 	
 	<mx:Script>
 		<![CDATA[

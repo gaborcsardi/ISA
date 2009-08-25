@@ -27,9 +27,13 @@ package ch.unil.cbg.ExpressionView.model {
 		public var shortLabelsGene:Array;
 		public var shortLabelsSample:Array;
 		public var shortLabelsModule:Array;
+		public var shortLabelsGO:Array;
+		public var shortLabelsKEGG:Array;		
 		public var longLabelsGene:Array;
 		public var longLabelsSample:Array;
 		public var longLabelsModule:Array;
+		public var longLabelsGO:Array;
+		public var longLabelsKEGG:Array;
 		
 		public var ModulesColors:Vector.<Array>;
 
@@ -98,33 +102,53 @@ package ch.unil.cbg.ExpressionView.model {
 			// set labels
 			shortLabelsGene = [];
 			longLabelsGene = [];
-			var shortgenetags:XMLListCollection = new XMLListCollection(XMLData.genes.shortgenetags.tag);
-			var longgenetags:XMLListCollection = new XMLListCollection(XMLData.genes.longgenetags.tag);
-			for ( var tag:int = 0; tag < shortgenetags.length; ++tag ) {
-				shortLabelsGene.push(shortgenetags[tag]);
+			var shorttags:XMLListCollection = new XMLListCollection(XMLData.genes.shortgenetags.tag);
+			var longtags:XMLListCollection = new XMLListCollection(XMLData.genes.longgenetags.tag);
+			for ( var tag:int = 0; tag < shorttags.length; ++tag ) {
+				shortLabelsGene.push(shorttags[tag]);
 			}
-			for ( tag = 0; tag < longgenetags.length; ++tag ) {
-				longLabelsGene.push(longgenetags[tag]);
+			for ( tag = 0; tag < longtags.length; ++tag ) {
+				longLabelsGene.push(longtags[tag]);
 			}
 			shortLabelsSample = [];
 			longLabelsSample = [];
-			var shortsampletags:XMLListCollection = new XMLListCollection(XMLData.samples.shortsampletags.tag);
-			var longsampletags:XMLListCollection = new XMLListCollection(XMLData.samples.longsampletags.tag);
-			for ( tag = 0; tag < shortsampletags.length; ++tag ) {
-				shortLabelsSample.push(shortsampletags[tag]);
+			shorttags = new XMLListCollection(XMLData.samples.shortsampletags.tag);
+			longtags = new XMLListCollection(XMLData.samples.longsampletags.tag);
+			for ( tag = 0; tag < shorttags.length; ++tag ) {
+				shortLabelsSample.push(shorttags[tag]);
 			}
-			for ( tag = 0; tag < longsampletags.length; ++tag ) {
-				longLabelsSample.push(longsampletags[tag]);
+			for ( tag = 0; tag < longtags.length; ++tag ) {
+				longLabelsSample.push(longtags[tag]);
 			}
 			shortLabelsModule = [];
 			longLabelsModule = [];
-			var shortmoduletags:XMLListCollection = new XMLListCollection(XMLData.modules.shortmoduletags.tag);
-			var longmoduletags:XMLListCollection = new XMLListCollection(XMLData.modules.longmoduletags.tag);
-			for ( tag = 0; tag < shortmoduletags.length; ++tag ) {
-				shortLabelsModule.push(shortmoduletags[tag]);
+			shorttags = new XMLListCollection(XMLData.modules.shortmoduletags.tag);
+			longtags = new XMLListCollection(XMLData.modules.longmoduletags.tag);
+			for ( tag = 0; tag < shorttags.length; ++tag ) {
+				shortLabelsModule.push(shorttags[tag]);
 			}
-			for ( tag = 0; tag < longmoduletags.length; ++tag ) {
-				longLabelsModule.push(longmoduletags[tag]);
+			for ( tag = 0; tag < longtags.length; ++tag ) {
+				longLabelsModule.push(longtags[tag]);
+			}
+			shortLabelsGO = [];
+			longLabelsGO = [];
+			shorttags = new XMLListCollection(XMLData.modules.shortgotags.tag);
+			longtags = new XMLListCollection(XMLData.modules.longgotags.tag);
+			for ( tag = 0; tag < shorttags.length; ++tag ) {
+				shortLabelsGO.push(shorttags[tag]);
+			}
+			for ( tag = 0; tag < longtags.length; ++tag ) {
+				longLabelsGO.push(longtags[tag]);
+			}
+			shortLabelsKEGG = [];
+			longLabelsKEGG = [];
+			shorttags = new XMLListCollection(XMLData.modules.shortkeggtags.tag);
+			longtags = new XMLListCollection(XMLData.modules.longkeggtags.tag);
+			for ( tag = 0; tag < shorttags.length; ++tag ) {
+				shortLabelsKEGG.push(shorttags[tag]);
+			}
+			for ( tag = 0; tag < longtags.length; ++tag ) {
+				longLabelsKEGG.push(longtags[tag]);
 			}
 
 			// set modularData[0]
@@ -186,17 +210,25 @@ package ch.unil.cbg.ExpressionView.model {
 			var nsamples:int = samples.length;
 			
 			newmodule.nGenes = ngenes;
+			var string:String = Modules.source[module-1].genescores.toString();
+		   	var scores:Array = string.split(", ");
 			for ( var gene:int = 0; gene < genes.length; ++gene ) {
 				var item:XML = global.Genes[genes[gene]-1];
 				item.tag0 = gene + 1;
+				item.tag1 = scores[gene];
 				newmodule.Genes.addItem(item);
 			}			
 			newmodule.nSamples = nsamples;
+			string = Modules.source[module-1].samplescores.toString();
+		   	scores = string.split(", ");
 			for ( var sample:int = 0; sample < samples.length; ++sample ) {
 				item = global.Samples[samples[sample]-1];
 				item.tag0 = sample + 1;
+				item.tag1 = scores[sample];
 				newmodule.Samples.addItem(item);
 			}
+			newmodule.GO = new XMLListCollection(XMLData.modules.module[module-1].gos.go);
+			newmodule.KEGG = new XMLListCollection(XMLData.modules.module[module-1].keggs.kegg);
 			
 			// get ModulesRectangles
 			newmodule.ModulesRectangles = new Vector.<Array>(nModules + 1, true);
