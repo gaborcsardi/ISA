@@ -25,7 +25,6 @@ package ch.unil.cbg.ExpressionView.view {
 		private var fileBox:HBox;
 		private var navigationBox:HBox;
 		private var selectionBox:HBox;
-		private var panelBox:HBox;
 		private var windowBox:HBox;
 		
 		[Embed(source='/ch/unil/cbg/ExpressionView/assets/menu/inspect.png')]
@@ -36,16 +35,11 @@ package ch.unil.cbg.ExpressionView.view {
 		public var panIcon:Class; 
 		
 		private var openButton:Button;
+		private var pdfExportButton:Button;
 		private var navigationMenu:ToggleButtonBar;
 		private var outlineVisibility:CheckBox;
 		private var fillingVisibility:CheckBox;
 		private var alphaSlider:HSlider;
-		private var pdfExportButton:Button;
-		private var gedatainfoVisibilityButton:Button;
-		private var infoVisibilityButton:Button;
-		private var modulesVisibilityButton:Button;
-		private var genesVisibilityButton:Button;
-		private var samplesVisibilityButton:Button;
 		private var defaultPositionsButton:Button;
 		private var fullScreenButton:Button;
 
@@ -120,56 +114,7 @@ package ch.unil.cbg.ExpressionView.view {
 		private function pdfExportHandler(event:MouseEvent): void {
 			dispatchEvent(new MenuEvent(MenuEvent.PDF_EXPORT));
 		}
-
-
-		// set Panel visibility
-		private function updatePanelVisibility(event:MenuEvent):void {
-			var whichPanel:int = event.data[0];
-			var visibility:Boolean = event.data[1];
-			if ( whichPanel == 0 ) { gedatainfoVisibilityButton.selected = visibility; }
-			else if ( whichPanel == 1 ) { infoVisibilityButton.selected = visibility; }
-			else if ( whichPanel == 2 ) { modulesVisibilityButton.selected = visibility; }
-			else if ( whichPanel == 3 ) { genesVisibilityButton.selected = visibility; }
-			else if ( whichPanel == 4 ) { samplesVisibilityButton.selected = visibility; } 
-		}
-
-		
-		private function gedatainfoVisibilityButtonClickHandler(event:MouseEvent): void {
-			var visibility:Boolean = true;
-			if ( !gedatainfoVisibilityButton.selected ) {
-				visibility = false;
-			}
-			dispatchEvent(new MenuEvent(MenuEvent.PANELS, [0, visibility]));
-		}
-		private function infoVisibilityButtonClickHandler(event:MouseEvent): void {
-			var visibility:Boolean = true;
-			if ( !infoVisibilityButton.selected ) {
-				visibility = false;
-			}
-			dispatchEvent(new MenuEvent(MenuEvent.PANELS, [1, visibility]));
-		}
-		private function modulesVisibilityButtonClickHandler(event:MouseEvent): void {
-			var visibility:Boolean = true;
-			if ( !modulesVisibilityButton.selected ) {
-				visibility = false;
-			}
-			dispatchEvent(new MenuEvent(MenuEvent.PANELS, [2, visibility]));
-		}
-		private function genesVisibilityButtonClickHandler(event:MouseEvent): void {
-			var visibility:Boolean = true;
-			if ( !genesVisibilityButton.selected ) {
-				visibility = false;
-			}
-			dispatchEvent(new MenuEvent(MenuEvent.PANELS, [3, visibility]));
-		}
-		private function samplesVisibilityButtonClickHandler(event:MouseEvent): void {
-			var visibility:Boolean = true;
-			if ( !samplesVisibilityButton.selected ) {
-				visibility = false;
-			}
-			dispatchEvent(new MenuEvent(MenuEvent.PANELS, [4, visibility]));
-		}
-		
+				
 		// resize
 		private function resizeHandler(event:MouseEvent): void {
 			dispatchEvent(new MenuEvent(MenuEvent.DEFAULT_POSITIONS));
@@ -286,63 +231,6 @@ package ch.unil.cbg.ExpressionView.view {
 				}
 			}
 
-			if ( !panelBox ) {
-				panelBox = new HBox();
-				panelBox.styleName = "menuItemBox";
-				menuBox.addChild(panelBox);
-
-				if ( !gedatainfoVisibilityButton ) {
-					gedatainfoVisibilityButton = new Button();
-					//gedatainfoVisibilityButton.label = "Data Description";
-					gedatainfoVisibilityButton.selected = false;
-					gedatainfoVisibilityButton.toggle = true;
-					gedatainfoVisibilityButton.styleName = "gedatainfoVisibilityButton";
-					gedatainfoVisibilityButton.toolTip = "Show/hide gene expression data description.";
-					gedatainfoVisibilityButton.addEventListener(MouseEvent.CLICK, gedatainfoVisibilityButtonClickHandler);
-					panelBox.addChild(gedatainfoVisibilityButton);
-				}
-				if ( !infoVisibilityButton ) {
-					infoVisibilityButton = new Button();
-					//infoVisibilityButton.label = "Info";
-					infoVisibilityButton.selected = true;
-					infoVisibilityButton.toggle = true;
-					infoVisibilityButton.styleName = "infoVisibilityButton";
-					infoVisibilityButton.toolTip = "Show/hide info panel.";
-					infoVisibilityButton.addEventListener(MouseEvent.CLICK, infoVisibilityButtonClickHandler);
-					panelBox.addChild(infoVisibilityButton);
-				}
-				if ( !modulesVisibilityButton ) {
-					modulesVisibilityButton = new Button();
-					//modulesVisibilityButton.label = "Modules";
-					modulesVisibilityButton.selected = true;
-					modulesVisibilityButton.toggle = true;
-					modulesVisibilityButton.styleName = "modulesVisibilityButton";
-					modulesVisibilityButton.toolTip = "Show/hide modules panel.";
-					modulesVisibilityButton.addEventListener(MouseEvent.CLICK, modulesVisibilityButtonClickHandler);
-					panelBox.addChild(modulesVisibilityButton);
-				}
-				if ( !genesVisibilityButton ) {
-					genesVisibilityButton = new Button();
-					//genesVisibilityButton.label = "Genes";
-					genesVisibilityButton.selected = true;
-					genesVisibilityButton.toggle = true;
-					genesVisibilityButton.styleName = "genesVisibilityButton";
-					genesVisibilityButton.toolTip = "Show/hide genes panel.";
-					genesVisibilityButton.addEventListener(MouseEvent.CLICK, genesVisibilityButtonClickHandler);
-					panelBox.addChild(genesVisibilityButton);
-				}
-				if ( !samplesVisibilityButton ) {
-					samplesVisibilityButton = new Button();
-					//samplesVisibilityButton.label = "Samples";
-					samplesVisibilityButton.selected = true;
-					samplesVisibilityButton.toggle = true;
-					samplesVisibilityButton.styleName = "samplesVisibilityButton";
-					samplesVisibilityButton.toolTip = "Show/hide samples panel.";
-					samplesVisibilityButton.addEventListener(MouseEvent.CLICK, samplesVisibilityButtonClickHandler);
-					panelBox.addChild(samplesVisibilityButton);
-				}
-			}
-
 			if ( !windowBox ) {
 				windowBox = new HBox();
 				windowBox.styleName = "menuItemBox";
@@ -368,8 +256,7 @@ package ch.unil.cbg.ExpressionView.view {
 				}
 				
 				parentApplication.addEventListener(KeyboardEvent.KEY_UP, keyHandler);
-				parentApplication.addEventListener(MenuEvent.PANELS, updatePanelVisibility);
-			
+				
 			}
 			
 		}

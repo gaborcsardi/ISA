@@ -4,8 +4,6 @@ package ch.unil.cbg.ExpressionView.model {
 	
 	import ch.unil.cbg.ExpressionView.utilities.LargeBitmapData;
 	
-	import flash.geom.Rectangle;
-	
 	import mx.collections.XMLListCollection; 		
 	
 	/**
@@ -19,6 +17,9 @@ package ch.unil.cbg.ExpressionView.model {
 		
 		public var nSamples:int;
 		public var Samples:XMLListCollection;
+		
+		public var GO:XMLListCollection;
+		public var KEGG:XMLListCollection;
 				
 		public var GEImage:LargeBitmapData;
 		public var ModulesImage:LargeBitmapData;

@@ -10,8 +10,8 @@ using namespace std;
 class Clusters {
 
 	private:
-		vector<vector<int> > matrix;
-		vector<vector<int> > initialmatrix;
+		vector<vector<int> > data;
+		vector<vector<int> > initialdata;
 		vector<int> multiplicity;
 		vector<set<int> > redundantslots;
 		vector<int> optimallength;
@@ -34,14 +34,15 @@ class Clusters {
 	public:
 		int debug;
 		int maxtime;
+		int status;
 		
 		int nClusters;
 		int nSlots;
 
 		vector<int> order;
-
+		
 		Clusters(int, int);
-		Clusters(vector<vector<int> >);
+		Clusters(vector<vector<int> >, vector<int>);
 
 		void orderedsample();
 		void permute();

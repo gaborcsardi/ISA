@@ -13,6 +13,9 @@ package ch.unil.cbg.ExpressionView.view {
 	import flash.utils.ByteArray;
 	
 	import mx.containers.Canvas;
+	import mx.containers.HDividedBox;
+	import mx.containers.Panel;
+	import mx.containers.VDividedBox;
 	import mx.controls.Alert;
 	import mx.controls.TextArea;
 	import mx.controls.dataGridClasses.DataGridColumn;
@@ -30,8 +33,9 @@ package ch.unil.cbg.ExpressionView.view {
 	import org.alivepdf.saving.Method;
 	
 	public class MainCanvas extends Canvas {
-		
+				
 		private var useDefaultPositions:Boolean;
+		private var scoreColumnsVisible:Boolean;
 		
 		private var rawged:GeneExpressionData;
 		private var ged:GeneExpressionData;
@@ -40,23 +44,25 @@ package ch.unil.cbg.ExpressionView.view {
 		
 		private var lastHighlightedModules:Array;
 		
-		private var gePanel:ResizablePanel;
+		private var divider:HDividedBox;
+		
+		private var gePanel:Panel;
 		private var modulesNavigator:ClosableTabNavigator;
 		private var openTabs:Vector.<ZoomPanCanvas>;
 		private var mapOpenTabs:Vector.<int>;
 		
-		private var infoPanel:ResizablePanel;
+		private var infoPanel:Panel;
+		private var infoDivider:VDividedBox;
 		private var infoContent:TextArea;
+		private var infoNavigator:ClosableTabNavigator;
 		
-		private var modulesPanel:ResizablePanel;
 		private var modulesSearchableDataGrid:SearchableDataGrid;
-		private var genesPanel:ResizablePanel;
 		private var genesSearchableDataGrid:SearchableDataGrid;		
-		private var samplesPanel:ResizablePanel;
 		private var samplesSearchableDataGrid:SearchableDataGrid;
-		
-		private var gedatainfoPanel:ResizablePanel;
-		private var gedatainfoContent:TextArea;
+		private var GOSearchableDataGrid:SearchableDataGrid;
+		private var KEGGSearchableDataGrid:SearchableDataGrid;
+		private var experimentData:Canvas;
+		private var experimentDataContent:TextArea
 
 		public function MainCanvas() {
 			super();
@@ -70,11 +76,15 @@ package ch.unil.cbg.ExpressionView.view {
 			
 			super.createChildren();
 						
+			if ( !divider ) {
+				divider = new HDividedBox();
+				divider.liveDragging = false;
+				addChild(divider);
+				
+			}
 			if ( !gePanel ) {
-				gePanel = new ResizablePanel();
-				gePanel.enableClose = false;
-				gePanel.enableMinimize = false;
-				addChild(gePanel);
+				gePanel = new Panel();
+				divider.addChild(gePanel);
 				
 				if ( !modulesNavigator ) {
 					modulesNavigator = new ClosableTabNavigator();
@@ -90,111 +100,83 @@ package ch.unil.cbg.ExpressionView.view {
 			}
 			
 			if ( !infoPanel ) {
-				infoPanel = new ResizablePanel();
-				infoPanel.enableMinimize = false;
+				infoPanel = new Panel();
 				infoPanel.title = "Info";
-				infoPanel.addEventListener(ResizablePanelEvent.CLOSE, infoPanelCloseHandler);
-				addChild(infoPanel);
+				divider.addChild(infoPanel);
 				
-				if ( !infoContent ) {
-					infoContent = new TextArea();
-					infoContent.setStyle("backgroundAlpha", infoPanel.getStyle("backgroundAlpha"));
-					infoPanel.addChild(infoContent);
-				}
+				if ( !infoDivider ) { 
+					infoDivider = new VDividedBox();
+					infoDivider.liveDragging = false;
+					infoPanel.addChild(infoDivider);
 				
-			}
-		
-			if ( !modulesPanel ) {
-				modulesPanel = new ResizablePanel();
-				modulesPanel.enableMinimize = false;
-				modulesPanel.title = "Modules";
-				modulesPanel.addEventListener(ResizablePanelEvent.CLOSE, modulesPanelCloseHandler);
-				addChild(modulesPanel);
-												
-				if ( !modulesSearchableDataGrid ) {
-					modulesSearchableDataGrid = new SearchableDataGrid();
-					modulesSearchableDataGrid.addEventListener(SearchableDataGridSelectionEvent.ITEM_CLICK, clickModulesHandler);
-					modulesSearchableDataGrid.addEventListener(SearchableDataGridSelectionEvent.ITEM_DOUBLE_CLICK, doubleClickModulesHandler);
-					modulesPanel.addChild(modulesSearchableDataGrid);
-				}
-							
-			}
+					if ( !infoContent ) {
+						infoContent = new TextArea();
+						infoContent.setStyle("backgroundAlpha", infoPanel.getStyle("backgroundAlpha"));
+						infoDivider.addChild(infoContent);
+					}
+					
+					if ( !infoNavigator ) {
+						infoNavigator = new ClosableTabNavigator();
+						infoDivider.addChild(infoNavigator);
+						
+						if ( !modulesSearchableDataGrid ) {
+							modulesSearchableDataGrid = new SearchableDataGrid();
+							modulesSearchableDataGrid.label = "Modules";
+							modulesSearchableDataGrid.addEventListener(SearchableDataGridSelectionEvent.ITEM_CLICK, clickModulesHandler);
+							modulesSearchableDataGrid.addEventListener(SearchableDataGridSelectionEvent.ITEM_DOUBLE_CLICK, doubleClickModulesHandler);
+							infoNavigator.addChild(modulesSearchableDataGrid);
+						}
+	
+						if ( !genesSearchableDataGrid ) {
+							genesSearchableDataGrid = new SearchableDataGrid();
+							genesSearchableDataGrid.label = "Genes";
+							genesSearchableDataGrid.addEventListener(SearchableDataGridSelectionEvent.ITEM_CLICK, clickGenesHandler);
+							genesSearchableDataGrid.addEventListener(SearchableDataGridSelectionEvent.ITEM_DOUBLE_CLICK, doubleClickGenesHandler);
+							infoNavigator.addChild(genesSearchableDataGrid);
+						}			
+						
+						if ( !samplesSearchableDataGrid ) {
+							samplesSearchableDataGrid = new SearchableDataGrid();
+							samplesSearchableDataGrid.label = "Samples";
+							samplesSearchableDataGrid.addEventListener(SearchableDataGridSelectionEvent.ITEM_CLICK, clickSamplesHandler);
+							samplesSearchableDataGrid.addEventListener(SearchableDataGridSelectionEvent.ITEM_DOUBLE_CLICK, doubleClickSamplesHandler);
+							infoNavigator.addChild(samplesSearchableDataGrid);
+						}
+						
+						if ( !GOSearchableDataGrid ) {
+							GOSearchableDataGrid = new SearchableDataGrid();
+							GOSearchableDataGrid.label = "GO";
+							infoNavigator.addChild(GOSearchableDataGrid);
+						}
 
-			if ( !genesPanel ) {
-				genesPanel = new ResizablePanel();
-				genesPanel.enableMinimize = false;
-				genesPanel.title = "Genes";
-				genesPanel.addEventListener(ResizablePanelEvent.CLOSE, genesPanelCloseHandler);
-				addChild(genesPanel);
-												
-				if ( !genesSearchableDataGrid ) {
-					genesSearchableDataGrid = new SearchableDataGrid();
-					genesSearchableDataGrid.addEventListener(SearchableDataGridSelectionEvent.ITEM_CLICK, clickGenesHandler);
-					genesSearchableDataGrid.addEventListener(SearchableDataGridSelectionEvent.ITEM_DOUBLE_CLICK, doubleClickGenesHandler);
-					genesPanel.addChild(genesSearchableDataGrid);
-				}			
+						if ( !KEGGSearchableDataGrid ) {
+							KEGGSearchableDataGrid = new SearchableDataGrid();
+							KEGGSearchableDataGrid.label = "KEGG";
+							infoNavigator.addChild(KEGGSearchableDataGrid);
+						}
+
+						if ( !experimentData ) {
+							experimentData = new Canvas();
+							experimentData.label = "Experiment";
+							infoNavigator.addChild(experimentData);
+						}
+
+					}
+				}
+				
 			}
 			
-			if ( !samplesPanel ) {
-				samplesPanel = new ResizablePanel();
-				samplesPanel.enableMinimize = false;
-				samplesPanel.title = "Samples";
-				samplesPanel.addEventListener(ResizablePanelEvent.CLOSE, samplesPanelCloseHandler);
-				addChild(samplesPanel);
-												
-				if ( !samplesSearchableDataGrid ) {
-					samplesSearchableDataGrid = new SearchableDataGrid();
-					samplesSearchableDataGrid.addEventListener(SearchableDataGridSelectionEvent.ITEM_CLICK, clickSamplesHandler);
-					samplesSearchableDataGrid.addEventListener(SearchableDataGridSelectionEvent.ITEM_DOUBLE_CLICK, doubleClickSamplesHandler);
-					samplesPanel.addChild(samplesSearchableDataGrid);
-				}			
-			}
-
-			if ( !gedatainfoPanel ) {
-				gedatainfoPanel = new ResizablePanel();
-				gedatainfoPanel.title = "Gene Expression Data Description";
-				gedatainfoPanel.visible = false;
-				gedatainfoPanel.addEventListener(ResizablePanelEvent.CLOSE, gedatainfoPanelCloseHandler);
-				addChild(gedatainfoPanel);
-				
-				if ( !gedatainfoContent ) {
-					gedatainfoContent = new TextArea();
-					gedatainfoPanel.addChild(gedatainfoContent);					
-				}
-			}
-
 			useDefaultPositions = true;
 			
 			parentApplication.addEventListener(MenuEvent.DEFAULT_POSITIONS, setDefaultPositionsHandler);
 			parentApplication.addEventListener(UpdateGEDataEvent.UPDATEGEDATAEVENT, updateGEDataHandler);
 			parentApplication.addEventListener(MenuEvent.MODE, modeChangeHandler);
-			parentApplication.addEventListener(MenuEvent.PANELS, setPanelVisibilityHandler);
 			parentApplication.addEventListener(BroadcastPositionEvent.MOUSE_OVER, broadcastPositionOverHandler);
 			parentApplication.addEventListener(BroadcastPositionEvent.MOUSE_CLICK, broadcastPositionClickHandler);
 			parentApplication.addEventListener(MenuEvent.PDF_EXPORT, pdfExportHandler);
 			parentApplication.addEventListener(ResizeBrowserEvent.RESIZEBROWSEREVENT, resizeBrowserHandler);
 		}
-		
-		private function gedatainfoPanelCloseHandler(event:ResizablePanelEvent):void {
-			parentApplication.dispatchEvent(new MenuEvent(MenuEvent.PANELS, [0, false]));
-		}
-		private function infoPanelCloseHandler(event:ResizablePanelEvent):void {
-			parentApplication.dispatchEvent(new MenuEvent(MenuEvent.PANELS, [1, false]));
-		}
-		private function modulesPanelCloseHandler(event:ResizablePanelEvent):void {
-			parentApplication.dispatchEvent(new MenuEvent(MenuEvent.PANELS, [2, false]));
-		}
-		private function genesPanelCloseHandler(event:ResizablePanelEvent):void {
-			parentApplication.dispatchEvent(new MenuEvent(MenuEvent.PANELS, [3, false]));
-		}
-		private function samplesPanelCloseHandler(event:ResizablePanelEvent):void {
-			parentApplication.dispatchEvent(new MenuEvent(MenuEvent.PANELS, [4, false]));
-		}
-		
-		private function dataDescriptionHandler(event:MenuEvent): void {
-			gedatainfoPanel.visible = event.data[0];
-		}
-		
+						
 		private function resizeBrowserHandler(event:ResizeBrowserEvent): void {
 			
 			var scalex:Number = event.scaleX;
@@ -203,27 +185,15 @@ package ch.unil.cbg.ExpressionView.view {
 			if ( isFinite(scalex) && isFinite(scaley) ) {
 				gePanel.x *= scalex;
 				infoPanel.x *= scalex;
-				modulesPanel.x *= scalex;
-				genesPanel.x *= scalex;			
-				samplesPanel.x *= scalex;
 				
 				gePanel.width *= scalex;
 				infoPanel.width *= scalex;
-				modulesPanel.width *= scalex;
-				genesPanel.width *= scalex;			
-				samplesPanel.width *= scalex;
 
 				gePanel.y *= scaley;
 				infoPanel.y *= scaley;
-				modulesPanel.y *= scaley;
-				genesPanel.y *= scaley;			
-				samplesPanel.y *= scaley;
 
 				gePanel.height *= scaley;
 				infoPanel.height *= scaley;
-				modulesPanel.height *= scaley;
-				genesPanel.height *= scaley;			
-				samplesPanel.height *= scaley;
 			}
 			
 		}
@@ -232,56 +202,36 @@ package ch.unil.cbg.ExpressionView.view {
 			
 			super.updateDisplayList(unscaledWidth, unscaledHeight);
 
-			gedatainfoContent.percentWidth = 100;
-			gedatainfoContent.percentHeight = 100;
+			divider.percentWidth = 100;
+			divider.percentHeight = 100;
+			
+			gePanel.percentHeight = 100;
+			infoPanel.percentHeight = 100;
+
+			modulesNavigator.percentWidth = 100;
+			modulesNavigator.percentHeight = 100;							
+			for ( var module:int = 0; module < openTabs.length; ++module ) {
+				openTabs[module].percentWidth = 100;
+				openTabs[module].percentHeight = 100;
+			}
+			
+			infoDivider.percentWidth = 100;
+			infoDivider.percentHeight = 100;
 			infoContent.percentWidth = 100;
 			infoContent.percentHeight = 100;
+			infoNavigator.percentWidth = 100;
+			infoNavigator.percentHeight = 100;
 			modulesSearchableDataGrid.percentWidth = 100;
 			modulesSearchableDataGrid.percentHeight = 100;
 			genesSearchableDataGrid.percentWidth = 100;
 			genesSearchableDataGrid.percentHeight = 100;
 			samplesSearchableDataGrid.percentWidth = 100;
 			samplesSearchableDataGrid.percentHeight = 100;
-
-			modulesNavigator.percentWidth = 100;
-			modulesNavigator.percentHeight = 100;
-				
-			for ( var module:int = 0; module < openTabs.length; ++module ) {
-				openTabs[module].percentWidth = 100;
-				openTabs[module].percentHeight = 100;
-			}
+			
 			
 			if ( useDefaultPositions ) {
-
-				var width:Number = stage.stageWidth * 1/4;
-				var x:Number = 3 * width;
-				var y:Number = (stage.stageHeight - 70) / 4;
-
-				gePanel.x = 0;
-				gePanel.y = 0;
-				gePanel.percentWidth = 75;
-				gePanel.percentHeight = 100;
-				
-				infoPanel.x = x;
-				infoPanel.y = 0;
-				infoPanel.width = width;
-				infoPanel.height = y;
-				
-				modulesPanel.x = x;
-				modulesPanel.y = y;
-				modulesPanel.width = width;
-				modulesPanel.height = y;
-							
-				genesPanel.x = x;
-				genesPanel.y = 2*y;
-				genesPanel.width = width;
-				genesPanel.height = y;
-				
-				samplesPanel.x = x;
-				samplesPanel.y = 3*y;
-				samplesPanel.width = width;
-				samplesPanel.height = y;
-				
+				gePanel.percentWidth = 60;
+				infoPanel.percentWidth = 40;
 			}
 			useDefaultPositions = false;
 			
@@ -294,12 +244,37 @@ package ch.unil.cbg.ExpressionView.view {
 			}
 			selectedMode = mode;
 		}
+
+		private function toggleScoreColumns(state:Boolean):void {
+			var temp:Array = genesSearchableDataGrid.columns;
+			for ( var j:int = 0; j < temp.length; ++j ) {
+				if ( temp[j].headerText == "score" ) {
+					temp[j].visible = state;
+				}
+			}
+			genesSearchableDataGrid.columns = temp;
+			temp = samplesSearchableDataGrid.columns;
+			for ( j = 0; j < temp.length; ++j ) {
+				if ( temp[j].headerText == "score" ) {
+					temp[j].visible = state;
+				}
+			}
+			samplesSearchableDataGrid.columns = temp;
+			scoreColumnsVisible = true;
+		}
 		
 		private function tabChangeHandler(event:IndexChangedEvent): void {
 			openTabs[event.oldIndex].removeListener();
 			openTabs[event.newIndex].addListener();
+			var oldmodule:int = mapOpenTabs[event.oldIndex];
 			var module:int = mapOpenTabs[event.newIndex];
 			genesSearchableDataGrid.dataProvider = ged.getModule(module).Genes;
+			if ( module == 0 ) {
+				toggleScoreColumns(false);
+			} 
+			if ( oldmodule == 0 ) {
+				toggleScoreColumns(true);
+			}
 			samplesSearchableDataGrid.dataProvider = ged.getModule(module).Samples;
 			dispatchEvent(new MenuEvent(MenuEvent.MODE, [selectedMode]));
 		}
@@ -370,7 +345,12 @@ package ch.unil.cbg.ExpressionView.view {
 					}
 					openTabs[selectedTab].dataProvider = new Array(gem.GEImage, gem.ModulesImage, largestRectangles, ged.ModulesColors, [maxwidth, maxheight]);
 					genesSearchableDataGrid.dataProvider = gem.Genes;
-					samplesSearchableDataGrid.dataProvider = gem.Samples;	
+					samplesSearchableDataGrid.dataProvider = gem.Samples;
+					if ( scoreColumnsVisible == false ) {
+						toggleScoreColumns(true);
+					}
+					GOSearchableDataGrid.dataProvider = gem.GO;
+					KEGGSearchableDataGrid.dataProvider = gem.KEGG;
 					mapOpenTabs.push(selectedModule);
 				}
 				var lastSelectedTab:int = modulesNavigator.selectedIndex; 
@@ -498,41 +478,22 @@ package ch.unil.cbg.ExpressionView.view {
 			useDefaultPositions = true;
 			invalidateDisplayList();
 		}
-		
-		private function setPanelVisibilityHandler(event:MenuEvent): void {
-			var panel:int = event.data[0]
-			var visible:Boolean = event.data[1];
-			
-			switch (panel) {
-				case 0:
-					if ( gedatainfoContent.htmlText == "" ) {
-						generategedatainfo();
-					}
-					gedatainfoPanel.visible = visible;
-					break;
-				case 1:
-					infoPanel.visible = visible;
-					break;
-				case 2:
-					modulesPanel.visible = visible;
-					break;
-				case 3:
-					genesPanel.visible = visible;
-					break;
-				case 4:
-					samplesPanel.visible = visible;
-					break;
-			}			
-		}
-		
+				
 		private function updateGEDataHandler(event:UpdateGEDataEvent): void {
-			rawged = event.data[0]
+			rawged = event.data[0];
 			ged = event.data[1];
 			var gem:GeneExpressionModule = ged.getModule(0);
 
+			var title:String = ged.XMLData.experimentdata.title;
+			if ( title.length > 80 ) {
+				title = title.substr(0,80) + "..." 
+			}
+			title += ": " + ged.nGenes + " Genes, " + ged.nSamples + " Samples and " + ged.nModules + " Modules";
+			gePanel.title = title;
 			modulesSearchableDataGrid.dataProvider = ged.Modules;
 			genesSearchableDataGrid.dataProvider = gem.Genes;
 			samplesSearchableDataGrid.dataProvider = gem.Samples;
+			// genes
 			var temp:Array = [];
 			for ( var i:int = 0; i < ged.shortLabelsGene.length; i++ ) {
 				var column:DataGridColumn = new DataGridColumn();
@@ -541,6 +502,9 @@ package ch.unil.cbg.ExpressionView.view {
 					column.headerText = ged.shortLabelsGene[i];
 				} else {
 					column.headerText = "#";
+				}
+				if ( column.headerText == "score" ) {
+					column.visible = false;
 				}
 				// show hyperlinks
 				var linkRenderer:ClassFactory = new ClassFactory(LinkRenderer);
@@ -556,6 +520,7 @@ package ch.unil.cbg.ExpressionView.view {
 				temp.push(column);
 			}
 			genesSearchableDataGrid.columns = temp;
+			// samples
 			temp = [];
 			for ( i = 0; i < ged.shortLabelsSample.length; i++ ) {
 				column = new DataGridColumn();
@@ -565,10 +530,14 @@ package ch.unil.cbg.ExpressionView.view {
 				} else {
 					column.headerText = "#";
 				}
+				if ( column.headerText == "score" ) {
+					column.visible = false;
+				}
 				column.sortCompareFunction = sortFunction(i);
 				temp.push(column)
 			}
 			samplesSearchableDataGrid.columns = temp;
+			// modules
 			temp = [];
 			for ( i = 0; i < ged.shortLabelsModule.length; i++ ) {
 				column = new DataGridColumn();
@@ -582,6 +551,48 @@ package ch.unil.cbg.ExpressionView.view {
 				temp.push(column)
 			}
 			modulesSearchableDataGrid.columns = temp;
+			// GO
+			temp = [];
+			for ( i = 0; i < ged.shortLabelsGO.length; i++ ) {
+				column = new DataGridColumn();
+				column.dataField = "tag" + i;
+				if ( i > 0 ) {
+					column.headerText = ged.shortLabelsGO[i];
+				} else {
+					column.headerText = "#";
+				}
+				// show hyperlinks
+				linkRenderer = new ClassFactory(LinkRenderer);
+				if ( ged.shortLabelsGO[i] == "GO" ) {
+					database = "go";
+					linkRenderer.properties = { dataProvider : database }
+					column.itemRenderer = linkRenderer;	
+				}
+				column.sortCompareFunction = sortFunction(i);
+				temp.push(column);
+			}
+			GOSearchableDataGrid.columns = temp;
+			// KEGG
+			temp = [];
+			for ( i = 0; i < ged.shortLabelsKEGG.length; i++ ) {
+				column = new DataGridColumn();
+				column.dataField = "tag" + i;
+				if ( i > 0 ) {
+					column.headerText = ged.shortLabelsKEGG[i];
+				} else {
+					column.headerText = "#";
+				}
+				// show hyperlinks
+				linkRenderer = new ClassFactory(LinkRenderer);
+				if ( ged.shortLabelsGO[i] == "KEGG" ) {
+					database = "kegg";
+					linkRenderer.properties = { dataProvider : database }
+					column.itemRenderer = linkRenderer;	
+				}
+				column.sortCompareFunction = sortFunction(i);
+				temp.push(column);
+			}
+			KEGGSearchableDataGrid.columns = temp;
 
 			modulesNavigator.removeAllChildren();
 			
@@ -655,22 +666,22 @@ package ch.unil.cbg.ExpressionView.view {
 				
 		private function generategedatainfo(): void {
 			if ( ged.XMLData.experimentdata.title != "" ) {
-				gedatainfoContent.htmlText = "<b>" + ged.XMLData.experimentdata.title + "</b><br><br>";
+				experimentDataContent.htmlText = "<b>" + ged.XMLData.experimentdata.title + "</b><br><br>";
 			} 
 			if ( ged.XMLData.experimentdata.name != "" ) {
-				gedatainfoContent.htmlText += ged.XMLData.experimentdata.name + "<br><br>";
+				experimentDataContent.htmlText += ged.XMLData.experimentdata.name + "<br><br>";
 			} 
 			if ( ged.XMLData.experimentdata.lab != "" ) {
-				gedatainfoContent.htmlText += "<i>" + ged.XMLData.experimentdata.lab + "</i><br><br>";
+				experimentDataContent.htmlText += "<i>" + ged.XMLData.experimentdata.lab + "</i><br><br>";
 			} 
 			if ( ged.XMLData.experimentdata.abstract != "" ) {
-				gedatainfoContent.htmlText += "<p>" + ged.XMLData.experimentdata.abstract + "</p><br><br>";
+				experimentDataContent.htmlText += "<p>" + ged.XMLData.experimentdata.abstract + "</p><br><br>";
 			}
 			if ( ged.XMLData.experimentdata.url != "" ) {
-				gedatainfoContent.htmlText += ged.XMLData.experimentdata.url + "<br>";
+				experimentDataContent.htmlText += ged.XMLData.experimentdata.url + "<br>";
 			}
 			if ( ged.XMLData.experimentdata.annotation != "" ) {
-				gedatainfoContent.htmlText += "Annotation: " + ged.XMLData.experimentdata.annotation;
+				experimentDataContent.htmlText += "Annotation: " + ged.XMLData.experimentdata.annotation;
 			}
 		}
 		
