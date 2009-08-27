@@ -449,10 +449,10 @@ package ch.unil.cbg.ExpressionView.view {
 				// update infoPanel
 				var infoString:String = "";
 				if ( infoArray.length != 0 ) {
-					infoString = infoString + "Gene: " + infoArray[0].tag1;
-					infoString = infoString + "\nSample: " + infoArray[1].tag1;
+					infoString = infoString + "Gene: " + infoArray[0].tag2;
+					infoString = infoString + "\nSample: " + infoArray[1].tag2;
 					infoString = infoString + "\nModules: " + infoArray[2];
-					infoString = infoString + "\nData: " + infoArray[3];
+					infoString = infoString + "\nData: " + infoArray[3].toPrecision(3);
 				}
 				infoContent.text = infoString;
 	

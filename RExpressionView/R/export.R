@@ -342,7 +342,9 @@ toExpressionView <- function(modules, eset, order, filename="",
 				xmldata$addNode("gos", close=FALSE)
 				k <- 1
 				for ( i in 1:3 ) {
+					
 					s <- summary(gos[[i]])[[module]]
+
 					if ( dim(s)[1] > 0 ) {
 						for ( j in 1:dim(s)[1] ) {
 							xmldata$addNode("go", close=FALSE)
@@ -364,7 +366,7 @@ toExpressionView <- function(modules, eset, order, filename="",
 					}
 				}
 				xmldata$closeTag()
-				
+								
 				xmldata$addNode("keggs", close=FALSE)
 				k <- 1
 				s <- summary(keggs)[[module]]

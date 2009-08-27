@@ -499,6 +499,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 						var y:Number = (r.y - currentRectangle.y) * scaley;
 						var dx:Number = r.width * scalex;
 						var dy:Number = r.height * scaley;
+						shape.alpha = 0.4;
 						shape.graphics.beginFill(modulesColors[module][1]);
 						shape.graphics.drawRect(x, y, dx, dy);
 						shape.graphics.endFill();
