@@ -193,8 +193,8 @@ package ch.unil.cbg.ExpressionView.model {
 		   	var scores:Array = string.split(", ");
 			for ( var gene:int = 0; gene < genes.length; ++gene ) {
 				var item:XML = global.Genes[genes[gene]-1];
-				item.tag0 = gene + 1;
-				item.tag1 = scores[gene];
+				item.id = gene + 1;
+				item.score = scores[gene];
 				newmodule.Genes.addItem(item);
 			}			
 			newmodule.nSamples = nsamples;
@@ -202,8 +202,8 @@ package ch.unil.cbg.ExpressionView.model {
 		   	scores = string.split(", ");
 			for ( var sample:int = 0; sample < samples.length; ++sample ) {
 				item = global.Samples[samples[sample]-1];
-				item.tag0 = sample + 1;
-				item.tag1 = scores[sample];
+				item.id = sample + 1;
+				item.score = scores[sample];
 				newmodule.Samples.addItem(item);
 			}
 			newmodule.GO = new XMLListCollection(XMLData.modules.module[module-1].gos.go);

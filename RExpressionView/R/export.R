@@ -82,6 +82,7 @@ toExpressionView <- function(modules, eset, order, go=NULL, kegg=NULL, filename=
 
 		writeLines("\t\t<genetags>", con)
 			writeLines("\t\t\t<id>#</id>", con)
+			writeLines("\t\t\t<score>Score</score>", con)
 			writeLines("\t\t\t<name>Name</name>", con)
 			writeLines("\t\t\t<symbol>Symbol</symbol>", con)
 			writeLines("\t\t\t<entrezid>EntrezID</entrezid>", con)
@@ -93,6 +94,7 @@ toExpressionView <- function(modules, eset, order, go=NULL, kegg=NULL, filename=
 		for ( gene in 1:nGenes ) {
 			writeLines("\t\t<gene>", con)
 				writeLines(paste("\t\t\t<id>", gene, "</id>", sep=""), con)
+				writeLines("\t\t\t<score/>", con)
 				writeLines(paste("\t\t\t<name>", Genes[gene], "</name>", sep=""), con)
 				writeLines(paste("\t\t\t<symbol>", symbol.table[genemap[gene],2], "</symbol>", sep=""), con)
 				writeLines(paste("\t\t\t<entrezid>", entrez.table[genemap[gene],2], "</entrezid>", sep=""), con)
@@ -107,6 +109,7 @@ toExpressionView <- function(modules, eset, order, go=NULL, kegg=NULL, filename=
 
 		writeLines("\t\t<sampletags>", con)
 			writeLines("\t\t\t<id>#</id>", con)
+			writeLines("\t\t\t<score>Score</score>", con)
 			writeLines("\t\t\t<name>Name</name>", con)
 	
 			temp <- rownames(phenoData(eset)@varMetadata)
@@ -127,6 +130,7 @@ toExpressionView <- function(modules, eset, order, go=NULL, kegg=NULL, filename=
 			writeLines("\t\t<sample>", con)
 					
 				writeLines(paste("\t\t\t<id>", sample, "</id>", sep=""), con)
+				writeLines("\t\t\t<score/>", con)
 				writeLines(paste("\t\t\t<name>", Samples[sample], "</name>", sep=""), con)
 				if ( dim(eset@phenoData@data)[2] != 0 ) {
 					tempp <- eset@phenoData@data[sampleMaps[[1]][sample],]

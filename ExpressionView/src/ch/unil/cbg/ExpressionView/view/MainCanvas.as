@@ -18,6 +18,7 @@ package ch.unil.cbg.ExpressionView.view {
 	import mx.containers.VDividedBox;
 	import mx.controls.Alert;
 	import mx.controls.TextArea;
+	import mx.controls.Label;
 	import mx.controls.dataGridClasses.DataGridColumn;
 	import mx.core.ClassFactory;
 	import mx.events.IndexChangedEvent;
@@ -160,7 +161,7 @@ package ch.unil.cbg.ExpressionView.view {
 							experimentData.label = "Experiment";
 							infoNavigator.addChild(experimentData);
 						}
-
+						
 					}
 				}
 				
@@ -228,12 +229,15 @@ package ch.unil.cbg.ExpressionView.view {
 			samplesSearchableDataGrid.percentWidth = 100;
 			samplesSearchableDataGrid.percentHeight = 100;
 			
-			
 			if ( useDefaultPositions ) {
 				gePanel.percentWidth = 60;
 				infoPanel.percentWidth = 40;
+				infoContent.percentHeight = 20;
+				infoNavigator.percentHeight = 80;
+				if ( infoContent.height > 0 ) {
+					useDefaultPositions = false;
+				}
 			}
-			useDefaultPositions = false;
 			
 		}
 
@@ -248,14 +252,14 @@ package ch.unil.cbg.ExpressionView.view {
 		private function toggleScoreColumns(state:Boolean):void {
 			var temp:Array = genesSearchableDataGrid.columns;
 			for ( var j:int = 0; j < temp.length; ++j ) {
-				if ( temp[j].headerText == "score" ) {
+				if ( temp[j].dataField == "score" ) {
 					temp[j].visible = state;
 				}
 			}
 			genesSearchableDataGrid.columns = temp;
 			temp = samplesSearchableDataGrid.columns;
 			for ( j = 0; j < temp.length; ++j ) {
-				if ( temp[j].headerText == "score" ) {
+				if ( temp[j].dataField == "score" ) {
 					temp[j].visible = state;
 				}
 			}
@@ -275,6 +279,18 @@ package ch.unil.cbg.ExpressionView.view {
 			if ( oldmodule == 0 ) {
 				toggleScoreColumns(true);
 			}
+			if ( module == 0 ) { 
+				infoNavigator.getTabAt(3).visible = false;
+				infoNavigator.getTabAt(4).visible = false;
+				infoNavigator.getTabAt(3).includeInLayout = false;
+				infoNavigator.getTabAt(4).includeInLayout = false;
+			} else {
+				infoNavigator.getTabAt(3).visible = true;
+				infoNavigator.getTabAt(4).visible = true;				
+				infoNavigator.getTabAt(3).includeInLayout = true;
+				infoNavigator.getTabAt(4).includeInLayout = true;
+			}
+
 			samplesSearchableDataGrid.dataProvider = ged.getModule(module).Samples;
 			dispatchEvent(new MenuEvent(MenuEvent.MODE, [selectedMode]));
 		}
@@ -490,16 +506,26 @@ package ch.unil.cbg.ExpressionView.view {
 			}
 			title += ": " + ged.nGenes + " Genes, " + ged.nSamples + " Samples and " + ged.nModules + " Modules";
 			gePanel.title = title;
+			
+			// hide GO and KEGG tabs
+			infoNavigator.getTabAt(3).visible = false;
+			infoNavigator.getTabAt(4).visible = false;
+			infoNavigator.getTabAt(3).includeInLayout = false;
+			infoNavigator.getTabAt(4).includeInLayout = false;
+
 			modulesSearchableDataGrid.dataProvider = ged.Modules;
 			genesSearchableDataGrid.dataProvider = gem.Genes;
 			samplesSearchableDataGrid.dataProvider = gem.Samples;
 			// genes
+			var wrap:Boolean = false;
 			var temp:Array = [];
 			for ( var i:int = 0; i < ged.geneLabels.length; i++ ) {
 				var column:DataGridColumn = new DataGridColumn();
 				column.dataField = ged.geneLabels[i][0];
 				column.headerText = ged.geneLabels[i][1];
-				if ( column.headerText == "score" ) {
+				column.headerWordWrap = wrap;
+				column.headerRenderer = new ClassFactory(Label);
+				if ( column.dataField == "score" ) {
 					column.visible = false;
 				}
 				// show hyperlinks
@@ -522,7 +548,9 @@ package ch.unil.cbg.ExpressionView.view {
 				column = new DataGridColumn();
 				column.dataField = ged.sampleLabels[i][0];
 				column.headerText = ged.sampleLabels[i][1];
-				if ( column.headerText == "score" ) {
+				column.headerWordWrap = wrap;
+				column.headerRenderer = new ClassFactory(Label);
+				if ( column.dataField == "score" ) {
 					column.visible = false;
 				}
 				column.sortCompareFunction = sortFunction(column.dataField);
@@ -535,6 +563,8 @@ package ch.unil.cbg.ExpressionView.view {
 				column = new DataGridColumn();
 				column.dataField = ged.moduleLabels[i][0];
 				column.headerText = ged.moduleLabels[i][1];
+				column.headerWordWrap = wrap;
+				column.headerRenderer = new ClassFactory(Label);
 				column.sortCompareFunction = sortFunction(column.dataField);
 				temp.push(column)
 			}
@@ -545,6 +575,8 @@ package ch.unil.cbg.ExpressionView.view {
 				column = new DataGridColumn();
 				column.dataField = ged.goLabels[i][0];
 				column.headerText = ged.goLabels[i][1];
+				column.headerWordWrap = wrap;
+				column.headerRenderer = new ClassFactory(Label);
 				// show hyperlinks
 				linkRenderer = new ClassFactory(LinkRenderer);
 				if ( ged.goLabels[i][0] == "go" ) {
@@ -562,6 +594,8 @@ package ch.unil.cbg.ExpressionView.view {
 				column = new DataGridColumn();
 				column.dataField = ged.keggLabels[i][0];
 				column.headerText = ged.keggLabels[i][1];
+				column.headerWordWrap = wrap;
+				column.headerRenderer = new ClassFactory(Label);
 				// show hyperlinks
 				linkRenderer = new ClassFactory(LinkRenderer);
 				if ( ged.keggLabels[i][0] == "kegg" ) {

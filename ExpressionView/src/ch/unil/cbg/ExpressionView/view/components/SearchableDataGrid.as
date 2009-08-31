@@ -241,8 +241,8 @@ package ch.unil.cbg.ExpressionView.view.components {
 					renderer.text = dataGrid.columns[col].itemToLabel(item);
 					optimalWidths[col] = Math.max(renderer.measuredWidth, optimalWidths[col]);
 				}
-				renderer.text = dataGrid.columns[col].headerText;
-				optimalWidths[col] = Math.max(renderer.measuredWidth, optimalWidths[col]);
+				//renderer.text = dataGrid.columns[col].headerText;
+				//optimalWidths[col] = Math.max(renderer.measuredWidth, optimalWidths[col]);
 			}
 			invalidateDisplayList();
 		}
