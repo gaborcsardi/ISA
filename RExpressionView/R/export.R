@@ -7,31 +7,289 @@ ExpressionView <- function(modules, eset, order) {
   browseURL(url)
 }
 
-toExpressionView <- function(modules, eset, order, filename="",
+toExpressionView <- function(modules, eset, order, go=NULL, kegg=NULL, filename="",
                              norm=c("sample", "feature", "raw")) {
 	
-	library(XML)
+	library(caTools)
 	
 	if ( filename == "" ) {
-		con <- file(file.choose(TRUE), open="wb")
+		con <- file(file.choose(TRUE), open="w")
 	} else {
-		con <- file(filename, open="wb", blocking = TRUE)
+		con <- file(filename, open="w", blocking = TRUE)
 	}
 		
 	geneMaps <- order$genes
 	sampleMaps <- order$samples
 	
-	Genes <- featureNames(modules);
-	Samples <- sampleNames(modules);
+	Genes <- featureNames(modules)[geneMaps[[1]]];
+	Samples <- sampleNames(modules)[sampleMaps[[1]]];
 		
 	nGenes <- (dim(modules))[1]
 	nSamples <- (dim(modules))[2]
 	nModules <- length(modules)
 
-	writeBin("ExpressionViewFile", con, endian="big")
-	writeBin(as.integer(nGenes), con, 4, endian="big")
-	writeBin(as.integer(nSamples), con, 4, endian="big")
-	writeBin(as.integer(nModules), con, 4, endian="big")
+	writeLines("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", con)
+	writeLines("<ged>", con)
+	writeLines("\t<summary>", con)
+	writeLines("\t\t<description>ExpressionView data file</description>", con)
+	writeLines("\t\t<version>1.0</version>", con)
+	writeLines(paste("\t\t<nmodules>", nModules, "</nmodules>", sep=""), con)
+	writeLines(paste("\t\t<ngenes>", nGenes, "</ngenes>", sep=""), con)
+	writeLines(paste("\t\t<nsamples>", nSamples, "</nsamples>", sep=""), con)
+	writeLines("\t</summary>", con)
+
+	library(GO.db)
+	go.table <- toTable(GOTERM)
+	if ( is.null(go) ) {
+		gos <- ISA.GO(modules)
+	} else {
+		gos <- go
+	}
+
+	library(KEGG.db)
+	kegg.table <- toTable(KEGGPATHID2NAME)
+	if ( is.null(kegg) ) {
+		keggs <- ISA.KEGG(modules)
+	} else {
+		keggs <- kegg
+	}
+		
+	# get gene info
+	ann <- annotation(eset)
+	library(paste(ann, sep="", ".db"), character.only=TRUE)
+	symbol.table <- toTable(get(paste(ann, "SYMBOL", sep="")))
+	entrez.table <- toTable(get(paste(ann, "ENTREZID", sep="")))
+
+	writeLines("", con)
+
+	
+	# experimentdata
+	writeLines("\t<experimentdata>", con)
+		writeLines(paste("\t\t<title>", eset@experimentData@title, "</title>", sep=""), con)
+		writeLines(paste("\t\t<name>", eset@experimentData@name, "</name>", sep=""), con)
+		writeLines(paste("\t\t<lab>", eset@experimentData@lab, "</lab>", sep=""), con)
+		writeLines(paste("\t\t<abstract>", eset@experimentData@abstract, "</abstract>", sep=""), con)
+		writeLines(paste("\t\t<url>", eset@experimentData@url, "</url>", sep=""), con)
+		writeLines(paste("\t\t<annotation>", eset@annotation, "</annotation>", sep=""), con)
+		organism <- get(paste(ann, "ORGANISM", sep=""))
+		writeLines(paste("\t\t<organism>", organism, "</organism>", sep=""), con)
+	writeLines("\t</experimentdata>", con)
+
+	writeLines("", con)
+
+	# genes
+	writeLines("\t<genes>", con)
+
+		writeLines("\t\t<genetags>", con)
+			writeLines("\t\t\t<id>#</id>", con)
+			writeLines("\t\t\t<name>Name</name>", con)
+			writeLines("\t\t\t<symbol>Symbol</symbol>", con)
+			writeLines("\t\t\t<entrezid>EntrezID</entrezid>", con)
+		writeLines("\t\t</genetags>", con)
+
+		writeLines("", con)
+
+		genemap <- match(Genes, symbol.table[,1])
+		for ( gene in 1:nGenes ) {
+			writeLines("\t\t<gene>", con)
+				writeLines(paste("\t\t\t<id>", gene, "</id>", sep=""), con)
+				writeLines(paste("\t\t\t<name>", Genes[gene], "</name>", sep=""), con)
+				writeLines(paste("\t\t\t<symbol>", symbol.table[genemap[gene],2], "</symbol>", sep=""), con)
+				writeLines(paste("\t\t\t<entrezid>", entrez.table[genemap[gene],2], "</entrezid>", sep=""), con)
+			writeLines("\t\t</gene>", con)
+		}
+			
+	writeLines("\t</genes>", con)
+
+
+	# samples  
+	writeLines("\t<samples>", con)
+
+		writeLines("\t\t<sampletags>", con)
+			writeLines("\t\t\t<id>#</id>", con)
+			writeLines("\t\t\t<name>Name</name>", con)
+	
+			temp <- rownames(phenoData(eset)@varMetadata)
+			# replace unallowed characters by underscores
+			temp <- gsub("[^[:alnum:]]", "_", temp)
+			tempp <- phenoData(eset)@varMetadata[[1]]
+			if ( length(temp) >= 2 ) {	
+				for ( i in 2:length(temp) ) {
+					writeLines(paste("\t\t\t<", temp[i], ">", tempp[i], "</", temp[i], ">", sep=""), con)
+				}
+			}
+		writeLines("\t\t</sampletags>", con)
+
+		writeLines("", con)
+		
+		for ( sample in 1:nSamples ) {
+			
+			writeLines("\t\t<sample>", con)
+					
+				writeLines(paste("\t\t\t<id>", sample, "</id>", sep=""), con)
+				writeLines(paste("\t\t\t<name>", Samples[sample], "</name>", sep=""), con)
+				if ( dim(eset@phenoData@data)[2] != 0 ) {
+					tempp <- eset@phenoData@data[sampleMaps[[1]][sample],]
+					for ( i in 2:length(temp) ) {
+						writeLines(paste("\t\t\t<", temp[i], ">", tempp[i], "</", temp[i], ">", sep=""), con)
+					}
+				}
+				
+			writeLines("\t\t</sample>", con)
+		}
+	writeLines("\t</samples>", con)
+
+	writeLines("", con)
+
+	# modules
+	writeLines("\t<modules>", con)
+
+		writeLines("\t\t<moduletags>", con)
+			writeLines("\t\t\t<id>#</id>", con)
+			writeLines("\t\t\t<name>Name</name>", con)
+
+			temp <- colnames(modules@seeddata)
+			# replace unallowed characters by underscores
+			tempp <- gsub("[^[:alnum:]]", "_", temp)
+			if ( length(temp) >= 1 ) {	
+				for ( i in 1:length(temp) ) {
+					writeLines(paste("\t\t\t<", tempp[i], ">", temp[i], "</", tempp[i], ">", sep=""), con)
+				}
+			}
+		writeLines("\t\t</moduletags>", con)
+
+		writeLines("", con)
+	
+		writeLines("\t\t<gotags>", con)
+			writeLines("\t\t\t<id>#</id>", con)
+			writeLines("\t\t\t<go>GO</go>", con)
+			writeLines("\t\t\t<term>Term</term>", con)
+			writeLines("\t\t\t<ontology>Ontology</ontology>", con)
+			writeLines("\t\t\t<definition>Definition</definition>", con)
+			writeLines("\t\t\t<pvalue>PValue</pvalue>", con)
+			writeLines("\t\t\t<oddsratio>OddsRatio</oddsratio>", con)
+			writeLines("\t\t\t<expcount>ExpCount</expcount>", con)
+			writeLines("\t\t\t<count>Count</count>", con)
+			writeLines("\t\t\t<size>Size</size>", con)
+		writeLines("\t\t</gotags>", con)
+
+		writeLines("\t\t<keggtags>", con)
+			writeLines("\t\t\t<id>#</id>", con)
+			writeLines("\t\t\t<kegg>KEGG</kegg>", con)
+			writeLines("\t\t\t<pathname>Path Name</pathname>", con)
+			writeLines("\t\t\t<pvalue>PValue</pvalue>", con)
+			writeLines("\t\t\t<oddsratio>OddsRatio</oddsratio>", con)
+			writeLines("\t\t\t<expcount>ExpCount</expcount>", con)
+			writeLines("\t\t\t<count>Count</count>", con)
+			writeLines("\t\t\t<size>Size</size>", con)
+		writeLines("\t\t</keggtags>", con)
+
+	writeLines("", con)
+
+	for ( module in 1:nModules ) {
+		writeLines("\t\t<module>", con)
+
+			writeLines(paste("\t\t\t<id>", module, "</id>", sep=""), con)
+			writeLines(paste("\t\t\t<name>module ", module, "</name>", sep=""), con)
+			temp <- colnames(modules@seeddata)
+			# replace unallowed characters by underscores
+			temp <- gsub("[^[:alnum:]]", "_", temp)
+			if ( length(temp) != 0 ) {
+				tempp <- modules@seeddata[module,]
+				for ( i in 1:length(temp) ) {
+					value <- tempp[i]
+					if ( temp[i] == "rob" || temp[i] == "rob_limit" ) {
+						value <- formatter(as.numeric(value))
+					}
+					writeLines(paste("\t\t\t<", temp[i], ">", value, "</", temp[i], ">", sep=""), con)
+				}
+			}
+
+			intersectingmodulesgenes = list();
+			genes <- modules@genes[,module][geneMaps[[1]]]
+			for ( modulep in 1:nModules ) {
+				if ( sum(genes * modules@genes[,modulep][geneMaps[[1]]]) != 0 && module != modulep ) {
+					intersectingmodulesgenes <- append(intersectingmodulesgenes, modulep)
+				}
+			}
+
+			genesp <- which(genes!=0)[geneMaps[[module+1]]]
+			writeLines(paste("\t\t\t<containedgenes>", toString(genesp), "</containedgenes>", sep=""), con)
+			scores <- as.array(genes[genesp])
+			scores <- apply(scores, 1, formatter)
+			writeLines(paste("\t\t\t<genescores>", toString(scores), "</genescores>", sep=""), con)
+
+			intersectingmodulessamples = list();
+			samples <- modules@conditions[,module][sampleMaps[[1]]]
+			for ( modulep in 1:nModules ) {
+				if ( sum(samples * modules@conditions[,modulep][sampleMaps[[1]]]) != 0 && module != modulep ) {
+					intersectingmodulessamples <- append(intersectingmodulessamples, modulep)
+				}
+			}
+
+			samplesp <- which(samples!=0)[sampleMaps[[module+1]]]
+			writeLines(paste("\t\t\t<containedsamples>", toString(samplesp), "</containedsamples>", sep=""), con)
+			scores <- as.array(samples[samplesp])
+			scores <- apply(scores, 1, formatter)
+			writeLines(paste("\t\t\t<samplescores>", toString(scores), "</samplescores>", sep=""), con)
+
+			intersectingmodules <- intersect(unique(intersectingmodulesgenes), unique(intersectingmodulessamples))
+			writeLines(paste("\t\t\t<intersectingmodules>", toString(intersectingmodules), "</intersectingmodules>", sep=""), con)
+
+			writeLines("", con)
+
+			writeLines("\t\t\t<gos>", con)
+			k <- 1
+			for ( i in 1:3 ) {
+				s <- summary(gos[[i]])[[module]]
+				if ( dim(s)[1] > 0 ) {
+					temp <- match(rownames(s), go.table[,1])
+					
+					for ( j in 1:dim(s)[1] ) {
+						writeLines("\t\t\t\t<go>", con)
+							writeLines(paste("\t\t\t\t\t<id>", k, "</id>", sep=""), con)
+							k <- k + 1
+							writeLines(paste("\t\t\t\t\t<go>", rownames(s)[j], "</go>", sep=""), con)
+							writeLines(paste("\t\t\t\t\t<term>", go.table[temp[j], 3], "</term>", sep=""), con)
+							writeLines(paste("\t\t\t\t\t<ontology>", go.table[temp[j], 4], "</ontology>", sep=""), con)
+							writeLines(paste("\t\t\t\t\t<definition>", go.table[temp[j], 5], "</definition>", sep=""), con)
+							writeLines(paste("\t\t\t\t\t<pvalue>", formatter(s[j, 1]), "</pvalue>", sep=""), con)
+							writeLines(paste("\t\t\t\t\t<oddsratio>", formatter(s[j, 2]), "</oddsratio>", sep=""), con)
+							writeLines(paste("\t\t\t\t\t<expcount>", formatter(s[j, 3]), "</expcount>", sep=""), con)
+							writeLines(paste("\t\t\t\t\t<count>", s[j, 4], "</count>", sep=""), con)
+							writeLines(paste("\t\t\t\t\t<size>", s[j, 5], "</size>", sep=""), con)
+						writeLines("\t\t\t\t</go>", con)
+					}
+				}
+			}
+			writeLines("\t\t\t</gos>", con)
+
+			writeLines("", con)
+
+			writeLines("\t\t\t<keggs>", con)
+			s <- summary(keggs)[[module]]
+			if ( dim(s)[1] > 0 ) {
+				temp <- match(rownames(s), kegg.table[,1])
+				for ( j in 1:dim(s)[1] ) {
+					writeLines("\t\t\t\t<kegg>", con)
+						writeLines(paste("\t\t\t\t\t<id>", j, "</id>", sep=""), con)
+						writeLines(paste("\t\t\t\t\t<kegg>", rownames(s)[j], "</kegg>", sep=""), con)
+						writeLines(paste("\t\t\t\t\t<pathname>", kegg.table[temp, 2][j], "</pathname>", sep=""), con)
+						writeLines(paste("\t\t\t\t\t<pvalue>", formatter(s[j, 1]), "</pvalue>", sep=""), con)
+						writeLines(paste("\t\t\t\t\t<oddsratio>", formatter(s[j, 2]), "</oddsratio>", sep=""), con)
+						writeLines(paste("\t\t\t\t\t<expcount>", formatter(s[j, 3]), "</expcount>", sep=""), con)
+						writeLines(paste("\t\t\t\t\t<count>", s[j, 4], "</count>", sep=""), con)
+						writeLines(paste("\t\t\t\t\t<size>", s[j, 5], "</size>", sep=""), con)
+					writeLines("\t\t\t\t</kegg>", con)
+				}
+			}
+			writeLines("\t\t\t</keggs>", con)
+		writeLines("\t\t</module>", con)
+		
+		}
+		
+	writeLines("\t</modules>", con)
+
 
 	norm <- match.arg(norm)
 	Data <- eisa:::select.eset(eset, modules, norm)
@@ -42,364 +300,33 @@ toExpressionView <- function(modules, eset, order, filename="",
 	Data.max <- max(Data)
 	Data.delta <- Data.max - Data.min
 
-	Data <- (Data - Data.min) / Data.delta * 2 -1
-	writeBin(Data, con, endian="big")
+	Data <- (Data - Data.min) / Data.delta * 2 - 1
+	Data <- as.integer(round(Data * 100, 0))
 
-	library(GO.db)
-	go.table <- toTable(GOTERM)
-	gos <- ISA.GO(modules)
+	writeLines("", con)
 
-	library(KEGG.db)
-	kegg.table <- toTable(KEGGPATHID2NAME)
-	keggs <- ISA.KEGG(modules)
+	# data
+	writeLines("\t<data>", con)
 	
-	#<isadata>
-	
-	#	<experimentdata>
-	#		<title></title>
-	#		<name></name>
-	#		<lab></lab>
-	#		<abstract></abstract>
-	#		<url></url>
-	#		...
-	#	</experimentdata> 	
-	#	<genes>
-	#		<gene>
-	#			<tag0></tag0>		## id
-	#			<tag1></tag1>
-	#			...
-	#		</gene>
-	#	</genes>"; 	
-	#	<samples>
-	#		<sample>
-	#			<tag0></tag0>		## id
-	#			<tag1></tag1>
-	#			...
-	#		</sample>
-	#	</samples>"; 	
-	#	<modules>
-	#		<module>
-	#			<tag0></tag0>
-	#			<tag1></tag1>
-	#			...
-	#			<containedgenes></containedgenes>
-	#			<containedsamples></containedsamples>
-	#			<intersectingmodules></intersectingmodules>
-	#			<gos>
-	#				<go>
-	#					<id></id>
-	#					<term></term>
-	#					<ontology></ontology>
-	#					<pvalue></pvalue>
-	#					<oddsratio></oddsratio>
-	#					<expcount></expcount>
-	#					<count></count>
-	#					<size></size>
-	#				</go>
-	#			</gos>
-	#			<keggs>
-	#				<kegg>
-	#				</kegg>
-	#			</keggs>
-	#		</module>
-	#	</modules>
-	#</isadata>
-	
-	xmldata = xmlTree("isadata")
-	
-		# get gene info
-		ann <- annotation(eset)
-		library(paste(ann, sep="", ".db"), character.only=TRUE)
-		symbol.table <- toTable(get(paste(ann, "SYMBOL", sep="")))
-		entrez.table <- toTable(get(paste(ann, "ENTREZID", sep="")))
-
-		xmldata$addNode("experimentdata", close = FALSE)
-			xmldata$addNode("title", eset@experimentData@title)
-			xmldata$addNode("name", eset@experimentData@name)
-			xmldata$addNode("lab", eset@experimentData@lab)
-			xmldata$addNode("abstract", eset@experimentData@abstract)
-			xmldata$addNode("url", eset@experimentData@url)
-			xmldata$addNode("annotation", eset@annotation)
-			organism <- get(paste(ann, "ORGANISM", sep=""))
-			xmldata$addNode("organism", organism)
-		xmldata$closeTag()
-
-		xmldata$addNode("genes", close = FALSE)
-			xmldata$addNode("shortgenetags", close = FALSE)
-			xmldata$addNode("tag", "id") 		# 0
-			xmldata$addNode("tag", "score") 	# 1
-			xmldata$addNode("tag", "name") 		# 2
-			xmldata$addNode("tag", "symbol")	# 3
-			xmldata$addNode("tag", "entrezid")	# 4
-			xmldata$closeTag()		
-
-			xmldata$addNode("longgenetags", close = FALSE)
-			xmldata$addNode("tag", "id") 		# 0
-			xmldata$addNode("tag", "score") 	# 1
-			xmldata$addNode("tag", "name") 		# 2
-			xmldata$addNode("tag", "symbol")	# 3
-			xmldata$addNode("tag", "entrezid")	# 4
-			xmldata$closeTag()
-
-			for ( gene in 1:nGenes ) {
-				xmldata$addNode("gene", close = FALSE)
-					xmldata$addNode("tag0", gene)
-					genep <- Genes[geneMaps[[1]][gene]]
-					xmldata$addNode("tag1", "")
-					xmldata$addNode("tag2", genep)
-					xmldata$addNode("tag3", paste("", symbol.table[which(symbol.table==genep),2], sep=""))
-					xmldata$addNode("tag4", paste("", entrez.table[which(entrez.table==genep),2], sep=""))
-				xmldata$closeTag()
-			}
-		xmldata$closeTag()	
-
-		xmldata$addNode("samples", close = FALSE)
-		
-			xmldata$addNode("shortsampletags", close = FALSE)
-			xmldata$addNode("tag", "id")		# 0
-			xmldata$addNode("tag", "score")		# 1
-			xmldata$addNode("tag", "name")		# 2
-			temp <- rownames(phenoData(eset)@varMetadata)
-			if ( length(temp) >= 2 ) {			
-				for ( i in 2:length(temp) ) {
-					xmldata$addNode("tag", temp[i])
-				}
-			}
-			xmldata$closeTag()
-			
-			xmldata$addNode("longsampletags", close = FALSE)
-			xmldata$addNode("tag", "id")		# 0
-			xmldata$addNode("tag", "score")		# 1
-			xmldata$addNode("tag", "name")		# 2
-			temp <- phenoData(eset)@varMetadata[[1]]
-			if ( length(temp) >= 2 ) {
-				for ( i in 2:length(temp) ) {
-					xmldata$addNode("tag", temp[i])
-				}
-			}
-			xmldata$closeTag()		
-
-			for ( sample in 1:nSamples ) {
-				xmldata$addNode("sample", close = FALSE)
-					xmldata$addNode("tag0", sample)
-					xmldata$addNode("tag1", "")
-					xmldata$addNode("tag2", Samples[sampleMaps[[1]][sample]])
-					if ( dim(eset@phenoData@data)[2] != 0 ) {
-						temp <- eset@phenoData@data[sampleMaps[[1]][sample],]
-						for ( i in 2:length(temp) ) {
-							xmldata$addNode(paste("tag", i+1, sep=""), temp[i])
-						}
-					}
-				xmldata$closeTag()
-			}
-
-		xmldata$closeTag()
-	
-		xmldata$addNode("modules", close = FALSE)
-		
-			xmldata$addNode("shortmoduletags", close = FALSE)
-			xmldata$addNode("tag", "id")
-			xmldata$addNode("tag", "name")
-			temp <- colnames(modules@seeddata)
-			if ( length(temp) >= 1 ) {
-				for ( i in 1:length(temp) ) {
-					xmldata$addNode("tag", temp[i])
-				}
-			}
-			xmldata$closeTag()
-			
-			xmldata$addNode("longmoduletags", close = FALSE)
-			xmldata$addNode("tag", "id")
-			xmldata$addNode("tag", "name")
-			temp <- colnames(modules@seeddata)
-			if ( length(temp) >= 1 ) {
-				for ( i in 1:length(temp) ) {
-					xmldata$addNode("tag", temp[i])
-				}
-			}
-			xmldata$closeTag()		
-
-			xmldata$addNode("shortgotags", close = FALSE)
-			xmldata$addNode("tag", "id")
-			xmldata$addNode("tag", "GO")
-			xmldata$addNode("tag", "Term")
-			xmldata$addNode("tag", "Ontology")
-			xmldata$addNode("tag", "Definition")
-			xmldata$addNode("tag", "PValue")
-			xmldata$addNode("tag", "OddsRatio")
-			xmldata$addNode("tag", "ExpCount")
-			xmldata$addNode("tag", "Count")
-			xmldata$addNode("tag", "Size")
-			xmldata$closeTag()
-
-			xmldata$addNode("longgotags", close = FALSE)
-			xmldata$addNode("tag", "id")
-			xmldata$addNode("tag", "GO")
-			xmldata$addNode("tag", "Term")
-			xmldata$addNode("tag", "Ontology")
-			xmldata$addNode("tag", "Definition")
-			xmldata$addNode("tag", "PValue")
-			xmldata$addNode("tag", "OddsRatio")
-			xmldata$addNode("tag", "ExpCount")
-			xmldata$addNode("tag", "Count")
-			xmldata$addNode("tag", "Size")
-			xmldata$closeTag()
-
-			xmldata$addNode("shortkeggtags", close = FALSE)
-			xmldata$addNode("tag", "id")
-			xmldata$addNode("tag", "KEGG")
-			xmldata$addNode("tag", "Path Name")
-			xmldata$addNode("tag", "PValue")
-			xmldata$addNode("tag", "OddsRatio")
-			xmldata$addNode("tag", "ExpCount")
-			xmldata$addNode("tag", "Count")
-			xmldata$addNode("tag", "Size")
-			xmldata$closeTag()
-
-			xmldata$addNode("longkeggtags", close = FALSE)
-			xmldata$addNode("tag", "id")
-			xmldata$addNode("tag", "KEGG")
-			xmldata$addNode("tag", "Path name")
-			xmldata$addNode("tag", "PValue")
-			xmldata$addNode("tag", "OddsRatio")
-			xmldata$addNode("tag", "ExpCount")
-			xmldata$addNode("tag", "Count")
-			xmldata$addNode("tag", "Size")
-			xmldata$closeTag()
-
-
-		for ( module in 1:nModules ) {
-			xmldata$addNode("module", close = FALSE)
-				xmldata$addNode("tag0", module)
-				xmldata$addNode("tag1", paste("module", module))
-				if ( length(colnames(modules@seeddata)) != 0 ) {
-					temp <- modules@seeddata[module,]
-					for ( i in 1:length(temp) ) {
-						xmldata$addNode(paste("tag", i+1, sep=""), temp[i])
-					}
-				}
-				
-				genes = as.matrix(modules@genes[,module]);
-				temp <- vector("numeric", getNoFeatures(modules)[module])
-				genesp <- vector("numeric", getNoFeatures(modules)[module])
-				scores <- vector("numeric", getNoFeatures(modules)[module])
-				i = 1;
-				intersectingmodulesgenes = list();
-				for ( gene in 1:nGenes ) {
-					if ( genes[gene] != 0 ) {
-						temp[i] <- gene
-						i <- i + 1
-						
-						for ( modulep in 1:nModules ) {
-							if ( module != modulep ) {
-								if ( modules@genes[gene, modulep] != 0 ) {
-									intersectingmodulesgenes <- append(intersectingmodulesgenes, modulep)
-								}
-							}
-						}
-						
-					}
-				}
-				for ( gene in 1:length(temp) ) {
-					genesp[gene] <- which(geneMaps[[1]]==temp[geneMaps[[module+1]][gene]])
-					scores[gene] <- genes[temp[geneMaps[[module+1]][gene]]]
-				}
-				xmldata$addNode("containedgenes", toString(genesp))
-				xmldata$addNode("genescores", toString(scores))
-				
-
-				samples = as.matrix(modules@conditions[,module]);
-				temp <- vector("numeric", getNoSamples(modules)[module])
-				samplesp <- vector("numeric", getNoSamples(modules)[module])
-				scores <- vector("numeric", getNoSamples(modules)[module])
-				i <- 1;
-				intersectingmodulessamples = list();
-				for ( sample in 1:nSamples ) {
-					if ( samples[sample] != 0 ) {
-						temp[i] <- sample
-						i <- i + 1
-						
-						for ( modulep in 1:nModules ) {
-							if ( module != modulep ) {
-								if ( modules@conditions[sample, modulep] != 0 ) {
-									intersectingmodulessamples <- append(intersectingmodulessamples, modulep)
-								}
-							}
-						}
-
-					}
-				}
-				for ( sample in 1:length(temp) ) {
-					samplesp[sample] <- which(sampleMaps[[1]]==temp[sampleMaps[[module+1]][sample]])
-					scores[sample] <- samples[temp[sampleMaps[[module+1]][sample]]]
-				}
-				xmldata$addNode("containedsamples", toString(samplesp))
-				xmldata$addNode("samplescores", toString(scores))
-
-				intersectingmodules <- intersect(unique(intersectingmodulesgenes), unique(intersectingmodulessamples))
-				xmldata$addNode("intersectingmodules", toString(intersectingmodules))
-				
-				xmldata$addNode("gos", close=FALSE)
-				k <- 1
-				for ( i in 1:3 ) {
-					
-					s <- summary(gos[[i]])[[module]]
-
-					if ( dim(s)[1] > 0 ) {
-						for ( j in 1:dim(s)[1] ) {
-							xmldata$addNode("go", close=FALSE)
-								xmldata$addNode("tag0", k)
-								k <- k + 1
-								goid <- rownames(s)[j]
-								xmldata$addNode("tag1", goid)
-								goentry <- which(go.table[,1]==goid)
-								xmldata$addNode("tag2", go.table[goentry,3])
-								xmldata$addNode("tag3", go.table[goentry,4])
-								xmldata$addNode("tag4", go.table[goentry,5])
-								xmldata$addNode("tag5", s[j,1])
-								xmldata$addNode("tag6", s[j,2])
-								xmldata$addNode("tag7", s[j,3])
-								xmldata$addNode("tag8", s[j,4])
-								xmldata$addNode("tag9", s[j,5])
-							xmldata$closeTag()
-						}
-					}
-				}
-				xmldata$closeTag()
-								
-				xmldata$addNode("keggs", close=FALSE)
-				k <- 1
-				s <- summary(keggs)[[module]]
-				if ( dim(s)[1] > 0 ) {
-					for ( j in 1:dim(s)[1] ) {
-						xmldata$addNode("kegg", close=FALSE)
-							xmldata$addNode("tag0", k)
-							k <- k + 1
-							keggid <- rownames(s)[j]
-							xmldata$addNode("tag1", keggid)
-							keggentry <- which(kegg.table[,1]==keggid)
-							xmldata$addNode("tag2", kegg.table[keggentry,2])
-							xmldata$addNode("tag3", s[j,1])
-							xmldata$addNode("tag4", s[j,2])
-							xmldata$addNode("tag5", s[j,3])
-							xmldata$addNode("tag6", s[j,4])
-							xmldata$addNode("tag7", s[j,5])
-						xmldata$closeTag()
-					}
-				}
-				xmldata$closeTag()
-
-			xmldata$closeTag()
+		temp <- base64encode(writeBin(Data, raw(), size=1))
+		# line breaks after 76 characters
+		for ( i in 1:ceiling(nchar(temp) / 76) ) {
+			writeLines(substr(temp, (i-1)*76 + 1, i*76), con)
 		}
-		xmldata$closeTag()
 		
-		# to get rid of "In xmlRoot.XMLInternalDocument(currentNodes[[1]]) : empty XML document use"
-		# options(warn=-1)
+	writeLines("\t</data>", con)
 
-		# show XML data
-		# cat(saveXML(xmldata))
-		writeBin(saveXML(xmldata), con, 1, endian="big")
-		
+	writeLines("</ged>", con)
+	
 	close(con)
 
+}
+
+formatter <- function(x) {
+	if ( abs(x) < 1e-2 ) {
+		res <- formatC(x, digits=2, format="e")
+	} else {
+		res <- formatC(x, digits=2, format="f")	
+	}
+	res
 }

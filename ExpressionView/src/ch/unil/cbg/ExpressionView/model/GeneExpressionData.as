@@ -11,6 +11,7 @@ package ch.unil.cbg.ExpressionView.model {
 	import flash.utils.setTimeout;
 	
 	import mx.collections.XMLListCollection;
+	import mx.utils.Base64Decoder;
 	
 	[Event(name=UpdateStatusBarEvent.UPDATESTATUSBAREVENT, type="ch.unil.cbg.expressionview.events.UpdateStatusBarEvent")];
 	[Event(name=GEDCompleteEvent.GEDCOMPLETEEVENT, type="ch.unil.cbg.expressionview.events.GEDCcmpleteEvent")];
@@ -24,16 +25,11 @@ package ch.unil.cbg.ExpressionView.model {
 		
 		public var XMLData:XML;
 		
-		public var shortLabelsGene:Array;
-		public var shortLabelsSample:Array;
-		public var shortLabelsModule:Array;
-		public var shortLabelsGO:Array;
-		public var shortLabelsKEGG:Array;		
-		public var longLabelsGene:Array;
-		public var longLabelsSample:Array;
-		public var longLabelsModule:Array;
-		public var longLabelsGO:Array;
-		public var longLabelsKEGG:Array;
+		public var geneLabels:Vector.<Array>;
+		public var sampleLabels:Vector.<Array>;
+		public var moduleLabels:Vector.<Array>;
+		public var goLabels:Vector.<Array>;
+		public var keggLabels:Vector.<Array>;		
 		
 		public var ModulesColors:Vector.<Array>;
 
@@ -74,23 +70,21 @@ package ch.unil.cbg.ExpressionView.model {
 		}
 
 
-		public function initialize(bytes: ByteArray): void  {		
+		public function initialize(data:XML): void  {		
 
-			XML.ignoreWhitespace = true;
+			XMLData = data;
+			//XML.ignoreWhitespace = true;
 
-			bytes.position = 19;
-			nGenes = bytes.readInt();
-			nSamples = bytes.readInt();
-			nModules = bytes.readInt();
-						
-			bytes.readBytes(Data, 0, (nGenes * nSamples)*8);
+			// read summary
+			nModules = int(XMLData.summary.nmodules);
+			nGenes = int(XMLData.summary.ngenes);
+			nSamples = int(XMLData.summary.nsamples);
 			
-			// get XML Data
-			XML.ignoreWhitespace = true;
-			bytes.position = (nGenes * nSamples) * 8 + 3 * 4 + 19;
-			var length:int = bytes.length - bytes.position;
-			XMLData = new XML(bytes.readUTFBytes(length));
-
+			// read expression matrix
+			var decoder:Base64Decoder = new Base64Decoder();
+			decoder.decode(XMLData.data);
+			Data = decoder.toByteArray();
+						
 			Modules = new XMLListCollection(XMLData.modules.module);
 			ModularData = new Vector.<GeneExpressionModule>(nModules+1, true);
 			ModulesColors = new Vector.<Array>(nModules+1, true);
@@ -99,56 +93,41 @@ package ch.unil.cbg.ExpressionView.model {
 				ModulesColors[module]  = [hsv2rgb(module / nModules * 360, 100, 60), hsv2rgb(module / nModules * 360, 100, 100)];
 			}
 			
-			// set labels
-			shortLabelsGene = [];
-			longLabelsGene = [];
-			var shorttags:XMLListCollection = new XMLListCollection(XMLData.genes.shortgenetags.tag);
-			var longtags:XMLListCollection = new XMLListCollection(XMLData.genes.longgenetags.tag);
-			for ( var tag:int = 0; tag < shorttags.length; ++tag ) {
-				shortLabelsGene.push(shorttags[tag]);
+			// read labels
+			var tags:XML = XML(XMLData.genes.genetags);
+			var size:int = tags.children().length();
+			geneLabels = new Vector.<Array>(size, true);
+ 			for ( var tag:int = 0; tag < size; ++tag ) {
+ 				var temp:String = tags.children()[tag].name();
+				geneLabels[tag] = [temp, tags.child(temp)];
 			}
-			for ( tag = 0; tag < longtags.length; ++tag ) {
-				longLabelsGene.push(longtags[tag]);
+			tags = new XML(XMLData.samples.sampletags);
+			size = tags.children().length();
+			sampleLabels = new Vector.<Array>(size, true);
+ 			for ( tag = 0; tag < size; ++tag ) {
+ 				temp = tags.children()[tag].name();
+				sampleLabels[tag] = [temp, tags.child(temp)];
 			}
-			shortLabelsSample = [];
-			longLabelsSample = [];
-			shorttags = new XMLListCollection(XMLData.samples.shortsampletags.tag);
-			longtags = new XMLListCollection(XMLData.samples.longsampletags.tag);
-			for ( tag = 0; tag < shorttags.length; ++tag ) {
-				shortLabelsSample.push(shorttags[tag]);
+			tags = new XML(XMLData.modules.moduletags);
+			size = tags.children().length();
+			moduleLabels = new Vector.<Array>(size, true);
+ 			for ( tag = 0; tag < size; ++tag ) {
+ 				temp = tags.children()[tag].name();
+				moduleLabels[tag] = [temp, tags.child(temp)];
 			}
-			for ( tag = 0; tag < longtags.length; ++tag ) {
-				longLabelsSample.push(longtags[tag]);
+			tags = new XML(XMLData.modules.gotags);
+			size = tags.children().length();
+			goLabels = new Vector.<Array>(size, true);
+ 			for ( tag = 0; tag < size; ++tag ) {
+ 				temp = tags.children()[tag].name();
+				goLabels[tag] = [temp, tags.child(temp)];
 			}
-			shortLabelsModule = [];
-			longLabelsModule = [];
-			shorttags = new XMLListCollection(XMLData.modules.shortmoduletags.tag);
-			longtags = new XMLListCollection(XMLData.modules.longmoduletags.tag);
-			for ( tag = 0; tag < shorttags.length; ++tag ) {
-				shortLabelsModule.push(shorttags[tag]);
-			}
-			for ( tag = 0; tag < longtags.length; ++tag ) {
-				longLabelsModule.push(longtags[tag]);
-			}
-			shortLabelsGO = [];
-			longLabelsGO = [];
-			shorttags = new XMLListCollection(XMLData.modules.shortgotags.tag);
-			longtags = new XMLListCollection(XMLData.modules.longgotags.tag);
-			for ( tag = 0; tag < shorttags.length; ++tag ) {
-				shortLabelsGO.push(shorttags[tag]);
-			}
-			for ( tag = 0; tag < longtags.length; ++tag ) {
-				longLabelsGO.push(longtags[tag]);
-			}
-			shortLabelsKEGG = [];
-			longLabelsKEGG = [];
-			shorttags = new XMLListCollection(XMLData.modules.shortkeggtags.tag);
-			longtags = new XMLListCollection(XMLData.modules.longkeggtags.tag);
-			for ( tag = 0; tag < shorttags.length; ++tag ) {
-				shortLabelsKEGG.push(shorttags[tag]);
-			}
-			for ( tag = 0; tag < longtags.length; ++tag ) {
-				longLabelsKEGG.push(longtags[tag]);
+			tags = new XML(XMLData.modules.keggtags);
+			size = tags.children().length();
+			keggLabels = new Vector.<Array>(size, true);
+ 			for ( tag = 0; tag < size; ++tag ) {
+ 				temp = tags.children()[tag].name();
+				keggLabels[tag] = [temp, tags.child(temp)];
 			}
 
 			// set modularData[0]
@@ -314,7 +293,7 @@ package ch.unil.cbg.ExpressionView.model {
 					var value:Number = global.GEImage.getPixel(gene-1, sample-1);
 					gebitmapdata.setPixel(genep, samplep, value);					
 					value = global.ModulesImage.getPixel(gene-1, sample-1);
-					var k:int = (sample - 1) * nGenes + gene - 1;
+					var k:int = (gene - 1) * nSamples + sample - 1;
 					if ( ModulesLookup[k].length > 0 ) {
 						var color:uint = ModulesColors[ModulesLookup[k][ModulesLookup[k].length-1]][0];
 						if ( color != ModulesColors[module][0] ) {
@@ -349,13 +328,12 @@ package ch.unil.cbg.ExpressionView.model {
 					samplep = SamplesLookup[module][sample];
 				}
 				var k:int = (genep-1) * nSamples + samplep - 1;
-				var k2:int = (samplep-1) * nGenes + genep - 1;
 				var modules:Array = [];
-				if ( k2 >= 0 && k2 < ModulesLookup.length ) {
-					modules = ModulesLookup[k2];
+				if ( k >= 0 && k < ModulesLookup.length ) {
+					modules = ModulesLookup[k];
 				}
-				Data.position = k * 8;
-				var data:Number = Data.readDouble();
+				Data.position = k;
+				var data:Number = int(Data.readByte()) / 100.;
 				return new Array(geneDescription, sampleDescription, modules, data);
 			}
 			return null;
@@ -381,7 +359,7 @@ package ch.unil.cbg.ExpressionView.model {
 					ModulesLookupGenes[genep].push(module);
 				}				 
 		   		genes.sort(Array.NUMERIC);
-		   		
+
 				string = Modules.source[module-1].containedsamples.toString();
 				var samples:Array = string.split(", ");
 				SamplesLookup[module] = [];
@@ -393,10 +371,9 @@ package ch.unil.cbg.ExpressionView.model {
 				}
 				samples.sort(Array.NUMERIC);
 
-				string = Modules.source[module-1].intersectingmodules.toString();				
+				string = Modules.source[module-1].intersectingmodules.toString();
 				var modules:Array = string.split(", ");
 				modules.sort(Array.NUMERIC);
-									
 				
 				// determine rectangles				
 				var rectxleft:Array = []; var rectxright:Array = [];
@@ -448,7 +425,7 @@ package ch.unil.cbg.ExpressionView.model {
 					gene = GenesLookup[module][genep];
 					for ( samplep = 0; samplep < SamplesLookup[module].length; ++samplep ) {
 						sample = SamplesLookup[module][samplep];
-						var k:int = (sample-1) * nGenes + gene - 1;
+						var k:int = (gene-1) * nSamples + sample - 1;
 						if ( ModulesLookup[k] == null ) { 
 							ModulesLookup[k] = [module]; 
 						} else {
@@ -496,18 +473,18 @@ package ch.unil.cbg.ExpressionView.model {
 				}
 						
 				for ( var sample:int = 1; sample <= nSamples; ++sample ) {
-					var value:Number = Data.readDouble();
+					var value:int = int(Data.readByte());
 					var red:uint; var green:uint;
 					if ( value >= 0 ) {
-						red = value * 255;
+						red = value * 2.55;
 						green = 0;
 					} else {
 						red = 0;
-						green = -value * 255;
+						green = -value * 2.55;
 					}
 					gebitmapdata.setPixel(gene-1, sample-1, (red<<16) + (green<<8) + 0);
 					
-					var k:int = (sample-1) * nGenes + gene - 1;
+					var k:int = (gene-1) * nSamples + sample - 1
 					if ( ModulesLookup[k].length > 0 ) {
 						var color:uint = ModulesColors[ModulesLookup[k][ModulesLookup[k].length-1]][0];
 						modulesbitmapdata.setPixel(gene-1, sample-1, color);

@@ -37,11 +37,11 @@ package ch.unil.cbg.ExpressionView.view.components {
 		private function mouseClickHandler(event:MouseEvent):void {
 			var url:String = new String();
 			if ( dataProvider == "genecard" ) {
-				url = "http://www.genecards.org/cgi-bin/carddisp.pl?gene=" + event.currentTarget.data.tag3;
+				url = "http://www.genecards.org/cgi-bin/carddisp.pl?gene=" + event.currentTarget.data.symbol;
 			} else if ( dataProvider == "entrez" ) {
-				url = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=Retrieve&dopt=full_report&list_uids=" + event.currentTarget.data.tag4; 
+				url = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=Retrieve&dopt=full_report&list_uids=" + event.currentTarget.data.entrezid; 
 			} else if ( dataProvider == "go" ) {
-				url = "http://amigo.geneontology.org/cgi-bin/amigo/term-details.cgi?term=" + event.currentTarget.data.tag1
+				url = "http://amigo.geneontology.org/cgi-bin/amigo/term-details.cgi?term=" + event.currentTarget.data.go
 			}
 			var request:URLRequest = new URLRequest(url);
 			navigateToURL(request, "_blank");

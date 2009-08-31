@@ -449,8 +449,8 @@ package ch.unil.cbg.ExpressionView.view {
 				// update infoPanel
 				var infoString:String = "";
 				if ( infoArray.length != 0 ) {
-					infoString = infoString + "Gene: " + infoArray[0].tag2;
-					infoString = infoString + "\nSample: " + infoArray[1].tag2;
+					infoString = infoString + "Gene: " + infoArray[0].symbol + " (" + infoArray[0].name + ")";
+					infoString = infoString + "\nSample: " + infoArray[1].name;
 					infoString = infoString + "\nModules: " + infoArray[2];
 					infoString = infoString + "\nData: " + infoArray[3].toPrecision(3);
 				}
@@ -495,20 +495,16 @@ package ch.unil.cbg.ExpressionView.view {
 			samplesSearchableDataGrid.dataProvider = gem.Samples;
 			// genes
 			var temp:Array = [];
-			for ( var i:int = 0; i < ged.shortLabelsGene.length; i++ ) {
+			for ( var i:int = 0; i < ged.geneLabels.length; i++ ) {
 				var column:DataGridColumn = new DataGridColumn();
-				column.dataField = "tag" + i;
-				if ( i > 0 ) {
-					column.headerText = ged.shortLabelsGene[i];
-				} else {
-					column.headerText = "#";
-				}
+				column.dataField = ged.geneLabels[i][0];
+				column.headerText = ged.geneLabels[i][1];
 				if ( column.headerText == "score" ) {
 					column.visible = false;
 				}
 				// show hyperlinks
 				var linkRenderer:ClassFactory = new ClassFactory(LinkRenderer);
-				if ( ged.shortLabelsGene[i] == "symbol" || ged.shortLabelsGene[i] == "entrezid" ) {
+				if ( ged.geneLabels[i][0] == "symbol" || ged.geneLabels[i][0] == "entrezid" ) {
 					var database:String = "entrez";
 					if ( ged.XMLData.experimentdata.organism == "Homo sapiens" ) {
 						database = "genecard";
@@ -516,80 +512,64 @@ package ch.unil.cbg.ExpressionView.view {
 					linkRenderer.properties = { dataProvider : database }
 					column.itemRenderer = linkRenderer;	
 				}
-				column.sortCompareFunction = sortFunction(i);
+				column.sortCompareFunction = sortFunction(column.dataField);
 				temp.push(column);
 			}
 			genesSearchableDataGrid.columns = temp;
 			// samples
 			temp = [];
-			for ( i = 0; i < ged.shortLabelsSample.length; i++ ) {
+			for ( i = 0; i < ged.sampleLabels.length; i++ ) {
 				column = new DataGridColumn();
-				column.dataField = "tag" + i;
-				if ( i > 0 ) {
-					column.headerText = ged.shortLabelsSample[i];
-				} else {
-					column.headerText = "#";
-				}
+				column.dataField = ged.sampleLabels[i][0];
+				column.headerText = ged.sampleLabels[i][1];
 				if ( column.headerText == "score" ) {
 					column.visible = false;
 				}
-				column.sortCompareFunction = sortFunction(i);
+				column.sortCompareFunction = sortFunction(column.dataField);
 				temp.push(column)
 			}
 			samplesSearchableDataGrid.columns = temp;
 			// modules
 			temp = [];
-			for ( i = 0; i < ged.shortLabelsModule.length; i++ ) {
+			for ( i = 0; i < ged.moduleLabels.length; i++ ) {
 				column = new DataGridColumn();
-				column.dataField = "tag" + i;
-				if ( i > 0 ) {
-					column.headerText = ged.shortLabelsModule[i];
-				} else {
-					column.headerText = "#";
-				}
-				column.sortCompareFunction = sortFunction(i);
+				column.dataField = ged.moduleLabels[i][0];
+				column.headerText = ged.moduleLabels[i][1];
+				column.sortCompareFunction = sortFunction(column.dataField);
 				temp.push(column)
 			}
 			modulesSearchableDataGrid.columns = temp;
 			// GO
 			temp = [];
-			for ( i = 0; i < ged.shortLabelsGO.length; i++ ) {
+			for ( i = 0; i < ged.goLabels.length; i++ ) {
 				column = new DataGridColumn();
-				column.dataField = "tag" + i;
-				if ( i > 0 ) {
-					column.headerText = ged.shortLabelsGO[i];
-				} else {
-					column.headerText = "#";
-				}
+				column.dataField = ged.goLabels[i][0];
+				column.headerText = ged.goLabels[i][1];
 				// show hyperlinks
 				linkRenderer = new ClassFactory(LinkRenderer);
-				if ( ged.shortLabelsGO[i] == "GO" ) {
+				if ( ged.goLabels[i][0] == "go" ) {
 					database = "go";
 					linkRenderer.properties = { dataProvider : database }
 					column.itemRenderer = linkRenderer;	
 				}
-				column.sortCompareFunction = sortFunction(i);
+				column.sortCompareFunction = sortFunction(column.dataField);
 				temp.push(column);
 			}
 			GOSearchableDataGrid.columns = temp;
 			// KEGG
 			temp = [];
-			for ( i = 0; i < ged.shortLabelsKEGG.length; i++ ) {
+			for ( i = 0; i < ged.keggLabels.length; i++ ) {
 				column = new DataGridColumn();
-				column.dataField = "tag" + i;
-				if ( i > 0 ) {
-					column.headerText = ged.shortLabelsKEGG[i];
-				} else {
-					column.headerText = "#";
-				}
+				column.dataField = ged.keggLabels[i][0];
+				column.headerText = ged.keggLabels[i][1];
 				// show hyperlinks
 				linkRenderer = new ClassFactory(LinkRenderer);
-				if ( ged.shortLabelsGO[i] == "KEGG" ) {
+				if ( ged.keggLabels[i][0] == "kegg" ) {
 					database = "kegg";
 					linkRenderer.properties = { dataProvider : database }
 					column.itemRenderer = linkRenderer;	
 				}
-				column.sortCompareFunction = sortFunction(i);
+				column.sortCompareFunction = sortFunction(column.dataField);
 				temp.push(column);
 			}
 			KEGGSearchableDataGrid.columns = temp;
@@ -620,14 +600,13 @@ package ch.unil.cbg.ExpressionView.view {
 			mapOpenTabs.push(0);				
 		}
 		
-		private function sortFunction(sortfield:int):Function {
+		private function sortFunction(sortfield:String):Function {
 			return function (obj1:Object, obj2:Object):int {
-				var childname:String = "tag" + sortfield;
 				var result:int;
-				if ( isNaN(Number(obj1.child(childname))) ) {
-					result = ObjectUtil.stringCompare(obj1.child(childname),obj2.child(childname),true);
+				if ( isNaN(Number(obj1.child(sortfield))) ) {
+					result = ObjectUtil.stringCompare(obj1.child(sortfield),obj2.child(sortfield),true);
 				} else {
-					result = ObjectUtil.numericCompare(Number(obj1.child(childname)),Number(obj2.child(childname)));
+					result = ObjectUtil.numericCompare(Number(obj1.child(sortfield)),Number(obj2.child(sortfield)));
 				}        		
 	    	    return result;
     		}

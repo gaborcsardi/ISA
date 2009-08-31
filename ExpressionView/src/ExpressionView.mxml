@@ -174,18 +174,24 @@
 
 			private function processFileHandler(event:MenuEvent): void {
 				statusBar.visible = true;
-				bytes = event.data[0];				
+				bytes = event.data[0];			
 				bytes.position = 0;
 				
-				var identifier:String = bytes.readUTFBytes(18);
-				
-				if ( identifier != "ExpressionViewFile" ) {
+				var data:XML = new XML();
+				try {
+					data = XML(bytes.readUTFBytes(bytes.length));
+				} catch (error:Error) {
 					Alert.show('Not an ExpressionView file.', 'Error', mx.controls.Alert.OK);
-					return;				
+					return;			
+				}
+				
+				if ( !data.summary.ngenes ) {
+					Alert.show('Not an ExpressionView file.', 'Error', mx.controls.Alert.OK);
+					return;		
 				}
 				
 				dispatchEvent(new UpdateStatusBarEvent("parsing file"));
-				rawged.initialize(bytes);
+				rawged.initialize(data);
 
 			}
 			
