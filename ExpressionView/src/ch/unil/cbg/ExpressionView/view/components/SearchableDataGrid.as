@@ -219,6 +219,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 		public function set dataProvider(value:Object):void{
 			dataprovider = value as XMLListCollection;
 			dataGrid.dataProvider = dataprovider;
+			calculateOptimalWidths();
 		}
 
 		public function get columns():Array {

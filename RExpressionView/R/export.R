@@ -169,7 +169,7 @@ toExpressionView <- function(modules, eset, order, go=NULL, kegg=NULL, filename=
 			writeLines("\t\t\t<go>GO</go>", con)
 			writeLines("\t\t\t<term>Term</term>", con)
 			writeLines("\t\t\t<ontology>Ontology</ontology>", con)
-			writeLines("\t\t\t<definition>Definition</definition>", con)
+			#writeLines("\t\t\t<definition>Definition</definition>", con)
 			writeLines("\t\t\t<pvalue>PValue</pvalue>", con)
 			writeLines("\t\t\t<oddsratio>OddsRatio</oddsratio>", con)
 			writeLines("\t\t\t<expcount>ExpCount</expcount>", con)
@@ -217,7 +217,7 @@ toExpressionView <- function(modules, eset, order, go=NULL, kegg=NULL, filename=
 				}
 			}
 
-			genesp <- which(genes!=0)[geneMaps[[module+1]]]
+			genesp <- match(as.vector(which(modules@genes[,module]!=0)),geneMaps[[1]])[geneMaps[[module+1]]]
 			writeLines(paste("\t\t\t<containedgenes>", toString(genesp), "</containedgenes>", sep=""), con)
 			scores <- as.array(genes[genesp])
 			scores <- apply(scores, 1, formatter)
@@ -231,7 +231,7 @@ toExpressionView <- function(modules, eset, order, go=NULL, kegg=NULL, filename=
 				}
 			}
 
-			samplesp <- which(samples!=0)[sampleMaps[[module+1]]]
+			samplesp <- match(as.vector(which(modules@conditions[,module]!=0)),sampleMaps[[1]])[sampleMaps[[module+1]]]
 			writeLines(paste("\t\t\t<containedsamples>", toString(samplesp), "</containedsamples>", sep=""), con)
 			scores <- as.array(samples[samplesp])
 			scores <- apply(scores, 1, formatter)
@@ -256,7 +256,7 @@ toExpressionView <- function(modules, eset, order, go=NULL, kegg=NULL, filename=
 							writeLines(paste("\t\t\t\t\t<go>", rownames(s)[j], "</go>", sep=""), con)
 							writeLines(paste("\t\t\t\t\t<term>", go.table[temp[j], 3], "</term>", sep=""), con)
 							writeLines(paste("\t\t\t\t\t<ontology>", go.table[temp[j], 4], "</ontology>", sep=""), con)
-							writeLines(paste("\t\t\t\t\t<definition>", go.table[temp[j], 5], "</definition>", sep=""), con)
+							#writeLines(paste("\t\t\t\t\t<definition>", go.table[temp[j], 5], "</definition>", sep=""), con)
 							writeLines(paste("\t\t\t\t\t<pvalue>", formatter(s[j, 1]), "</pvalue>", sep=""), con)
 							writeLines(paste("\t\t\t\t\t<oddsratio>", formatter(s[j, 2]), "</oddsratio>", sep=""), con)
 							writeLines(paste("\t\t\t\t\t<expcount>", formatter(s[j, 3]), "</expcount>", sep=""), con)
