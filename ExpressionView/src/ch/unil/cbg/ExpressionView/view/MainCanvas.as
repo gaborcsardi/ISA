@@ -251,16 +251,16 @@ package ch.unil.cbg.ExpressionView.view {
 
 		private function toggleScoreColumns(state:Boolean):void {
 			var temp:Array = genesSearchableDataGrid.columns;
-			for ( var j:int = 0; j < temp.length; ++j ) {
-				if ( temp[j].dataField == "score" ) {
-					temp[j].visible = state;
+			for ( var i:int = 0; i < temp.length; ++i ) {
+				if ( temp[i].dataField == "score" ) {
+					temp[i].visible = state;
 				}
 			}
 			genesSearchableDataGrid.columns = temp;
 			temp = samplesSearchableDataGrid.columns;
-			for ( j = 0; j < temp.length; ++j ) {
-				if ( temp[j].dataField == "score" ) {
-					temp[j].visible = state;
+			for ( i = 0; i < temp.length; ++i ) {
+				if ( temp[i].dataField == "score" ) {
+					temp[i].visible = state;
 				}
 			}
 			samplesSearchableDataGrid.columns = temp;
@@ -272,7 +272,7 @@ package ch.unil.cbg.ExpressionView.view {
 			openTabs[event.newIndex].addListener();
 			var oldmodule:int = mapOpenTabs[event.oldIndex];
 			var module:int = mapOpenTabs[event.newIndex];
-			genesSearchableDataGrid.dataProvider = ged.getModule(module).Genes;
+			
 			if ( module == 0 ) {
 				toggleScoreColumns(false);
 			} 
@@ -290,7 +290,8 @@ package ch.unil.cbg.ExpressionView.view {
 				infoNavigator.getTabAt(3).includeInLayout = true;
 				infoNavigator.getTabAt(4).includeInLayout = true;
 			}
-
+			
+			genesSearchableDataGrid.dataProvider = ged.getModule(module).Genes;
 			samplesSearchableDataGrid.dataProvider = ged.getModule(module).Samples;
 			dispatchEvent(new MenuEvent(MenuEvent.MODE, [selectedMode]));
 		}

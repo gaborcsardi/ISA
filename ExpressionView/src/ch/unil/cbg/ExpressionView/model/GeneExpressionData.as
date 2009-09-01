@@ -179,7 +179,7 @@ package ch.unil.cbg.ExpressionView.model {
 		}
 
 		private function generateModule(module:int): void {
-						
+			
 			var global:GeneExpressionModule = ModularData[0];
 			var newmodule:GeneExpressionModule = new GeneExpressionModule();
 			
@@ -187,25 +187,26 @@ package ch.unil.cbg.ExpressionView.model {
 			var samples:Array = SamplesLookup[module];
 			var ngenes:int = genes.length;
 			var nsamples:int = samples.length;
-			
+						
 			newmodule.nGenes = ngenes;
 			var string:String = Modules.source[module-1].genescores.toString();
 		   	var scores:Array = string.split(", ");
 			for ( var gene:int = 0; gene < genes.length; ++gene ) {
-				var item:XML = global.Genes[genes[gene]-1];
+				var item:XML = new XML(global.Genes[genes[gene]-1]);
 				item.id = gene + 1;
 				item.score = scores[gene];
 				newmodule.Genes.addItem(item);
-			}			
+			}
 			newmodule.nSamples = nsamples;
 			string = Modules.source[module-1].samplescores.toString();
 		   	scores = string.split(", ");
 			for ( var sample:int = 0; sample < samples.length; ++sample ) {
-				item = global.Samples[samples[sample]-1];
+				item = new XML(global.Samples[samples[sample]-1]);
 				item.id = sample + 1;
 				item.score = scores[sample];
 				newmodule.Samples.addItem(item);
 			}
+
 			newmodule.GO = new XMLListCollection(XMLData.modules.module[module-1].gos.go);
 			newmodule.KEGG = new XMLListCollection(XMLData.modules.module[module-1].keggs.kegg);
 			
