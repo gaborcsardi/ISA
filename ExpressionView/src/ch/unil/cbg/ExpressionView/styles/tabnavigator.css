@@ -1,0 +1,12 @@
+.closableTabNavigator {
+}
+
+.closableTab {
+}
+
+.tabCloseButton {
+	upSkin:        Embed('/ch/unil/cbg/ExpressionView/assets/tabnavigator/closeButton.png');
+	overSkin:      Embed('/ch/unil/cbg/ExpressionView/assets/tabnavigator/closeButton.png');
+	downSkin:      Embed('/ch/unil/cbg/ExpressionView/assets/tabnavigator/closeButton.png');
+	disabledSkin:  Embed('/ch/unil/cbg/ExpressionView/assets/tabnavigator/closeButton.png');
+}

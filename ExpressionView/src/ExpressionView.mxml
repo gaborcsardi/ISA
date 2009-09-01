@@ -212,5 +212,6 @@
 	<mx:Style source="ch/unil/cbg/ExpressionView/styles/global.css"/>
 	<mx:Style source="ch/unil/cbg/ExpressionView/styles/panel.css"/>
 	<mx:Style source="ch/unil/cbg/ExpressionView/styles/menu.css"/>
+	<mx:Style source="ch/unil/cbg/ExpressionView/styles/tabnavigator.css"/>
 	
 </mx:Application>

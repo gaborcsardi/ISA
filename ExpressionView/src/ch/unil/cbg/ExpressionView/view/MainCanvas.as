@@ -15,10 +15,11 @@ package ch.unil.cbg.ExpressionView.view {
 	import mx.containers.Canvas;
 	import mx.containers.HDividedBox;
 	import mx.containers.Panel;
+	import mx.containers.TabNavigator;
 	import mx.containers.VDividedBox;
 	import mx.controls.Alert;
-	import mx.controls.TextArea;
 	import mx.controls.Label;
+	import mx.controls.TextArea;
 	import mx.controls.dataGridClasses.DataGridColumn;
 	import mx.core.ClassFactory;
 	import mx.events.IndexChangedEvent;
@@ -55,7 +56,7 @@ package ch.unil.cbg.ExpressionView.view {
 		private var infoPanel:Panel;
 		private var infoDivider:VDividedBox;
 		private var infoContent:TextArea;
-		private var infoNavigator:ClosableTabNavigator;
+		private var infoNavigator:TabNavigator;
 		
 		private var modulesSearchableDataGrid:SearchableDataGrid;
 		private var genesSearchableDataGrid:SearchableDataGrid;		
@@ -90,7 +91,7 @@ package ch.unil.cbg.ExpressionView.view {
 				if ( !modulesNavigator ) {
 					modulesNavigator = new ClosableTabNavigator();
 					modulesNavigator.addEventListener(IndexChangedEvent.CHANGE, tabChangeHandler);
-					//modulesNavigator.addEventListener(ClosableTabNavigatorEvent.TAB_CLOSE, tabCloseHandler);
+					modulesNavigator.addEventListener(ClosableTabNavigatorEvent.CLOSE, tabCloseHandler);
 					modulesNavigator.addEventListener(IndexChangedEvent.CHILD_INDEX_CHANGE, tabReorderHandler);
 					gePanel.addChild(modulesNavigator);
 					
@@ -117,7 +118,7 @@ package ch.unil.cbg.ExpressionView.view {
 					}
 					
 					if ( !infoNavigator ) {
-						infoNavigator = new ClosableTabNavigator();
+						infoNavigator = new TabNavigator();
 						infoDivider.addChild(infoNavigator);
 						
 						if ( !modulesSearchableDataGrid ) {
@@ -268,46 +269,42 @@ package ch.unil.cbg.ExpressionView.view {
 		}
 		
 		private function tabChangeHandler(event:IndexChangedEvent): void {
-			openTabs[event.oldIndex].removeListener();
+
 			openTabs[event.newIndex].addListener();
-			var oldmodule:int = mapOpenTabs[event.oldIndex];
 			var module:int = mapOpenTabs[event.newIndex];
-			
 			if ( module == 0 ) {
 				toggleScoreColumns(false);
-			} 
-			if ( oldmodule == 0 ) {
-				toggleScoreColumns(true);
-			}
-			if ( module == 0 ) { 
 				infoNavigator.getTabAt(3).visible = false;
 				infoNavigator.getTabAt(4).visible = false;
 				infoNavigator.getTabAt(3).includeInLayout = false;
 				infoNavigator.getTabAt(4).includeInLayout = false;
 			} else {
+				toggleScoreColumns(true);
 				infoNavigator.getTabAt(3).visible = true;
 				infoNavigator.getTabAt(4).visible = true;				
 				infoNavigator.getTabAt(3).includeInLayout = true;
 				infoNavigator.getTabAt(4).includeInLayout = true;
-			}
-			
+			} 
 			genesSearchableDataGrid.dataProvider = ged.getModule(module).Genes;
 			samplesSearchableDataGrid.dataProvider = ged.getModule(module).Samples;
 			dispatchEvent(new MenuEvent(MenuEvent.MODE, [selectedMode]));
+			
+			if ( event.oldIndex < modulesNavigator.numChildren ) {
+				openTabs[event.oldIndex].removeListener();
+				var oldmodule:int = mapOpenTabs[event.oldIndex];
+			}			
+			
 		}
 		
-		/*
 		private function tabCloseHandler(event:ClosableTabNavigatorEvent): void {
-			if ( event.tabIndex == 0 ) {
-				event.preventDefault();
-			} else {
-				event.preventDefault();
-				Alert.show("Closing tabs is not yet supported.", 'Warning', mx.controls.Alert.OK)
-				//openTabs.splice(event.tabIndex, 1);
-				//mapOpenTabs.splice(event.tabIndex, 1);
+			var tabIndex:int = event.data[0];
+			if ( tabIndex != 0 ) {
+				modulesNavigator.selectedIndex = tabIndex - 1;
+				modulesNavigator.removeChildAt(tabIndex);			
+				openTabs.splice(tabIndex, 1);
+				mapOpenTabs.splice(tabIndex, 1);
 			}
 		}
-		*/
 		
 		private function tabReorderHandler(event:IndexChangedEvent): void {
 			event.preventDefault();
@@ -335,7 +332,6 @@ package ch.unil.cbg.ExpressionView.view {
 		}
 				
 		private function doubleClickModulesHandler(event:SearchableDataGridSelectionEvent): void {
-			
 			for ( var i:int = 0; i < event.selection.length; ++i ) {
 				var selectedModule:int = event.selection[i];
 				var selectedTab:int = mapOpenTabs.indexOf(selectedModule);
@@ -343,6 +339,7 @@ package ch.unil.cbg.ExpressionView.view {
 					var gem:GeneExpressionModule = ged.getModule(selectedModule);
 					selectedTab = openTabs.push(new ZoomPanCanvas()) - 1;
 					modulesNavigator.addChild(openTabs[selectedTab]);
+					modulesNavigator.enableClose = [0, ClosableTab.NEVER];
 					openTabs[selectedTab].label = "m" + selectedModule.toString();
 
 					var largestRectangles:Array = new Array(ged.nModules + 1);
@@ -615,6 +612,8 @@ package ch.unil.cbg.ExpressionView.view {
 			var selectedTab:int = openTabs.push(new ZoomPanCanvas()) - 1;
 			modulesNavigator.addChild(openTabs[selectedTab]);
 
+			modulesNavigator.enableClose = [selectedTab, ClosableTab.NEVER];
+
 			var largestRectangles:Array = new Array(ged.nModules + 1);
 			largestRectangles[0] = new Rectangle();
 			var maxwidth:int = 0;
@@ -632,7 +631,7 @@ package ch.unil.cbg.ExpressionView.view {
 			openTabs[selectedTab].addEventListener(MouseEvent.ROLL_OUT, rollOutHandler);
 
 			mapOpenTabs = new Vector.<int>;
-			mapOpenTabs.push(0);				
+			mapOpenTabs.push(0);							
 		}
 		
 		private function sortFunction(sortfield:String):Function {
