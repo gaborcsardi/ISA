@@ -14,8 +14,6 @@ package ch.unil.cbg.ExpressionView.view.components {
 		
 		use namespace mx_internal;
 		
-		private var _enableClose:String = "rollover";
-		
 		public function ClosableTabBar() {
 			super();
 			navItemFactory = new ClassFactory(ClosableTab);
@@ -27,24 +25,14 @@ package ch.unil.cbg.ExpressionView.view.components {
 		
 		override protected function createNavItem(label:String, icon:Class = null):IFlexDisplayObject{
 			var tab:ClosableTab = super.createNavItem(label,icon) as ClosableTab;
-			tab.enableClose = _enableClose;
 			tab.addEventListener(ClosableTab.CLOSE_TAB_EVENT, closeTabClickHandler);
 			return tab;
 		}
 		
 		public function set enableClose(data:Array):void {
-			if ( data[0] == "all" ) {
-				_enableClose = data[1];
-		        for ( var i:int = 0; i < numChildren; ++i ) {
-		            var child:ClosableTab = ClosableTab(getChildAt(i));
-					child.enableClose = _enableClose;
-	        	}
-				invalidateDisplayList();
-			} else {
-				if ( data[0] < numChildren ) {
-					child = ClosableTab(getChildAt(data[0]));
-					child.enableClose = data[1];
-				}				
+			if ( data[0] < numChildren ) {
+				var child:ClosableTab = ClosableTab(getChildAt(data[0]));
+				child.enableClose = data[1];
 			}
 		}
 		

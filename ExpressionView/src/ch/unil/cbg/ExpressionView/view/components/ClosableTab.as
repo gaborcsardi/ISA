@@ -15,7 +15,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 		public static const ROLLOVER:String = "rollover";
 		//public static const SELECTED:String = "selected";
 		public static const CLOSE_TAB_EVENT:String = "closeTab";
-		private var _enableClose:String = ROLLOVER;
+		private var _enableClose:String = NEVER;
 		
 		private var overCloseButton:Boolean = false;
 				
@@ -48,8 +48,8 @@ package ch.unil.cbg.ExpressionView.view.components {
 				closeButton.visible = true;
 			}
 			
-			
 			if ( closeButton.visible ) {
+				trace("visible", _enableClose)
 				textField.width -= closeButton.width;
 				textField.truncateToFit();
 

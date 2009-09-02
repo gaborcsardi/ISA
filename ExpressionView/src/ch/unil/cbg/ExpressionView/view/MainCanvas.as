@@ -339,7 +339,7 @@ package ch.unil.cbg.ExpressionView.view {
 					var gem:GeneExpressionModule = ged.getModule(selectedModule);
 					selectedTab = openTabs.push(new ZoomPanCanvas()) - 1;
 					modulesNavigator.addChild(openTabs[selectedTab]);
-					modulesNavigator.enableClose = [0, ClosableTab.NEVER];
+					modulesNavigator.enableClose = [selectedTab, ClosableTab.ROLLOVER];
 					openTabs[selectedTab].label = "m" + selectedModule.toString();
 
 					var largestRectangles:Array = new Array(ged.nModules + 1);
