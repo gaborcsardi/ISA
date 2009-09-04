@@ -444,7 +444,7 @@ package ch.unil.cbg.ExpressionView.model {
 								
 			}					
 			
-			this.dispatchEvent(new UpdateStatusBarEvent("reading module " + module + " of " + nModules + "."));			
+			dispatchEvent(new UpdateStatusBarEvent("reading module " + module + " of " + nModules + "."));			
 			setTimeout(treatModules, 10, module);
 
 		}
@@ -495,7 +495,7 @@ package ch.unil.cbg.ExpressionView.model {
 			
 			}
 			
-			this.dispatchEvent(new UpdateStatusBarEvent("generating bitmap " + int(gene/nGenes*100) + " %."));
+			dispatchEvent(new UpdateStatusBarEvent("generating bitmap " + int(gene/nGenes*100) + " %."));
 			setTimeout(treatBitmap, 10, gene);
 		
 		}

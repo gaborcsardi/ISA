@@ -1,3 +1,5 @@
+// inspired by Doug McCune SuperTabNavigator (http://dougmccune.com/blog)
+
 package ch.unil.cbg.ExpressionView.view.components {
 	
 	import flash.events.Event;
@@ -49,7 +51,6 @@ package ch.unil.cbg.ExpressionView.view.components {
 			}
 			
 			if ( closeButton.visible ) {
-				trace("visible", _enableClose)
 				textField.width -= closeButton.width;
 				textField.truncateToFit();
 

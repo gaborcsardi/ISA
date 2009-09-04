@@ -1,3 +1,5 @@
+// inspired by Doug McCune SuperTabNavigator (http://dougmccune.com/blog)
+
 package ch.unil.cbg.ExpressionView.view.components {
 	
 	import ch.unil.cbg.ExpressionView.events.ClosableTabNavigatorEvent;

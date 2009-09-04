@@ -43,6 +43,7 @@ package ch.unil.cbg.ExpressionView.view {
 		private var ged:GeneExpressionData;
 		
 		private var selectedMode:int;
+		private var selectedAlpha:Number;
 		
 		private var lastHighlightedModules:Array;
 		
@@ -161,6 +162,10 @@ package ch.unil.cbg.ExpressionView.view {
 							experimentData = new Canvas();
 							experimentData.label = "Experiment";
 							infoNavigator.addChild(experimentData);
+							if ( !experimentDataContent ) {
+								experimentDataContent = new TextArea();
+								experimentData.addChild(experimentDataContent);
+							}
 						}
 						
 					}
@@ -177,8 +182,13 @@ package ch.unil.cbg.ExpressionView.view {
 			parentApplication.addEventListener(BroadcastPositionEvent.MOUSE_CLICK, broadcastPositionClickHandler);
 			parentApplication.addEventListener(MenuEvent.PDF_EXPORT, pdfExportHandler);
 			parentApplication.addEventListener(ResizeBrowserEvent.RESIZEBROWSEREVENT, resizeBrowserHandler);
+			parentApplication.addEventListener(MenuEvent.ALPHA, alphaSliderChangeHandler);
 		}
-						
+
+		private function alphaSliderChangeHandler(event:MenuEvent): void {
+			selectedAlpha = event.data[0];
+		}
+		
 		private function resizeBrowserHandler(event:ResizeBrowserEvent): void {
 			
 			var scalex:Number = event.scaleX;
@@ -229,6 +239,10 @@ package ch.unil.cbg.ExpressionView.view {
 			genesSearchableDataGrid.percentHeight = 100;
 			samplesSearchableDataGrid.percentWidth = 100;
 			samplesSearchableDataGrid.percentHeight = 100;
+			experimentData.percentWidth = 100;
+			experimentData.percentHeight = 100;
+			experimentDataContent.percentWidth = 100;
+			experimentDataContent.percentHeight = 100;
 			
 			if ( useDefaultPositions ) {
 				gePanel.percentWidth = 60;
@@ -367,7 +381,8 @@ package ch.unil.cbg.ExpressionView.view {
 					KEGGSearchableDataGrid.dataProvider = gem.KEGG;
 					mapOpenTabs.push(selectedModule);
 				}
-				var lastSelectedTab:int = modulesNavigator.selectedIndex; 
+				var lastSelectedTab:int = modulesNavigator.selectedIndex;
+				dispatchEvent(new MenuEvent(MenuEvent.ALPHA, [selectedAlpha]));
 				if ( lastSelectedTab != selectedTab ) { 
 					openTabs[lastSelectedTab].removeListener();
 					openTabs[selectedTab].addListener();
@@ -605,6 +620,7 @@ package ch.unil.cbg.ExpressionView.view {
 				temp.push(column);
 			}
 			KEGGSearchableDataGrid.columns = temp;
+			generategedatainfo();
 
 			modulesNavigator.removeAllChildren();
 			
