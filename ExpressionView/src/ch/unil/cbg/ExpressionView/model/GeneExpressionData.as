@@ -486,11 +486,17 @@ package ch.unil.cbg.ExpressionView.model {
 					gebitmapdata.setPixel(gene-1, sample-1, (red<<16) + (green<<8) + 0);
 					
 					var k:int = (gene-1) * nSamples + sample - 1
+					//if ( ModulesLookup[k].length > 0 ) {
+					//	var color:uint = ModulesColors[ModulesLookup[k][ModulesLookup[k].length-1]][0];
+					//	modulesbitmapdata.setPixel(gene-1, sample-1, color);
+					//}
 					if ( ModulesLookup[k].length > 0 ) {
-						var color:uint = ModulesColors[ModulesLookup[k][ModulesLookup[k].length-1]][0];
+						var color:uint = ModulesColors[ModulesLookup[k][0]][0];
+						for ( var i:int = 1; i < ModulesLookup[k].length; ++i ) {
+							color = ( color + ModulesColors[ModulesLookup[k][i]][0] ) / 2
+						}
 						modulesbitmapdata.setPixel(gene-1, sample-1, color);
 					}
-
 				}				
 			
 			}

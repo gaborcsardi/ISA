@@ -43,7 +43,7 @@ package ch.unil.cbg.ExpressionView.view {
 		private var ged:GeneExpressionData;
 		
 		private var selectedMode:int;
-		private var selectedAlpha:Number;
+		private var selectedAlpha:Number = 0.2;
 		
 		private var lastHighlightedModules:Array;
 		
