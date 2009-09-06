@@ -15,13 +15,26 @@ package ch.unil.cbg.ExpressionView.view.components {
 	import flash.utils.getTimer;
 	
 	import mx.containers.Canvas;
+	import mx.controls.ButtonBar;
 	import mx.controls.HScrollBar;
 	import mx.controls.Image;
 	import mx.controls.VScrollBar;
+	import mx.events.ItemClickEvent;
 	import mx.events.ScrollEvent;
 
 
 	public class ZoomPanCanvas extends Canvas {
+
+		[Embed(source='/ch/unil/cbg/ExpressionView/assets/menu/zoomin.png')]
+		public var zoomInIcon:Class; 
+		[Embed(source='/ch/unil/cbg/ExpressionView/assets/menu/zoomout.png')]
+		public var zoomOutIcon:Class; 
+		[Embed(source='/ch/unil/cbg/ExpressionView/assets/menu/zoomauto.png')]
+		public var zoomAutoIcon:Class; 
+		[Embed(source='/ch/unil/cbg/ExpressionView/assets/menu/zoomautox.png')]
+		public var zoomAutoXIcon:Class; 
+		[Embed(source='/ch/unil/cbg/ExpressionView/assets/menu/zoomautoy.png')]
+		public var zoomAutoYIcon:Class; 
 
 		private const MINIMAL_WIDTH:int = 2;
 		private const MINIMAL_HEIGHT:int = 2;
@@ -71,6 +84,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 		private var modulesCanvas:Canvas;
 		private var highlightCanvas:Canvas;
 		private var overlayCanvas:Canvas;
+		private var zoomMenu:ButtonBar;
 		
 		public function ZoomPanCanvas() {
 			super();
@@ -102,6 +116,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 					overlayCanvas.removeEventListener(MouseEvent.MOUSE_MOVE, zoomMouseMoveHandler);
 					overlayCanvas.removeEventListener(MouseEvent.MOUSE_UP, zoomMouseUpHandler);
 					parentApplication.removeEventListener(KeyboardEvent.KEY_UP, zoomKeyUpHandler);
+					zoomMenu.visible = false;
 					dispatchEvent(new UpdateStatusBarEvent("")); 
 				} else if ( lastMode == PAN ) {
 					overlayCanvas.removeEventListener(MouseEvent.MOUSE_UP, dragMouseUpHandler);
@@ -117,6 +132,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 				else if ( mode == ZOOM ) {
 					overlayCanvas.addEventListener(MouseEvent.MOUSE_DOWN, zoomMouseDownHandler);
 					parentApplication.addEventListener(KeyboardEvent.KEY_UP, zoomKeyUpHandler);
+					zoomMenu.visible = true;
 					dispatchEvent(new UpdateStatusBarEvent("click to zoom in, shift-click to zoom out, a to autozoom, g to autozoom genes, and s to autozoom samples.")); 
 				} else if ( mode == PAN ) {
 					overlayCanvas.addEventListener(MouseEvent.MOUSE_DOWN, dragMouseDownHandler);
@@ -394,6 +410,39 @@ package ch.unil.cbg.ExpressionView.view.components {
 				overlayCanvas.addEventListener(MouseEvent.CLICK, inspectMouseClickHandler);
 				addChild(overlayCanvas);
 			}
+			
+			if ( !zoomMenu ) {
+				zoomMenu = new ButtonBar();
+				zoomMenu.visible = false;
+				zoomMenu.direction = "vertical";				
+				
+				var buttons:Array = [];
+				var item:Object = new Object();
+				item.label = "+";
+				item.icon = zoomInIcon;
+				item.toolTip = "Zoom in";
+				buttons.push(item);
+				item = new Object();
+				item.icon = zoomOutIcon;
+				item.toolTip = "Zoom out";
+				buttons.push(item);
+				item = new Object();
+				item.icon = zoomAutoIcon;
+				item.toolTip = "Auto zoom";
+				buttons.push(item);
+				item = new Object();
+				item.icon = zoomAutoXIcon;
+				item.toolTip = "Auto zoom x";
+				buttons.push(item);
+				item = new Object();
+				item.icon = zoomAutoYIcon;
+				item.toolTip = "Auto zoom y";
+				buttons.push(item);
+				zoomMenu.dataProvider = buttons;
+				
+				zoomMenu.addEventListener(ItemClickEvent.ITEM_CLICK, zoomMenuClickHandler);
+				addChild(zoomMenu);				
+			}
 						
 			parentApplication.addEventListener(MenuEvent.ALPHA, alphaSliderChangeHandler);
 			parentApplication.addEventListener(MenuEvent.OUTLINE, setOutlineVisibilityHandler);
@@ -401,6 +450,22 @@ package ch.unil.cbg.ExpressionView.view.components {
 			parentApplication.addEventListener(HighlightingEvent.MODULE, highlightModulesHandler);
 			parentApplication.addEventListener(HighlightingEvent.GENE, highlightGenesHandler);
 			parentApplication.addEventListener(HighlightingEvent.SAMPLE, highlightSamplesHandler);			
+		}
+
+		private function zoomMenuClickHandler(event:ItemClickEvent): void {
+			if ( event.index == 0 ) {
+				overlayCanvas.dispatchEvent(new MouseEvent(MouseEvent.MOUSE_DOWN, true, false, overlayCanvas.height/2, overlayCanvas.width/2, null, false, false, false));
+				overlayCanvas.dispatchEvent(new MouseEvent(MouseEvent.MOUSE_UP, true, false, overlayCanvas.height/2, overlayCanvas.width/2, null, false, false, false));
+			} else if ( event.index == 1 ) {
+				overlayCanvas.dispatchEvent(new MouseEvent(MouseEvent.MOUSE_DOWN, true, false, overlayCanvas.height/2, overlayCanvas.width/2, null, false, false, true));
+				overlayCanvas.dispatchEvent(new MouseEvent(MouseEvent.MOUSE_UP, true, false, overlayCanvas.height/2, overlayCanvas.width/2, null, false, false, true));
+			} else if ( event.index == 2 ) {
+				dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, 65));
+			} else if ( event.index == 3 ) {
+				dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, 71));
+			} else if ( event.index == 4 ) {
+				dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, 83));
+			}
 		}
 
 		private function updateScrollBars():void {
@@ -435,6 +500,10 @@ package ch.unil.cbg.ExpressionView.view.components {
 			modulesCanvas.height = canvasheight;
 			overlayCanvas.width = canvaswidth;
 			overlayCanvas.height = canvasheight;
+			zoomMenu.width = 20;
+			zoomMenu.height = 160;
+			zoomMenu.x = overlayCanvas.width - 3/2 * zoomMenu.width;
+			zoomMenu.y = zoomMenu.width / 2;
 						
 			hscrollbar.width = canvaswidth;
 			hscrollbar.height = thickness;
