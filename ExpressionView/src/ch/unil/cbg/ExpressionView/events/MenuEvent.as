@@ -14,6 +14,7 @@ package ch.unil.cbg.ExpressionView.events {
 		public static const ALPHA:String = "Alpha";
 		
 		public static const PDF_EXPORT:String = "PDFExport";
+		public static const EXCEL_EXPORT:String = "ExcelExport";
 		
 		public static const PANELS:String = "Panels";
 		

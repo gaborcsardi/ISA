@@ -23,6 +23,7 @@ package ch.unil.cbg.ExpressionView.view {
 		
 		private var menuBox:HBox;
 		private var fileBox:HBox;
+		private var exportBox:HBox;
 		private var navigationBox:HBox;
 		private var selectionBox:HBox;
 		private var windowBox:HBox;
@@ -36,6 +37,7 @@ package ch.unil.cbg.ExpressionView.view {
 		
 		private var openButton:Button;
 		private var pdfExportButton:Button;
+		private var excelExportButton:Button;
 		private var navigationMenu:ToggleButtonBar;
 		private var outlineVisibility:CheckBox;
 		private var fillingVisibility:CheckBox;
@@ -110,9 +112,13 @@ package ch.unil.cbg.ExpressionView.view {
 			dispatchEvent(new MenuEvent(MenuEvent.ALPHA, [event.value]));
 		}
 		
-		// alpha slider
+		// pdf export
 		private function pdfExportHandler(event:MouseEvent): void {
 			dispatchEvent(new MenuEvent(MenuEvent.PDF_EXPORT));
+		}
+		// excel export
+		private function excelExportHandler(event:MouseEvent): void {
+			dispatchEvent(new MenuEvent(MenuEvent.EXCEL_EXPORT));
 		}
 				
 		// resize
@@ -151,15 +157,31 @@ package ch.unil.cbg.ExpressionView.view {
 					openButton.addEventListener(MouseEvent.CLICK, fileOpenHandler);
 					fileBox.addChild(openButton);
 				}
-
+			}
+			
+			if ( !exportBox ) {
+				exportBox = new HBox();
+				exportBox.styleName = "menuItemBox";
+				menuBox.addChild(exportBox);
+				
 				if ( !pdfExportButton ) {
 					pdfExportButton = new Button();
 					pdfExportButton.label = "PDF";
-					pdfExportButton.toolTip = "Export PDF file.";
+					pdfExportButton.toolTip = "Export PDF file of currently viewed area.";
 					pdfExportButton.styleName = "pdfExportButton";
 					
 					pdfExportButton.addEventListener(MouseEvent.CLICK, pdfExportHandler);
-					fileBox.addChild(pdfExportButton);
+					exportBox.addChild(pdfExportButton);
+				}
+				
+				if ( !excelExportButton ) {
+					excelExportButton = new Button();
+					excelExportButton.label = "CSV";
+					excelExportButton.toolTip = "Export Excel (CSV) file containing all the information\n associated with the currently viewed module.";
+					excelExportButton.styleName = "excelExportButton";
+					
+					excelExportButton.addEventListener(MouseEvent.CLICK, excelExportHandler);
+					exportBox.addChild(excelExportButton);
 				}
 			}
 

@@ -12,6 +12,7 @@ package ch.unil.cbg.ExpressionView.view {
 	import flash.net.FileReference;
 	import flash.utils.ByteArray;
 	
+	import mx.collections.XMLListCollection;
 	import mx.containers.Canvas;
 	import mx.containers.HDividedBox;
 	import mx.containers.Panel;
@@ -181,6 +182,7 @@ package ch.unil.cbg.ExpressionView.view {
 			parentApplication.addEventListener(BroadcastPositionEvent.MOUSE_OVER, broadcastPositionOverHandler);
 			parentApplication.addEventListener(BroadcastPositionEvent.MOUSE_CLICK, broadcastPositionClickHandler);
 			parentApplication.addEventListener(MenuEvent.PDF_EXPORT, pdfExportHandler);
+			parentApplication.addEventListener(MenuEvent.EXCEL_EXPORT, excelExportHandler);
 			parentApplication.addEventListener(ResizeBrowserEvent.RESIZEBROWSEREVENT, resizeBrowserHandler);
 			parentApplication.addEventListener(MenuEvent.ALPHA, alphaSliderChangeHandler);
 		}
@@ -481,7 +483,7 @@ package ch.unil.cbg.ExpressionView.view {
 					infoString = infoString + "Gene: " + infoArray[0].symbol + " (" + infoArray[0].name + ")";
 					infoString = infoString + "\nSample: " + infoArray[1].name;
 					infoString = infoString + "\nModules: " + infoArray[2];
-					infoString = infoString + "\nData: " + infoArray[3].toPrecision(3);
+					infoString = infoString + "\nData: " + infoArray[3];
 				}
 				infoContent.text = infoString;
 	
@@ -691,6 +693,39 @@ package ch.unil.cbg.ExpressionView.view {
 			var file:FileReference = new FileReference();
 			file.save(bytes);
 	
+		}
+		
+		private function excelExportHandler(event:MenuEvent): void {
+			
+			if ( openTabs.length == 0 ) {
+				return;
+			}
+			
+			var bytes:ByteArray = new ByteArray();
+			
+			var module:int = mapOpenTabs[modulesNavigator.selectedIndex];
+			var gem:GeneExpressionModule = ged.getModule(module);
+			var genes:XMLListCollection = gem.Genes;
+			var samples:XMLListCollection = gem.Samples;
+			
+			var tag:String = "MODULE " + module.toString() + ": ";
+			if ( module == 0 ) { tag = ""; }
+			bytes.writeUTFBytes(tag + gem.nSamples + " samples (rows) x " + gem.nGenes + " genes (columns)");
+			for ( var gene:int = 0; gene < genes.length; ++gene ) {
+				bytes.writeUTFBytes(", " + genes[gene].name);
+			}
+			bytes.writeUTFBytes("\n"); 
+			for ( var sample:int = 0; sample < samples.length; ++sample ) {
+				bytes.writeUTFBytes(samples[sample].name + ", ");
+				for ( gene = 0; gene < genes.length-1; ++gene ) {
+					bytes.writeUTFBytes(ged.getInfo(module, gene, sample)[3].toString() + ", ");
+				}
+				bytes.writeUTFBytes(ged.getInfo(module, gene, sample)[3].toString() + "\n");
+			}
+			
+			var file:FileReference = new FileReference();
+			file.save(bytes);
+			
 		}
 				
 		private function generategedatainfo(): void {
