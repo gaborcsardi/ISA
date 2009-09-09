@@ -699,6 +699,8 @@ ISA2heatmap <- function(modules, module, eset,
                         norm=c("raw", "feature", "sample"),
                         scale=c("none", "row", "column"), ...) {
 
+  norm <- match.arg(norm)
+  scale <- match.arg(scale)
   eset <- select.eset(eset, modules, norm)
   x <- getFeatureNames(modules, module)[[1]]
   y <- getSampleNames (modules, module)[[1]]
