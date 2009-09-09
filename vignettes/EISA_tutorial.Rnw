@@ -252,7 +252,7 @@ since \Rfunction{ISA.GO} calculates enrichment for many gene sets
 (i.e. for all biclusters), \Rfunction{summary} returns a list of data
 frames, one for each bicluster. A table for the first module:
 <<GO summary>>=
-summary(GO[[1]], p=0.001)[[2]][,-6]
+summary(GO[[1]], p=0.001)[[1]][,-6]
 @ 
 
 We omitted the sixth column of the result, because it is very wide and
@@ -266,15 +266,15 @@ genes in the second module and the third GO BP category. (The GO
 categories are ordered according to the enrichment $p$-values, just
 like in the output of \Rfunction{summary}.)
 <<GO gene ids by category>>=
-geneIdsByCategory(GO[[1]])[[2]][[3]]
+geneIdsByCategory(GO[[1]])[[1]][[3]]
 @ 
 
 You can use the \Rpackage{GO.db} package to obtain more information
 about the enriched GO categories.
 <<GO info>>=
-sigCategories(GO[[1]])[[2]]
+sigCategories(GO[[1]])[[1]]
 library(GO.db)
-mget(sigCategories(GO[[1]])[[2]], GOTERM)
+mget(sigCategories(GO[[1]])[[1]], GOTERM)
 @ 
 
 In addition, the following functions are implemented to work on the
@@ -304,9 +304,9 @@ same way as for the Gene Ontology, this time we use the
 <<KEGG enrichment>>=
 KEGG <- ISA.KEGG(modules)
 KEGG
-summary(KEGG)[[4]]
+summary(KEGG)[[1]]
 library(KEGG.db)
-mget(sigCategories(KEGG)[[4]], KEGGPATHID2NAME)
+mget(sigCategories(KEGG)[[1]], KEGGPATHID2NAME)
 @
 
 The functions mentioned in the Gene ontology enrichment section can be
@@ -369,13 +369,13 @@ package.
 
 The \Rpackage{biclust} R package implements several biclustering
 algorithms in a unified framework. It uses the class \Rclass{Biclust}
-to store a set of biclusters. The \Rfunction{ISA.biclust} function converts ISA
-modules to a \Rclass{Biclust} object. This requires the binarization
-of the modules, i.e. the ISA scores are lost, they are converted to
-zeros and ones:
+to store a set of biclusters. The standard R \Rfunction{as} function
+can be used to convert ISA modules to a \Rclass{Biclust} object. This
+requires the binarization of the modules, i.e. the ISA scores are
+lost, they are converted to zeros and ones:
 <<biclust,cache=TRUE>>=
 library(biclust)
-Bc <- ISA.biclust(modules)
+Bc <- as(modules, "Biclust")
 Bc
 @ 
 
@@ -390,7 +390,7 @@ are plotted in the next example. If you want to plot the normalized
 values, then you need to do the normalization ``by hand'', before
 calling ISA, see Section~\ref{sec:detailed-isa}.
 <<heatmap,fig=TRUE>>=
-ISA2heatmap(modules, 1, ALL)
+ISA2heatmap(modules, 1, ALL, scale="none")
 @ 
 
 \Rfunction{ISA2heatmap} simply calls the \Rfunction{heatmap} function,
@@ -435,7 +435,7 @@ if (require(Cairo)) {
 }
 @ 
 <<parallel>>=
-profile.plot(modules, 2, ALL, plot="both")
+profilePlot(modules, 2, ALL, plot="both")
 @
 <<parallel.post,echo=FALSE,results=hide>>=
 dev.off()
@@ -531,7 +531,7 @@ vs. T-cell leukemia.
 
 <<condplot,fig=TRUE,width=10,height=4>>=
 col <- ifelse( grepl("^B", pData(modules)$BT), "orange", "darkolivegreen")
-cond.plot(modules, 2, ALL, col=col)
+cond.plot(modules, 1, ALL, col=col)
 @
 
 It is clear that the \Sexpr{getNoFeatures(modules)[2]} genes included
@@ -836,10 +836,10 @@ disease. The other seeds are similar, for the other subtypes.
 
 We perform the ISA iterations for our two sets of seeds separately.
 <<iteration>>=
-modules1 <- ISA.iterate(ALL.normed, row.seeds=random.seeds, 
-                        thr.row=2, thr.col=2)
-modules2 <- ISA.iterate(ALL.normed, col.seeds=smart.seeds,
-                        thr.row=2, thr.col=2)
+modules1 <- ISA.iterate(ALL.normed, feature.seeds=random.seeds, 
+                        thr.feat=2, thr.samp=2)
+modules2 <- ISA.iterate(ALL.normed, sample.seeds=smart.seeds,
+                        thr.feat=2, thr.samp=2)
 @
 
 \subsection{Dropping non-unique modules}

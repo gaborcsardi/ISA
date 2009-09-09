@@ -886,11 +886,12 @@ modules found by ISA (Fig.~\ref{fig:overlapplot}).
 png("graphics/overlapplot.png", 600, 400)
 @ 
 <<overlapplot>>=
+no.modules <- ncol(ov.modules.1$rows) + ncol(ov.modules.2$rows)
 plotModules(data=two.over[[1]],
             list(rows=cbind(ov.modules.1$rows, ov.modules.2$rows),
                  columns=cbind(ov.modules.1$columns,
                    ov.modules.2$column)),
-            names=c("Input matrix", paste("Module", 1:6)))
+            names=c("Input matrix", paste("Module", seq_len(no.modules))))
 @
 <<overlapplot.post,echo=FALSE,results=hide>>=
 dev.off()
