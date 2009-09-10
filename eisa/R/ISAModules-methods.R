@@ -23,12 +23,12 @@ setMethod("dim", signature(x="ISAModules"),
 
 setMethod("featureNames", signature(object="ISAModules"),
           function(object) {
-            object@rundata$features
+            rownames(object@genes)
           })
 
 setMethod("sampleNames", signature(object="ISAModules"),
           function(object) {
-            rownames(object@rundata$pData)
+            rownames(object@conditions)
           })
 
 setMethod("pData", signature(object="ISAModules"),
@@ -45,7 +45,6 @@ setMethod("runData", signature(object="ISAModules"),
           function(object) {
             res <- object@rundata
             res[["pData"]] <- NULL
-            res[["features"]] <- NULL
             res
           })
 
@@ -56,7 +55,14 @@ setMethod("annotation", signature(object="ISAModules"),
 
 setMethod("getOrganism", signature(object="ISAModules"),
           function(object) {
-            object@rundata$organism
+            if (!is.null(object@rundata$organism)) {
+              object@rundata$organism
+            } else if (!is.null(object@rundata$annotation)) {
+              library(paste(sep="", annotation(object), ".db"), character.only=TRUE)
+              get(paste(sep="", annotation(object), "ORGANISM"))
+            } else {
+              NULL
+            }
           })
 
 setMethod("getFeatures", signature(object="ISAModules"),
@@ -202,7 +208,6 @@ setMethod("[", signature(x="ISAModules"),
             }
             if (!missing(i)) {
               x@genes <- x@genes[i,,drop=FALSE]
-              x@rundata$features <- x@rundata$features[i]
             }
             x
           })

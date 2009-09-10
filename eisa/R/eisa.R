@@ -12,7 +12,6 @@ isa.result.to.ISAModules <- function(modules, data) {
   new.modules@rundata$organism <- get(paste(sep="", annotation(data),
                                             "ORGANISM"))
 
-  new.modules@rundata$features <- featureNames(data)
   new.modules@rundata$pData <- pData(data)
 
   rownames(new.modules@genes) <- featureNames(data)
