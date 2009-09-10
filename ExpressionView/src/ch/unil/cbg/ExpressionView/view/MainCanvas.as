@@ -303,6 +303,8 @@ package ch.unil.cbg.ExpressionView.view {
 			} 
 			genesSearchableDataGrid.dataProvider = ged.getModule(module).Genes;
 			samplesSearchableDataGrid.dataProvider = ged.getModule(module).Samples;
+			GOSearchableDataGrid.dataProvider = ged.getModule(module).GO;
+			KEGGSearchableDataGrid.dataProvider = ged.getModule(module).KEGG;
 			dispatchEvent(new MenuEvent(MenuEvent.MODE, [selectedMode]));
 			
 			if ( event.oldIndex < modulesNavigator.numChildren ) {
