@@ -48,7 +48,7 @@ isa.in.silico <- function(num.rows=300, num.cols=50, num.fact=3,
   for (i in which(mod.noise != 0)) {
     idx2 <- crow.from[i]:crow.to[i]
     idx1 <- ccol.from[i]:ccol.to[i]
-    rnd <- rnorm(length(idx1)*length(idx2), sd=mod.noise)
+    rnd <- rnorm(length(idx1)*length(idx2), sd=mod.noise[i])
     data[idx1,idx2] <- data[idx1,idx2] + rnd
   }
   
