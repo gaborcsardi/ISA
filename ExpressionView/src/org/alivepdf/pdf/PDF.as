@@ -3506,7 +3506,6 @@ package org.alivepdf.pdf
                 {
                 	compressedPages = new ByteArray();
                     //compressedPages.writeMultiByte( page.content+"\n", "windows-1252" );
-                    //writeSafeMultiByte( page.content+"\n", compressedPages );
                     compressedPages.writeUTFBytes( page.content+"\n" );
                     compressedPages.compress();
                     newObj();
@@ -3911,15 +3910,8 @@ package org.alivepdf.pdf
             if ( currentPage == null ) throw new Error ("No pages available, please call the addPage method first !");
             if ( state == 2 ) currentPage.content += content+"\n";
             //else buffer.writeMultiByte( content+"\n", "windows-1252" );
-            //writeSafeMultiByte(content + "\n", buffer);
             buffer.writeUTFBytes(content + "\n");
         }
-
-        private function writeSafeMultiByte(msg:String, buffer:ByteArray):void {
-            for( var i:int = 0; i < msg.length; ++i ) {
-                buffer.writeByte(msg.charCodeAt(i));
-            }
-        } 
 
         //--
         //-- IEventDispatcher
