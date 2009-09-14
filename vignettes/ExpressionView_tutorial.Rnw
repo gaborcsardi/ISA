@@ -1,0 +1,293 @@
+% \VignetteIndexEntry{ExpressionView}
+\documentclass{article}
+\usepackage{ragged2e}
+\usepackage{url}
+
+\newcommand{\Rfunction}[1]{\texttt{#1}}
+\newcommand{\Rpackage}[1]{\texttt{#1}}
+\newcommand{\Rclass}[1]{\texttt{#1}}
+\newcommand{\Rargument}[1]{\textsl{#1}}
+\newcommand{\filename}[1]{\texttt{#1}}
+\newcommand{\variable}[1]{\texttt{#1}}
+
+\SweaveOpts{cache=TRUE}
+\SweaveOpts{prefix.string=graphics/plot}
+
+\begin{document}
+
+\title{ExpressionView}
+\author{Andreas L\"uscher}
+\maketitle
+
+\tableofcontents
+
+\RaggedRight
+
+<<set width,echo=FALSE,print=FALSE>>=
+options(width=60)
+options(continue=" ")
+@ 
+
+\section{Introduction}
+
+\section{Preparing the data}
+
+\subsection{Loading the data}
+
+First, we load the required packages and the data to analyze. ISA is
+implemented in the \Rpackage{eisa} and \Rpackage{isa2} packages, see
+Section{sec:isapackages} for a more elaborated summary about the two
+packages. It is enough to load the \Rpackage{eisa} package,
+\Rpackage{isa2} and other required packages are loaded automatically.
+\Rpackage{eisa} 
+<<load the packages>>=
+library(ExpressionView)
+@
+
+In this tutorial we will use the data in the \Rpackage{ALL}
+package. 
+<<load the data>>=
+library(ALL)
+library(hgu95av2.db)
+library(affy)
+data(ALL)
+@
+This is a data set from a clinical trial in acute
+lymphoblastic leukemia and it contains \Sexpr{ncol(ALL)} samples
+altogether.
+
+\section{Simple ISA runs}
+
+The simplest way to run ISA is to choose the two threshold parameters
+and then call the \Rfunction{isa} function on the
+\Rclass{ExpressionSet} object:
+<<simple ISA>>=
+thr.gene <- 2.7
+thr.cond <- 1.4
+set.seed(1) # to get the same results, always
+modules <- ISA(ALL, thr.gene=thr.gene, thr.cond=thr.cond)
+@ 
+
+This first applies a non-specific filter to the data set filters the
+data set and then runs ISA from
+\Sexpr{formals(eisa:::ISA)$no.seeds} % $
+random seeds (the default). See Section~\ref{sec:detailed-isa} if the
+default parameters are not appropriate for you and need more control.
+
+\section{Inspect the result}
+
+The \Rfunction{isa} function returns an \Rclass{ISAModules} object. By
+typing in its name we can get a brief summary of the results:
+<<type in name of ISAModules object>>=
+modules
+@
+
+There are various other \Rclass{ISAModules} methods that help to
+access the modules themselves and the ISA parameters that were used
+for the run. 
+
+Calling \Rfunction{length} on \variable{modules} returns the number of
+ISA modules in the set, \Rfunction{dim} gives the dimension of the
+input expression matrix: the number of features and the number of
+samples.
+<<accessors 1>>=
+length(modules)
+dim(modules)
+@ 
+
+The double bracket indexing operator (`\verb+[[+') can be used to
+select some modules from the complete set, the result is another,
+smaller \Rclass{ISAModules} object. The following selects the first
+five modules.
+<<indexing>>=
+modules[[1:5]]
+@ 
+
+The single bracket indexing operator can be used to restrict an
+\Rclass{ISAModules} object to a subset of features and/or
+samples. E.g. selecting all features that map to a gene on
+chromosome~1 can be done with 
+<<indexing 2>>=
+chr <- get(paste(annotation(modules), sep="", "CHR"))
+entrez <- sapply(mget(featureNames(modules), chr), 
+                 function(x) "1" %in% x)
+modules[entrez,]
+@
+
+Similarly, selecting all B-cell samples can be performed with
+<<indexing 3>>=
+modules[ ,grep("^B", pData(modules)$BT)]
+@ 
+
+Remember, that the ISA biclustering is not binary, every feature (and
+similarly, every sample) has a score between -1 and 1; the further the
+score is from zero the stronger the association between the feature
+(or sample) and the module. If two features both have scores with the
+same sign, then they are correlated, if the sign of their scores are
+opposite, then they are anti-correlated. You can query the scores of
+the features with the \Rfunction{getFeatureScores} function, and
+similarly, the \Rfunction{getSampleScores} function queries the sample
+scores. You can supply the modules you want to query as an optional
+argument:
+<<query scores>>=
+getFeatureScores(modules, 3)
+getSampleScores(modules, 3)
+@ 
+
+You can also query the scores in a matrix form, that is probably
+better if you need many or all of them at the same time. The
+\Rfunction{getFeatureMatrix} and \Rfunction{getSampleMatrix} functions
+are defined for this:
+<<query all scores>>=
+dim(getFeatureMatrix(modules))
+dim(getSampleMatrix(modules))
+@
+
+Objects from the \Rclass{ISAModules} class store various information
+about the ISA run and the convergence of the seeds. Information
+associated with the individual seeds can be queried with the
+\Rfunction{seedData} function, it returns a data frame, with as many
+rows as the number of seeds and various seed-level information,
+e.g. the number of iterations required for the seed to converge. See
+the manual page of \Rfunction{isa} for details.
+<<seed data>>=
+seedData(modules)
+@
+
+The \Rfunction{runData} function returns additional information about
+the ISA run, seed the \Rfunction{isa} manual page for details.
+<<run data>>=
+runData(modules)
+@ 
+
+\section{Enrichment calculations}
+
+The \Rpackage{eisa} package provides some functions to perform
+enrichment tests for the genes in the various modules against various
+databases. These tests are usually simplified and less sophisticated
+versions than the ones in the \Rpackage{Category}, \Rpackage{GOstats}
+or \Rpackage{topGO} packages, but they are much faster and this is
+important if we need to perform them for many modules.
+
+\subsection{Gene Ontology}
+
+To perform enrichment analysis against the Gene Ontology database, all
+you have to do is to supply your \Rclass{ISAModules} object to the
+\Rfunction{ISA.GO} function.
+<<GO enrichment>>=
+GO <- ISA.GO(modules)
+@ 
+
+The \Rfunction{ISA.GO} requires an annotation package that maps the
+Entrez identifiers of the studied organism to GO terms. For human, the
+\Rpackage{org.Hs.eg.db} package is required, for the mouse the
+\Rpackage{org.Mm.eg.db} package, etc.
+
+The \variable{GO} object is a list with three elements, these
+correspond to the ontologies: biological function, cellular component
+and molecular function, in this order.
+<<list GO result>>=
+GO
+@
+
+We can see the number of categories tested, this is different for each
+ontology, as they have different number of terms. The gene universe
+size is also different, because it contains only genes that have at
+least one annotation in the given category.
+
+For extracting the results themselves, the \Rfunction{summary}
+function can be used, this converts them to a simple data frame. The
+$p$-value limit can be supplied to \Rfunction{summary}. Note, that
+since \Rfunction{ISA.GO} calculates enrichment for many gene sets
+(i.e. for all biclusters), \Rfunction{summary} returns a list of data
+frames, one for each bicluster. A table for the first module:
+<<GO summary>>=
+summary(GO[[1]], p=0.001)[[1]][,-6]
+@ 
+
+We omitted the sixth column of the result, because it is very wide and
+would look bad in this vignette. This column is called
+\variable{drive} and lists the Entrez IDs of the genes that are in the
+intersection of the bicluster and the GO category; or in other
+words, the genes that drive the enrichment.
+These genes can also be obtained with the
+\Rfunction{geneIdsByCategory} function. The following returns the
+genes in the second module and the third GO BP category. (The GO
+categories are ordered according to the enrichment $p$-values, just
+like in the output of \Rfunction{summary}.)
+<<GO gene ids by category>>=
+geneIdsByCategory(GO[[1]])[[1]][[3]]
+@ 
+
+You can use the \Rpackage{GO.db} package to obtain more information
+about the enriched GO categories.
+<<GO info>>=
+sigCategories(GO[[1]])[[1]]
+library(GO.db)
+mget(sigCategories(GO[[1]])[[1]], GOTERM)
+@ 
+
+In addition, the following functions are implemented to work on the
+objects returned by \Rfunction{ISA.GO}: \Rfunction{htmlReport},
+\Rfunction{pvalues}, \Rfunction{geneCounts}, \Rfunction{oddsRatios},
+\Rfunction{exprectedCounts}, \Rfunction{universeCounts},
+\Rfunction{universeMappedCount}, \Rfunction{geneMappedCount},
+\Rfunction{geneIdUniverse}. These functions do essentially the same as
+they counterparts for \Rclass{GOHyperGResult} objects, see the
+documentation of the \Rpackage{GOstats} package. The only difference
+is, that since here we are testing a list of gene sets (=biclusters),
+they calculate the results for all gene sets and return a list.
+
+
+\subsection{KEGG Pathway Database}
+
+Enrichment calculation against the KEGG pathway goes essentially the
+same way as for the Gene Ontology, this time we use the
+\Rfunction{ISA.KEGG} function:
+<<KEGG enrichment>>=
+KEGG <- ISA.KEGG(modules)
+KEGG
+summary(KEGG)[[1]]
+library(KEGG.db)
+mget(sigCategories(KEGG)[[1]], KEGGPATHID2NAME)
+@
+
+The functions mentioned in the Gene ontology enrichment section can be
+used for KEGG, as well.
+
+
+\section{Visualizing the results}
+
+Visualizing overlapping biclusters is a challenging task. We
+show simple methods that usually visualize a single bicluster 
+at a time. For some of these we will use the \Rpackage{biclust} R
+package.
+
+\subsection{The \Rpackage{biclust} package}
+
+The \Rpackage{biclust} R package implements several biclustering
+algorithms in a unified framework. It uses the class \Rclass{Biclust}
+to store a set of biclusters. The standard R \Rfunction{as} function
+can be used to convert ISA modules to a \Rclass{Biclust} object. This
+requires the binarization of the modules, i.e. the ISA scores are
+lost, they are converted to zeros and ones:
+<<biclust,cache=TRUE>>=
+library(biclust)
+Bc <- as(modules, "Biclust")
+Bc
+@ 
+
+\section{Session information}
+
+The version number of R and packages loaded for generating this
+vignette were:
+
+<<sessioninfo,results=tex,echo=FALSE>>=
+toLatex(sessionInfo())
+@ 
+
+\bibliographystyle{apalike}
+\bibliography{EISA}
+\nocite{*}
+
+\end{document}
