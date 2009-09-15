@@ -1,5 +1,6 @@
 export(ExpressionView)
 export(toExpressionView)
-exportMethods("orderModules")
+
+exportMethods("order.clusters")
 
 useDynLib(ExpressionView)

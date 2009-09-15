@@ -656,6 +656,10 @@ package ch.unil.cbg.ExpressionView.view.components {
 			}			
 			return new Bitmap(bitmapData);
 		}
+
+		public function getRectangle():Rectangle {
+			return currentRectangle.clone();
+		}
 		
 	}
 }	

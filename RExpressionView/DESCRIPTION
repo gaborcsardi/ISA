@@ -6,7 +6,7 @@ Author: Andreas Luscher <andreas.luescher@a3.epfl.ch>
 Maintainer: Andreas Luscher <andreas.luescher@a3.epfl.ch>
 Description: ExpressionView visualizes possibly overlapping biclusters
 	in a gene expression matrix. It can use the result of the ISA
-	algorithm (eisa package) or the algorithms in the biclust
+	method (eisa package) or the algorithms in the biclust
 	package. The program itself was developed using Adobe Flex and
 	runs in a flash-enabled web browser.
 Depends: isa2, eisa

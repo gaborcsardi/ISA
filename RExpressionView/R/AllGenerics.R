@@ -1,2 +1,2 @@
-setGeneric("orderModules",
-           function(modules, ...) standardGeneric("orderModules"))
+setGeneric("order.clusters",
+           function(modules, ...) standardGeneric("order.clusters"))
