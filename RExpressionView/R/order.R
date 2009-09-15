@@ -3,8 +3,7 @@
 ########################################################################
 
 if (require(eisa)) {
-  setMethod("order.clusters", signature(modules="ISAModules"),
-            function(modules, ...) order.clusters.ISAModules(modules, ...))
+	setMethod("order.clusters", signature(modules="ISAModules"), function(modules, ...) order.clusters.ISAModules(modules, ...))
 }
 
 order.clusters.ISAModules <- function(modules, initialorder=NULL, debuglevel=0, maxtime=60) {
@@ -23,8 +22,7 @@ order.clusters.ISAModules <- function(modules, initialorder=NULL, debuglevel=0, 
 ########################################################################
 
 if (require(biclust)) {
-  setMethod("order.clusters", signature(modules="Biclust"),
-            function(modules, ...) order.clusters.Biclust(modules, ...))
+	setMethod("order.clusters", signature(modules="Biclust"), function(modules, ...) order.clusters.Biclust(modules, ...))
 }
 
 order.clusters.Biclust <- function(modules, initialorder=NULL, debuglevel=0, maxtime=60) {
@@ -33,14 +31,12 @@ order.clusters.Biclust <- function(modules, initialorder=NULL, debuglevel=0, max
 }
 
 
-
 ########################################################################
 # order ISA ############################################################
 ########################################################################
 
 if (require(isa2)) {
-  setMethod("order.clusters", signature(modules="list"),
-            function(modules, ...) order.clusters.default(modules, ...))
+	setMethod("order.clusters", signature(modules="list"), function(modules, ...) order.clusters.default(modules, ...))
 }
 
 order.clusters.default <- function(modules, initialorder, debuglevel, maxtime) {

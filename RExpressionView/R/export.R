@@ -1,14 +1,28 @@
-ExpressionView <- function(modules, eset, order) {
+########################################################################
+# export Biclust #######################################################
+########################################################################
 
-  filename <- paste(tempfile(), sep="", ".ged")
-  toExpressionView(modules, eset, order, filename=filename)
-  swf <- system.file("ExpressionView.html", package="ExpressionView")
-  url <- URLencode(paste("file://", swf, sep="", "?filename=", filename))
-  browseURL(url)
+if (require(biclust)) {
+ 	setMethod("export.ev", signature(modules="Biclust"), function(modules, ...) export.ev.Biclust(modules, ...))
 }
 
-toExpressionView <- function(modules, eset, order, go=NULL, kegg=NULL, filename="",
-                             norm=c("sample", "feature", "raw")) {
+export.ev.Biclust <- function(modules, eset, order, go=NULL, kegg=NULL, filename="", norm=c("sample", "feature", "raw")) {
+	eisamodules <- as(modules, "ISAModules")
+	eisamodules@rundata$annotation <- annotation(eset)
+	eisamodules@rundata$prenormalize <- FALSE
+	export.ev(eisamodules, eset, order, go, kegg, filename, norm)
+}
+
+
+########################################################################
+# export EISA ##########################################################
+########################################################################
+
+if (require(eisa)) {
+	setMethod("export.ev", signature(modules="ISAModules"), function(modules, ...) export.ev.default(modules, ...))
+}
+
+export.ev.default <- function(modules, eset, order, go=NULL, kegg=NULL, filename="", norm=c("sample", "feature", "raw")) {
 	
 	library(caTools)
 	
@@ -152,12 +166,14 @@ toExpressionView <- function(modules, eset, order, go=NULL, kegg=NULL, filename=
 			writeLines("\t\t\t<id>#</id>", con)
 			writeLines("\t\t\t<name>Name</name>", con)
 
-			temp <- colnames(modules@seeddata)
-			# replace unallowed characters by underscores
-			tempp <- gsub("[^[:alnum:]]", "_", temp)
-			if ( length(temp) >= 1 ) {	
-				for ( i in 1:length(temp) ) {
-					writeLines(paste("\t\t\t<", tempp[i], ">", temp[i], "</", tempp[i], ">", sep=""), con)
+			if ( dim(modules@seeddata)[1] > 0 ) {
+				temp <- colnames(modules@seeddata)
+				# replace unallowed characters by underscores
+				tempp <- gsub("[^[:alnum:]]", "_", temp)
+				if ( length(temp) >= 1 ) {	
+					for ( i in 1:length(temp) ) {
+						writeLines(paste("\t\t\t<", tempp[i], ">", temp[i], "</", tempp[i], ">", sep=""), con)
+					}
 				}
 			}
 		writeLines("\t\t</moduletags>", con)
@@ -195,17 +211,19 @@ toExpressionView <- function(modules, eset, order, go=NULL, kegg=NULL, filename=
 
 			writeLines(paste("\t\t\t<id>", module, "</id>", sep=""), con)
 			writeLines(paste("\t\t\t<name>module ", module, "</name>", sep=""), con)
-			temp <- colnames(modules@seeddata)
-			# replace unallowed characters by underscores
-			temp <- gsub("[^[:alnum:]]", "_", temp)
-			if ( length(temp) != 0 ) {
-				tempp <- modules@seeddata[module,]
-				for ( i in 1:length(temp) ) {
-					value <- tempp[i]
-					if ( temp[i] == "rob" || temp[i] == "rob_limit" ) {
-						value <- formatter(as.numeric(value))
+			if ( dim(modules@seeddata)[1] > 0 ) {
+				temp <- colnames(modules@seeddata)
+				# replace unallowed characters by underscores
+				temp <- gsub("[^[:alnum:]]", "_", temp)
+				if ( length(temp) != 0 ) {
+					tempp <- modules@seeddata[module,]
+					for ( i in 1:length(temp) ) {
+						value <- tempp[i]
+						if ( temp[i] == "rob" || temp[i] == "rob_limit" ) {
+							value <- formatter(as.numeric(value))
+						}
+						writeLines(paste("\t\t\t<", temp[i], ">", value, "</", temp[i], ">", sep=""), con)
 					}
-					writeLines(paste("\t\t\t<", temp[i], ">", value, "</", temp[i], ">", sep=""), con)
 				}
 			}
 
@@ -219,7 +237,7 @@ toExpressionView <- function(modules, eset, order, go=NULL, kegg=NULL, filename=
 
 			genesp <- match(as.vector(which(modules@genes[,module]!=0)),geneMaps[[1]])[geneMaps[[module+1]]]
 			writeLines(paste("\t\t\t<containedgenes>", toString(genesp), "</containedgenes>", sep=""), con)
-			scores <- as.array(genes[genesp])
+			scores <- as.array(as.real(genes[genesp]))
 			scores <- apply(scores, 1, formatter)
 			writeLines(paste("\t\t\t<genescores>", toString(scores), "</genescores>", sep=""), con)
 
@@ -233,7 +251,7 @@ toExpressionView <- function(modules, eset, order, go=NULL, kegg=NULL, filename=
 
 			samplesp <- match(as.vector(which(modules@conditions[,module]!=0)),sampleMaps[[1]])[sampleMaps[[module+1]]]
 			writeLines(paste("\t\t\t<containedsamples>", toString(samplesp), "</containedsamples>", sep=""), con)
-			scores <- as.array(samples[samplesp])
+			scores <- as.array(as.real(samples[samplesp]))
 			scores <- apply(scores, 1, formatter)
 			writeLines(paste("\t\t\t<samplescores>", toString(scores), "</samplescores>", sep=""), con)
 
