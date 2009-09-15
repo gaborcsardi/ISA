@@ -2076,6 +2076,14 @@ package org.alivepdf.pdf
             write(s);
         }
 
+        public function addVerticalText ( text:String, x:Number=0, y:Number=0):void
+        {
+            var s:String = sprintf('BT %.2f %.2f %.2f %.2f %.2f %.2f Tm (%s) Tj ET', 0, 1, -1, 0, x*k, (currentPage.h-y)*k, escape(text));
+            if (underline && text !='') s += ' '+doUnderline(x,y,text);
+            if (colorFlag) s = 'q ' + addTextColor + ' ' + s +' Q';
+            write(s);
+        }
+
         /**
         * Sets the text style
         *

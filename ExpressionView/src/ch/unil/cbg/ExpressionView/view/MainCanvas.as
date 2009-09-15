@@ -676,7 +676,9 @@ package ch.unil.cbg.ExpressionView.view {
 				return;
 			}
 			var module:int = modulesNavigator.selectedIndex;
+			var gem:GeneExpressionModule = ged.getModule(module);
 			var pdfBitmap:Bitmap = openTabs[module].getBitmap();
+			var pdfRectangle:Rectangle = openTabs[module].getRectangle();
 			
 			var myPDF:PDF;
 			myPDF = new PDF(Orientation.PORTRAIT, Unit.MM, Size.A4);
@@ -689,8 +691,21 @@ package ch.unil.cbg.ExpressionView.view {
 				myPDF.setXY(10,10);
 				myPDF.addMultiCell(190, 6, title);
 			}
-			myPDF.addImage(pdfBitmap,10,myPDF.getY() + 10,190,0);
+			var y:Number = myPDF.getY();
+			myPDF.addImage(pdfBitmap, 10, y + 10, 190, 0);
+			var dx:Number = 190;
+			var dy:Number = pdfBitmap.height * 190 / pdfBitmap.width;
 
+			myPDF.setFont(FontFamily.HELVETICA, Style.NORMAL);
+			myPDF.setFontSize(10);
+			for ( var sample:int = pdfRectangle.y; sample < pdfRectangle.bottomRight.y; ++sample ) {
+				//myPDF.addText(gem.Samples[sample].name, 10, y + 10 + sample * dy/gem.nSamples);				
+			}
+			for ( var gene:int = pdfRectangle.x; gene < pdfRectangle.bottomRight.x; ++gene ) {
+				//myPDF.addVerticalText(gem.Genes[gene].name, 10 + gene * dx/gem.nGenes, y+dy);				
+			}
+			
+			
 			var bytes:ByteArray = myPDF.save(Method.LOCAL);
 			var file:FileReference = new FileReference();
 			file.save(bytes);
