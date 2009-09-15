@@ -1,3 +1,7 @@
+########################################################################
+# order EISA ###########################################################
+########################################################################
+
 if (require(eisa)) {
   setMethod("order.clusters", signature(modules="ISAModules"),
             function(modules, ...) order.clusters.ISAModules(modules, ...))
@@ -12,6 +16,27 @@ order.clusters.ISAModules <- function(modules, initialorder=NULL, debuglevel=0, 
 	res <- list(genes=resp$rows, samples=resp$cols, status=list(genes=resp$status[[1]], samples=resp$status[[2]]))
 	res
 }
+
+
+########################################################################
+# order biclust ########################################################
+########################################################################
+
+if (require(biclust)) {
+  setMethod("order.clusters", signature(modules="Biclust"),
+            function(modules, ...) order.clusters.Biclust(modules, ...))
+}
+
+order.clusters.Biclust <- function(modules, initialorder=NULL, debuglevel=0, maxtime=60) {
+	eisamodules <- as(modules, "ISAModules")
+	order.clusters(eisamodules, initialorder, debuglevel, maxtime)
+}
+
+
+
+########################################################################
+# order ISA ############################################################
+########################################################################
 
 if (require(isa2)) {
   setMethod("order.clusters", signature(modules="list"),
