@@ -29,12 +29,17 @@ options(continue=" ")
 @ 
 
 \section{Introduction}
+Clustering genes according to their expression profiles is an important task 
+in analyzing microarray data. In this tutorial, we explain how to use ExpressionView, 
+a Flash applet designed to interactively explore biclusters identified in gene 
+expression data in conjunction with the Iterative Signature Algorithm (ISA)~\cite{bergmann03} 
+and the biclustering methods available in the \Rpackage{Biclust} package~\cite{kaiser08}.
 
-\section{Preparing the data}
+\section{Loading the gene expression data}
+The \Rpackage{ExpressionView} package requires the gene expression data to be available in the
+form of a \Rpackage{Bioconductor} \Rclass{ExpressionSet}.
 
-\subsection{Loading the data}
-
-First, we load the required packages and the data to analyze. ISA is
+First, we load the required packages and the data to analyze. ISA is 
 implemented in the \Rpackage{eisa} and \Rpackage{isa2} packages, see
 Section{sec:isapackages} for a more elaborated summary about the two
 packages. It is enough to load the \Rpackage{eisa} package,
@@ -56,7 +61,9 @@ This is a data set from a clinical trial in acute
 lymphoblastic leukemia and it contains \Sexpr{ncol(ALL)} samples
 altogether.
 
-\section{Simple ISA runs}
+\section{Find bicusters}
+
+\subsection{ISA}
 
 The simplest way to run ISA is to choose the two threshold parameters
 and then call the \Rfunction{isa} function on the
@@ -73,8 +80,6 @@ data set and then runs ISA from
 \Sexpr{formals(eisa:::ISA)$no.seeds} % $
 random seeds (the default). See Section~\ref{sec:detailed-isa} if the
 default parameters are not appropriate for you and need more control.
-
-\section{Inspect the result}
 
 The \Rfunction{isa} function returns an \Rclass{ISAModules} object. By
 typing in its name we can get a brief summary of the results:
@@ -160,111 +165,8 @@ the ISA run, seed the \Rfunction{isa} manual page for details.
 runData(modules)
 @ 
 
-\section{Enrichment calculations}
 
-The \Rpackage{eisa} package provides some functions to perform
-enrichment tests for the genes in the various modules against various
-databases. These tests are usually simplified and less sophisticated
-versions than the ones in the \Rpackage{Category}, \Rpackage{GOstats}
-or \Rpackage{topGO} packages, but they are much faster and this is
-important if we need to perform them for many modules.
-
-\subsection{Gene Ontology}
-
-To perform enrichment analysis against the Gene Ontology database, all
-you have to do is to supply your \Rclass{ISAModules} object to the
-\Rfunction{ISA.GO} function.
-<<GO enrichment>>=
-GO <- ISA.GO(modules)
-@ 
-
-The \Rfunction{ISA.GO} requires an annotation package that maps the
-Entrez identifiers of the studied organism to GO terms. For human, the
-\Rpackage{org.Hs.eg.db} package is required, for the mouse the
-\Rpackage{org.Mm.eg.db} package, etc.
-
-The \variable{GO} object is a list with three elements, these
-correspond to the ontologies: biological function, cellular component
-and molecular function, in this order.
-<<list GO result>>=
-GO
-@
-
-We can see the number of categories tested, this is different for each
-ontology, as they have different number of terms. The gene universe
-size is also different, because it contains only genes that have at
-least one annotation in the given category.
-
-For extracting the results themselves, the \Rfunction{summary}
-function can be used, this converts them to a simple data frame. The
-$p$-value limit can be supplied to \Rfunction{summary}. Note, that
-since \Rfunction{ISA.GO} calculates enrichment for many gene sets
-(i.e. for all biclusters), \Rfunction{summary} returns a list of data
-frames, one for each bicluster. A table for the first module:
-<<GO summary>>=
-summary(GO[[1]], p=0.001)[[1]][,-6]
-@ 
-
-We omitted the sixth column of the result, because it is very wide and
-would look bad in this vignette. This column is called
-\variable{drive} and lists the Entrez IDs of the genes that are in the
-intersection of the bicluster and the GO category; or in other
-words, the genes that drive the enrichment.
-These genes can also be obtained with the
-\Rfunction{geneIdsByCategory} function. The following returns the
-genes in the second module and the third GO BP category. (The GO
-categories are ordered according to the enrichment $p$-values, just
-like in the output of \Rfunction{summary}.)
-<<GO gene ids by category>>=
-geneIdsByCategory(GO[[1]])[[1]][[3]]
-@ 
-
-You can use the \Rpackage{GO.db} package to obtain more information
-about the enriched GO categories.
-<<GO info>>=
-sigCategories(GO[[1]])[[1]]
-library(GO.db)
-mget(sigCategories(GO[[1]])[[1]], GOTERM)
-@ 
-
-In addition, the following functions are implemented to work on the
-objects returned by \Rfunction{ISA.GO}: \Rfunction{htmlReport},
-\Rfunction{pvalues}, \Rfunction{geneCounts}, \Rfunction{oddsRatios},
-\Rfunction{exprectedCounts}, \Rfunction{universeCounts},
-\Rfunction{universeMappedCount}, \Rfunction{geneMappedCount},
-\Rfunction{geneIdUniverse}. These functions do essentially the same as
-they counterparts for \Rclass{GOHyperGResult} objects, see the
-documentation of the \Rpackage{GOstats} package. The only difference
-is, that since here we are testing a list of gene sets (=biclusters),
-they calculate the results for all gene sets and return a list.
-
-
-\subsection{KEGG Pathway Database}
-
-Enrichment calculation against the KEGG pathway goes essentially the
-same way as for the Gene Ontology, this time we use the
-\Rfunction{ISA.KEGG} function:
-<<KEGG enrichment>>=
-KEGG <- ISA.KEGG(modules)
-KEGG
-summary(KEGG)[[1]]
-library(KEGG.db)
-mget(sigCategories(KEGG)[[1]], KEGGPATHID2NAME)
-@
-
-The functions mentioned in the Gene ontology enrichment section can be
-used for KEGG, as well.
-
-
-\section{Visualizing the results}
-
-Visualizing overlapping biclusters is a challenging task. We
-show simple methods that usually visualize a single bicluster 
-at a time. For some of these we will use the \Rpackage{biclust} R
-package.
-
-\subsection{The \Rpackage{biclust} package}
-
+\subsection{Algorithms of the \Rpackage{Biclust} package}
 The \Rpackage{biclust} R package implements several biclustering
 algorithms in a unified framework. It uses the class \Rclass{Biclust}
 to store a set of biclusters. The standard R \Rfunction{as} function
@@ -277,6 +179,20 @@ Bc <- as(modules, "Biclust")
 Bc
 @ 
 
+
+\section{Order}
+
+Visualizing overlapping biclusters is a challenging task. We
+show simple methods that usually visualize a single bicluster 
+at a time. For some of these we will use the \Rpackage{biclust} R
+package.
+
+\section{Export}
+
+
+\section{Visualize}
+
+
 \section{Session information}
 
 The version number of R and packages loaded for generating this
@@ -287,7 +203,7 @@ toLatex(sessionInfo())
 @ 
 
 \bibliographystyle{apalike}
-\bibliography{EISA}
+\bibliography{ExpressionView}
 \nocite{*}
 
 \end{document}
