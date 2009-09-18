@@ -1,6 +1,8 @@
 exportMethods("order.clusters")
 exportMethods("export.ev")
 
+importFrom(AnnotationDbi, summary)
+
 export(open.ev)
 
 useDynLib(ExpressionView)
