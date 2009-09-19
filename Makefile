@@ -168,9 +168,9 @@ ALIVEPDFFILES=	ExpressionView/src/org/alivepdf/annotations/AnnotationHighlight.a
 		ExpressionView/src/org/alivepdf/viewing/WindowUI.as
 ALIVEPDFCLASSES = $(subst ExpressionView.src.,,$(subst /,.,$(basename $(ALIVEPDFFILES))))
 
-alivepdf: ExpressionView/libs/alivepdf.swc
+alivepdf: ExpressionView/libs/AlivePDF.swc
 
-ExpressionView/libs/alivepdf.swc: $(ALIVEPDFFILES)
+ExpressionView/libs/AlivePDF.swc: $(ALIVEPDFFILES)
 	cd ExpressionView/src/
 	compc -source-path ExpressionView/src -include-classes $(ALIVEPDFCLASSES) -output $@
 
