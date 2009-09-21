@@ -103,69 +103,7 @@ REVFILES=RExpressionView/inst/ExpressionView.swf	\
 REVVIGNETTES=RExpressionView/inst/doc/ExpressionView.vignette \
 	RExpressionView/inst/doc/ExpressionView.pdf
 
-ALIVEPDFFILES=	ExpressionView/src/org/alivepdf/annotations/AnnotationHighlight.as \
-		ExpressionView/src/org/alivepdf/annotations/AttachFileStyle.as \
-		ExpressionView/src/org/alivepdf/annotations/StampStyle.as \
-		ExpressionView/src/org/alivepdf/cells/CellVO.as \
-		ExpressionView/src/org/alivepdf/colors/CMYKColor.as \
-		ExpressionView/src/org/alivepdf/colors/Color.as \
-		ExpressionView/src/org/alivepdf/colors/GrayColor.as \
-		ExpressionView/src/org/alivepdf/colors/IColor.as \
-		ExpressionView/src/org/alivepdf/colors/RGBColor.as \
-		ExpressionView/src/org/alivepdf/data/Grid.as \
-		ExpressionView/src/org/alivepdf/data/GridColumn.as \
-		ExpressionView/src/org/alivepdf/display/Display.as \
-		ExpressionView/src/org/alivepdf/display/PageMode.as \
-		ExpressionView/src/org/alivepdf/drawing/Blend.as \
-		ExpressionView/src/org/alivepdf/drawing/Caps.as \
-		ExpressionView/src/org/alivepdf/drawing/DashedLine.as \
-		ExpressionView/src/org/alivepdf/drawing/Joint.as \
-		ExpressionView/src/org/alivepdf/drawing/WindingRule.as \
-		ExpressionView/src/org/alivepdf/encoding/Base64.as \
-		ExpressionView/src/org/alivepdf/encoding/BitString.as \
-		ExpressionView/src/org/alivepdf/encoding/IntBlock.as \
-		ExpressionView/src/org/alivepdf/encoding/IntList.as \
-		ExpressionView/src/org/alivepdf/encoding/JPEGEncoder.as \
-		ExpressionView/src/org/alivepdf/encoding/PNGEncoder.as \
-		ExpressionView/src/org/alivepdf/events/PageEvent.as \
-		ExpressionView/src/org/alivepdf/events/PagingEvent.as \
-		ExpressionView/src/org/alivepdf/events/ProcessingEvent.as \
-		ExpressionView/src/org/alivepdf/fonts/CoreFonts.as \
-		ExpressionView/src/org/alivepdf/fonts/FontFamily.as \
-		ExpressionView/src/org/alivepdf/fonts/FontType.as \
-		ExpressionView/src/org/alivepdf/fonts/Style.as \
-		ExpressionView/src/org/alivepdf/html/HTMLTag.as \
-		ExpressionView/src/org/alivepdf/images/GIFImage.as \
-		ExpressionView/src/org/alivepdf/images/IImage.as \
-		ExpressionView/src/org/alivepdf/images/ImageFormat.as \
-		ExpressionView/src/org/alivepdf/images/ImageHeader.as \
-		ExpressionView/src/org/alivepdf/images/JPEGImage.as \
-		ExpressionView/src/org/alivepdf/images/PDFImage.as \
-		ExpressionView/src/org/alivepdf/images/PNGImage.as \
-		ExpressionView/src/org/alivepdf/images/ResizeMode.as \
-		ExpressionView/src/org/alivepdf/layout/Align.as \
-		ExpressionView/src/org/alivepdf/layout/Format.as \
-		ExpressionView/src/org/alivepdf/layout/Layout.as \
-		ExpressionView/src/org/alivepdf/layout/Orientation.as \
-		ExpressionView/src/org/alivepdf/layout/Size.as \
-		ExpressionView/src/org/alivepdf/layout/Unit.as \
-		ExpressionView/src/org/alivepdf/metrics/FontMetrics.as \
-		ExpressionView/src/org/alivepdf/pages/Page.as \
-		ExpressionView/src/org/alivepdf/pdf/PDF.as \
-		ExpressionView/src/org/alivepdf/saving/Download.as \
-		ExpressionView/src/org/alivepdf/saving/Method.as \
-		ExpressionView/src/org/alivepdf/tools/sprintf.as \
-		ExpressionView/src/org/alivepdf/transitions/Dimension.as \
-		ExpressionView/src/org/alivepdf/transitions/MotionDirection.as \
-		ExpressionView/src/org/alivepdf/transitions/Transition.as \
-		ExpressionView/src/org/alivepdf/transitions/TransitionDirection.as \
-		ExpressionView/src/org/alivepdf/viewing/CenterWindow.as \
-		ExpressionView/src/org/alivepdf/viewing/Direction.as \
-		ExpressionView/src/org/alivepdf/viewing/FitWindow.as \
-		ExpressionView/src/org/alivepdf/viewing/MenuBar.as \
-		ExpressionView/src/org/alivepdf/viewing/Title.as \
-		ExpressionView/src/org/alivepdf/viewing/ToolBar.as \
-		ExpressionView/src/org/alivepdf/viewing/WindowUI.as
+ALIVEPDFFILES = $(shell find ExpressionView/src/org -name "*.as" -print)
 ALIVEPDFCLASSES = $(subst ExpressionView.src.,,$(subst /,.,$(basename $(ALIVEPDFFILES))))
 
 alivepdf: ExpressionView/libs/AlivePDF.swc
