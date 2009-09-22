@@ -17,3 +17,4 @@
 - put the SIB logo on the homepage (G)
 - write a separate eisa vignette on biclust (G)
 - update EV to handle general data, not just gene expression (A)
+- check terminology, features vs. genes and samples vs. conditions (A+G)
