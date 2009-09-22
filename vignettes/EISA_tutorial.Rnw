@@ -3,7 +3,7 @@
 \usepackage{ragged2e}
 \usepackage{url}
 
-\newcommand{\Rfunction}[1]{\texttt{#1}}
+\newcommand{\Rfunction}[1]{\texttt{#1()}}
 \newcommand{\Rpackage}[1]{\texttt{#1}}
 \newcommand{\Rclass}[1]{\texttt{#1}}
 \newcommand{\Rargument}[1]{\textsl{#1}}
@@ -12,6 +12,8 @@
 
 \SweaveOpts{cache=TRUE}
 \SweaveOpts{prefix.string=graphics/plot}
+
+\setlength{\parindent}{2em}
 
 \begin{document}
 
@@ -31,15 +33,23 @@ options(continue=" ")
 \section{Introduction}
 
 The Iterative Signature Algorithm (ISA) is biclustering method. The
-input of a biclustering method a matrix and its output is a set of
-biclusters that fulfill some criteria; a bicluster is a block of the
+input of a biclustering method a matrix and the output is a set of
+biclusters that fulfill some criteria. A bicluster is a block of the
 potentially reordered input matrix.
 
 Most commonly, this algorithm is used on microarray expression data,
 to find gene sets that are coexpressed across a subset of the original
-samples. In the original ISA paper the biclusters are called
+samples. In the ISA papers the biclusters are called
 transription modules (TM), we will often refer them under this name in
 the following.
+
+This tutorial specifically deals with the modular analysis of gene
+expression data. Section~\ref{sec:isa} gives a short summary of how
+ISA works. If you need more information of the underlying math
+or want to apply it to other data, then please see the referenced
+papers, the vignette titled ``The Iterative Signature Algorithm'' in
+the \Rpackage{isa2} R package, or the ISA homepage at
+\url{http://www.unil.ch/cbg/homepage/software.html}.
 
 \section{Preparing the data}
 
@@ -47,10 +57,9 @@ the following.
 
 First, we load the required packages and the data to analyze. ISA is
 implemented in the \Rpackage{eisa} and \Rpackage{isa2} packages, see
-Section{sec:isapackages} for a more elaborated summary about the two
-packages. It is enough to load the \Rpackage{eisa} package,
-\Rpackage{isa2} and other required packages are loaded automatically.
-\Rpackage{eisa} 
+Section~\ref{sec:isapackages} for a more elaborated summary about the
+two packages. It is enough to load the \Rpackage{eisa} package,
+\Rpackage{isa2} and other required packages are loaded automatically:
 <<load the packages>>=
 library(eisa)
 @
@@ -71,7 +80,10 @@ altogether.
 
 The simplest way to run ISA is to choose the two threshold parameters
 and then call the \Rfunction{isa} function on the
-\Rclass{ExpressionSet} object:
+\Rclass{ExpressionSet} object. The threshold parameters tune the size
+of the modules, less stringent (i.e. smaller) values result bigger,
+less correlated modules. The optimal values depend on your data and
+some experimentation is needed to determine them.
 <<simple ISA>>=
 thr.gene <- 2.7
 thr.cond <- 1.4
@@ -79,9 +91,8 @@ set.seed(1) # to get the same results, always
 modules <- ISA(ALL, thr.gene=thr.gene, thr.cond=thr.cond)
 @ 
 
-This first applies a non-specific filter to the data set filters the
-data set and then runs ISA from
-\Sexpr{formals(eisa:::ISA)$no.seeds} % $
+This first applies a non-specific filter to the data set and then runs
+ISA from \Sexpr{formals(eisa:::ISA)$no.seeds} % $
 random seeds (the default). See Section~\ref{sec:detailed-isa} if the
 default parameters are not appropriate for you and need more control.
 
@@ -99,8 +110,8 @@ for the run.
 
 Calling \Rfunction{length} on \variable{modules} returns the number of
 ISA modules in the set, \Rfunction{dim} gives the dimension of the
-input expression matrix: the number of features and the number of
-samples.
+input expression matrix: the number of features (after the filtering)
+and the number of samples:
 <<accessors 1>>=
 length(modules)
 dim(modules)
@@ -108,7 +119,7 @@ dim(modules)
 
 Functions \Rfunction{featureNames} and \Rfunction{sampleNames} return
 the names of the features and samples, just like the functions with
-the same name for an \Rclass{ExpressionSet}
+the same name for an \Rclass{ExpressionSet}:
 <<accessors 2>>=
 featureNames(modules)[1:5]
 sampleNames(modules)[1:5]
@@ -117,11 +128,11 @@ sampleNames(modules)[1:5]
 The \Rfunction{getNoFeatures} function returns a numeric vector, the
 number of features (probesets in our case) in each module. Similarly,
 \Rfunction{getNoSamples} returns a numeric vector, the number of
-samples in each module. Similarly, \Rfunction{pData} returns the
+samples in each module. \Rfunction{pData} returns the
 phenotype data of the expression set as a data frame. The
 \Rfunction{getOrganism} function returns the scientific name of the
 organism, \Rfunction{annotation} the name of the chip. For the former
-the appropriate annotation must be installed.
+the appropriate annotation package must be installed.
 <<number of features and samples>>=
 getNoFeatures(modules)
 getNoSamples(modules)
@@ -154,7 +165,7 @@ Similarly, selecting all B-cell samples can be performed with
 modules[ ,grep("^B", pData(modules)$BT)]
 @ 
 
-\Rfunction{getFeatureNames} lists the probes (more precisely,
+\Rfunction{getFeatureNames} lists the probesets (more precisely,
 the feature names coming from the \Rclass{ExpressionSet} object) in
 the modules. It returns a list, here we just print the first entry in
 the list.
@@ -169,7 +180,7 @@ object that was passed to \Rfunction{isa}:
 getSampleNames(modules)[[1]]
 @ 
 
-Remember, that the ISA biclustering is not binary, every feature (and
+ISA biclustering is not binary, every feature (and
 similarly, every sample) has a score between -1 and 1; the further the
 score is from zero the stronger the association between the feature
 (or sample) and the module. If two features both have scores with the
@@ -199,7 +210,7 @@ associated with the individual seeds can be queried with the
 \Rfunction{seedData} function, it returns a data frame, with as many
 rows as the number of seeds and various seed-level information,
 e.g. the number of iterations required for the seed to converge. See
-the manual page of \Rfunction{isa} for details.
+the manual page of \Rfunction{ISA} for details.
 <<seed data>>=
 seedData(modules)
 @
@@ -213,11 +224,12 @@ runData(modules)
 \section{Enrichment calculations}
 
 The \Rpackage{eisa} package provides some functions to perform
-enrichment tests for the genes in the various modules against various
-databases. These tests are usually simplified and less sophisticated
-versions than the ones in the \Rpackage{Category}, \Rpackage{GOstats}
-or \Rpackage{topGO} packages, but they are much faster and this is
-important if we need to perform them for many modules.
+enrichment tests for the gene sets corresponding to the ISA modules
+against various databases. These tests are usually simplified and less
+sophisticated versions than the ones in the \Rpackage{Category},
+\Rpackage{GOstats} or \Rpackage{topGO} packages, but they are much
+faster and this is important if we need to perform them for many
+modules.
 
 \subsection{Gene Ontology}
 
@@ -228,14 +240,13 @@ you have to do is to supply your \Rclass{ISAModules} object to the
 GO <- ISA.GO(modules)
 @ 
 
-The \Rfunction{ISA.GO} requires an annotation package that maps the
-Entrez identifiers of the studied organism to GO terms. For human, the
-\Rpackage{org.Hs.eg.db} package is required, for the mouse the
-\Rpackage{org.Mm.eg.db} package, etc.
+The \Rfunction{ISA.GO} function requires the annotation package on the
+chip, e.g. for the ALL data, the \Rpackage{hgu95av2.db} package is
+required.
 
 The \variable{GO} object is a list with three elements, these
-correspond to the ontologies: biological function, cellular component
-and molecular function, in this order.
+correspond to the GO ontologies, they are: biological function,
+cellular component and molecular function, in this order.
 <<list GO result>>=
 GO
 @
@@ -246,13 +257,13 @@ size is also different, because it contains only genes that have at
 least one annotation in the given category.
 
 For extracting the results themselves, the \Rfunction{summary}
-function can be used, this converts them to a simple data frame. The
+function can be used, this converts them to a simple data frame. A
 $p$-value limit can be supplied to \Rfunction{summary}. Note, that
 since \Rfunction{ISA.GO} calculates enrichment for many gene sets
 (i.e. for all biclusters), \Rfunction{summary} returns a list of data
 frames, one for each bicluster. A table for the first module:
 <<GO summary>>=
-summary(GO[[1]], p=0.001)[[1]][,-6]
+summary(GO$BP, p=0.001)[[1]][,-6]
 @ 
 
 We omitted the sixth column of the result, because it is very wide and
@@ -262,19 +273,19 @@ intersection of the bicluster and the GO category; or in other
 words, the genes that drive the enrichment.
 These genes can also be obtained with the
 \Rfunction{geneIdsByCategory} function. The following returns the
-genes in the second module and the third GO BP category. (The GO
+genes in the first module and the third GO BP category. (The GO
 categories are ordered according to the enrichment $p$-values, just
 like in the output of \Rfunction{summary}.)
 <<GO gene ids by category>>=
-geneIdsByCategory(GO[[1]])[[1]][[3]]
+geneIdsByCategory(GO$BP)[[1]][[3]]
 @ 
 
 You can use the \Rpackage{GO.db} package to obtain more information
 about the enriched GO categories.
 <<GO info>>=
-sigCategories(GO[[1]])[[1]]
+sigCategories(GO$BP)[[1]]
 library(GO.db)
-mget(sigCategories(GO[[1]])[[1]], GOTERM)
+mget(sigCategories(GO$BP)[[1]], GOTERM)
 @ 
 
 In addition, the following functions are implemented to work on the
@@ -286,25 +297,26 @@ objects returned by \Rfunction{ISA.GO}: \Rfunction{htmlReport},
 they counterparts for \Rclass{GOHyperGResult} objects, see the
 documentation of the \Rpackage{GOstats} package. The only difference
 is, that since here we are testing a list of gene sets (=biclusters),
-they calculate the results for all gene sets and return a list.
+they calculate the results for all gene sets and usually return lists.
 
 \subsubsection{Multiple testing correction}
 
 By default, the \Rfunction{ISA.GO} function performs multiple testing
 correction using the Holm method, this can be changed via the
 \texttt{correction} and \texttt{correction.method} arguments. See the
-manual page of the \Rfunction{p.adjust} function for the possible
-multiple testing correction schemes.
+manual page of the \Rfunction{ISA.GO} function for details, and also
+the \Rfunction{p.adjust} function for the possible multiple testing
+correction schemes.
 
 \subsection{KEGG Pathway Database}
 
-Enrichment calculation against the KEGG pathway goes essentially the
-same way as for the Gene Ontology, this time we use the
-\Rfunction{ISA.KEGG} function:
+Enrichment calculation against the KEGG pathway database goes
+essentially the same way as for the Gene Ontology, this time we use
+the \Rfunction{ISA.KEGG} function:
 <<KEGG enrichment>>=
 KEGG <- ISA.KEGG(modules)
 KEGG
-summary(KEGG)[[1]]
+summary(KEGG, p=1e-3)[[1]]
 library(KEGG.db)
 mget(sigCategories(KEGG)[[1]], KEGGPATHID2NAME)
 @
@@ -337,11 +349,11 @@ used for chromosome enrichment, as well.
   from the TargetScan database}
 
 $\mu$RNAs are short RNA molecules that regulate gene expression.
-TargetScan is a data based of predicted target genes of $\mu$RNAs, for
+TargetScan is a database of predicted target genes of $\mu$RNAs, for
 several organisms. There are two R packages that incorporate this
-database, one for human and another one for mouse, right now they can
+data, one for human and another one for mouse, right now they can
 be downloaded from
-\url{http://www2.unil.ch/cbg/index.php?title=Building_BioConductor_Annotation_Packages}.
+\url{http://www.unil.ch/cbg/homepage/software.html}.
 The \Rpackage{targetscan.Hs.eg.db} package is for human, the
 \Rpackage{targetscan.Mm.eg.db} package is for mouse.
 
@@ -365,7 +377,8 @@ show simple methods that usually visualize a single bicluster
 at a time. For some of these we will use the \Rpackage{biclust} R
 package.
 
-\subsection{The \Rpackage{biclust} package}
+\subsection{The \Rpackage{biclust} package}%
+\label{sec:biclust}
 
 The \Rpackage{biclust} R package implements several biclustering
 algorithms in a unified framework. It uses the class \Rclass{Biclust}
@@ -385,13 +398,25 @@ The easiest way to create a heatmap of a single module is to call the
 \Rfunction{ISA2heatmap} function. You need to specify which module you
 want to plot and also the \Rclass{ExpressionSet} object that is being
 analyzed. Note that by default ISA normalizes the expression data
-before running the module detection; the raw, non-normalized values
-are plotted in the next example. If you want to plot the normalized
-values, then you need to do the normalization ``by hand'', before
-calling ISA, see Section~\ref{sec:detailed-isa}.
-<<heatmap,fig=TRUE>>=
-ISA2heatmap(modules, 1, ALL, scale="none")
+before running the module detection, but \Rfunction{ISA2heatmap} plots
+the raw values by default, optionally scaled. 
+If you want to plot the normalized values, then you need supply the
+\Rargument{norm} argument to \Rfunction{ISA2heatmap}, see the manual
+for details. The result is in Fig.~\ref{fig:heatmap}.
+<<heatmap,results=hide,include=FALSE,eval=FALSE>>=
+ISA2heatmap(modules, 1, ALL, norm="sample", scale="none")
 @ 
+
+\begin{figure}
+\centering
+<<heatmap-real,fig=TRUE,echo=FALSE,results=hide>>=
+<<heatmap>>
+@
+\caption{Heatmap of the first ISA module, plotted via the
+\Rfunction{ISA2heatmap} function. The expression values are
+sample-wised normalized.}
+\label{fig:heatmap}
+\end{figure}
 
 \Rfunction{ISA2heatmap} simply calls the \Rfunction{heatmap} function,
 and passes additional arguments to it. See the manual of
@@ -416,7 +441,9 @@ dev.off()
 \begin{figure}
   \centering
   \includegraphics[width=0.7\textwidth]{graphics/heatmap.png}
-  \caption{Heatmap of the first transcription module.}
+  \caption{Heatmap of the first transcription module, plotted with the
+  \Rfunction{drawHeatmap} function from the \Rpackage{biclust}
+  package.}
   \label{fig:drawHeatmap}
 \end{figure}
 
@@ -463,7 +490,7 @@ can be the subcategory of more than one broader categories: e.g. the
 ``vesicle-mediated transport'' and ``intracellular
 transport''.
 
-The \Rpackage{eisa} package provides some functions to plot parts of
+The \Rpackage{eisa} package provides functions to plot parts of
 the GO graph that is related to a transcription module. The
 \Rfunction{gograph} function creates an object that is a
 representation of such a plot. Its input is a table with the GO
@@ -471,17 +498,16 @@ categories to plot and their enrichment $p$-values. (Additional
 columns are silently ignored.) Here is how to use
 it on the previously calculated enrichment scores:
 <<goplot1>>=
-goplot.2 <- gograph(summary(GO[[1]], p=0.05)[[1]])
+goplot.2 <- gograph(summary(GO$BP, p=0.05)[[1]])
 @ 
 
 \Rfunction{goplot} uses the \Rpackage{igraph} package to create a
-graph with associated meta data:
+graph with the associated meta data:
 <<gograph object>>=
 summary(goplot.2)
-list.vertex.attributes(goplot.2)
 @ 
 The \texttt{width} and \texttt{height} graph attributes contain the
-suggested width and height of the graph, if plotted to a bitmap
+suggested width and height of the graph in pixels, if plotted to a bitmap
 device. (The graph attributes of an \Rpackage{igraph} graph can be
 queried with the `\texttt{\$}' selector:
 <<gograph object 2>>=
@@ -490,21 +516,31 @@ goplot.2$height
 @
 
 Let's plot the graph, we can do this with the \Rfunction{gograph.plot}
-function.
+function, see Fig.~\ref{fig:gotree}.
 <<goplot2,eval=FALSE>>=
 x11(width=10, height=10*goplot.2$height/goplot.2$width)
 gograph.plot(goplot.2)
 @
 \setkeys{Gin}{width=\textwidth}
-<<goplot2-real,echo=FALSE,width=10,height=2.5,fig=TRUE>>=
+<<goplot2-real,results=hide,include=FALSE,eval=FALSE,echo=FALSE>>=
 ps.options(fonts=c("serif", "mono"))
 gograph.plot(goplot.2)
 @ 
 
-Because the GO is not really a tree, \Rfunction{gograph} ``unfolds''
+\begin{figure}
+\centering
+<<goplot2-real-real,width=10,height=5,fig=TRUE,results=hide,echo=FALSE>>=  
+<<goplot2-real>>
+@
+\caption{Part of the Gene ontology database, ``Biological Function''
+ontology, that contains all GO terms enriched by a transcription module.}
+\label{fig:gotree}
+\end{figure}
+
+Because the GO is not a tree, \Rfunction{gograph} ``unfolds''
 it into a tree by including categories more than once, if needed. It
 also abbreviates the names of the GO categories to make them fit on
-the tree. The graph object contains the full name of the category as
+the plot. The graph object contains the full name of the category as
 well. The full and abbreviated names can be listed by querying the
 appropriate vertex attributes of the graph. Here they are for the
 first five categories:
@@ -527,12 +563,27 @@ between the two groups.
 The \Rfunction{cond.plot} function can plot the sample scores,
 potentially including the scores before the ISA filtering. Let us plot
 the scores for the second module, the color code denotes B-cell
-vs. T-cell leukemia.
+vs. T-cell leukemia (Fig.~\ref{fig:condplot}).
 
-<<condplot,fig=TRUE,width=10,height=4>>=
-col <- ifelse( grepl("^B", pData(modules)$BT), "orange", "darkolivegreen")
-cond.plot(modules, 1, ALL, col=col)
+<<condplot,results=hide,include=FALSE,eval=FALSE>>=
+col <- ifelse( grepl("^B", pData(modules)$BT), "darkolivegreen", "orange")
+cond.plot(modules, 2, ALL, col=col)
 @
+
+\begin{figure}
+\centering
+<<condplot-real,fig=TRUE,width=10,height=4,echo=FALSE,results=hide>>=
+<<condplot>>
+@
+\caption{Condition plot for the ALL data and the second module. Every
+  sample is represented as a bar, and its ISA score is plotted. The
+  scores are also printed at the top or bottom of the bars. The scores
+  corresponding to the ISA thresholds are represented as horizontal
+  lines. The dashed line is the mean of the condition scores. B-cell
+  samples are dark green, T-cell samples are orange.
+}
+\label{fig:condplot}
+\end{figure}
 
 It is clear that the \Sexpr{getNoFeatures(modules)[2]} genes included
 in this transcription module can separate B-cell and T-cell leukemia
@@ -645,7 +696,7 @@ module. The scores are between minus one and one and they are by
 definition zero for the genes/samples that are not included in the
 module. For the non-zero entries, the further the score of a
 gene/samples is from zero, the stronger the association between the
-gene/sample and the module. If the sign of two genes/samples are the
+gene/sample and the module. If the signs of two genes/samples are the
 same, then they are correlated, if they have opposite signs, then they
 are anti-correlated. 
 
@@ -657,6 +708,7 @@ Madeira and Oliviera\cite{madeira04} define various coherence scores
 for biclusters, these measure how well the rows and or columns are
 correlated. It is possible to use these measures for ISA as well,
 after converting the output of ISA to a \Rclass{biclust} object. 
+We use the \texttt{Bc} object that was created in Section~\ref{sec:biclust}. 
 Here are the measures for the first bicluster:
 <<coherence>>=
 constantVariance(exprs(ALL), Bc, number=1)
@@ -684,11 +736,11 @@ The \Rpackage{eisa} package uses a measure that is related to
 coherence; it is called robustness. Robustness is a generalization of
 the singular value of a matrix. If there were no thresholding during
 the ISA iteration, then ISA would be equivalent to a numerical method
-for singular value decomposition and robustness would be indeed the
+for singular value decomposition and robustness would be the
 same the principal singular value of the input matrix. 
 
 If the \Rfunction{isa} function was used to find the transcription
-modules, then the robustness measure is used to filter the results.
+modules, then the robustness measure is used automatically to filter the results.
 This is done by first scrambling the input matrix and then running ISA
 on it. As ISA is an unsupervised algorithm it usually finds some
 (although less and smaller) modules even in such a scrambled data
@@ -705,7 +757,7 @@ seedData(modules)$rob
 \label{sec:isapackages}
 
 ISA and its companion functions for visualization, functional
-enrichment calculation, etc. are distributed in two separate packages,
+enrichment calculation, etc. are distributed in two separate R packages,
 \Rpackage{isa2} and \Rpackage{eisa}.
 
 \Rpackage{isa2} contains the implementation of ISA itself, and
@@ -716,7 +768,7 @@ enrichment calculation, etc. are distributed in two separate packages,
 \label{sec:detailed-isa}
 
 The \Rfunction{ISA} function takes care of all steps performed during
-a modular study, and for each step it uses parameters work reasonably
+a modular study, and for each step it uses parameters, that work reasonably
 well. In some cases, however, one wants to access these steps
 individually, to use custom parameters instead of the defaults.
 
@@ -767,7 +819,7 @@ ALL.filt.2 <- ALL.filt[keep,]
 @ 
 
 To reduce ambiguity in the interpretation of the results, we might
-also want to keep only single probeset for each Entrez genes.
+also want to keep only single probeset for each Entrez gene.
 <<Entrez unique>>=
 vari <- apply(exprs(ALL.filt.2), 1, var)
 larg <- findLargest(featureNames(ALL.filt.2), vari, data=annotation(ALL.filt.2))
@@ -782,8 +834,8 @@ matrices that are normalized differently. The
 \Rfunction{ISA.normalize} function can be used to calculate the
 normalized expression matrices; it returns an \Rclass{ExpressionSet}
 object including three expression matrices: the original raw
-expression, the row-wise normalized and the column-wise normalized
-expression matrix.
+expression, the row-wise (=gene-wise) normalized and the column-wise
+(=sample-wise) normalized expression matrix.
 <<normed>>=
 ALL.normed <- ISA.normalize(ALL.filt.3)
 ls(assayData(ALL.normed))
@@ -797,11 +849,12 @@ refines this set by 1) including other probesets in the set that are
 coexpressed with the input probesets and 2) removing probesets from it
 that are not coexpressed with the rest of the input set.
 
-The \Rfunction{generate.seeds} generates a set of random seeds (i.e. a
-set of random gene sets). See its documentation if you need to change
-the sparsity of the seeds.
+The \Rfunction{generate.seeds} function generates a set of random
+seeds (i.e. a set of random gene sets). See its documentation if you
+need to change the sparsity of the seeds.
 
 <<seeds>>=
+set.seed(3)
 random.seeds <- generate.seeds(length=nrow(ALL.normed), count=100)
 @ 
 
@@ -837,16 +890,16 @@ disease. The other seeds are similar, for the other subtypes.
 We perform the ISA iterations for our two sets of seeds separately.
 <<iteration>>=
 modules1 <- ISA.iterate(ALL.normed, feature.seeds=random.seeds, 
-                        thr.feat=2, thr.samp=2)
+                        thr.feat=1.5, thr.samp=1.8, convergence="cor")
 modules2 <- ISA.iterate(ALL.normed, sample.seeds=smart.seeds,
-                        thr.feat=2, thr.samp=2)
+                        thr.feat=1.5, thr.samp=1.8, convergence="cor")
 @
 
 \subsection{Dropping non-unique modules}
 
-\Rfunction{ISA.iterate} returns the same number of ``modules'' as the
-number of input seeds; these, however, do not always correspond to
-meaningful modules, the input seeds can converge to an all-zero
+\Rfunction{ISA.iterate} returns the same number of modules as the
+number of input seeds; these are, however, not always meaningful,
+the input seeds can converge to an all-zero
 vector, or occasionally they may not converge at all. It is also
 possible that two or more input seeds converge to the same module. 
 
@@ -864,14 +917,14 @@ seeds and \Sexpr{length(modules2.unique)} for the second set.
 \subsection{Dropping non-robust modules}
 
 The \Rfunction{ISA.filter.robust} function filters a set of modules by
-running ISA with the same parameters on a scrambled data set and then
+running ISA with the same parameters on the scrambled data set and then
 calculating a robustness score, both for the real modules and the ones
 from the scrambled data. The highest robustness score obtained from
 the scrambled data is used as a threshold to filter the real modules.
 <<robust>>=
 modules1.robust <- ISA.filter.robust(ALL.normed, modules1.unique)
 modules2.robust <- ISA.filter.robust(ALL.normed, modules2.unique)
-@ 
+@
 
 We still have \Sexpr{length(modules1.robust)} modules for
 the first set of seeds and \Sexpr{length(modules2.unique)} for the
@@ -881,12 +934,15 @@ second set.
 
 Now we check whether the ISA modules that we found can be used as
 classifiers for the different types of ALL. For this we use the sample
-scores of the modules, the score of a sample in a given module is the
-(weighted) average of the expression of the genes of the module in
-the sample in question.
+scores of the modules. The score of a sample is the weighted average
+of the normalized expression level of the modules genes. Thus, a good
+classifier module should have high sample scores for one type of ALL
+and low for the other. Here we perform a $t$-test to quantify this
+difference.
 
 Let's first check, whether any of the modules can distinguish between
-T-cell and B-cell ALL samples.
+T-cell and B-cell ALL samples. We perform $t$-tests for both sets of
+modules.
 <<B vs T>>=
 scores1 <- getSampleMatrix(modules1.robust)
 tt1 <- colttests(scores1, as.factor(substr(type, 1, 1)))
@@ -896,13 +952,13 @@ sign1 <- which(p.adjust(tt1$p.value, "holm") < 0.05)
 sign2 <- which(p.adjust(tt2$p.value, "holm") < 0.05)
 @
 
-For the first set of samples \Sexpr{length(sign1)} modules show
+For the first (random) set of seeds \Sexpr{length(sign1)} modules show
 significant difference for T-cell and B-cell samples, for the second
 (smart) set \Sexpr{length(sign2)} of them.
 
 Let's make some condition plots for the best separating modules from
-each set.
-<<conditions-plots-dysreg,fig=TRUE,width=10,height=8>>=
+each set (Fig.~\ref{fig:dysregmodules}).
+<<conditions-plots-dysreg,results=hide,include=FALSE,eval=FALSE>>=
 color <- ifelse(grepl("T", type), "orange", "darkolivegreen")
 layout(cbind(1:2))
 cond.plot(modules1.robust, which.min(tt1$p.value), ALL.normed, col=color, 
@@ -911,11 +967,25 @@ cond.plot(modules2.robust, which.min(tt2$p.value), ALL.normed, col=color,
           main="Best separator, smart seeds")
 @ 
 
+\begin{figure}
+<<conditions-plots-dysreg-real,fig=TRUE,width=10,height=8,echo=FALSE,results=hide>>=
+<<conditions-plots-dysreg>>
+@
+\caption{Condition plots for the best separator module found with
+  random seeds and the one found with the smart seeds. They are
+  essentially the same, with some minor differences. 
+}
+\label{fig:dysregmodules}
+\end{figure}
+
 Let's extract the modules that are good separators.
 <<extract separators>>=
 modules1.TB <- modules1.robust[[sign1]]
 modules2.TB <- modules2.robust[[sign2]]
 @ 
+
+As it turns out, one modules found using the smart seeds was also
+found with random seeds.
 
 \subsection{Enrichment calculations}
 
@@ -959,8 +1029,8 @@ min(p.adjust(na.omit(tt.B1.2$p.value)))
 @ 
 
 Both module sets seem to have some good separators, let us make some
-condition plots.
-<<B1-cond-plots,fig=TRUE,width=10,height=8>>=
+condition plots (Fig.~\ref{fig:B1condplots}).
+<<B1-cond-plots,results=hide,include=FALSE,eval=FALSE>>=
 color <- ifelse(type == "B1", "green", 
                 ifelse(grepl("^T", type), "orange", "darkolivegreen"))
 layout(cbind(1:2))
@@ -969,6 +1039,17 @@ cond.plot(modules1.robust, which.min(tt.B1.1$p.value), ALL.normed, col=color,
 cond.plot(modules2.robust, which.min(tt.B1.2$p.value), ALL.normed, col=color,
           main="Best B1 separator, smart seeds")
 @ 
+
+\begin{figure}
+\centering
+<<B1-cond-plots-real,fig=TRUE,echo=FALSE,results=hide,width=10,height=8>>=
+<<B1-cond-plots>>
+@ 
+\caption{Condition plots for the modules that best separate the B1-type 
+  ALL samples from the other B-cell ALL samples. The two modules are essentially
+  the same.}
+\label{fig:B1condplots}
+\end{figure}
 
 From the plot it seems that these two modules are essentially the
 same, one is the opposite of the others.
@@ -985,6 +1066,13 @@ B1.cor
 Indeed, they are almost the same, their Pearson correlation is around
 \Sexpr{round(B1.cor[1],3)} for the sample scores and
 \Sexpr{round(B1.cor[2],3)} for the feature (=gene) scores.
+
+\section{More information}
+
+For more information about the ISA, please see the references
+below. The ISA homepage at
+\url{http://www.unil.ch/cbg/homepage/software.html} has example data
+sets, and all ISA related tutorials and papers.
 
 \section{Session information}
 
