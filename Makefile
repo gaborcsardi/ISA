@@ -3,7 +3,7 @@ VERSION=0.1
 
 all: homepage isa2 eisa ExpressionView
 
-.PHONY: homepage isa2 eisa ExpressionView clean
+.PHONY: homepage isa2 eisa ExpressionView clean alivepdf vignettes
 
 clean: 
 	bzr clean-tree --force
@@ -100,8 +100,8 @@ REVFILES=RExpressionView/inst/ExpressionView.swf	\
 	RExpressionView/src/*.h RExpressionView/src/*.cpp 	\
 	RExpressionView/inst/CITATION
 
-REVVIGNETTES=RExpressionView/inst/doc/ExpressionView.vignette \
-	RExpressionView/inst/doc/ExpressionView.pdf
+REVVIGNETTES=RExpressionView/inst/doc/ExpressionView_tutorial.vignette \
+	RExpressionView/inst/doc/ExpressionView_tutorial.pdf
 
 ALIVEPDFFILES = $(shell find ExpressionView/src/org -name "*.as" -print)
 ALIVEPDFCLASSES = $(subst ExpressionView.src.,,$(subst /,.,$(basename $(ALIVEPDFFILES))))
@@ -112,7 +112,7 @@ ExpressionView/libs/AlivePDF.swc: $(ALIVEPDFFILES)
 	cd ExpressionView/src/
 	compc -source-path ExpressionView/src -include-classes $(ALIVEPDFCLASSES) -output $@
 
-RExpressionView/inst/ExpressionView.swf: $(EVFILES) alivepdf
+RExpressionView/inst/ExpressionView.swf: $(EVFILES) ExpressionView/libs/AlivePDF.swc
 	cd ExpressionView/src && \
 		mxmlc -compiler.library-path+=../libs/AlivePDF.swc \
 			-use-network=false ExpressionView.mxml \
@@ -122,25 +122,25 @@ RExpressionView/inst/ExpressionView.swf: $(EVFILES) alivepdf
 ExpressionView_$(VERSION).tar.gz: $(REVFILES) $(REVVIGNETTES)
 	R CMD build RExpressionView
 
-vignettes/ExpressionView.tex: $(REVFILES) vignettes/ExpressionView.Rnw
+vignettes/ExpressionView_tutorial.tex: $(REVFILES) vignettes/ExpressionView_tutorial.Rnw
 	R CMD build --no-vignettes isa2
 	R CMD build --no-vignettes eisa
 	R CMD build --no-vignettes RExpressionView
 	R CMD INSTALL -l /tmp/ isa2_$(VERSION).tar.gz
 	R CMD INSTALL -l /tmp/ eisa_$(VERSION).tar.gz
 	R CMD INSTALL -l /tmp/ ExpressionView_$(VERSION).tar.gz
-	cd vignettes && R_LIBS=/tmp/ R CMD Sweave ExpressionView.Rnw || rm ExpressionView.tex
+	cd vignettes && R_LIBS=/tmp/ R CMD Sweave ExpressionView_tutorial.Rnw || rm ExpressionView_tutorial.tex
 
-RExpressionView/inst/doc/ExpressionView.vignette: vignettes/ExpressionView.Rnw
+RExpressionView/inst/doc/ExpressionView_tutorial.vignette: vignettes/ExpressionView_tutorial.Rnw
 	cp $< $@
 
-RExpressionView/inst/doc/ExpressionView.pdf: vignettes/ExpressionView.pdf
+RExpressionView/inst/doc/ExpressionView_tutorial.pdf: vignettes/ExpressionView_tutorial.pdf
 	cp $< $@
 
-vignettes/ExpressionView.pdf: vignettes/ExpressionView.tex
-	cd vignettes && pdflatex ExpressionView.tex && pdflatex ExpressionView.tex && \
-		pdflatex ExpressionView.tex
-	cp vignettes/ExpressionView.pdf RExpressionView/inst/doc/
+vignettes/ExpressionView_tutorial.pdf: vignettes/ExpressionView_tutorial.tex
+	cd vignettes && pdflatex ExpressionView_tutorial.tex && pdflatex ExpressionView_tutorial.tex && \
+		pdflatex ExpressionView_tutorial.tex
+	cp vignettes/ExpressionView_tutorial.pdf RExpressionView/inst/doc/
 
 ############################################
 ## Homepage
@@ -148,17 +148,15 @@ vignettes/ExpressionView.pdf: vignettes/ExpressionView.tex
 SWEAVE2HTML = htlatex
 SWEAVE2HTMLOPTIONS = style,xhtml,graphics-,charset=utf-8 " -cunihtf -utf8" -cvalidate
 
-.PHONY: htmlfiles vignettes
+homepage: vignettes homepage/.stamp
 
-homepage: vignettes htmlfiles
-
-htmlfiles: homepage/*.in
-	cd homepage && ./generate.py
+homepage/.stamp: homepage/*.in
+	cd homepage && ./generate.py && touch .stamp
 
 vignettes: homepage/ISA_tutorial.html homepage/ISA_tutorial.pdf \
 	homepage/ISA_parallel.html homepage/ISA_parallel.pdf \
 	homepage/EISA_tutorial.html homepage/EISA_tutorial.pdf \
-	homepage/ExpressionView.html homepage/ExpressionView.pdf \
+	homepage/ExpressionView_tutorial.html homepage/ExpressionView_tutorial.pdf \
 	vignettes/style.cfg
 
 homepage/ISA_tutorial.html: vignettes/ISA_tutorial.tex
@@ -191,12 +189,12 @@ homepage/EISA_tutorial.html: vignettes/EISA_tutorial.tex
 homepage/EISA_tutorial.pdf: vignettes/EISA_tutorial.pdf
 	cp $< $@
 
-homepage/ExpressionView.html: vignettes/ExpressionView.tex
-	cd vignettes && $(SWEAVE2HTML) ExpressionView $(SWEAVE2HTMLOPTIONS)
-	cp vignettes/ExpressionView.html homepage
-	cp vignettes/ExpressionView.css homepage
+homepage/ExpressionView_tutorial.html: vignettes/ExpressionView_tutorial.tex
+	cd vignettes && $(SWEAVE2HTML) ExpressionView_tutorial $(SWEAVE2HTMLOPTIONS)
+	cp vignettes/ExpressionView_tutorial.html homepage
+	cp vignettes/ExpressionView_tutorial.css homepage
 #	cp vignettes/ExpressionView*.png homepage/
 	cp vignettes/graphics/*.png homepage/graphics/
 
-homepage/ExpressionView.pdf: vignettes/ExpressionView.pdf
+homepage/ExpressionView_tutorial.pdf: vignettes/ExpressionView_tutorial.pdf
 	cp $< $@
