@@ -12,7 +12,7 @@ export(gograph, gographPlot, expPlotCreate, expPlotColbar,
        expPlot, condPlot, overlap, overlapPlot, mnplot, ISAmnplot,
        ISA2heatmap, profilePlot)
        
-export(ISAHHTMLTable, ISAHTMLModules, ISAHTML)
+export(ISAHTMLTable, ISAHTMLModules, ISAHTML)
 
 exportMethods("featExprs", "sampExprs",
               "prenormalized", "prenormalized<-",
