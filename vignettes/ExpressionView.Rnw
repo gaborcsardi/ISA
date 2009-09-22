@@ -1,7 +1,7 @@
 % \VignetteIndexEntry{ExpressionView manual}
 \documentclass{article}
 
-\newcommand{\Rfunction}[1]{\texttt{#1}}
+\newcommand{\Rfunction}[1]{\texttt{#1()}}
 \newcommand{\Rpackage}[1]{\texttt{#1}}
 \newcommand{\Rclass}[1]{\texttt{#1}}
 \newcommand{\Rargument}[1]{\textsl{#1}}
