@@ -6,7 +6,6 @@
 - things for homepage:
   - general structure, break it into more files (G+A)
   - add EV stuff as well (A)
-  - 
 - write eisa application note (G)
 - check whether EV package can be added to BioC (G)
 - add a Makefile to EV R package that builds the swf (A)
@@ -17,3 +16,4 @@
 - submit package, either to BioC or to CRAN (G)
 - put the SIB logo on the homepage (G)
 - write a separate eisa vignette on biclust (G)
+- update EV to handle general data, not just gene expression (A)
