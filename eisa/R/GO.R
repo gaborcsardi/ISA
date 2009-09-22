@@ -155,7 +155,7 @@ setMethod("htmlReport", signature(r="GOListHyperGResult"),
             }
           })  
 
-ISA.GO <- function(modules,
+ISAGO <- function(modules,
                    ann=annotation(modules),
                    features=featureNames(modules),
                    hgCutoff=0.05,

@@ -54,7 +54,7 @@ setMethod("hyperGTest",
             do.call(new, c("CHRListHyperGResult", res))
           })
 
-ISA.CHR <- function(modules,
+ISACHR <- function(modules,
                     ann=annotation(modules),
                     features=featureNames(modules),
                     hgCutoff=0.05,

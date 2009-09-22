@@ -14,7 +14,7 @@ ISA2heatmap (modules, module, eset, norm = c("raw", "feature", "sample"),
   \item{eset}{An \code{ExpressionSet} or \code{ISAExpressionSet}
     object. If an \code{ExpressionSet} object is
     supplied (and the \code{norm} argument is not set to \sQuote{raw}),
-    then it is normalised by calling \code{\link{ISA.normalize}} on it.
+    then it is normalised by calling \code{\link{ISANormalize}} on it.
     A subset of \code{eset} is selected that corresponds to
     the features included in \code{modules}.
   }

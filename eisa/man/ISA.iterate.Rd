@@ -1,18 +1,18 @@
-\name{ISA.iterate}
-\alias{ISA.iterate}
+\name{ISAIterate}
+\alias{ISAIterate}
 \title{Perform the Iterative Signature Algorithm}
 \description{
-  \code{ISA.iterate} performs the ISA on an \code{ExpressionSet}
+  \code{ISAIterate} performs the ISA on an \code{ExpressionSet}
   object, from the given input seeds.
 }
 \usage{
-ISA.iterate(data, feature.seeds, sample.seeds, thr.feat,
+ISAIterate(data, feature.seeds, sample.seeds, thr.feat,
     thr.samp = thr.feat, \dots)
 }
 \arguments{
   \item{data}{An \code{ExpressionSet} or \code{ISAExpressionSet}
     object. If \code{ExpressionSet} object is supplied, then it is
-    normalised by calling \code{\link{ISA.normalize}} on it.}
+    normalised by calling \code{\link{ISANormalize}} on it.}
   \item{feature.seeds}{A matrix of feature seeds. The number of rows
     should match the number of features in the \code{ExpressionSet},
     each column is a seed. Either this, or the \code{sample.seeds}

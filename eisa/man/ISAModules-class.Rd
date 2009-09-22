@@ -98,7 +98,7 @@
     object. This is needed for calculating the scores of the
     features/samples that are not in the module.
     If an \code{ExpressionSet} object is supplied, then it is
-    normalised by calling \code{\link{ISA.normalize}} on it.}
+    normalised by calling \code{\link{ISANormalize}} on it.}
   \item{i}{For \sQuote{\code{[}} an index vector for selecting features
     (=probes, genes). For \sQuote{\code{[[}} an index vector for
     selecting modules.}
@@ -154,9 +154,9 @@
     \item{thr.col}{The sample (=condition) threshold used for finding
        the module.}
     \item{freq}{The number of times the module was found. This is always
-       one, unless \code{\link{ISA.unique}} was performed.}
+       one, unless \code{\link{ISAUnique}} was performed.}
     \item{rob}{The robustness score of the module. See
-       \code{\link{ISA.robustness}} for details.}
+       \code{\link{ISARobustness}} for details.}
     \item{rob.limit}{The robustness limit that was used for filtering
        the modules. As this depends of the feature and sample
        thresholds, it may be different for different modules.}
@@ -169,17 +169,17 @@
       expression set.}
     \item{organism}{The scientific name of the organism.}
     \item{direction}{The \code{direction} parameter of the ISA. Please
-       see \code{\link{ISA.iterate}} for details.}
+       see \code{\link{ISAIterate}} for details.}
     \item{convergence}{The method to determine ISA convergence, a
-       character scalar. Please see \code{\link{ISA.iterate}} for
+       character scalar. Please see \code{\link{ISAIterate}} for
        details.}
     \item{cor.limit}{Correlation limit for the \dQuote{\code{cor}}
-       convergence criterium, see \code{\link{ISA.iterate}} for
+       convergence criterium, see \code{\link{ISAIterate}} for
        details.}
     \item{eps}{Difference limit for the \dQuote{\code{eps}} convergence
-       criterium, see \code{\link{ISA.iterate}} for details.}
+       criterium, see \code{\link{ISAIterate}} for details.}
     \item{corx}{Size of the time window for the \dQuote{\code{corx}}
-       convergence criterium, see \code{\link{ISA.iterate}} for
+       convergence criterium, see \code{\link{ISAIterate}} for
        details.}
     \item{maxiter}{The maximum number of ISA iterations that was
        allowed.}
@@ -187,18 +187,18 @@
        considered during the ISA iteration.}
     \item{N}{Numeric scalar, the number of input seeds that were used to
        find the modules.}
-    \item{unique}{Logical scalar, whether \code{\link{ISA.unique}} was
+    \item{unique}{Logical scalar, whether \code{\link{ISAUnique}} was
        run on the modules.}
     \item{prenormalize}{Logical scalar, whether the input data was
        prenormalized during ISA normalization, see
-       \code{\link{ISA.normalize}}.}
+       \code{\link{ISANormalize}}.}
     \item{hasNA}{Logical scalar, whether the normalized input data
        contained some \code{NA} or \code{NaN} values.}
     \item{rob.perms}{Numeric scalar, the number of times the input data
        was scrambled when the modules were filtered according to robustness.}
   }
   Note that some of these might be missing, i.e. \code{rob.perms} is
-  only present if \code{\link{ISA.filter.robust}} was performed.
+  only present if \code{\link{ISAFilterRobust}} was performed.
 
   \code{featureThreshold} returns the feature thresholds that were used
   to find the modules.

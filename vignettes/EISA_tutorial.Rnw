@@ -235,12 +235,12 @@ modules.
 
 To perform enrichment analysis against the Gene Ontology database, all
 you have to do is to supply your \Rclass{ISAModules} object to the
-\Rfunction{ISA.GO} function.
+\Rfunction{ISAGO} function.
 <<GO enrichment>>=
-GO <- ISA.GO(modules)
+GO <- ISAGO(modules)
 @ 
 
-The \Rfunction{ISA.GO} function requires the annotation package on the
+The \Rfunction{ISAGO} function requires the annotation package on the
 chip, e.g. for the ALL data, the \Rpackage{hgu95av2.db} package is
 required.
 
@@ -259,7 +259,7 @@ least one annotation in the given category.
 For extracting the results themselves, the \Rfunction{summary}
 function can be used, this converts them to a simple data frame. A
 $p$-value limit can be supplied to \Rfunction{summary}. Note, that
-since \Rfunction{ISA.GO} calculates enrichment for many gene sets
+since \Rfunction{ISAGO} calculates enrichment for many gene sets
 (i.e. for all biclusters), \Rfunction{summary} returns a list of data
 frames, one for each bicluster. A table for the first module:
 <<GO summary>>=
@@ -289,7 +289,7 @@ mget(sigCategories(GO$BP)[[1]], GOTERM)
 @ 
 
 In addition, the following functions are implemented to work on the
-objects returned by \Rfunction{ISA.GO}: \Rfunction{htmlReport},
+objects returned by \Rfunction{ISAGO}: \Rfunction{htmlReport},
 \Rfunction{pvalues}, \Rfunction{geneCounts}, \Rfunction{oddsRatios},
 \Rfunction{exprectedCounts}, \Rfunction{universeCounts},
 \Rfunction{universeMappedCount}, \Rfunction{geneMappedCount},
@@ -301,10 +301,10 @@ they calculate the results for all gene sets and usually return lists.
 
 \subsubsection{Multiple testing correction}
 
-By default, the \Rfunction{ISA.GO} function performs multiple testing
+By default, the \Rfunction{ISAGO} function performs multiple testing
 correction using the Holm method, this can be changed via the
 \texttt{correction} and \texttt{correction.method} arguments. See the
-manual page of the \Rfunction{ISA.GO} function for details, and also
+manual page of the \Rfunction{ISAGO} function for details, and also
 the \Rfunction{p.adjust} function for the possible multiple testing
 correction schemes.
 
@@ -312,9 +312,9 @@ correction schemes.
 
 Enrichment calculation against the KEGG pathway database goes
 essentially the same way as for the Gene Ontology, this time we use
-the \Rfunction{ISA.KEGG} function:
+the \Rfunction{ISAKEGG} function:
 <<KEGG enrichment>>=
-KEGG <- ISA.KEGG(modules)
+KEGG <- ISAKEGG(modules)
 KEGG
 summary(KEGG, p=1e-3)[[1]]
 library(KEGG.db)
@@ -328,9 +328,9 @@ used for KEGG, as well.
 
 The \Rpackage{eisa} includes a simple way to check whether the genes
 in a bicluster are associated with a chromosome. See the
-\Rfunction{ISA.CHR} function:
+\Rfunction{ISACHR} function:
 <<CHR enrichment>>=
-CHR <- ISA.CHR(modules)
+CHR <- ISACHR(modules)
 summary(CHR,p=0.05)[[2]][,-6]
 @ 
 
@@ -358,10 +358,10 @@ The \Rpackage{targetscan.Hs.eg.db} package is for human, the
 \Rpackage{targetscan.Mm.eg.db} package is for mouse.
 
 The enrichment calculation itself is basically the same as for GO and
-KEGG, but the \Rfunction{ISA.miRNA} function should be used:
+KEGG, but the \Rfunction{ISAmiRNA} function should be used:
 <<miRNA enrichment>>=
 if (require(targetscan.Hs.eg.db)) {
-  miRNA <- ISA.miRNA(modules)
+  miRNA <- ISAmiRNA(modules)
   summary(miRNA, p=0.1)[[7]]
 }
 @ 
@@ -515,16 +515,16 @@ goplot.2$width
 goplot.2$height
 @
 
-Let's plot the graph, we can do this with the \Rfunction{gograph.plot}
+Let's plot the graph, we can do this with the \Rfunction{gographPlot}
 function, see Fig.~\ref{fig:gotree}.
 <<goplot2,eval=FALSE>>=
 x11(width=10, height=10*goplot.2$height/goplot.2$width)
-gograph.plot(goplot.2)
+gographPlot(goplot.2)
 @
 \setkeys{Gin}{width=\textwidth}
 <<goplot2-real,results=hide,include=FALSE,eval=FALSE,echo=FALSE>>=
 ps.options(fonts=c("serif", "mono"))
-gograph.plot(goplot.2)
+gographPlot(goplot.2)
 @ 
 
 \begin{figure}
@@ -548,7 +548,7 @@ first five categories:
 V(goplot.2)$abbrv[1:5]
 lapply(V(goplot.2)$desc[1:5], strwrap)
 @ 
-\Rfunction{gograph.plot} colors the categories according to the
+\Rfunction{gographPlot} colors the categories according to the
 supplied enrichment $p$-values, the minus $\log_{10}$ $p$-value is
 also added to the plot, see the bold blue numbers.
 
@@ -560,14 +560,14 @@ significantly differ for two groups of samples (e.g. cases versus
 controls), then the genes in the module can be used as discriminators
 between the two groups.
 
-The \Rfunction{cond.plot} function can plot the sample scores,
+The \Rfunction{condPlot} function can plot the sample scores,
 potentially including the scores before the ISA filtering. Let us plot
 the scores for the second module, the color code denotes B-cell
 vs. T-cell leukemia (Fig.~\ref{fig:condplot}).
 
 <<condplot,results=hide,include=FALSE,eval=FALSE>>=
 col <- ifelse( grepl("^B", pData(modules)$BT), "darkolivegreen", "orange")
-cond.plot(modules, 2, ALL, col=col)
+condPlot(modules, 2, ALL, col=col)
 @
 
 \begin{figure}
@@ -591,7 +591,12 @@ samples.
 
 \subsection{Generating a HTML summary for the modules}
 
-The \Rfunction{autogen.table} function creates a summary 
+The \Rfunction{autogen.table} function creates a summary of a set of
+ISA modules, as an HTML table. The summary includes the results of the
+enrichment calculations as well.
+<<HTML1>>=
+
+@ 
 
 \section{How ISA works}
 
@@ -630,8 +635,8 @@ correlation.
 
 It is very possible that the ISA finds the same module more than once;
 two or more seeds might converge to the same module. The function
-\Rfunction{ISA.unique} eliminates every module from the result of 
-\Rfunction{ISA.iterate} that is very similar (in terms of
+\Rfunction{ISAUnique} eliminates every module from the result of 
+\Rfunction{ISAIterate} that is very similar (in terms of
 Pearson correlation) to the one that was already found before.
 
 It might be also apparent from the description of ISA, that the
@@ -662,7 +667,7 @@ results for different runs.
 It is possible to use non-random seeds as well. If you have some
 knowledge about the data or are interested in a particular subset of
 genes/samples, then you can feed in your seeds into the
-\Rfunction{ISA.iterate} function directly. In this case the
+\Rfunction{ISAIterate} function directly. In this case the
 algorithm is deterministic, for the same seed you will always get the
 same results. Using smart (i.e. non-random) seeds can be considered as
 a semi-supervised approach. 
@@ -670,7 +675,7 @@ a semi-supervised approach.
 \subsection{Normalization}
 
 Using in silico data we observed that ISA has the best performance if the
-input matrix is normalized (see \Rfunction{ISA.normalize}). The
+input matrix is normalized (see \Rfunction{ISANormalize}). The
 normalization produces two matrices: $E_r$ and
 $E_c$. $E_r$ is calculated by transposing $E$ and
 centering and scaling its genes (see the \Rfunction{scale} R function). $E_c$ is
@@ -681,7 +686,7 @@ to calculate the signature of the samples.
 It is possible to use another normalization. In this case the user is
 requested to supply the normalized input data in a named list,
 including the two matrices of appropriate
-dimensions to the \Rfunction{ISA.iterate} function.
+dimensions to the \Rfunction{ISAIterate} function.
 
 The \texttt{Er} entry of the list will be used for calculating the
 signature of the genes, \texttt{Ec} will be used for the signature of the
@@ -831,13 +836,13 @@ ALL.filt.3 <- ALL.filt.2[larg,]
 The ISA works best, if the expression matrix is scaled and
 centered. In fact, the two sub-steps of an ISA step require expression
 matrices that are normalized differently. The
-\Rfunction{ISA.normalize} function can be used to calculate the
+\Rfunction{ISANormalize} function can be used to calculate the
 normalized expression matrices; it returns an \Rclass{ExpressionSet}
 object including three expression matrices: the original raw
 expression, the row-wise (=gene-wise) normalized and the column-wise
 (=sample-wise) normalized expression matrix.
 <<normed>>=
-ALL.normed <- ISA.normalize(ALL.filt.3)
+ALL.normed <- ISANormalize(ALL.filt.3)
 ls(assayData(ALL.normed))
 @ 
 
@@ -889,26 +894,26 @@ disease. The other seeds are similar, for the other subtypes.
 
 We perform the ISA iterations for our two sets of seeds separately.
 <<iteration>>=
-modules1 <- ISA.iterate(ALL.normed, feature.seeds=random.seeds, 
+modules1 <- ISAIterate(ALL.normed, feature.seeds=random.seeds, 
                         thr.feat=1.5, thr.samp=1.8, convergence="cor")
-modules2 <- ISA.iterate(ALL.normed, sample.seeds=smart.seeds,
+modules2 <- ISAIterate(ALL.normed, sample.seeds=smart.seeds,
                         thr.feat=1.5, thr.samp=1.8, convergence="cor")
 @
 
 \subsection{Dropping non-unique modules}
 
-\Rfunction{ISA.iterate} returns the same number of modules as the
+\Rfunction{ISAIterate} returns the same number of modules as the
 number of input seeds; these are, however, not always meaningful,
 the input seeds can converge to an all-zero
 vector, or occasionally they may not converge at all. It is also
 possible that two or more input seeds converge to the same module. 
 
-The \Rfunction{ISA.unique} function eliminates the all-zero or
+The \Rfunction{ISAUnique} function eliminates the all-zero or
 non-convergent input seeds and keeps only one instance of the
 duplicated ones.
 <<unique>>=
-modules1.unique <- ISA.unique(ALL.normed, modules1)
-modules2.unique <- ISA.unique(ALL.normed, modules2)
+modules1.unique <- ISAUnique(ALL.normed, modules1)
+modules2.unique <- ISAUnique(ALL.normed, modules2)
 @ 
 
 \Sexpr{length(modules1.unique)} modules were kept for the first set of
@@ -916,14 +921,14 @@ seeds and \Sexpr{length(modules2.unique)} for the second set.
 
 \subsection{Dropping non-robust modules}
 
-The \Rfunction{ISA.filter.robust} function filters a set of modules by
+The \Rfunction{ISAFilterRobust} function filters a set of modules by
 running ISA with the same parameters on the scrambled data set and then
 calculating a robustness score, both for the real modules and the ones
 from the scrambled data. The highest robustness score obtained from
 the scrambled data is used as a threshold to filter the real modules.
 <<robust>>=
-modules1.robust <- ISA.filter.robust(ALL.normed, modules1.unique)
-modules2.robust <- ISA.filter.robust(ALL.normed, modules2.unique)
+modules1.robust <- ISAFilterRobust(ALL.normed, modules1.unique)
+modules2.robust <- ISAFilterRobust(ALL.normed, modules2.unique)
 @
 
 We still have \Sexpr{length(modules1.robust)} modules for
@@ -961,9 +966,9 @@ each set (Fig.~\ref{fig:dysregmodules}).
 <<conditions-plots-dysreg,results=hide,include=FALSE,eval=FALSE>>=
 color <- ifelse(grepl("T", type), "orange", "darkolivegreen")
 layout(cbind(1:2))
-cond.plot(modules1.robust, which.min(tt1$p.value), ALL.normed, col=color, 
+condPlot(modules1.robust, which.min(tt1$p.value), ALL.normed, col=color, 
           main="Best separator, random seeds")
-cond.plot(modules2.robust, which.min(tt2$p.value), ALL.normed, col=color,
+condPlot(modules2.robust, which.min(tt2$p.value), ALL.normed, col=color,
           main="Best separator, smart seeds")
 @ 
 
@@ -993,10 +998,10 @@ We can check our separator modules against the Gene Ontology
 categories and the pathways in the KEGG database to find dysregulated
 GO categories and/or KEGG pathways.
 <<dysreg enrichment>>=
-GO.dysreg1 <- ISA.GO(modules1.TB)
-GO.dysreg2 <- ISA.GO(modules2.TB)
-KEGG.dysreg1 <- ISA.KEGG(modules1.TB)
-KEGG.dysreg2 <- ISA.KEGG(modules2.TB)
+GO.dysreg1 <- ISAGO(modules1.TB)
+GO.dysreg2 <- ISAGO(modules2.TB)
+KEGG.dysreg1 <- ISAKEGG(modules1.TB)
+KEGG.dysreg2 <- ISAKEGG(modules2.TB)
 @ 
 
 Let's collect the significantly enriched GO categories and KEGG
@@ -1034,9 +1039,9 @@ condition plots (Fig.~\ref{fig:B1condplots}).
 color <- ifelse(type == "B1", "green", 
                 ifelse(grepl("^T", type), "orange", "darkolivegreen"))
 layout(cbind(1:2))
-cond.plot(modules1.robust, which.min(tt.B1.1$p.value), ALL.normed, col=color, 
+condPlot(modules1.robust, which.min(tt.B1.1$p.value), ALL.normed, col=color, 
           main="Best B1 separator, random seeds")
-cond.plot(modules2.robust, which.min(tt.B1.2$p.value), ALL.normed, col=color,
+condPlot(modules2.robust, which.min(tt.B1.2$p.value), ALL.normed, col=color,
           main="Best B1 separator, smart seeds")
 @ 
 

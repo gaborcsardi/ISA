@@ -308,7 +308,7 @@ function(x,y=NULL,input=c('usr','plt','fig','dev','tdev')) {
 
 }
 
-gograph.plot <- function(graph, coords=FALSE, ...) {
+gographPlot <- function(graph, coords=FALSE, ...) {
 
   if (dev.cur() == 1) {
     device <- options("device")[[1]]
@@ -484,7 +484,7 @@ expPlot <- function(epo, scores=TRUE) {
        cond.height=epo$cond.height.px)
 }  
 
-cond.plot <- function(modules, number, eset,
+condPlot <- function(modules, number, eset,
                       col="white", all=TRUE,
                       sep=NULL, sepcol="grey", val=TRUE, srt=90,
                       adj.above=c(0,0.5), adj.below=c(1,0.5),
@@ -493,7 +493,7 @@ cond.plot <- function(modules, number, eset,
   isa2:::isa.status("Creating a condition plot", "in")
 
   eset <- eisa.get.nm(eset, modules)
-  nm1 <- t(feat.exprs(eset))
+  nm1 <- t(featExprs(eset))
 
   genes <- getFeatureMatrix(modules, mods=number)
   samp <- getSampleMatrix(modules, mods=number)
@@ -623,7 +623,7 @@ overlap <- function(modules, algorithm=c("mds", "fr", "drl"), edge.limit=0.5) {
   g
 }
 
-overlap.plot <- function(graph, xsize=400, ysize=400,
+overlapPlot <- function(graph, xsize=400, ysize=400,
                          vertex.size=20, vertex.size2=10, ...) {
 
   l <- cbind(V(graph)$x, V(graph)$y)
@@ -672,10 +672,10 @@ select.eset <- function(eset, modules, norm=c("raw", "feature", "sample")) {
     eset <- exprs(eset)
   } else if (norm=="feature") {
     eset <- eisa.get.nm(eset, modules)
-    eset <- feat.exprs(eset)
+    eset <- featExprs(eset)
   } else if (norm=="sample") {
     eset <- eisa.get.nm(eset, modules)
-    eset <- samp.exprs(eset)
+    eset <- sampExprs(eset)
   }
   eset
 }

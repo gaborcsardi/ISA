@@ -1,17 +1,17 @@
-\name{ISA.unique}
-\alias{ISA.unique}
+\name{ISAUnique}
+\alias{ISAUnique}
 \title{Remove duplicated ISA modules}
 \description{
   From a potentially non-unique set of ISA modules remove all modules
   that are similar to others.
 }
 \usage{
-ISA.unique(data, isaresult, \dots)
+ISAUnique(data, isaresult, \dots)
 }
 \arguments{
   \item{data}{An \code{ExpressionSet} or \code{ISAExpressionSet}
     object. If \code{ExpressionSet} object is supplied, then it is
-    normalised by calling \code{\link{ISA.normalize}} on it.}
+    normalised by calling \code{\link{ISANormalize}} on it.}
   \item{isaresult}{An \code{ISAModules} object to be filtered.}
   \item{\dots}{Additional arguments, these are passed to the
     \code{\link[isa2]{isa.unique}} function in the \code{isa2}
@@ -19,11 +19,11 @@ ISA.unique(data, isaresult, \dots)
 }
 \details{
   The ISA algorithm might very well find the same modules from many
-  different input seeds, so the output of the \code{\link{ISA.iterate}}
+  different input seeds, so the output of the \code{\link{ISAIterate}}
   function is usually not unique: many modules are very similar to each
   other.
 
-  \code{ISA.unique} eliminate the duplicates and potentially also the
+  \code{ISAUnique} eliminate the duplicates and potentially also the
   non-convergent modules.
 
   The work is performed by calling the \code{\link[isa2]{isa.iterate}}

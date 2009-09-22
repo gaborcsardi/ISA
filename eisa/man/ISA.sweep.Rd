@@ -1,6 +1,6 @@
-\name{ISA.sweep}
-\alias{ISA.sweep}
-\alias{ISA.sweep.graph}
+\name{ISASweep}
+\alias{ISASweep}
+\alias{ISASweepGraph}
 \title{Create an ISA module tree}
 \description{}
 \usage{}

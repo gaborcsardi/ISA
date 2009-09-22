@@ -1,5 +1,5 @@
-\name{ISA.GO}
-\alias{ISA.GO}
+\name{ISAGO}
+\alias{ISAGO}
 \concept{Gene Ontology}
 \concept{Enrichment analysis}
 \title{Calculate Gene Ontology enrichment for transcription modules}
@@ -9,7 +9,7 @@
   testing.
 }
 \usage{
-ISA.GO (modules, ann = annotation(modules), features = featureNames(modules),      
+ISAGO (modules, ann = annotation(modules), features = featureNames(modules),      
     hgCutoff = 0.05, correction = TRUE, correction.method = "holm")      
 }
 \arguments{
@@ -46,11 +46,11 @@ ISA.GO (modules, ann = annotation(modules), features = featureNames(modules),
   whether the number of genes in the set annotated by the term is
   significantly more (or less) than what one would expect by chance.
   
-  \code{ISA.GO} performs the hypergeometric test for every module, for
+  \code{ISAGO} performs the hypergeometric test for every module, for
   all GO terms of the three GO ontologies. The GO data is taken from the
   \code{GO.db} package and the annotation package of the chip.
 
-  \code{ISA.GO} currently cannot test for under-representation and the
+  \code{ISAGO} currently cannot test for under-representation and the
   conditional test, as implemented in the \code{GOstats} package, is not
   available either.
 }
@@ -69,8 +69,8 @@ ISA.GO (modules, ann = annotation(modules), features = featureNames(modules),
   analysis of large-scale gene expression data \emph{Phys Rev E Stat
     Nonlin Soft Matter Phys.} 2003 Mar;67(3 Pt 1):031902. Epub 2003 Mar 11.
 }
-\seealso{\code{\link{ISA.KEGG}}, \code{\link{ISA.CHR}},
-  \code{\link{ISA.miRNA}} for other enrichment calculations.
+\seealso{\code{\link{ISAKEGG}}, \code{\link{ISACHR}},
+  \code{\link{ISAmiRNA}} for other enrichment calculations.
 
   The \code{GO.db}, \code{GOstats} and \code{Category} packages.
 }

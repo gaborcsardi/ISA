@@ -122,8 +122,8 @@
 }
 \author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
 \seealso{Functions for enrichment calculation of ISA modules:
-  \code{\link{ISA.GO}}, \code{\link{ISA.KEGG}}, \code{\link{ISA.CHR}},
-  \code{\link{ISA.miRNA}}.
+  \code{\link{ISAGO}}, \code{\link{ISAKEGG}}, \code{\link{ISACHR}},
+  \code{\link{ISAmiRNA}}.
   
   Perhaps see also the vignette in the \code{GOstats} package.
 }

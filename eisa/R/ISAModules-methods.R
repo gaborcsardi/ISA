@@ -128,7 +128,7 @@ setMethod("getSampleMatrix", signature(object="ISAModules"),
 setMethod("getFullFeatureMatrix", signature(object="ISAModules"),
           function(object, eset, mods) {
             eset <- eisa.get.nm(eset, object)
-            nm2 <- samp.exprs(eset)
+            nm2 <- sampExprs(eset)
             if (missing(mods)) {
               genes <- getFeatureMatrix(object)
               samp  <- getSampleMatrix(object)
@@ -152,7 +152,7 @@ setMethod("getFullFeatureMatrix", signature(object="ISAModules"),
 setMethod("getFullSampleMatrix", signature(object="ISAModules"),
           function(object, eset, mods) {
             eset <- eisa.get.nm(eset, object)
-            nm1 <- t(feat.exprs(eset))
+            nm1 <- t(featExprs(eset))
             if (missing(mods)) {
               genes <- getFeatureMatrix(object)
               samp  <- getSampleMatrix(object)

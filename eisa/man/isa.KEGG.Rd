@@ -1,5 +1,5 @@
-\name{ISA.KEGG}
-\alias{ISA.KEGG}
+\name{ISAKEGG}
+\alias{ISAKEGG}
 \concept{Enrichment analysis}
 \title{Calculate KEGG Pathway enrichment for transcription modules}
 \description{
@@ -8,7 +8,7 @@
   testing.
 }
 \usage{
-ISA.KEGG (modules,ann = annotation(modules), features = featureNames(modules), 
+ISAKEGG (modules,ann = annotation(modules), features = featureNames(modules), 
     hgCutoff = 0.05, correction = TRUE, correction.method = "holm") 
 }
 \arguments{
@@ -40,11 +40,11 @@ ISA.KEGG (modules,ann = annotation(modules), features = featureNames(modules),
   whether the number of genes in the set participating in the pathway, is
   significantly more (or less) than what one would expect by chance.
   
-  \code{ISA.KEGG} performs the hypergeometric test for every module, for
+  \code{ISAKEGG} performs the hypergeometric test for every module, for
   all KEGG pathways. The KEGG data is taken from the \code{KEGG.db}
   package and the annotation package of the chip.
 
-  \code{ISA.KEGG} currently cannot test for under-representation.
+  \code{ISAKEGG} currently cannot test for under-representation.
 }
 \value{A \code{\link{KEGGListHyperGResult}} object.}
 \author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
@@ -59,8 +59,8 @@ ISA.KEGG (modules,ann = annotation(modules), features = featureNames(modules),
   analysis of large-scale gene expression data \emph{Phys Rev E Stat
     Nonlin Soft Matter Phys.} 2003 Mar;67(3 Pt 1):031902. Epub 2003 Mar 11.
 }
-\seealso{\code{\link{ISA.GO}}, \code{\link{ISA.CHR}},
-  \code{\link{ISA.miRNA}} for other enrichment calculations.
+\seealso{\code{\link{ISAGO}}, \code{\link{ISACHR}},
+  \code{\link{ISAmiRNA}} for other enrichment calculations.
 
   The \code{KEGG.db} and \code{Category} packages.
 }

@@ -1,8 +1,8 @@
 
-setMethod("feat.exprs", signature(object="ISAExpressionSet"),
+setMethod("featExprs", signature(object="ISAExpressionSet"),
           function(object) assayDataElement(object, "er.exprs"))
 
-setMethod("samp.exprs", signature(object="ISAExpressionSet"),
+setMethod("sampExprs", signature(object="ISAExpressionSet"),
           function(object) assayDataElement(object, "ec.exprs"))
 
 setMethod("prenormalized", signature(object="ISAExpressionSet"),

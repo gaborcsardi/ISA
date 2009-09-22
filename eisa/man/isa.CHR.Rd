@@ -1,5 +1,5 @@
-\name{ISA.CHR}
-\alias{ISA.CHR}
+\name{ISACHR}
+\alias{ISACHR}
 \concept{Chromosome}
 \concept{Enrichment analysis}
 \title{Calculate chromosome enrichment for transcription modules}
@@ -8,7 +8,7 @@
   ISA module are on the same chromosome.
 }
 \usage{
-ISA.CHR (modules,ann = annotation(modules), features = featureNames(modules), 
+ISACHR (modules,ann = annotation(modules), features = featureNames(modules), 
     hgCutoff = 0.05, correction = TRUE, correction.method = "holm") 
 }
 \arguments{
@@ -35,11 +35,11 @@ ISA.CHR (modules,ann = annotation(modules), features = featureNames(modules),
   chromosome is significantly more (or less) than what one would expect
   by chance.
   
-  \code{ISA.CHR} performs the hypergeometric test for every module, for
+  \code{ISACHR} performs the hypergeometric test for every module, for
   every chromosome. The chromosome mapping is taken from the annotation
   package of the chip.
   
-  \code{ISA.CHR} currently cannot test for under-representation.
+  \code{ISACHR} currently cannot test for under-representation.
 }
 \value{
   A \code{\link{CHRListHyperGResult}} object.
@@ -51,8 +51,8 @@ ISA.CHR (modules,ann = annotation(modules), features = featureNames(modules),
     Nonlin Soft Matter Phys.} 2003 Mar;67(3 Pt 1):031902. Epub 2003 Mar 11.
 }
 \seealso{
-  \code{\link{ISA.GO}}, \code{\link{ISA.KEGG}} and
-  \code{\link{ISA.miRNA}} for other enrichment calculations.
+  \code{\link{ISAGO}}, \code{\link{ISAKEGG}} and
+  \code{\link{ISAmiRNA}} for other enrichment calculations.
 
   The \code{Category} package.
 }

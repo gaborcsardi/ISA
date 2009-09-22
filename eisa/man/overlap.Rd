@@ -1,6 +1,6 @@
 \name{overlap}
 \alias{overlap}
-\alias{overlap.plot}
+\alias{overlapPlot}
 \title{Overlap of ISA biclusters}
 \description{
   Plots a network, where each node is a module and modules that overlap
@@ -8,7 +8,7 @@
 }
 \usage{
 overlap (modules, algorithm = c("mds", "fr", "drl"), edge.limit = 0.5)
-overlap.plot (graph, xsize = 400, ysize = 400, vertex.size = 20,
+overlapPlot (graph, xsize = 400, ysize = 400, vertex.size = 20,
      vertex.size2 = 10, \dots)
 }
 \arguments{
@@ -37,7 +37,7 @@ overlap.plot (graph, xsize = 400, ysize = 400, vertex.size = 20,
   information on how to plot this graph in a way that nodes representing
   overlapping modules are close to each other.
 
-  \code{overlap.plot} takes such a graph and plots it.
+  \code{overlapPlot} takes such a graph and plots it.
 
   \code{overlap} can use various algorithm, depending on the
   \code{algorithm} argument. If it is \sQuote{\code{mds}}, then

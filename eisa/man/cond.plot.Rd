@@ -1,12 +1,12 @@
-\name{cond.plot}
-\alias{cond.plot}
+\name{condPlot}
+\alias{condPlot}
 \title{Plot sample scores of a transcription module}
 \description{
   Creates a barplot of sample (=condition) scores, for a given
   transcription module. See details below.
 }
 \usage{
-cond.plot (modules, number, eset, col = "white", all = TRUE, sep = NULL, 
+condPlot (modules, number, eset, col = "white", all = TRUE, sep = NULL, 
     sepcol = "grey", val = TRUE, srt = 90, adj.above = c(0, 0.5),         
     adj.below = c(1, 0.5), plot.only = seq_len(ncol(eset)), \dots)
 }
@@ -17,7 +17,7 @@ cond.plot (modules, number, eset, col = "white", all = TRUE, sep = NULL,
     object. This is needed for calculating the scores of the samples
     that are not in the module, see the \code{all} argument. If an
     \code{ExpressionSet} object is supplied, then it is normalised by
-    calling \code{\link{ISA.normalize}} on it.}
+    calling \code{\link{ISANormalize}} on it.}
   \item{col}{Color of the bars, it it passed to
     \code{\link[graphics]{barplot}}, so it can be any format
     \code{\link[graphics]{barplot}} accepts. E.g. it can be a character
@@ -47,7 +47,7 @@ cond.plot (modules, number, eset, col = "white", all = TRUE, sep = NULL,
     \code{\link[graphics]{barplot}}.}
 }
 \details{
-  \code{cond.plot} creates a barplot for the sample scores of an ISA
+  \code{condPlot} creates a barplot for the sample scores of an ISA
   transcription module. Each sample is represented as a bar.
 
   These plots are useful if you want to show that a given transcription

@@ -68,7 +68,7 @@ setMethod("htmlReport", signature(r="KEGGListHyperGResult"),
             }
           })  
 
-ISA.KEGG <- function(modules,
+ISAKEGG <- function(modules,
                      ann=annotation(modules),
                      features=featureNames(modules),
                      hgCutoff=0.05,

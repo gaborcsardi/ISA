@@ -1,5 +1,5 @@
-\name{ISA.miRNA}
-\alias{ISA.miRNA}
+\name{ISAmiRNA}
+\alias{ISAmiRNA}
 \concept{miRNA}
 \concept{Enrichment analysis}
 \title{Calculate (predicted) miRNA target enrichment for transcription
@@ -9,7 +9,7 @@
   predicted miRNA targets to check whether an ISA module contains many
   genes that are targets of the same miRNA.}
 \usage{
-ISA.miRNA (modules, ann = annotation(modules), features = featureNames(modules), 
+ISAmiRNA (modules, ann = annotation(modules), features = featureNames(modules), 
     hgCutoff = 0.05, correction = TRUE, correction.method = "holm") 
 }
 \arguments{
@@ -44,7 +44,7 @@ ISA.miRNA (modules, ann = annotation(modules), features = featureNames(modules),
   whether the number of genes in the set regulated by the miRNA is
   significantly more (or less) than what one would expect by chance.
   
-  \code{ISA.miRNA} performs the hypergeometric test for every module,
+  \code{ISAmiRNA} performs the hypergeometric test for every module,
   for all miRNAs in the TargetScan database.
 
   In order to use this function, TargetScan annotation packages are
@@ -63,8 +63,8 @@ ISA.miRNA (modules, ann = annotation(modules), features = featureNames(modules),
   analysis of large-scale gene expression data \emph{Phys Rev E Stat
     Nonlin Soft Matter Phys.} 2003 Mar;67(3 Pt 1):031902. Epub 2003 Mar 11.
 }
-\seealso{\code{\link{ISA.GO}}, \code{\link{ISA.KEGG}} and
-  \code{\link{ISA.CHR}} for other enrichment calculations.
+\seealso{\code{\link{ISAGO}}, \code{\link{ISAKEGG}} and
+  \code{\link{ISACHR}} for other enrichment calculations.
 
   The \code{Category} package.
 }

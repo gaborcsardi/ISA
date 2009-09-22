@@ -3,18 +3,18 @@ import(Category)
 import(AnnotationDbi)
 import(Biobase)
 
-export(ISA, ISA.normalize, ISA.iterate, ISA.unique, ISA.sweep,
-       ISA.sweep.graph, ISA.robustness, ISA.filter.robust)
+export(ISA, ISANormalize, ISAIterate, ISAUnique, ISASweep,
+       ISASweepGraph, ISARobustness, ISAFilterRobust)
 
-export(ISA.GO, ISA.KEGG, ISA.CHR, ISA.miRNA)#, ISA.DBD)
+export(ISAGO, ISAKEGG, ISACHR, ISAmiRNA)#, ISA.DBD)
 
-export(gograph, gograph.plot, expPlotCreate, expPlotColbar,
-       expPlot, cond.plot, overlap, overlap.plot, mnplot, ISAmnplot,
+export(gograph, gographPlot, expPlotCreate, expPlotColbar,
+       expPlot, condPlot, overlap, overlapPlot, mnplot, ISAmnplot,
        ISA2heatmap, profilePlot)
        
-export(ISA.html.table, ISA.html.modules, ISA.html)
+export(ISAHHTMLTable, ISAHTMLModules, ISAHTML)
 
-exportMethods("feat.exprs", "samp.exprs",
+exportMethods("featExprs", "sampExprs",
               "prenormalized", "prenormalized<-",
               "hasNA", "hasNA<-")
 

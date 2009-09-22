@@ -1,15 +1,15 @@
 
-ISA.html <- function(eset, modules, target.dir,
+ISAHTML <- function(eset, modules, target.dir,
                      template=system.file("autogen", package="eisa"),
                      GO, KEGG, miRNA=NULL, CHR=NULL, htmltitle=NULL,
                      notes=NULL, seed=NULL,
                      cond.to.include=NULL, cond.col="white", sep=NULL) {
 
-  ISA.html.table(modules=modules, target.dir=target.dir, template=template,
+  ISAHTMLTable(modules=modules, target.dir=target.dir, template=template,
                  GO=GO, KEGG=KEGG, miRNA=miRNA, CHR=CHR, htmltitle=htmltitle,
                  notes=notes, seed=seed)
 
-  ISA.html.modules(eset=eset, modules=modules, target.dir=target.dir,
+  ISAHTMLModules(eset=eset, modules=modules, target.dir=target.dir,
                    template=template, GO=GO, KEGG=KEGG, miRNA=miRNA, CHR=CHR,
                    cond.to.include=cond.to.include,
                    cond.col=cond.col, sep=sep, seed=seed)
@@ -50,7 +50,7 @@ isa.autogen.create.dirs <- function(template, target.dir) {
   }
 }
 
-ISA.html.table <- function(modules, target.dir,
+ISAHTMLTable <- function(modules, target.dir,
                            which=seq_len(length(modules)),
                            template=system.file("autogen", package="eisa"),
                            GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL,
@@ -187,7 +187,7 @@ ISA.html.table <- function(modules, target.dir,
 }  
                           
 
-ISA.html.modules <- function(eset, modules, which=seq_len(length(modules)),
+ISAHTMLModules <- function(eset, modules, which=seq_len(length(modules)),
                              target.dir,
                              template=system.file("autogen", package="eisa"),
                              GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL,
@@ -524,7 +524,7 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
                    colbar.length=20, label.cex=1,
                    go.terms=go.terms, GOGRAPHS=GOGRAPHS)
     png(file=filename, width=gop$width*4, height=gop$height*4)
-    co <- gograph.plot(gop, coords=TRUE)
+    co <- gographPlot(gop, coords=TRUE)
     dev.off()
     list(graph=gop, coords=co)
   }
@@ -674,7 +674,7 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   
   png(file=paste(sep="", target.dir, "/condplot-", m, ".png"),
       width=1200, height=400)
-  cond.plot(modules, number=m, eset=eset,
+  condPlot(modules, number=m, eset=eset,
             col=cond.col, sep=sep)
   dev.off()
   

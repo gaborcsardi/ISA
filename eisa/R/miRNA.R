@@ -63,7 +63,7 @@ setMethod("hyperGTest",
             do.call(new, c("miRNAListHyperGResult", res))
           })
 
-ISA.miRNA <- function(modules,
+ISAmiRNA <- function(modules,
                       ann=annotation(modules),
                       features=featureNames(modules),
                       hgCutoff=0.05,

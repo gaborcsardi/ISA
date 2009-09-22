@@ -1,28 +1,28 @@
-\name{ISA.filter.robust}
-\alias{ISA.filter.robust}
-\alias{ISA.robustness}
+\name{ISAFilterRobust}
+\alias{ISAFilterRobust}
+\alias{ISARobustness}
 \title{Robustness of ISA biclusters}
 \description{Robustness of ISA biclusters. The more robust biclusters
   are more significant, in the sense that they are less likely to be
   found in random data.}
 \usage{
-ISA.robustness(data, isaresult)
-ISA.filter.robust(data, isaresult, \dots)
+ISARobustness(data, isaresult)
+ISAFilterRobust(data, isaresult, \dots)
 }
 \arguments{
   \item{data}{An \code{ExpressionSet} or \code{ISAExpressionSet}
     object. If an \code{ExpressionSet} object is
     supplied, then it is normalised by calling
-    \code{\link{ISA.normalize}} on it.}
+    \code{\link{ISANormalize}} on it.}
   \item{isaresult}{An \code{ISAModules} object, a set of modules.}
   \item{\dots}{Additional arguments, they are passed to the
     \code{\link[isa1]{isa.filter.robust}} function.}
 }
 \details{
-  \code{robustness} calculates robustness scores for ISA modules. The
+  \code{ISARobustness} calculates robustness scores for ISA modules. The
   higher the score, the more robust the module.
 
-  \code{ISA.filter.robust} filters a set of ISA modules, by running ISA
+  \code{ISAFilterRobust} filters a set of ISA modules, by running ISA
   on the randomized expression data and then eliminating all modules
   that have a robustness score that is lower than at least one
   robustness score found in the randomized data.
@@ -35,7 +35,7 @@ ISA.filter.robust(data, isaresult, \dots)
   \code{\link[isa2]{robustness}} function in the \code{isa2} package.
 }
 \value{
-  \code{ISA.robustness} returns a numeric vector, the robustness scores
+  \code{ISARobustness} returns a numeric vector, the robustness scores
   of the biclusters.
 }
 \author{

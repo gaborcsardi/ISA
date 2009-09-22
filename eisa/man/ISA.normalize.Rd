@@ -1,12 +1,12 @@
-\name{ISA.normalize}
-\alias{ISA.normalize}
+\name{ISANormalize}
+\alias{ISANormalize}
 \title{Normalize expression data for the Iterative Signature Algorithm}
 \description{
   ISA works best if the input data is centered and
-  scaled. \code{ISA.normalize} performs this transformation.
+  scaled. \code{ISANormalize} performs this transformation.
 }
 \usage{
-ISA.normalize (data, prenormalize = FALSE)
+ISANormalize (data, prenormalize = FALSE)
 }
 \arguments{
   \item{data}{An \code{ExpressionSet} object.}

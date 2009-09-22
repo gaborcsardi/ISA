@@ -1,11 +1,11 @@
 \name{ISAExpressionSet-class}
 \docType{class}
-\alias{feat.exprs}
-\alias{samp.exprs}
+\alias{featExprs}
+\alias{sampExprs}
 \alias{ISAExpressionSet}
 \alias{ISAExpressionSet-class}
-\alias{feat.exprs,ISAExpressionSet-method}
-\alias{samp.exprs,ISAExpressionSet-method}
+\alias{featExprs,ISAExpressionSet-method}
+\alias{sampExprs,ISAExpressionSet-method}
 \alias{hasNA}
 \alias{hasNA<-}
 \alias{hasNA,ISAExpressionSet-method}
@@ -20,8 +20,8 @@
   normalized for use with the Iterative Signature Algorithm.
 }
 \usage{
-\S4method{feat.exprs}{ISAExpressionSet}(object)
-\S4method{samp.exprs}{ISAExpressionSet}(object)
+\S4method{featExprs}{ISAExpressionSet}(object)
+\S4method{sampExprs}{ISAExpressionSet}(object)
 
 \S4method{hasNA}{ISAExpressionSet}(object)
 \S4method{hasNA}{ISAExpressionSet}(object) <- value
@@ -38,22 +38,22 @@
   An \code{ISAExpressionSet} contains three expression matrices.
 
   In most cases, when then \code{ISAExpressionSet} was produced by the
-  \code{\link{ISA.normalize}} function, these are: the original, raw
+  \code{\link{ISANormalize}} function, these are: the original, raw
   data, the feature-wise scaled and centered data and the sample-wise
   scaled and centered data.
 
   Two additional methods were defined to access the extra matrices:
-  \code{feat.exprs} returns the feature-wise standardized data,
-  \code{samp.exrs} the sample-wise standardized one.
+  \code{featExprs} returns the feature-wise standardized data,
+  \code{sampExprs} the sample-wise standardized one.
 
   The \code{hasNA} function returns \code{TRUE} if \code{NA} or
   \code{NaN} values appear in at least one of the expression matrices.
 
   The \code{prenormalized} function returns \code{TRUE} if the data was
-  prenormalized, see \code{\link{ISA.normalize}} for details.
+  prenormalized, see \code{\link{ISANormalize}} for details.
 }
 \value{
-  \code{feat.exprs} and \code{samp.exprs} both return a matrix.
+  \code{featExprs} and \code{sampExprs} both return a matrix.
 
   \code{hasNA} and \code{prenormalized} return a logical vector of
   length one.
@@ -65,7 +65,7 @@
     Nonlin Soft Matter Phys.} 2003 Mar;67(3 Pt 1):031902. Epub 2003 Mar 11.
 }
 \seealso{
-  \code{\link{ISA.normalize}}, \code{\link[Biobase]{ExpressionSet}}
+  \code{\link{ISANormalize}}, \code{\link[Biobase]{ExpressionSet}}
 }
 \examples{}
 \keyword{classes}
