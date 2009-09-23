@@ -3,10 +3,10 @@
 ########################################################################
 
 if (require(biclust)) {
- 	setMethod("export.ev", signature(modules="Biclust"), function(modules, ...) export.ev.Biclust(modules, ...))
+ 	setMethod("ExportEV", signature(modules="Biclust"), function(modules, ...) ExportEV.Biclust(modules, ...))
 }
 
-export.ev.Biclust <- function(modules, eset, order, go=NULL, kegg=NULL, filename="", norm=c("sample", "feature", "raw")) {
+ExportEV.Biclust <- function(modules, eset, order, go=NULL, kegg=NULL, filename="", norm=c("sample", "feature", "raw")) {
 	eisamodules <- as(modules, "ISAModules")
 	eisamodules@rundata$annotation <- annotation(eset)
 	eisamodules@rundata$prenormalize <- FALSE
@@ -19,12 +19,10 @@ export.ev.Biclust <- function(modules, eset, order, go=NULL, kegg=NULL, filename
 ########################################################################
 
 if (require(eisa)) {
-	setMethod("export.ev", signature(modules="ISAModules"), function(modules, ...) export.ev.default(modules, ...))
+	setMethod("ExportEV", signature(modules="ISAModules"), function(modules, ...) ExportEV.ISAModules(modules, ...))
 }
 
-export.ev.default <- function(modules, eset, order, go=NULL, kegg=NULL, filename="", norm=c("sample", "feature", "raw")) {
-	
-	library(caTools)
+ExportEV.ISAModules <- function(modules, eset, order, go=NULL, kegg=NULL, filename="", norm=c("sample", "feature", "raw")) {
 	
 	if ( filename == "" ) {
 		con <- file(file.choose(TRUE), open="w")
@@ -43,7 +41,7 @@ export.ev.default <- function(modules, eset, order, go=NULL, kegg=NULL, filename
 	nModules <- length(modules)
 
 	writeLines("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", con)
-	writeLines("<ged>", con)
+	writeLines("<evf>", con)
 	writeLines("\t<summary>", con)
 	writeLines("\t\t<description>ExpressionView data file</description>", con)
 	writeLines("\t\t<version>1.0</version>", con)
@@ -338,17 +336,245 @@ export.ev.default <- function(modules, eset, order, go=NULL, kegg=NULL, filename
 		
 	writeLines("\t</data>", con)
 
-	writeLines("</ged>", con)
+	writeLines("</evf>", con)
 	
 	close(con)
 
 }
 
-formatter <- function(x) {
-	if ( abs(x) < 1e-2 ) {
-		res <- formatC(x, digits=2, format="e")
+
+########################################################################
+# export list ##########################################################
+########################################################################
+
+setMethod("ExportEV", signature(modules="list"), function(modules, ...) ExportEV.list(modules, ...))
+
+ExportEV.list <- function(modules, eset, order, filename="", description=NULL, experimentdata=NULL) {
+	
+	if ( filename == "" ) {
+		con <- file(file.choose(TRUE), open="w")
 	} else {
-		res <- formatC(x, digits=2, format="f")	
+		con <- file(filename, open="w", blocking = TRUE)
+	}
+		
+	geneMaps <- order$cols
+	sampleMaps <- order$rows
+	
+	Genes <- colnames(eset)[geneMaps[[1]]];
+	Samples <- rownames(eset)[sampleMaps[[1]]];
+	
+	labels <- list(genes=description$cols[geneMaps[[1]]], samples=description$rows[sampleMaps[[1]]])
+	
+	nGenes <- dim(modules$columns)[1]
+	nSamples <- dim(modules$rows)[1]
+	nModules <- dim(modules$rows)[2]
+
+	writeLines("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", con)
+	writeLines("<evf>", con)
+	writeLines("\t<summary>", con)
+	writeLines("\t\t<description>ExpressionView data file</description>", con)
+	writeLines("\t\t<version>1.0</version>", con)
+	writeLines(paste("\t\t<nmodules>", nModules, "</nmodules>", sep=""), con)
+	writeLines(paste("\t\t<ngenes>", nGenes, "</ngenes>", sep=""), con)
+	writeLines(paste("\t\t<nsamples>", nSamples, "</nsamples>", sep=""), con)
+	writeLines("\t</summary>", con)
+
+	writeLines("", con)
+	
+	# experimentdata
+	writeLines("\t<experimentdata>", con)
+		writeLines(paste("\t\t<title>", experimentdata$title, "</title>", sep=""), con)
+		writeLines(paste("\t\t<name>", experimentdata$name, "</name>", sep=""), con)
+		writeLines(paste("\t\t<lab>", experimentdata$lab, "</lab>", sep=""), con)
+		writeLines(paste("\t\t<abstract>", experimentdata$abstract, "</abstract>", sep=""), con)
+		writeLines(paste("\t\t<url>", experimentdata$url, "</url>", sep=""), con)
+		writeLines(paste("\t\t<annotation>", experimentdata$annotation, "</annotation>", sep=""), con)
+		writeLines(paste("\t\t<organism>", experimentdata$organism, "</organism>", sep=""), con)
+	writeLines("\t</experimentdata>", con)
+
+	writeLines("", con)
+
+	# genes
+	writeLines("\t<genes>", con)
+
+		writeLines("\t\t<genetags>", con)
+			writeLines("\t\t\t<id>#</id>", con)
+			writeLines("\t\t\t<score>Score</score>", con)
+			writeLines("\t\t\t<name>Name</name>", con)
+			if ( !is.null(labels$genes) ) {
+				writeLines("\t\t\t<description>Description</description>", con)
+			}
+		writeLines("\t\t</genetags>", con)
+
+		writeLines("", con)
+
+		for ( gene in 1:nGenes ) {
+			writeLines("\t\t<gene>", con)
+				writeLines(paste("\t\t\t<id>", gene, "</id>", sep=""), con)
+				writeLines("\t\t\t<score/>", con)
+				writeLines(paste("\t\t\t<name>", Genes[gene], "</name>", sep=""), con)
+				if ( !is.null(labels$genes) ) {
+					writeLines(paste("\t\t\t<description>", xmlconf(labels$genes[gene]), "</description>", sep=""), con)
+				}
+			writeLines("\t\t</gene>", con)
+		}
+			
+	writeLines("\t</genes>", con)
+
+	# samples  
+	writeLines("\t<samples>", con)
+
+		writeLines("\t\t<sampletags>", con)
+			writeLines("\t\t\t<id>#</id>", con)
+			writeLines("\t\t\t<score>Score</score>", con)
+			writeLines("\t\t\t<name>Name</name>", con)
+			if ( !is.null(labels$samples) ) {
+				writeLines("\t\t\t<description>Description</description>", con)
+			}
+		writeLines("\t\t</sampletags>", con)
+
+		writeLines("", con)
+		
+		for ( sample in 1:nSamples ) {
+			
+			writeLines("\t\t<sample>", con)
+				writeLines(paste("\t\t\t<id>", sample, "</id>", sep=""), con)
+				writeLines("\t\t\t<score/>", con)
+				writeLines(paste("\t\t\t<name>", Samples[sample], "</name>", sep=""), con)
+				if ( !is.null(labels$samples) ) {
+					writeLines(paste("\t\t\t<description>", xmlconf(labels$samples[sample]), "</description>", sep=""), con)
+				}
+			writeLines("\t\t</sample>", con)
+		}
+	writeLines("\t</samples>", con)
+
+	writeLines("", con)
+
+	# modules
+	writeLines("\t<modules>", con)
+
+		writeLines("\t\t<moduletags>", con)
+			writeLines("\t\t\t<id>#</id>", con)
+			writeLines("\t\t\t<name>Name</name>", con)
+
+			if ( dim(modules$seeddata)[1] > 0 ) {
+				temp <- colnames(modules$seeddata)
+				# replace unallowed characters by underscores
+				tempp <- gsub("[^[:alnum:]]", "_", temp)
+				if ( length(temp) >= 1 ) {	
+					for ( i in 1:length(temp) ) {
+						writeLines(paste("\t\t\t<", tempp[i], ">", temp[i], "</", tempp[i], ">", sep=""), con)
+					}
+				}
+			}
+		writeLines("\t\t</moduletags>", con)
+	
+		for ( module in 1:nModules ) {
+			writeLines("\t\t<module>", con)
+
+				writeLines(paste("\t\t\t<id>", module, "</id>", sep=""), con)
+				writeLines(paste("\t\t\t<name>module ", module, "</name>", sep=""), con)
+				if ( dim(modules$seeddata)[1] > 0 ) {
+					temp <- colnames(modules$seeddata)
+					# replace unallowed characters by underscores
+					temp <- gsub("[^[:alnum:]]", "_", temp)
+					if ( length(temp) != 0 ) {
+						tempp <- modules$seeddata[module,]
+						for ( i in 1:length(temp) ) {
+							value <- tempp[i]
+							if ( temp[i] == "rob" || temp[i] == "rob_limit" ) {
+								value <- formatter(as.numeric(value))
+							}
+							writeLines(paste("\t\t\t<", temp[i], ">", value, "</", temp[i], ">", sep=""), con)
+						}
+					}
+				}
+
+				intersectingmodulesgenes = list();
+				genes <- modules$columns[,module][geneMaps[[1]]]
+				for ( modulep in 1:nModules ) {
+					if ( sum(genes * modules$columns[,modulep][geneMaps[[1]]]) != 0 && module != modulep ) {
+						intersectingmodulesgenes <- append(intersectingmodulesgenes, modulep)
+					}
+				}
+
+				genesp <- match(as.vector(which(modules$columns[,module]!=0)),geneMaps[[1]])[geneMaps[[module+1]]]
+				writeLines(paste("\t\t\t<containedgenes>", toString(genesp), "</containedgenes>", sep=""), con)
+				scores <- as.array(as.real(genes[genesp]))
+				scores <- apply(scores, 1, formatter)
+				writeLines(paste("\t\t\t<genescores>", toString(scores), "</genescores>", sep=""), con)
+
+				intersectingmodulessamples = list();
+				samples <- modules$rows[,module][sampleMaps[[1]]]
+				for ( modulep in 1:nModules ) {
+					if ( sum(samples * modules$rows[,modulep][sampleMaps[[1]]]) != 0 && module != modulep ) {
+						intersectingmodulessamples <- append(intersectingmodulessamples, modulep)
+					}
+				}
+
+				samplesp <- match(as.vector(which(modules$rows[,module]!=0)),sampleMaps[[1]])[sampleMaps[[module+1]]]
+				writeLines(paste("\t\t\t<containedsamples>", toString(samplesp), "</containedsamples>", sep=""), con)
+				scores <- as.array(as.real(samples[samplesp]))
+				scores <- apply(scores, 1, formatter)
+				writeLines(paste("\t\t\t<samplescores>", toString(scores), "</samplescores>", sep=""), con)
+
+				intersectingmodules <- intersect(unique(intersectingmodulesgenes), unique(intersectingmodulessamples))
+				writeLines(paste("\t\t\t<intersectingmodules>", toString(intersectingmodules), "</intersectingmodules>", sep=""), con)
+
+				writeLines("", con)
+
+		writeLines("\t\t</module>", con)
+		
+		}
+		
+	writeLines("\t</modules>", con)
+
+	Data <- t(isa.normalize(as.matrix(eset))[[1]])
+	Data[is.na(Data)] <- 0
+	Data <- Data[sampleMaps[[1]], geneMaps[[1]]]
+	Data <- as.vector(Data)
+        
+	Data.min <- min(Data, na.rm = TRUE)
+	Data.max <- max(Data, na.rm = TRUE)
+	Data.delta <- Data.max - Data.min
+	Data <- (Data - Data.min) / Data.delta * 2 - 1
+	
+	Data <- as.integer(round(Data * 100, 0))
+
+	writeLines("", con)
+
+	# data
+	writeLines("\t<data>", con)
+	
+		temp <- base64encode(writeBin(Data, raw(), size=1))
+		# line breaks after 76 characters
+		for ( i in 1:ceiling(nchar(temp) / 76) ) {
+			writeLines(substr(temp, (i-1)*76 + 1, i*76), con)
+		}
+		
+	writeLines("\t</data>", con)
+
+	writeLines("</evf>", con)
+	
+	close(con)
+
+}
+
+xmlconf <- function(s) {
+	res <- gsub("<", " .lt. ", s)
+	res <- gsub(">", " .gt. ", res)
+	res
+}
+
+formatter <- function(x) {
+	if ( !is.na(x) ) { 
+		if ( abs(x) < 1e-2 ) {
+			res <- formatC(x, digits=2, format="e")
+		} else {
+			res <- formatC(x, digits=2, format="f")
+		}
+	} else {
+		res <- formatC(0., digits=2, format="f")
 	}
 	res
 }

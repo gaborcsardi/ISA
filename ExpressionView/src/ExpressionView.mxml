@@ -181,7 +181,7 @@
 				try {
 					data = XML(bytes.readUTFBytes(bytes.length));
 				} catch (error:Error) {
-					Alert.show('Malformated XML file.', 'Error', mx.controls.Alert.OK);
+					Alert.show('Malformated XML file:', 'Error', mx.controls.Alert.OK);
 					return;			
 				}
 				
