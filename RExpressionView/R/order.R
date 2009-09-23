@@ -3,10 +3,10 @@
 ########################################################################
 
 if (require(eisa)) {
-	setMethod("order.clusters", signature(modules="ISAModules"), function(modules, ...) order.clusters.ISAModules(modules, ...))
+	setMethod("OrderEV", signature(modules="ISAModules"), function(modules, ...) OrderEV.ISAModules(modules, ...))
 }
 
-order.clusters.ISAModules <- function(modules, initialorder=NULL, debuglevel=0, maxtime=60) {
+OrderEV.ISAModules <- function(modules, initialorder=NULL, debuglevel=0, maxtime=60) {
 	isamodules <- eisa:::ISAModules.to.isa.result(modules)
 	if ( !is.null(initialorder) ) {
 		initialorder <- list(rows=initialorder$genes, cols=initialorder$samples, status=initialorder$status)
@@ -22,12 +22,12 @@ order.clusters.ISAModules <- function(modules, initialorder=NULL, debuglevel=0, 
 ########################################################################
 
 if (require(biclust)) {
-	setMethod("order.clusters", signature(modules="Biclust"), function(modules, ...) order.clusters.Biclust(modules, ...))
+	setMethod("OrderEV", signature(modules="Biclust"), function(modules, ...) OrderEV.Biclust(modules, ...))
 }
 
-order.clusters.Biclust <- function(modules, initialorder=NULL, debuglevel=0, maxtime=60) {
+OrderEV.Biclust <- function(modules, initialorder=NULL, debuglevel=0, maxtime=60) {
 	eisamodules <- as(modules, "ISAModules")
-	order.clusters(eisamodules, initialorder, debuglevel, maxtime)
+	OrderEV(eisamodules, initialorder, debuglevel, maxtime)
 }
 
 
@@ -36,11 +36,10 @@ order.clusters.Biclust <- function(modules, initialorder=NULL, debuglevel=0, max
 ########################################################################
 
 if (require(isa2)) {
-	setMethod("order.clusters", signature(modules="list"), function(modules, ...) order.clusters.default(modules, ...))
+	setMethod("OrderEV", signature(modules="list"), function(modules, ...) OrderEV.list(modules, ...))
 }
 
-order.clusters.default <- function(modules, initialorder, debuglevel, maxtime) {
-	
+OrderEV.list <- function(modules, initialorder=NULL, debuglevel=0, maxtime=60) {	
 	no.mods <- ncol(modules$rows)
 	no.rows <- nrow(modules$rows)
 	no.cols <- nrow(modules$columns)

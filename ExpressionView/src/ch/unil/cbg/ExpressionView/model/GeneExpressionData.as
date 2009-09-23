@@ -92,7 +92,7 @@ package ch.unil.cbg.ExpressionView.model {
 				ModularData[module] = new GeneExpressionModule();
 				ModulesColors[module]  = [hsv2rgb(module / nModules * 360, 100, 60), hsv2rgb(module / nModules * 360, 100, 100)];
 			}
-			
+
 			// read labels
 			var tags:XML = XML(XMLData.genes.genetags);
 			var size:int = tags.children().length();
@@ -115,19 +115,25 @@ package ch.unil.cbg.ExpressionView.model {
  				temp = tags.children()[tag].name();
 				moduleLabels[tag] = [temp, tags.child(temp)];
 			}
-			tags = new XML(XMLData.modules.gotags);
-			size = tags.children().length();
-			goLabels = new Vector.<Array>(size, true);
- 			for ( tag = 0; tag < size; ++tag ) {
- 				temp = tags.children()[tag].name();
-				goLabels[tag] = [temp, tags.child(temp)];
+			goLabels = new Vector.<Array>;
+			if ( XMLData.child("gotags").length > 0 ) {
+				tags = new XML(XMLData.modules.gotags);
+				size = tags.children().length();
+				goLabels = new Vector.<Array>(size, true);
+	 			for ( tag = 0; tag < size; ++tag ) {
+ 					temp = tags.children()[tag].name();
+					goLabels[tag] = [temp, tags.child(temp)];
+				}
 			}
-			tags = new XML(XMLData.modules.keggtags);
-			size = tags.children().length();
-			keggLabels = new Vector.<Array>(size, true);
- 			for ( tag = 0; tag < size; ++tag ) {
- 				temp = tags.children()[tag].name();
-				keggLabels[tag] = [temp, tags.child(temp)];
+			keggLabels = new Vector.<Array>;
+			if ( XMLData.child("keggtags").length > 0 ) {
+				tags = new XML(XMLData.modules.keggtags);
+				size = tags.children().length();
+				keggLabels = new Vector.<Array>(size, true);
+ 				for ( tag = 0; tag < size; ++tag ) {
+ 					temp = tags.children()[tag].name();
+					keggLabels[tag] = [temp, tags.child(temp)];
+				}
 			}
 
 			// set modularData[0]
@@ -371,7 +377,7 @@ package ch.unil.cbg.ExpressionView.model {
 					ModulesLookupSamples[samplep].push(module);
 				}
 				samples.sort(Array.NUMERIC);
-
+				
 				string = Modules.source[module-1].intersectingmodules.toString();
 				var modules:Array = string.split(", ");
 				modules.sort(Array.NUMERIC);

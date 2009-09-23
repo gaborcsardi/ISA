@@ -1,5 +1,5 @@
-setGeneric("order.clusters",
-           function(modules, ...) standardGeneric("order.clusters"))
+setGeneric("OrderEV",
+           function(modules, ...) standardGeneric("OrderEV"))
 
-setGeneric("export.ev",
-           function(modules, ...) standardGeneric("export.ev"))
+setGeneric("ExportEV",
+           function(modules, ...) standardGeneric("ExportEV"))

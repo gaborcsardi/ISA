@@ -45,6 +45,8 @@ package ch.unil.cbg.ExpressionView.view {
 		
 		private var selectedMode:int;
 		private var selectedAlpha:Number = 0.2;
+		private var selectedOutline:Boolean = true;
+		private var selectedFilling:Boolean = true;
 		
 		private var lastHighlightedModules:Array;
 		
@@ -185,12 +187,22 @@ package ch.unil.cbg.ExpressionView.view {
 			parentApplication.addEventListener(MenuEvent.EXCEL_EXPORT, excelExportHandler);
 			parentApplication.addEventListener(ResizeBrowserEvent.RESIZEBROWSEREVENT, resizeBrowserHandler);
 			parentApplication.addEventListener(MenuEvent.ALPHA, alphaSliderChangeHandler);
+			parentApplication.addEventListener(MenuEvent.FILLING, fillingChangeHandler);
+			parentApplication.addEventListener(MenuEvent.OUTLINE, outlineChangeHandler);
 		}
 
 		private function alphaSliderChangeHandler(event:MenuEvent): void {
 			selectedAlpha = event.data[0];
 		}
 		
+		private function fillingChangeHandler(event:MenuEvent): void {
+			selectedFilling = event.data[0];
+		}
+
+		private function outlineChangeHandler(event:MenuEvent): void {
+			selectedOutline = event.data[0];
+		}
+
 		private function resizeBrowserHandler(event:ResizeBrowserEvent): void {
 			
 			var scalex:Number = event.scaleX;
@@ -387,6 +399,8 @@ package ch.unil.cbg.ExpressionView.view {
 				}
 				var lastSelectedTab:int = modulesNavigator.selectedIndex;
 				dispatchEvent(new MenuEvent(MenuEvent.ALPHA, [selectedAlpha]));
+				dispatchEvent(new MenuEvent(MenuEvent.FILLING, [selectedFilling]));
+				dispatchEvent(new MenuEvent(MenuEvent.OUTLINE, [selectedOutline]));
 				if ( lastSelectedTab != selectedTab ) { 
 					openTabs[lastSelectedTab].removeListener();
 					openTabs[selectedTab].addListener();
@@ -482,7 +496,12 @@ package ch.unil.cbg.ExpressionView.view {
 				// update infoPanel
 				var infoString:String = "";
 				if ( infoArray.length != 0 ) {
-					infoString = infoString + "Gene: " + infoArray[0].symbol + " (" + infoArray[0].name + ")";
+					var temp:String = infoArray[0].symbol;
+					if ( temp == "" ) {
+						temp = infoArray[0].description;
+					}
+					//infoString = infoString + "Gene: " + infoArray[0].symbol + " (" + infoArray[0].name + ")";
+					infoString = infoString + "Gene: " + temp + " (" + infoArray[0].name + ")";
 					infoString = infoString + "\nSample: " + infoArray[1].name;
 					infoString = infoString + "\nModules: " + infoArray[2];
 					infoString = infoString + "\nData: " + infoArray[3];
