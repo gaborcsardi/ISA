@@ -717,8 +717,6 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   jfname <- paste(sep="", target.dir, "/module-", m, ".js")
   cat(jlines, file=jfname, sep="\n")
 
-  print("Done.")
-  
   isa2:::isa.status("DONE", "out")
 }
 
