@@ -227,7 +227,7 @@ void Clusters::prearrange() {
 
 		double bestfitness = getfitness();
 
-		for ( int slot2 = 0; slot2 <= slot1; slot2++ ) {		
+		for ( int slot2 = 0; slot2 <= slot1; slot2++ ) {
 			swap(slot1, slot2);
 			double fitness = getfitness();
 			if ( fitness <= bestfitness ) {
@@ -236,9 +236,13 @@ void Clusters::prearrange() {
 				bestfitness = fitness;
 			}
 		}
+		
+		if ( elapsedtime() > maxtime && maxtime != 0 ) {
+			break;
+		}
 
 	}
-	
+		
 	if ( getfitness() < initialfitness ) {
 		order = oldorder;
 		if ( debug > 1 ) {
@@ -259,7 +263,7 @@ double Clusters::getfitness() {
 			if ( data[order[slot]][cluster] ) {
 				length += multiplicity[order[slot]];
 				if ( slot == nSlots - 1 && length > maxlength ) {
-					maxlength = length;					
+					maxlength = length;
 				}
 			} else {
 				if ( length > maxlength ) {
@@ -397,6 +401,11 @@ int Clusters::reposition(int cluster) {
 			
 			start = end + 1;
 			
+			if ( elapsedtime() > maxtime && maxtime != 0 ) {
+				go = false; 
+				break;
+			}
+			
 		}
 	
 	} while ( go );
@@ -470,6 +479,10 @@ int Clusters::exchange(int cluster, int what) {
 		
 		if ( bestpermutation != initialpermutation ) {
 			result = 1;
+		}
+		
+		if ( elapsedtime() > maxtime && maxtime != 0 ) {
+			break;
 		}
 		
 	}

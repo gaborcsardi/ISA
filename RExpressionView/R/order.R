@@ -11,7 +11,7 @@ OrderEV.ISAModules <- function(modules, initialorder=NULL, debuglevel=0, maxtime
 	if ( !is.null(initialorder) ) {
 		initialorder <- list(rows=initialorder$genes, cols=initialorder$samples, status=initialorder$status)
 	}
-	resp <- order.clusters(isamodules, initialorder, debuglevel, maxtime)
+	resp <- OrderEV(isamodules, initialorder, debuglevel, maxtime)
 	res <- list(genes=resp$rows, samples=resp$cols, status=list(genes=resp$status[[1]], samples=resp$status[[2]]))
 	res
 }
@@ -56,40 +56,28 @@ OrderEV.list <- function(modules, initialorder=NULL, debuglevel=0, maxtime=60) {
 			row.map[[mod + 1]] <- c(1:sum(modules[[1]][,mod] != 0))
 			col.map[[mod + 1]] <- c(1:sum(modules[[2]][,mod] != 0))
 		}
-		initialorder <- list(rows=row.map, cols=col.map, status=list(vector("numeric",no.mods+1),vector("numeric",no.mods+1)))
+		initialorder <- list(rows=row.map, cols=col.map, status=list(vector("numeric",no.mods+1), vector("numeric",no.mods+1)))
 	}
-	
-	clusters = list(matrix(as.integer(0), no.rows, no.mods), matrix(as.integer(0), no.cols, no.mods))
-	intersections = list()
-	
-	# determine intersecting modules
+
+	clusters <- list(matrix(as.integer(modules[[1]] != 0), nrow=dim(modules[[1]])[1]), 
+					matrix(as.integer(modules[[2]] != 0), nrow=dim(modules[[2]])[1]))
+
+	intersections <- list()
 	for ( mod in 1:no.mods ) {
-	
-		intersection <- list()
+
+		temp <- list()
 		for ( i in 1:2 ) {
 
-			contains <- mat.or.vec(0, 1)
-			for ( slot in 1:no.slots[i] ) {
-				if ( modules[[i]][slot, mod] != 0 ) {
-					clusters[[i]][slot, mod] <- as.integer(1)
-					
-					for ( modp in 1:no.mods ) {
-						if ( modp != mod ) {
-							if ( modules[[i]][slot, modp] != 0 ) {
-								contains <- append(contains, modp)
-							}
-						}
-					}
-					
+			temp[[i]] <- vector("integer", 0)
+			for ( modp in mod:no.mods) {
+				if ( sum(clusters[[i]][,mod]*clusters[[i]][,modp]) > 0 && mod != modp ) {
+					temp[[i]] <- append(temp[[i]], modp)
 				}
 			}
 			
-			intersection[[i]] <- sort(unique(contains))
-
 		}
-		
-		intersections[[mod]] <- intersect(intersection[[1]], intersection[[2]])
-
+			
+		intersections[[mod]] <- intersect(temp[[1]], temp[[2]])
 	}
 	
 	# allocate time according to scaling
@@ -98,6 +86,9 @@ OrderEV.list <- function(modules, initialorder=NULL, debuglevel=0, maxtime=60) {
 		timelimits[[i]] <- list(maxtime / 4)
 		for ( mod in 1:no.mods ) {
 			timelimits[[i]][[mod+1]] <- maxtime / 4 / no.mods * length(intersections[[mod]])
+			if ( maxtime > 0 && timelimits[[i]][[mod+1]] < 1 ) {
+				timelimits[[i]][[mod+1]] <- 1
+			}
 		}
 	}
 	
@@ -107,8 +98,8 @@ OrderEV.list <- function(modules, initialorder=NULL, debuglevel=0, maxtime=60) {
 
 		# global
 		if ( i == 1 ) {
-			cat("ordering", no.rows, "genes\r")			} else {
-			cat("ordering", no.cols, "samples\r")
+			cat("ordering", no.rows, "rows\r")			} else {
+			cat("ordering", no.cols, "columns\r")
 		}
 		flush.console()
 		
@@ -124,9 +115,9 @@ OrderEV.list <- function(modules, initialorder=NULL, debuglevel=0, maxtime=60) {
 		for ( mod in 1:no.mods ) {
 						
 			if ( i == 1 ) {
-				cat("ordering genes in module", mod, "\r")
+				cat("ordering rows in module", mod, "\r")
 			} else {
-				cat("ordering samples in module", mod, "\r")
+				cat("ordering columns in module", mod, "\r")
 			}
 			flush.console()
 			
@@ -134,7 +125,7 @@ OrderEV.list <- function(modules, initialorder=NULL, debuglevel=0, maxtime=60) {
 					
 			contains <- intersections[[mod]]
 						
-			if ( length(contains) >= 1 ) {
+			if ( length(contains) > 0 ) {
 
 				subclusters <- matrix(as.integer(0), nslots, length(contains))
 				slotp <- 0

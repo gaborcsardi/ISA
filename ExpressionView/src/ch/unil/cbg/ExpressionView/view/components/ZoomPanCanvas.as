@@ -528,7 +528,11 @@ package ch.unil.cbg.ExpressionView.view.components {
 			modulesHeight = data[4][1];			
 			maximalWidth = fullgeimage.width;
 			maximalHeight = fullgeimage.height;
-			currentRectangle = new Rectangle(0, 0, maximalWidth, maximalHeight);
+			if ( modulesWidth == 0 || modulesHeight == 0 ) {
+				currentRectangle = new Rectangle(0, 0, maximalWidth, maximalHeight);
+			} else {
+				currentRectangle = new Rectangle(0, 0, modulesWidth, modulesHeight);
+			}
 			lastRectangle = currentRectangle.clone();
 			drawImage();
 		}
