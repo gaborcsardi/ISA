@@ -116,7 +116,7 @@ package ch.unil.cbg.ExpressionView.model {
 				moduleLabels[tag] = [temp, tags.child(temp)];
 			}
 			goLabels = new Vector.<Array>;
-			if ( XMLData.child("gotags").length > 0 ) {
+			if ( XMLData.modules.child("gotags").length() > 0 ) {
 				tags = new XML(XMLData.modules.gotags);
 				size = tags.children().length();
 				goLabels = new Vector.<Array>(size, true);
@@ -126,7 +126,7 @@ package ch.unil.cbg.ExpressionView.model {
 				}
 			}
 			keggLabels = new Vector.<Array>;
-			if ( XMLData.child("keggtags").length > 0 ) {
+			if ( XMLData.modules.child("keggtags").length() > 0 ) {
 				tags = new XML(XMLData.modules.keggtags);
 				size = tags.children().length();
 				keggLabels = new Vector.<Array>(size, true);

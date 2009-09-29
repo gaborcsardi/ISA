@@ -1,0 +1,36 @@
+\name{ExportEV}
+\alias{ExportEV}
+\title{Export ExpressionView file}
+\description{Exports the biclusters identified in  gene expression data with all the relevant biological data to an XML file that can be read by the ExpressionView Flash applet.}
+\usage{
+ExportEV(biclusters, eset, order=NULL, filename="", norm=c("sample", "feature", "raw"))
+}
+\arguments{
+\item{biclusters}{An \code{\link[ISAModules]{ISAModules}} object, a \code{\link[Biclust]{Biclust}} object or \code{list}}
+\item{order}{A \code{\link[list]{list}} containing the optimal order. If not specified, an ordering with the default parameters is performed.}
+\item{filename}{The filename of the output file. If not specified, the file is selected via the user interface.}
+\item{norm}{The normalization of the gene expression data. The \code{\link[isa.normalize]{isa.normalize}} function can normalize (zero mean and unit variance) the data with respect to the genes or the samples.}
+}
+\details{}
+\value{}
+\seealso{}
+\author{Andreas Luscher \email{andreas.luescher@a3.epfl.ch}}
+\references{Luscher A, ...}
+\examples{
+## We apply the Iterative Signature Algorithm (ISA) 
+library(eisa)
+library(ExpressionView)
+
+library(ALL)
+library(hgu95av2.db)
+data(ALL)
+
+genethr <- 2.7 
+condthr <- 1.4 
+set.seed(1)
+modules <- ISA(ALL, thr.gene=genethr, thr.cond=condthr)
+optimalorder <- order.clusters(modules)
+
+ExportEV(modules, ALL, optimalorder, filename="")
+}
+\keyword{order, cluster, bicluster, isa}

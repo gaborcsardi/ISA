@@ -50,7 +50,6 @@ ExportEV.ISAModules <- function(modules, eset, order, go=NULL, kegg=NULL, filena
 	writeLines(paste("\t\t<nsamples>", nSamples, "</nsamples>", sep=""), con)
 	writeLines("\t</summary>", con)
 
-	library(GO.db)
 	go.table <- toTable(GOTERM)
 	if ( is.null(go) ) {
 		gos <- ISA.GO(modules)
@@ -58,7 +57,6 @@ ExportEV.ISAModules <- function(modules, eset, order, go=NULL, kegg=NULL, filena
 		gos <- go
 	}
 
-	library(KEGG.db)
 	kegg.table <- toTable(KEGGPATHID2NAME)
 	if ( is.null(kegg) ) {
 		keggs <- ISA.KEGG(modules)
@@ -537,7 +535,24 @@ ExportEV.list <- function(modules, eset, order, filename="", description=NULL, e
 	Data.min <- min(Data, na.rm = TRUE)
 	Data.max <- max(Data, na.rm = TRUE)
 	Data.delta <- Data.max - Data.min
-	Data <- (Data - Data.min) / Data.delta * 2 - 1
+	
+	if ( Data.min < 0 && Data.max > 0 ) {
+		Data[Data < 0] <- - Data[Data < 0] / Data.min
+		Data[Data > 0] <- Data[Data > 0] / Data.max
+	} else {
+		Data <- (Data - Data.min) / Data.delta * 2 - 1
+	}
+	
+	# scale data if necessary
+	h<-hist(abs(Data), plot=FALSE, breaks = 510)
+	h <- h$counts
+	total <- sum(h)
+	for ( i in 1:length(h) ) {
+		if ( sum(h[1:i]) > 0.95*total ) {
+			break
+		}
+	}
+	Data <- Data / (i / length(h))
 	
 	Data <- as.integer(round(Data * 100, 0))
 
