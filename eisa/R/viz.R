@@ -712,17 +712,44 @@ ISA2heatmap <- function(modules, module, eset,
 }
 
 profilePlot <- function(modules, module, eset,
-                        norm=c("raw", "feature", "sample"),
                         plot=c("samples", "features", "both"),
+                        norm="default",
                         background=TRUE, col=gray(0.7), col.mod=1,
-                        type="l", type.mod=type, order=FALSE,
+                        type="l", type.mod=type,
+                        mean=TRUE, meancol="green", meancol.mod="red",
                         xlabs=c("Features","Samples"),
                         ylab="Expression", ...) {
 
-  data <- select.eset(eset, modules, norm)
+  plot <- match.arg(plot)
+
+  # How to normalize the expression matrix for the plots
+  if (any(!norm %in% c("default", "feature", "sample", "raw"))) {
+    stop("`norm' must be one of `default', `feature', `sample' or `raw'")
+  }
+  norm <- rep(norm, length=2)
+  if (norm[1]=="default") {
+    if (plot=="samples" || plot=="both") {
+      norm[1] <- "feature"
+    } else {
+      norm[1] <- "sample"
+    }
+  }
+  if (norm[2]=="default" && plot=="both") {
+    norm[2] <- "sample"
+  }
+   
+  data <- select.eset(eset, modules, norm[1])
+  if (norm[2] != norm[1] && plot=="both") {
+    data2 <- select.eset(eset, modules, norm[2])
+  } else {
+    data2 <- data
+  }
   
   if (is(data, "ExpressionSet") || !is.null(rownames(data))) {
     data <- data[featureNames(modules),]
+  }
+  if (is(data2, "ExpressionSet") || !is.null(rownames(data2))) {
+    data2 <- data2[featureNames(modules),]
   }
 
   if (!all(dim(data) == dim(modules))) {
@@ -744,10 +771,6 @@ profilePlot <- function(modules, module, eset,
     xlim <- c(1, length(xx))
     ylim <- range(data)
     
-    if (order) {
-      data <- data[ order(rowMeans(data[,yy])), ]
-    }
-    
     par(mar=c(2,4,1,1)+0.1)
     plot(NA, type="n", xlim=xlim, ylim=ylim, xlab=NA,
          ylab=ylab, axes=FALSE, ...)
@@ -761,9 +784,12 @@ profilePlot <- function(modules, module, eset,
     for (i in seq_len(ncol(data))[yy]) {
       lines(data[,i], col=col.mod, type=type.mod, ...)
     }
+    if (mean) {
+      if (background) { lines(rowMeans(data[,yy]), col=meancol, type=type) }
+      lines(rowMeans(data[,nyy]), col=meancol.mod, type=type.mod)
+    }
   }
 
-  plot <- match.arg(plot)
   if (plot=="samples") {
     pp(data, xx=feats, yy=samps, xlab=xlabs[1])
   } else if (plot=="features") {
@@ -771,7 +797,7 @@ profilePlot <- function(modules, module, eset,
   } else {
     par(mfrow=c(2,1))
     pp(data, xx=feats, yy=samps, xlab=xlabs[1])
-    pp(t(data), xx=samps, yy=feats, xlab=xlabs[2])
+    pp(t(data2), xx=samps, yy=feats, xlab=xlabs[2])
   }
 
   invisible(NULL)

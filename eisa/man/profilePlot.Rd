@@ -4,10 +4,11 @@
 \description{Line plots to compare biclusters to the background,
   i.e. the rest of the expression matrix.}
 \usage{
-profilePlot (modules, module, eset, norm = c("raw", "feature", "sample"), 
-    plot = c("samples", "features", "both"), background = TRUE, 
-    col = gray(0.7), col.mod = 1, type = "l", type.mod = type, 
-    order = FALSE, xlabs = c("Features", "Samples"), ylab = "Expression", 
+profilePlot (modules, module, eset, plot = c("samples", "features", 
+     "both"), norm = "default", background = TRUE, 
+    col = gray(0.7), col.mod = 1, type = "l", type.mod = type,
+    mean = TRUE, meancol = "green", meancol.mod = "red",
+    xlabs = c("Features", "Samples"), ylab = "Expression", 
     \dots) 
 }
 \arguments{
@@ -20,16 +21,20 @@ profilePlot (modules, module, eset, norm = c("raw", "feature", "sample"),
     A subset of \code{eset} is selected that corresponds to
     the features included in \code{modules}.
   }
-  \item{norm}{Character constant, specifies whether and how to normalize
-    the expression values to plot. \sQuote{raw} plots the raw expression
-    values, \sQuote{feature} the expression values scaled and centered
-    for each feature (=gene) separately and if \sQuote{sample} is
-    specified then the expression values are centered and scaled
-    separately for each sample.}
   \item{plot}{Character constant, specifies what to
     plot. \sQuote{sample} plots sample scores, \sQuote{features} plots
     feature scores. If \sQuote{both} is given, then the plot is divided
     into two subplots and both scores are plotted.}
+  \item{norm}{Character constant, specifies how to normalize the
+    expression matrix for plotting. It can be of length one or two, the
+    latter for the case when plots are made both for features and
+    samples. Possible values: \sQuote{\code{raw}} uses the raw
+    expression values; \sQuote{\code{feature}} uses
+    \code{\link{featExprs}} to extract the expression values from the
+    expression set object; \sQuote{\code{sample}} uses
+    \code{\link{sampExprs}}; \sQuote{\code{default}} means
+    \sQuote{\code{feature}} for sample plots and \sQuote{\code{sample}} 
+    for feature plots. }
   \item{background}{Logical scalar, whether to plot the features/samples
     that are not in the module.}
   \item{col}{Color of lines corresponding to the background
@@ -40,8 +45,13 @@ profilePlot (modules, module, eset, norm = c("raw", "feature", "sample"),
     is passed to \code{\link[graphics]{plot}}.} 
   \item{type.mod}{Type of the plot, for the features/samples included in
     the module. It is passed to \code{\link[graphics]{plot}}.}
-  \item{order}{Logical scalar, whether to order the features/samples on
-    the plot according to their mean expression value.}
+  \item{mean}{Logical scalar, whether to plot the mean expression for
+    each feature/sample, separately for the samples/features that are in
+    the module and the ones that are not.}
+  \item{meancol}{Color of the line for the mean expression values,
+    background.}
+  \item{meancol.mod}{Color of the line for the mean expression values,
+    module.}
   \item{xlabs}{Character vector of length one or two. The labels of
     the horizontal axes of the plot, the second value is used if both
     the feature and the sample plots are drawn.}
