@@ -609,7 +609,7 @@ if (interactive()) {
 
 \begin{figure}
 \centering
-\includegraphics[width=\textwidth]{graphics/HTMLTable}
+\includegraphics[width=\textwidth]{graphics/HTMLTable.png}
 \caption{A HTML summary table showing information for the first couple
 of modules found in the ALL data set. The ``Thr.'' column shows the
 ISA thresholds that were used to find the module; the next two columns
