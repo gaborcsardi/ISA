@@ -120,7 +120,7 @@ to get an \Rclass{ISAModules} class.
 \subsection{External clustering programs}
 Since the structure of biclustering results is independent of the applied method, it is straightforward to
 import results obtained from external clustering programs and convert them to \Rclass{ISAModules}.
-To illustrate the conversion, let us consider the sample data and {\bf randomly} assign the  \Sexpr{nrow(ALL)} genes 
+To illustrate the conversion, let us consider the sample data and {\bf randomly} assign the  \Sexpr{nrow(ALL)} genes 
 and  \Sexpr{ncol(ALL)} samples to  \Sexpr{length(modules)} modules. The resulting modules can be described by two
 binary matrices
 <<random-modules>>=
