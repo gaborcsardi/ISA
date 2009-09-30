@@ -61,7 +61,8 @@ vignettes/ISA_parallel.pdf: vignettes/ISA_parallel.tex
 EISAFILES = eisa/DESCRIPTION eisa/NAMESPACE eisa/R/*.R eisa/man/*.Rd \
 	eisa/inst/CITATION
 
-EISAVIGNETTES = eisa/inst/doc/EISA_tutorial.vignette eisa/inst/doc/EISA_tutorial.pdf
+EISAVIGNETTES = eisa/inst/doc/EISA_tutorial.vignette eisa/inst/doc/EISA_tutorial.pdf \
+	eisa/inst/doc/EISA_module_trees.vignette eisa/inst/doc/EISA_module_trees.pdf
 
 eisa: eisa_$(VERSION).tar.gz
 
@@ -84,6 +85,23 @@ eisa/inst/doc/EISA_tutorial.pdf: vignettes/EISA_tutorial.pdf
 vignettes/EISA_tutorial.pdf: vignettes/EISA_tutorial.tex
 	cd vignettes && pdflatex EISA_tutorial.tex && pdflatex EISA_tutorial.tex && \
 		pdflatex EISA_tutorial.tex
+
+vignettes/EISA_module_trees.tex: $(EISAFILES) vignettes/EISA_module_trees.Rnw
+	R CMD build --no-vignettes isa2
+	R CMD build --no-vignettes eisa
+	R CMD INSTALL -l /tmp/ isa2_$(VERSION).tar.gz
+	R CMD INSTALL -l /tmp/ eisa_$(VERSION).tar.gz
+	cd vignettes && R_LIBS=/tmp/ R CMD Sweave EISA_module_trees.Rnw || rm EISA_module_trees.tex
+
+eisa/inst/doc/EISA_module_trees.vignette: vignettes/EISA_module_trees.Rnw
+	cp $< $@
+
+eisa/inst/doc/EISA_module_trees.pdf: vignettes/EISA_module_trees.pdf
+	cp $< $@
+
+vignettes/EISA_module_trees.pdf: vignettes/EISA_module_trees.tex
+	cd vignettes && pdflatex EISA_module_trees.tex && pdflatex EISA_module_trees.tex && \
+		pdflatex EISA_module_trees.tex
 
 # ExpressionView
 
