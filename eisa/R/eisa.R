@@ -197,12 +197,27 @@ ISASweepGraphPlot <- function(graph, vertex.label=V(graph)$id,
                               edge.label=NA, asp=FALSE, rescale=FALSE,
                               xlim=range(graph$layout[,1]),
                               ylim=range(graph$layout[,2]),
+                              thresholds=TRUE,
+                              xlab=NA, ylab=NA,
                               ...) {
 
+  plot(NA, xlim=xlim, ylim=ylim, xlab=xlab, ylab=ylab, axes=FALSE)
+  
+  if (thresholds) {
+    la <- sort(unique(V(G)$thr))
+    at <- sort(unique(G$layout[,1]))
+    axis(1, at=at, labels=la)
+    axis(3, at=at, labels=la)
+    par(xpd=FALSE)
+    abline(v=at, col="lightgrey", lty=2)
+    par(xpd=TRUE)
+  }
+
   tmp <- plot(graph, asp=asp, rescale=rescale,
-              xlim=xlim, ylim=ylim,
+              xlim=xlim, ylim=ylim, add=TRUE,
               vertex.label=vertex.label, edge.label=edge.label,
               vertex.label.cex=vertex.label.cex, ...)
+
   if (any(!is.na(vertex.label.topleft))) {
     text(G$layout[,1]-V(G)$size/200, G$layout[,2], pos=3,
          vertex.label.topleft, cex=vertex.label.cex)

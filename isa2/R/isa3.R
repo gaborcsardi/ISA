@@ -581,6 +581,7 @@ sweep.graph.default <- function(sweep.result) {
   G$width <- length(unique(G$layout[,1])) * 2
   G$height <- (max(G$layout[,2])-min(G$layout[,2])) * 0.4
 
+  V(G)$color <- "lightgray"
   V(G)$shape <- "vrectangle"
   V(G)$size  <- 16
   V(G)$size2 <- offs * 1.5
