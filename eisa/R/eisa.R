@@ -158,16 +158,16 @@ ISAUnique <- function(data, isaresult, ...) {
   modules
 }
 
-ISASweep <- function(data, isaresult, ...) {
+ISASweep <- function(expset, modules, ...) {
 
   isa2:::isa.status("Sweeping an ExpressionSet")
 
-  data <- eisa.get.nm(data, isaresult)
+  data <- eisa.get.nm(expset, modules)
     
   mat.data <- exprs(data)
   nm <- list(Er=t(featExprs(data)),
              Ec=sampExprs(data))
-  res <- ISAModules.to.isa.result(isaresult)
+  res <- ISAModules.to.isa.result(modules)
 
   res <- isa.sweep(mat.data, nm, res, ...)
 
@@ -180,9 +180,49 @@ ISASweep <- function(data, isaresult, ...) {
 
 ISASweepGraph <- function(sweep.result) {
   res <- ISAModules.to.isa.result(sweep.result)
-  sweep.graph(res)
+  G <- sweep.graph(res)
+  V(G)$noFeatures <- V(G)$rows
+  V(G)$noSamples  <- V(G)$cols
+  G <- remove.vertex.attribute(G, "rows")
+  G <- remove.vertex.attribute(G, "cols")
+  G
 }
 
+ISASweepGraphPlot <- function(graph, vertex.label=V(graph)$id,
+                              vertex.label.topleft=NA,
+                              vertex.label.topright=NA,
+                              vertex.label.bottomleft=NA,
+                              vertex.label.bottomright=NA,
+                              vertex.label.cex=0.8,
+                              edge.label=NA, asp=FALSE, rescale=FALSE,
+                              xlim=range(graph$layout[,1]),
+                              ylim=range(graph$layout[,2]),
+                              ...) {
+
+  tmp <- plot(graph, asp=asp, rescale=rescale,
+              xlim=xlim, ylim=ylim,
+              vertex.label=vertex.label, edge.label=edge.label,
+              vertex.label.cex=vertex.label.cex, ...)
+  if (any(!is.na(vertex.label.topleft))) {
+    text(G$layout[,1]-V(G)$size/200, G$layout[,2], pos=3,
+         vertex.label.topleft, cex=vertex.label.cex)
+  }
+  if (any(!is.na(vertex.label.topright))) {
+    text(G$layout[,1]+V(G)$size/200, G$layout[,2], pos=3,
+         vertex.label.topright, cex=vertex.label.cex)
+  }
+  if (any(!is.na(vertex.label.bottomleft))) {
+    text(G$layout[,1]-V(G)$size/200, G$layout[,2], pos=1,
+         vertex.label.bottomleft, cex=vertex.label.cex)
+  }
+  if (any(!is.na(vertex.label.bottomright))) {
+    text(G$layout[,1]+V(G)$size/200, G$layout[,2], pos=1,
+         vertex.label.bottomright, cex=vertex.label.cex)
+  }
+
+  invisible(tmp)
+}
+  
 ISARobustness <- function(data, isaresult) {
 
   isa2:::isa.status("Calculating robustness for ExpressionSet", "in")

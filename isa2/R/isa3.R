@@ -545,7 +545,51 @@ sweep.graph.default <- function(sweep.result) {
   from <- from[valid]
   to <- to[valid]
 
-  graph( rbind(from, to)-1, n=nnodes )
+  G <- graph( rbind(from, to)-1, n=nnodes )
+
+  if (length(unique(sweep.result$seeddata$thr.row)) == 1) {
+    V(G)$thr <- sweep.result$seeddata$thr.col
+  } else {
+    V(G)$thr <- sweep.result$seeddata$thr.row
+  }
+
+  V(G)$id <- seq(vcount(G))
+  graphs <- decompose.graph(G)
+
+  layouts <- lapply(graphs, function(g) {
+    l <- layout.reingold.tilford(g, root=tail(topological.sort(g, mode="out"), 1))
+    r <- sqrt(l[,1]^2 + l[,2]^2)
+    phi <- atan2(l[,2], l[,1]) - pi/2
+    l[,1] <- r * cos(phi)
+    l[,2] <- r * sin(phi)
+    labels <- sort(unlist(V(g)$thr))
+    l <- layout.norm(l, labels[1]-2, labels[length(labels)]-2, NULL, NULL)
+    l[,2] <- l[,2] - min(l[,2])
+    l})
+
+  offs <- 0
+  for (i in 1:length(layouts)) {
+    layouts[[i]][,2] <- layouts[[i]][,2] + offs
+    r <- range(layouts[[i]][,2])
+    r[2] <- r[2] + 1
+    offs <- offs + r[2] - r[1]
+  }
+  offs <- offs-0.5
+  
+  G$layout <- do.call(rbind, layouts)
+  G$layout[unlist(sapply(graphs, get.vertex.attribute, "id")),] <- G$layout
+  G$width <- length(unique(G$layout[,1])) * 2
+  G$height <- (max(G$layout[,2])-min(G$layout[,2])) * 0.4
+
+  V(G)$shape <- "vrectangle"
+  V(G)$size  <- 16
+  V(G)$size2 <- offs * 1.5
+  V(G)$label <- V(G)$id
+  E(G)$arrow.size <- 0.5
+  V(G)$rows <- colSums(sweep.result$rows != 0)
+  V(G)$cols <- colSums(sweep.result$columns != 0)  
+  
+  G
 }
 
 setMethod("isa", signature(data="matrix"),

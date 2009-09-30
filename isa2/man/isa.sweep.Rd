@@ -76,7 +76,21 @@
   which the sweep tree was built. I.e. the most strict threshold is
   level one, the second most is level two, etc.
 
-  \code{sweep.graph} returns and igraph graph.
+  \code{sweep.graph} returns and igraph graph with a lot of attributes:
+  \item The \code{layout} graph attribute contains a two-column matrix
+  with the coordinates for an optimal tree-like layout to plot the
+  graph.
+  \item The \code{width} and \code{height} graph attributes contain the
+  optimal width and height of the plot, in inches.
+  \item The \code{thr} vertex attribute contains the ISA threshold that
+  varies along the sweeping.
+  \item The \code{id} vertex attribute contains the id of the module, these
+  correspond to the indices in the result matrix.
+  \item The \code{rows} and \code{cols} vertex attributes contain the
+  number of rows and columns in the module.
+  \item The \code{shape}, \code{size}, \code{size2}, \code{label} vertex
+  attributes and the \code{arrow.size} edge attribute contain various
+  graphical parameters.
 }
 \author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
 \references{

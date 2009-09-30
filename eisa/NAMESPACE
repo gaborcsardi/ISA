@@ -4,7 +4,7 @@ import(AnnotationDbi)
 import(Biobase)
 
 export(ISA, ISANormalize, ISAIterate, ISAUnique, ISASweep,
-       ISASweepGraph, ISARobustness, ISAFilterRobust)
+       ISASweepGraph, ISASweepGraphPlot, ISARobustness, ISAFilterRobust)
 
 export(ISAGO, ISAKEGG, ISACHR, ISAmiRNA)#, ISA.DBD)
 
