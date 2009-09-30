@@ -52,14 +52,14 @@ ExportEV.ISAModules <- function(modules, eset, order, go=NULL, kegg=NULL, filena
 
 	go.table <- toTable(GOTERM)
 	if ( is.null(go) ) {
-		gos <- ISA.GO(modules)
+		gos <- ISAGO(modules)
 	} else {
 		gos <- go
 	}
 
 	kegg.table <- toTable(KEGGPATHID2NAME)
 	if ( is.null(kegg) ) {
-		keggs <- ISA.KEGG(modules)
+		keggs <- ISAKEGG(modules)
 	} else {
 		keggs <- kegg
 	}
