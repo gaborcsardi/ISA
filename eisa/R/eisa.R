@@ -251,8 +251,6 @@ ISARobustness <- function(data, isaresult) {
   nm <- list(Er=t(featExprs(data)),
              Ec=sampExprs(data))
 
-  print(dim(nm[[1]]))
-  print(dim(nm[[2]]))        
   res <- isa2::robustness(nm, isaresult@genes, isaresult@conditions)
 
   isa2:::isa.status("DONE", "out")
