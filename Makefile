@@ -168,12 +168,13 @@ SWEAVE2HTMLOPTIONS = style,xhtml,graphics-,charset=utf-8 " -cunihtf -utf8" -cval
 
 homepage: vignettes homepage/.stamp
 
-homepage/.stamp: homepage/*.in
+homepage/.stamp: homepage/*.in homepage/template.html
 	cd homepage && ./generate.py && touch .stamp
 
 vignettes: homepage/ISA_tutorial.html homepage/ISA_tutorial.pdf \
 	homepage/ISA_parallel.html homepage/ISA_parallel.pdf \
 	homepage/EISA_tutorial.html homepage/EISA_tutorial.pdf \
+	homepage/EISA_module_trees.html homepage/EISA_module_trees.pdf \
 	homepage/ExpressionView_tutorial.html homepage/ExpressionView_tutorial.pdf \
 	vignettes/style.cfg
 
@@ -205,6 +206,16 @@ homepage/EISA_tutorial.html: vignettes/EISA_tutorial.tex
 	cp vignettes/graphics/*.png homepage/graphics/
 
 homepage/EISA_tutorial.pdf: vignettes/EISA_tutorial.pdf
+	cp $< $@
+
+homepage/EISA_module_trees.html: vignettes/EISA_module_trees.tex
+	cd vignettes && $(SWEAVE2HTML) EISA_module_trees $(SWEAVE2HTMLOPTIONS)
+	cp vignettes/EISA_module_trees.html homepage
+	cp vignettes/EISA_module_trees.css homepage
+	cp vignettes/EISA_module_trees*.png homepage/
+	cp vignettes/graphics/*.png homepage/graphics/
+
+homepage/EISA_module_trees.pdf: vignettes/EISA_module_trees.pdf
 	cp $< $@
 
 homepage/ExpressionView_tutorial.html: vignettes/ExpressionView_tutorial.tex

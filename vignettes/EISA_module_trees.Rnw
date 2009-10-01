@@ -178,25 +178,20 @@ graph returned by \Rfunction{ISASweepGraph}. We will use the suggested
 size for the plot, and leave all plotting options at their default
 values. The result is in Fig.~\ref{fig:moduletree}.
 
-<<dev,echo=FALSE,results=hide>>=
-pdf("graphics/module_tree.pdf", width=G$width, height=G$height)
-@ 
-
 <<plotting,eval=FALSE>>=
 X11(width=G$width, height=G$height)
 @ 
-
-<<plot>>=
+<<plotting2,eval=FALSE>>=
 ISASweepGraphPlot(G)
-@ 
-
-<<devoff,echo=FALSE,results=hide>>=
-dev.off()
-@ 
+@
 
 \begin{figure}
 \begin{narrow}{-1cm}{-1cm}
-\includegraphics[width=\linewidth]{graphics/module_tree}
+\setkeys{Gin}{width=\linewidth}
+<<plot,fig=TRUE,width=10,height=10,echo=FALSE>>=
+ps.options(fonts=c("serif", "mono"))
+<<plotting2>>
+@ 
 \caption{An ISA module tree. Each rectangle symbolizes a transcription
   module, modules in the same column were found at the same gene
   threshold. An arrow between two modules indicates that one is the
@@ -232,11 +227,7 @@ colbar <- c("#FFFFFF", rev(colbar))
 col <- colbar[p.bp]
 @ 
 
-<<dev2,echo=FALSE,results=hide>>=
-pdf("graphics/module_tree2.pdf", width=G$width, height=G$height)
-@ 
-
-<<plotting2,eval=FALSE>>=
+<<plotting3,eval=FALSE>>=
 X11(width=G$width, height=G$height)
 @ 
 
@@ -245,7 +236,7 @@ terms to the top left corner, and the size of the module (i.e. number
 of genes and number of samples) in the top right corner. We also
 increase the height of the vertices a bit.
 
-<<plot2>>=
+<<plotting4,eval=FALSE>>=
 ISASweepGraphPlot(G, vertex.color=col, vertex.size2=50, 
                   vertex.label.topleft=d.bp,
                   vertex.label.topright=paste(V(G)$noFeatures, sep=",", 
@@ -255,19 +246,19 @@ ISASweepGraphPlot(G, vertex.color=col, vertex.size2=50,
 Finally, we add a key for the abbreviated names at the top right
 corner. The result is in Fig.~\ref{fig:moduletree2}.
 
-<<key>>=
+<<key,eval=FALSE>>=
 key <- na.omit(d.bp)[unique(names(na.omit(d.bp)))]
 key2 <- paste(key, sep=": ", names(key))
 legend("topright", key2)
 @ 
 
-<<devoff,echo=FALSE,results=hide>>=
-dev.off()
-@ 
-
 \begin{figure}
 \begin{narrow}{-1cm}{-1cm}
-\includegraphics[width=\linewidth]{graphics/module_tree2}
+\setkeys{Gin}{width=\linewidth}
+<<plot2,fig=TRUE,width=10,height=10,echo=FALSE>>=
+<<plotting4>>
+<<key>>
+@ 
 \caption{The same module tree, but with some annotation added. The
   modules are colored according to their Gene Ontology Biological
   Process enrichment $p$-values, darker colors correspond to more

@@ -1,10 +1,8 @@
-<h2>Contents</h2>
-
 <a name="ISA"></a>
 <h2>The Iterative Signature Algorithm</h2>
 
 <p>
-The Iterative Signature Algorithm finds transcription modules,
+The Iterative Signature Algorithm (ISA) finds transcription modules,
 i.e. biclusters in gene expression data sets, or other numeric
 matrices. The ISA was developed to find modules of differentially
 co-expressed genes. A group of genes are differentially co-expressed
@@ -17,44 +15,38 @@ the rest.) See the various publications below for more about the ISA.
 We have developed several R packages to perform the modular analysis
 of gene expression data.
 </p>
+<p class="more">
+<a href="ISA.html">Read more &raquo;</a>
+</p>
 
-<ul class="no-bullet">
-  <li><a href="#ISA">The Iterative Signature Algorithm</a>
-    <ul class="no-bullet">
-      <li><a href="isa2.html">The <strong>isa2</strong> R package</a>
-<!-- 	<ul class="no-bullet"> -->
-<!-- 	  <li><a href="isa2.dl">Download and installation</a></li> -->
-<!-- 	  <li><a href="isa2.doc">Documentation</a></li> -->
-<!-- 	  <li><a href="isa2.pub">Publications</a></li> -->
-<!-- 	  <li><a href="isa2.lic">Licence</a></li> -->
-<!-- 	</ul> -->
-      </li>
-      <li><a href="eisa.html">The <strong>eisa</strong> R
-	  package</a>
-<!-- 	<ul class="no-bullet"> -->
-<!-- 	  <li><a href="eisa.dl">Download and installation</a></li> -->
-<!-- 	  <li><a href="eisa.doc">Documentation</a></li> -->
-<!-- 	  <li><a href="eisa.pub">Publications</a></li> -->
-<!-- 	  <li><a href="eisa.lic">Licence</a></li> -->
-<!-- 	</ul> -->
-      </li>
-      <li><a href="matlabisa.html">A Matlab implementation</a></li>
-    </ul>
-  </li>
-  <li><a href="ev.html">ExpressionView</a>
-<!--     <ul class="no-bullet"> -->
-<!--       <li><a href="eisa.dl">Download and installation</a></li> -->
-<!--       <li><a href="eisa.doc">Documentation</a></li> -->
-<!--       <li><a href="eisa.pub">Publications</a></li> -->
-<!--       <li><a href="eisa.lic">Licence</a></li> -->
-<!--     </ul> -->
-  </li>
-  <li><a href="annot.html">BioConductor annotation packages</a>
-    <ul class="no-bullet">
-      <li><a href="#targetscan">TargetScan packages, miRNA target
-	  prediction</a></li>
-    </ul>
-  </li>
-</ul>
+<a name="ev"></a>
+<h2>ExpressionView</h2>
 
+<p>
+ExpressionView is an R package that provides an interactive
+environment to explore biclusters identified in gene expression
+data. A sophisticated ordering algorithm is used to present the
+biclusters in a visually appealing layout that provides an intuitive
+summary of the results. From this overview, the user can select
+individual biclusters and access all the biologically relevant data
+associated with it. The package is aimed to facilitate the
+collaboration between bioinformaticians and life scientists who are
+not familiar with the R language.
+</p>
+<p class="more">
+<a href="ev.html">Read more &raquo;</a>
+</p>
 
+<a name="annot"></a>
+<h2>TargetScan miRNA target prediction in BioConductor</h2>
+
+<p>
+<a href="http://www.targetscan.org">TargetScan</a> is a database of
+  predicted miRNA targets, developed at the Whitehead Institute for
+  Biomedical Research. To facilitate the use of this database in
+  <a href="http://www.bioconductor.org">BioConductor</a> we created
+  annotation R packages from it.
+</p>
+<p class="more">
+<a href="annot.html">Read more &raquo;</a>
+</p>

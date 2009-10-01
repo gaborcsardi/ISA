@@ -1,17 +1,16 @@
 <a name="ISA.isa2"></a>
-<h3>The <strong>isa2</strong> R package</h3>
+<h2>The <strong>isa2</strong> R package</h2>
 
 This package contains the core implementation of the ISA. If you do
 not work with gene expression data, then this is the only package that
 you need.
 
-<h4>Download and installation</h4>
+<h3>Download and installation</h3>
 
 <p>
 The <strong>isa2</strong> R package is available from the
 Comprehensive R Archive Network, the standard repository of R
-packages, the easiest way to install it, all you need to do is to
-type 
+packages. The easiest way to install it is to type
 <pre class="programlisting">
 install.packages("isa2")
 </pre>
@@ -20,49 +19,54 @@ in your R session. Please try it before downloading from here.
 
 <ul class="download-links">
   <li class="download-windows">
-    <a href="downloads/isa2_$ISA_VERSION.zip">Windows binary</a> 
+    <a href="downloads/isa_$ISA_VERSION.zip">Microsoft Windows (all versions)</a><br/>
+    Save this file, start R, and from
+    the <code>Packages</code> menu choose <code>Install packages
+      from local zip files</code>. Select the
+    saved <code>isa_$ISA_VERSION.zip</code> file.
   </li>
   <li class="download-osx">
-    <a href="downloads/isa2_$ISA_VERSION.tgz">Mac OSX universal binary</a>
+    <a href="downloads/isa_$ISA_VERSION.tgz">Mac OSX (all versions)</a><br/>
+    Save this file. Then use
+    the <b><code>install.packages()</code></b> function to install it;
+    give the full path to the downloaded file (<code>isa_$ISA_VERSION.tgz</code>)
+    instead of just the package name, and use
+    the <code>repos=NULL</code> additional argument.
   </li>
   <li class="download-source">
-    <a href="downloads/isa2_$ISA_VERSION.tar.gz">Source package (for Linux and
-      similar)</a> 
+    <a href="downloads/isa_$ISA_VERSION.tar.gz">Linux variants, Unix systems</a><br/>
+    This is an R source package. Save this file. Then use
+    the <b><code>install.packages()</code></b> function to install it;
+    give the full path to the downloaded file
+    (<code>isa_$ISA_VERSION.tar.gz</code>) instead of just the
+    package name, and use the <code>repos=NULL</code> additional
+    argument. You will need a C compiler to install this package.
   </li>
 </ul>
 
-<h4>Documentation</h4>
+<h3>Documentation</h3>
 
-<ul class="no-bullet download">
+<p>ISA tutorial, GNU R vignette<br/>
+  <span class="download-external">
+    <a href="ISA_tutorial.html">Browse online</a>
+  </span><br/>
+  <span class="download-pdf">
+    <a href="ISA_tutorial.pdf">PDF file</a>
+  </span>
+</p>
 
-  <li class="download">
-    <span class="name">ISA tutorial, GNU R vignette</span>
-    <ul class="download-links">
-      <li class="download-external">
-	<a href="ISA_tutorial.html">Browse online</a>
-      </li>
-      <li class="download-pdf">
-	<a href="ISA_tutorial.pdf">PDF file</a>
-      </li>
-    </ul>
-  </li>
+<p>Using ISA in parallel, GNU R vignette<br/>
+  <span class="download-external">
+    <a href="ISA_parallel.html">Browse online</a>
+  </span><br/>
+  <span class="download-pdf">
+    <a href="ISA_parallel.pdf">PDF file</a>
+  </span>
+</p>
 
-  <li class="download">
-    <span class="name">Using ISA in parallel, GNU R vignette</span>
-    <ul class="download-links">
-      <li class="download-external">
-	<a href="ISA_parallel.html">Browse online</a>
-      </li>
-      <li class="download-pdf">
-	<a href="ISA_parallel.pdf">PDF file</a>
-      </li>
-    </ul>
-  </li>
+<h3>Publications</h3>
 
-</ul>
-
-<h4>Publications</h4>
-
+<p>
 <ul class="papers">
   <li class="paper">
     Bergmann S, Ihmels J, Barkai N: Iterative signature algorithm for the
@@ -77,8 +81,9 @@ in your R session. Please try it before downloading from here.
     </ul>
   </li>
 </ul>
+</p>
 
-<h4>Licence</h4>
+<h3>Licence</h3>
 
 <p>
 The <strong>isa2</strong> package is licensed under the Creative

@@ -1,9 +1,65 @@
-<a name="annot"></a>
-<h2>BioConductor annotation packages</h2>
-
 <a name="targetscan"></a>
-<h3>TargetScan packages, miRNA target prediction</h3>
+<h2>TargetScan packages, miRNA target prediction</h2>
 
-<h4>Download and installation</h4>
+<p>
+<a href="http://www.targetscan.org">TargetScan</a> is a database of
+  predicted miRNA targets, developed at the Whitehead Institute for
+  Biomedical Research. To facilitate the use of this database in
+  <a href="http://www.bioconductor.org">BioConductor</a> we created
+  annotation R packages from it.
+</p>
 
-<h4>Licence</h4>
+<h3>Download and installation</h3>
+
+<p>
+You will need to install the
+core <a href="http://www.bioconductor.org">BioConductor</a> packages
+first. See the <a href="http://www.bioconductor.org">BioConductor web
+    site</a> for details on this. Then, choose a package for your
+organism and your operating system:
+</p>
+
+<ul class="download-links">
+  <li class="download-windows">
+    <a href="downloads/targetscan.Hs.eg.db_$TARGETSCAN_VERSION.zip">Human,
+      Microsoft Windows (all versions)</a><br/>
+    Save this file, start R, and from
+    the <code>Packages</code> menu choose <code>Install packages
+      from local zip files</code>. Select the
+    saved <code>targetscan.Hs.eg.db_$TARGETSCAN_VERSION.zip</code> file.
+  </li>
+  <li class="download-windows">
+    <a href="downloads/targetscan.Mm.eg.db_$TARGETSCAN_VERSION.zip">Mouse,
+      Microsoft Windows (all versions)</a><br/>
+    Save this file, start R, and from
+    the <code>Packages</code> menu choose <code>Install packages
+      from local zip files</code>. Select the
+    saved <code>targetscan.Mm.eg.db_$TARGETSCAN_VERSION.zip</code> file.
+  </li>
+  <li class="download-source">
+    <a href="downloads/targetscan.Hs.eg.db_$TARGETSCAN_VERSION.tar.gz">Human,
+    Linux variants, Unix systems</a><br/>
+    This is an R source package. Save this file. Then use
+    the <b><code>install.packages()</code></b> function to install it;
+    give the full path to the downloaded file
+    (<code>targetscan.Hs.eg.db_$TARGETSCAN_VERSION.tar.gz</code>)
+    instead of just the package name, and use
+    the <code>repos=NULL</code> additional argument.
+  </li>
+  <li class="download-source">
+    <a href="downloads/targetscan.Mm.eg.db_$TARGETSCAN_VERSION.tar.gz">Mouse,
+    Linux variants, Unix systems</a><br/>
+    This is an R source package. Save this file. Then use
+    the <b><code>install.packages()</code></b> function to install it;
+    give the full path to the downloaded file
+    (<code>targetscan.Hs.eg.db_$TARGETSCAN_VERSION.tar.gz</code>)
+    instead of just the package name, and use
+    the <code>repos=NULL</code> additional argument.
+  </li>
+</ul>
+
+
+<h3>Licence</h3>
+
+Please see the <a href="http://www.targetscan.org">TargetScan</a>
+homepage for information on the use of this database.

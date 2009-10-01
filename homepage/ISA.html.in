@@ -1,0 +1,101 @@
+<h2>The Iterative Signature Algorithm</h2>
+
+<h3>The <strong>isa2</strong> R package</h3>
+
+<p>
+Use this package if you want to apply the ISA to a data set other than
+gene expression data. It is part of
+the <a href="http://cran.r-project.org/web/packages/isa2/index.html">standard
+    R package repository</a>, so you can install it directly from
+there.
+<p class="more">
+<a href="isa2.html">Read more &raquo;</a>
+</p>
+
+<h3>The <strong>eisa</strong> R package</h3>
+
+<p>
+The <strong>eisa</strong> package builds on <strong>isa2</strong> and
+provides a convenient interface to analyze gene expression data. It
+uses standard <a href="http://www.bioconductor.org">BioConductor</a>
+packages and classes.
+</p>
+<p class="more" >
+<a href="eisa.html">Read more &raquo;</a>
+</p>
+
+<h3>ISA in Matlab</h3>
+
+<p>
+If you prefer using Matlab instead of R, we also created a Matlab
+implementation of the ISA.
+</p>
+<p class="more">
+<a href="isamatlab.html">Read more &raquo;</a>
+</p>
+
+<h3>Publications</h3>
+
+<ul class="papers">
+
+  <li class="paper">
+    Bergmann S, Ihmels J, Barkai N: Iterative signature algorithm for the
+    analysis of large-scale gene expression data, 
+    <span class="journal">Phys Rev E Stat Nonlin Soft Matter
+      Phys.</span> 2003, Mar;67(3 Pt 1):031902. Epub 2003 Mar 11.
+    <ul class="paper-links">
+      <li class="paper-pdf">
+	<a href="http://serverdgm.unil.ch/bergmann/Publications/ISA.pdf">PDF
+	  file</a> 
+      </li>
+    </ul>
+  </li>
+
+  <li class="paper">
+    Ihmels J, Friedlander G, Bergmann S, Sarig O, Ziv Y, Barkai N:
+    Revealing modular organization in the yeast transcriptional network
+    <span class="journal">Nat Genet.</span>2002 Aug;31(4):370-7. Epub
+    2002 Jul 22
+    <ul class="paper-links">
+      <li class="paper-pdf">
+	<a href="http://serverdgm.unil.ch/bergmann/Publications/SA.pdf">PDF file</a>
+      </li>
+    </ul>
+  </li>
+
+  <li class="paper">
+    Ihmels J, Bergmann S, Barkai N:
+    Defining transcription modules using large-scale gene expression data
+    <span class="journal">Bioinformatics</span> 2004 Sep
+    1;20(13):1993-2003. Epub 2004 Mar 25.
+    <ul class="paper-links">
+      <li class="paper-pdf">
+	<a href="http://serverdgm.unil.ch/bergmann/Publications/bioISA.pdf">PDF file</a>
+      </li>
+    </ul>
+  </li>
+
+  <li class="paper">
+    Ihmels J, Bergmann S:
+    Challenges and prospects in the analysis of large-scale gene expression data
+    <span class="journal">Brief Bioinform.</span> 2004
+    Dec;5(4):313-27.
+    <ul class="paper-links">
+      <li class="paper-pdf">
+	<a href="http://serverdgm.unil.ch/bergmann/Publications/review.pdf">PDF file</a>
+      </li>
+    </ul>
+  </li>
+
+  <li class="paper">
+    Bergmann S, Ihmels J, Barkai N
+    Similarities and differences in genome-wide expression data of six organisms
+    <span class="journal">PLoS Biol.</span> 2004 Jan;2(1):E9. Epub 2003 Dec 15. 
+    <ul class="paper-links">
+      <li class="paper-pdf">
+	<a href="">PDF file</a>
+      </li>
+    </ul>
+  </li>
+  
+</ul>
