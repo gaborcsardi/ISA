@@ -4,7 +4,6 @@
 - write EV tutorial (A)
 - write note about ordering algorithm (A)
 - things for homepage:
-  - general structure, break it into more files (G+A)
   - add EV stuff as well (A)
 - write eisa application note (G)
 - check whether EV package can be added to BioC (G)
@@ -15,9 +14,6 @@
 - submit package, either to BioC or to CRAN (G)
 - put the SIB logo on the homepage (G)
 - write a separate eisa vignette on biclust (G)
-- update EV to handle general data, not just gene expression (A)
 - check terminology, features vs. genes and samples vs. conditions (A+G)
 - eliminate warning when installing 'eisa' package (G)
 - finetune the EV dependencies (G)
-- add an example ISAModules object to the eisa package, based on 
-  the ALL data (G)
