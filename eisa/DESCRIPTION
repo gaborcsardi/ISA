@@ -10,6 +10,6 @@ Description: The ISA is a biclustering algorithm that finds modules
 Depends: methods, isa2, Biobase, AnnotationDbi, Category, genefilter
 Suggests: ExpressionView, igraph (>= 0.5.2), Matrix, GOstats,
 	  targetscan.Hs.eg.db, targetscan.Mm.eg.db, Cairo, GO.db, KEGG.db, 
-	  biclust, MASS, xtable
+	  biclust, MASS, xtable, ALL
 License: GPL
 Packaged: Mon Jul 28 09:19:47 2008; csardi
