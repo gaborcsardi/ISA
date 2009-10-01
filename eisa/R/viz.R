@@ -480,8 +480,8 @@ expPlot <- function(epo, scores=TRUE) {
           lwd=3, col="brown", xpd=NA  )
   }
   
-  list(coords=bbox, gene.width=epo$gene.width.px,
-       cond.height=epo$cond.height.px)
+  invisible(list(coords=bbox, gene.width=epo$gene.width.px,
+                 cond.height=epo$cond.height.px))
 }  
 
 condPlot <- function(modules, number, eset,
@@ -637,7 +637,7 @@ overlapPlot <- function(graph, xsize=400, ysize=400,
   coords[,1] <- coords[,1] * xsize
   coords[,2] <- ysize - coords[,2] * ysize + 1
   mode(coords) <- "integer"
-  coords
+  invisible(coords)
 }
 
 mnplot <- function(x, expset, group, ...) {
