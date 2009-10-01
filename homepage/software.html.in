@@ -1,46 +1,5 @@
 <h2>Contents</h2>
 
-
-<ul class="no-bullet">
-  <li><a href="#ISA">The Iterative Signature Algorithm</a>
-    <ul class="no-bullet">
-      <li><a href="#ISA.isa2">The <strong>isa2</strong> R package</a>
-<!-- 	<ul class="no-bullet"> -->
-<!-- 	  <li><a href="isa2.dl">Download and installation</a></li> -->
-<!-- 	  <li><a href="isa2.doc">Documentation</a></li> -->
-<!-- 	  <li><a href="isa2.pub">Publications</a></li> -->
-<!-- 	  <li><a href="isa2.lic">Licence</a></li> -->
-<!-- 	</ul> -->
-      </li>
-      <li><a href="#ISA.eisa">The <strong>eisa</strong> R
-	  package</a>
-<!-- 	<ul class="no-bullet"> -->
-<!-- 	  <li><a href="eisa.dl">Download and installation</a></li> -->
-<!-- 	  <li><a href="eisa.doc">Documentation</a></li> -->
-<!-- 	  <li><a href="eisa.pub">Publications</a></li> -->
-<!-- 	  <li><a href="eisa.lic">Licence</a></li> -->
-<!-- 	</ul> -->
-      </li>
-      <li><a href="#ISA.matlab">A Matlab implementation</a></li>
-    </ul>
-  </li>
-  <li><a href="#EV">ExpressionView</a>
-<!--     <ul class="no-bullet"> -->
-<!--       <li><a href="eisa.dl">Download and installation</a></li> -->
-<!--       <li><a href="eisa.doc">Documentation</a></li> -->
-<!--       <li><a href="eisa.pub">Publications</a></li> -->
-<!--       <li><a href="eisa.lic">Licence</a></li> -->
-<!--     </ul> -->
-  </li>
-  <li><a href="#annot">BioConductor annotation packages</a>
-    <ul class="no-bullet">
-      <li><a href="#targetscan">TargetScan packages, miRNA target
-	  prediction</a></li>
-    </ul>
-  </li>
-</ul>
-
-
 <a name="ISA"></a>
 <h2>The Iterative Signature Algorithm</h2>
 
@@ -59,199 +18,43 @@ We have developed several R packages to perform the modular analysis
 of gene expression data.
 </p>
 
-<a name="ISA.isa2"></a>
-<h3>The <strong>isa2</strong> R package</h3>
-
-This package contains the core implementation of the ISA. If you do
-not work with gene expression data, then this is the only package that
-you need.
-
-<h4>Download and installation</h4>
-
-<p>
-The <strong>isa2</strong> R package is available from the
-Comprehensive R Archive Network, the standard repository of R
-packages, the easiest way to install it, all you need to do is to
-type 
-<pre class="programlisting">
-install.packages("isa2")
-</pre>
-in your R session. Please try it before downloading from here.
-</p>
-
-<ul class="download-links">
-  <li class="download-windows">
-    <a href="downloads/isa2_$ISA_VERSION.zip">Windows binary</a> 
-  </li>
-  <li class="download-osx">
-    <a href="downloads/isa2_$ISA_VERSION.tgz">Mac OSX universal binary</a>
-  </li>
-  <li class="download-source">
-    <a href="downloads/isa2_$ISA_VERSION.tar.gz">Source package (for Linux and
-      similar)</a> 
-  </li>
-</ul>
-
-<h4>Documentation</h4>
-
-<ul class="no-bullet download">
-
-  <li class="download">
-    <span class="name">ISA tutorial, GNU R vignette</span>
-    <ul class="download-links">
-      <li class="download-external">
-	<a href="ISA_tutorial.html">Browse online</a>
+<ul class="no-bullet">
+  <li><a href="#ISA">The Iterative Signature Algorithm</a>
+    <ul class="no-bullet">
+      <li><a href="isa2.html">The <strong>isa2</strong> R package</a>
+<!-- 	<ul class="no-bullet"> -->
+<!-- 	  <li><a href="isa2.dl">Download and installation</a></li> -->
+<!-- 	  <li><a href="isa2.doc">Documentation</a></li> -->
+<!-- 	  <li><a href="isa2.pub">Publications</a></li> -->
+<!-- 	  <li><a href="isa2.lic">Licence</a></li> -->
+<!-- 	</ul> -->
       </li>
-      <li class="download-pdf">
-	<a href="ISA_tutorial.pdf">PDF file</a>
+      <li><a href="eisa.html">The <strong>eisa</strong> R
+	  package</a>
+<!-- 	<ul class="no-bullet"> -->
+<!-- 	  <li><a href="eisa.dl">Download and installation</a></li> -->
+<!-- 	  <li><a href="eisa.doc">Documentation</a></li> -->
+<!-- 	  <li><a href="eisa.pub">Publications</a></li> -->
+<!-- 	  <li><a href="eisa.lic">Licence</a></li> -->
+<!-- 	</ul> -->
       </li>
+      <li><a href="matlabisa.html">A Matlab implementation</a></li>
     </ul>
   </li>
-
-  <li class="download">
-    <span class="name">Using ISA in parallel, GNU R vignette</span>
-    <ul class="download-links">
-      <li class="download-external">
-	<a href="ISA_parallel.html">Browse online</a>
-      </li>
-      <li class="download-pdf">
-	<a href="ISA_parallel.pdf">PDF file</a>
-      </li>
-    </ul>
+  <li><a href="ev.html">ExpressionView</a>
+<!--     <ul class="no-bullet"> -->
+<!--       <li><a href="eisa.dl">Download and installation</a></li> -->
+<!--       <li><a href="eisa.doc">Documentation</a></li> -->
+<!--       <li><a href="eisa.pub">Publications</a></li> -->
+<!--       <li><a href="eisa.lic">Licence</a></li> -->
+<!--     </ul> -->
   </li>
-
-</ul>
-
-<h4>Publications</h4>
-
-<ul class="papers">
-  <li class="paper">
-    Bergmann S, Ihmels J, Barkai N: Iterative signature algorithm for the
-    analysis of large-scale gene expression data, 
-    <span class="journal">Phys Rev E Stat Nonlin Soft Matter
-      Phys.</span> 2003, Mar;67(3 Pt 1):031902. Epub 2003 Mar 11.
-    <ul class="paper-links">
-      <li class="paper-pdf">
-	<a href="http://serverdgm.unil.ch/bergmann/Publications/ISA.pdf">PDF
-	  file</a> 
-      </li>
+  <li><a href="annot.html">BioConductor annotation packages</a>
+    <ul class="no-bullet">
+      <li><a href="#targetscan">TargetScan packages, miRNA target
+	  prediction</a></li>
     </ul>
   </li>
 </ul>
 
-<h4>Licence</h4>
 
-<p>
-The <strong>isa2</strong> package is licensed under the Creative
-Commons Attribution-Noncommercial-Share Alike 3.0 License. To view a
-copy of this license, visit
-<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
-  http://creativecommons.org/licenses/by-nc-sa/3.0/</a> or send a
-letter to Creative Commons, 171 Second Street, Suite 300, San
-Francisco, California, 94105, USA.
-</p>
-
-<a name="ISA.eisa"></a>
-<h3>The <strong>eisa</strong> R package</h3>
-
-<p>
-The <strong>eisa</strong> package builds on the <strong>isa2</strong>
-package, at makes it easy to apply ISA to
-a <a href="http://www.bioconductor.org">BioConductor</a>   
-<strong>ExpressionSet</strong> object. Use this package, together
-with <strong>isa2</strong> if you want to analyze gene expression data.
-</p>
-
-<h4>Download and installation</h4>
-
-<ol><li>
-    Remember, that you need to install the <strong>isa2</strong>
-    package first, see above.</li>
-  <li>
-    Then, choose a package for your platform:
-  </li>
-</ol>
-
-<ul class="download-links">
-  <li class="download-windows">
-    <a href="downloads/eisa_$EISA_VERSION.zip">Windows binary</a> 
-    &mdash; Download the <code>.zip</code> file, start R, and from
-    the <code>Packages</code> menu choose <code>Install packages
-      from local zip files</code>. Select the
-    downloaded <code>.zip</code> file.
-  </li>
-  <li class="download-osx">
-    <a href="downloads/eisa_$EISA_VERSION.tgz">Mac OSX universal
-    binary</a>
-    &mdash; Download the <code>.tgz</code> file. Then use
-    the <b><code>install.packages()</code></b> function to install it;
-    give the full path to the downloaded file instead of just the
-    package name, and use the <code>repos=NULL</code> additional
-    argument.
-  </li>
-  <li class="download-source">
-    <a href="downloads/eisa_$EISA_VERSION.tar.gz">Source package (for Linux and
-      similar)</a> 
-    &mdash; Download the <code>.tar.gz</code> file. Then use
-    the <b><code>install.packages()</code></b> function to install it;
-    give the full path to the downloaded file instead of just the
-    package name, and use the <code>repos=NULL</code> additional
-    argument.
-  </li>
-</ul>
-
-<h4>Documentation</h4>
-
-<ul class="no-bullet download">
-
-  <li class="download">
-    <span class="name">Modular Analysis of Gene Expression Data, EISA
-      tutorial, GNU R vignette</span> 
-    <ul class="download-links">
-      <li class="download-external">
-	<a href="EISA_tutorial.html">Browse online</a>
-      </li>
-      <li class="download-pdf">
-	<a href="ISA_tutorial.pdf">PDF file</a>
-      </li>
-    </ul>
-  </li>
-
-</ul>
-
-<h4>Publications</h4>
-
-<h4>License</h4>
-
-<p>
-The <strong>eisa</strong> package is licensed under the GNU General
-Public License, version 2 or later. For details,
-see <a href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html">
-  http://www.gnu.org/licenses/old-licenses/gpl-2.0.html</a>.
-</p>
-
-<a name="ISA.matlab"></a>
-<h3>A Matlab implementation</h3>
-
-<h4>Download and installation</h4>
-
-<a name="EV"></a>
-<h2>ExpressionView</h2>
-
-<h4>Download and installation</h4>
-
-<h4>Documentation</h4>
-
-<h4>Publications</h4>
-
-<h4>Licence</h4>
-
-<a name="annot"></a>
-<h2>BioConductor annotation packages</h2>
-
-<a name="targetscan"></a>
-<h3>TargetScan packages, miRNA target prediction</h3>
-
-<h4>Download and installation</h4>
-
-<h4>Licence</h4>

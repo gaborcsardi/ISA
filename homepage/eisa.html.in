@@ -1,0 +1,79 @@
+<a name="ISA.eisa"></a>
+<h3>The <strong>eisa</strong> R package</h3>
+
+<p>
+The <strong>eisa</strong> package builds on the <strong>isa2</strong>
+package, at makes it easy to apply ISA to
+a <a href="http://www.bioconductor.org">BioConductor</a>   
+<strong>ExpressionSet</strong> object. Use this package, together
+with <strong>isa2</strong> if you want to analyze gene expression data.
+</p>
+
+<h4>Download and installation</h4>
+
+<ol><li>
+    Remember, that you need to install the <strong>isa2</strong>
+    package first, see above.</li>
+  <li>
+    Then, choose a package for your platform:
+  </li>
+</ol>
+
+<ul class="download-links">
+  <li class="download-windows">
+    <a href="downloads/eisa_$EISA_VERSION.zip">Windows binary</a> 
+    &mdash; Download the <code>.zip</code> file, start R, and from
+    the <code>Packages</code> menu choose <code>Install packages
+      from local zip files</code>. Select the
+    downloaded <code>.zip</code> file.
+  </li>
+  <li class="download-osx">
+    <a href="downloads/eisa_$EISA_VERSION.tgz">Mac OSX universal
+    binary</a>
+    &mdash; Download the <code>.tgz</code> file. Then use
+    the <b><code>install.packages()</code></b> function to install it;
+    give the full path to the downloaded file instead of just the
+    package name, and use the <code>repos=NULL</code> additional
+    argument.
+  </li>
+  <li class="download-source">
+    <a href="downloads/eisa_$EISA_VERSION.tar.gz">Source package (for Linux and
+      similar)</a> 
+    &mdash; Download the <code>.tar.gz</code> file. Then use
+    the <b><code>install.packages()</code></b> function to install it;
+    give the full path to the downloaded file instead of just the
+    package name, and use the <code>repos=NULL</code> additional
+    argument.
+  </li>
+</ul>
+
+<h4>Documentation</h4>
+
+<ul class="no-bullet download">
+
+  <li class="download">
+    <span class="name">Modular Analysis of Gene Expression Data, EISA
+      tutorial, GNU R vignette</span> 
+    <ul class="download-links">
+      <li class="download-external">
+	<a href="EISA_tutorial.html">Browse online</a>
+      </li>
+      <li class="download-pdf">
+	<a href="ISA_tutorial.pdf">PDF file</a>
+      </li>
+    </ul>
+  </li>
+
+</ul>
+
+<h4>Publications</h4>
+
+<h4>License</h4>
+
+<p>
+The <strong>eisa</strong> package is licensed under the GNU General
+Public License, version 2 or later. For details,
+see <a href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html">
+  http://www.gnu.org/licenses/old-licenses/gpl-2.0.html</a>.
+</p>
+
