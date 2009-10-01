@@ -47,9 +47,9 @@
 \title{Classes for quick GO/KEGG/CHR/miRNA target enrichment calculation
   of multiple gene sets.}
 \description{
-  These classes extend the \code{HyperGParams} and \code{HyperGResult} 
-  classes from the \code{Category} package to perform enrichment
-  calculation for quickly for multiple gene sets.
+  These classes extend the \code{HyperGParams}
+  class from the \code{Category} package to perform enrichment
+  calculation quickly for multiple gene sets.
 }
 \usage{
 \S4method{makeValidParams}{ListHyperGParams}(p)
@@ -127,5 +127,32 @@
   
   Perhaps see also the vignette in the \code{GOstats} package.
 }
-\examples{}
+\examples{
+# GO enrichment, "by hand"
+# Load data first
+data(ALLModulesSmall)
+
+# Create gene sets
+library(hgu95av2.db)
+genes <- getFeatureNames(ALLModulesSmall)
+entrez <- lapply(genes, function(x) na.omit(unlist(mget(x,
+              hgu95av2ENTREZID))))
+
+# Create universe
+universe <- na.omit(unlist(mget(featureNames(ALLModulesSmall),
+              hgu95av2ENTREZID)))
+
+# Create parameter object
+param <- new("GOListHyperGParams", geneIds=entrez, universeGeneIds=universe,
+             pvalueCutoff=0.01, drive=FALSE, ontology="BP",
+             conditional=FALSE, testDirection="over",
+             annotation=annotation(ALLModulesSmall))
+
+# Do the calculation
+GOBP <- hyperGTest(param)
+
+# Inspect the result
+GOBP
+summary(GOBP)[[1]]
+}
 \keyword{cluster}

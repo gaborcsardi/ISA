@@ -79,5 +79,12 @@ profilePlot (modules, module, eset, plot = c("samples", "features",
 }
 \seealso{The similar \code{\link[biclust]{parallelCoordinates}} function
   in the \code{biclust} package.}
-\examples{}
+\examples{
+data(ALLModulesSmall)
+library(ALL)
+data(ALL)
+if (interactive()) {
+  profilePlot(ALLModulesSmall, 2, ALL, plot="samples")
+}
+}
 \keyword{cluster}

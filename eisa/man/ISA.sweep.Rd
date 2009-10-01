@@ -86,5 +86,29 @@ ISASweepGraphPlot (graph, vertex.label=V(graph)$id,
     Nonlin Soft Matter Phys.} 2003 Mar;67(3 Pt 1):031902. Epub 2003 Mar 11.
 }
 % \seealso{}
-\examples{}
+\examples{
+library(ALL)
+data(ALL)
+
+varLimit <- 0.5
+kLimit <- 4
+ALimit <- 5
+flist <- filterfun(function(x) var(x)>varLimit, kOverA(kLimit,ALimit))
+ALL.filt <- ALL[genefilter(ALL, flist), ]
+ALL.filt2 <- ALL.filt[, grepl("^B", ALL.filt$BT)]
+
+# Run ISA
+set.seed(1)
+modules <- ISA(ALL.filt2, flist=NA, thr.gene=seq(2,4,by=0.5), thr.cond=1)
+
+# Do the sweep
+modules2 <- ISASweep(ALL.filt2, modules)
+modules2
+
+# Plot it
+G <- ISASweepGraph(modules2)
+if (interactive()) {
+  ISASweepGraphPlot(G)
+}
+}
 \keyword{cluster}

@@ -50,7 +50,10 @@ overlapPlot (graph, xsize = 400, ysize = 400, vertex.size = 20,
   package.
 }
 \value{
-  \code{overlap}
+  \code{overlap} returns an igraph graph.
+
+  \code{overlapPlot} returns the coordinates of the vertices in a
+  two-column matrix, invisibly.
 }
 \author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
 \references{
@@ -59,5 +62,11 @@ overlapPlot (graph, xsize = 400, ysize = 400, vertex.size = 20,
     Nonlin Soft Matter Phys.} 2003 Mar;67(3 Pt 1):031902. Epub 2003 Mar 11.  
 }
 %\seealso{}
-\examples{}
+\examples{
+data(ALLModulesSmall)
+G <- overlap(ALLModulesSmall, algorithm="drl", edge.limit=0.3)
+if (interactive()) {
+  overlapPlot(G)
+}
+}
 \keyword{cluster}

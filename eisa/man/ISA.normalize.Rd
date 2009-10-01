@@ -32,5 +32,22 @@ ISANormalize (data, prenormalize = FALSE)
     Nonlin Soft Matter Phys.} 2003 Mar;67(3 Pt 1):031902. Epub 2003 Mar 11.
 }
 \seealso{The \code{\link{ISA}} function for an easier ISA workflow.}
-\examples{}
+\examples{
+library(ALL)
+data(ALL)
+
+# Do the normalization
+ALL.normed <- ISANormalize(ALL)
+class(ALL.normed)
+dim(exprs(ALL.normed))
+dim(featExprs(ALL.normed))
+dim(sampExprs(ALL.normed))
+
+# Check that we indeed have Z-scores
+all(abs(apply(featExprs(ALL.normed), 2, mean) ) < 1e-12)
+all(abs(1-apply(featExprs(ALL.normed), 2, sd)) < 1e-12)
+
+all(abs(apply(sampExprs(ALL.normed), 1, mean) ) < 1e-12)
+all(abs(1-apply(sampExprs(ALL.normed), 1, sd)) < 1e-12)
+}
 \keyword{cluster}

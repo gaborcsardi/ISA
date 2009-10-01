@@ -24,4 +24,8 @@ ALLModulesSmall
     Nonlin Soft Matter Phys.} 2003 Mar;67(3 Pt 1):031902. Epub 2003 Mar 11.
 }
 \seealso{The \code{ALL} BioConductor package.}
+\examples{
+data(ALLModules)
+ALLModules
+}
 \keyword{datasets}

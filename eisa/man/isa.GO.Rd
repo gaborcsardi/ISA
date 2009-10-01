@@ -74,5 +74,10 @@ ISAGO (modules, ann = annotation(modules), features = featureNames(modules),
 
   The \code{GO.db}, \code{GOstats} and \code{Category} packages.
 }
-\examples{}
+\examples{
+data(ALLModulesSmall)
+GO <- ISAGO(ALLModulesSmall)
+GO
+summary(GO$BP)[[1]][,1:5]
+}
 \keyword{cluster}

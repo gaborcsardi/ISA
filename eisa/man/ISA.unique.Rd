@@ -55,5 +55,20 @@ ISAUnique(data, isaresult, \dots)
   11.
 }
 \seealso{The \code{\link{ISA}} function for an easier ISA workflow.}
-\examples{}
+\examples{
+library(ALL)
+data(ALL)
+
+# Only use a small sample, to make this example finish faster
+ALL.normed <- ISANormalize(ALL)[sample(1:nrow(ALL), 1000),]
+
+# Generate seeds and do ISA
+seeds <- generate.seeds(nrow(ALL.normed), count=100)
+modules <- ISAIterate(ALL.normed, seeds, thr.feat=3, thr.samp=2)
+modules
+
+# Merge the modules
+modules2 <- ISAUnique(ALL.normed, modules)
+modules2
+}
 \keyword{cluster}

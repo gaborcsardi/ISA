@@ -300,5 +300,20 @@
 \seealso{
   The vignette included in the \code{eisa} package.
 }
-\examples{}
+\examples{
+data(ALLModulesSmall)
+ALLModulesSmall
+
+length(ALLModulesSmall)
+dim(ALLModulesSmall)
+annotation(ALLModulesSmall)
+getOrganism(ALLModulesSmall)
+
+seedData(ALLModulesSmall)
+
+getNoFeatures(ALLModulesSmall)
+getNoSamples(ALLModulesSmall)
+
+getFeatureScores(ALLModulesSmall, 1)[[1]]
+}
 \keyword{cluster}

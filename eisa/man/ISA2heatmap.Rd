@@ -38,5 +38,13 @@ ISA2heatmap (modules, module, eset, norm = c("raw", "feature", "sample"),
     Nonlin Soft Matter Phys.} 2003 Mar;67(3 Pt 1):031902. Epub 2003 Mar 11.
 }
 \seealso{\code{\link[stats]{heatmap}}}
-\examples{}
+\examples{
+library(ALL)
+data(ALL)
+data(ALLModulesSmall)
+
+if (interactive()) {
+  ISA2heatmap(ALLModulesSmall, 1, ALL, norm="feature")
+}
+}
 \keyword{cluster}

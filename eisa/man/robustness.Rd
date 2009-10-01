@@ -50,5 +50,11 @@ ISAFilterRobust(data, isaresult, \dots)
   The \code{\link[isa2]{robustness}} function in the \code{isa2}
   package.
 }
-\examples{}
+\examples{
+data(ALLModules)
+library(ALL)
+data(ALL)
+rob <- ISARobustness(ALL, ALLModules)
+summary(rob)
+}
 \keyword{cluster}

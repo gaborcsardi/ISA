@@ -39,5 +39,32 @@
   package version 0.8.1. http://CRAN.R-project.org/package=biclust  
 }
 %\seealso{}
-\examples{}
+\examples{
+if (require(biclust)) {
+
+  library(ALL)
+  data(ALL)
+  ALL.filtered <- ALL[sample(1:nrow(ALL), 1000),]
+
+  # Biclust -> ISAModules
+  set.seed(1)
+  Bc <- biclust(exprs(ALL.filtered), BCPlaid(),
+                fit.model = ~m + a + b, verbose = FALSE)
+  Bc@Parameters$annotation <- annotation(ALL)
+  modules <- as(Bc, "ISAModules")
+  Bc
+  modules
+  getNoFeatures(modules)
+  getNoSamples(modules)
+
+  # ISAModules -> Biclust
+  data(ALLModulesSmall)
+  Bc2 <- as(ALLModulesSmall, "Biclust")
+  ALLModulesSmall
+  getNoFeatures(ALLModulesSmall)
+  getNoSamples(ALLModulesSmall)
+  Bc2
+
+}
+}
 \keyword{cluster}

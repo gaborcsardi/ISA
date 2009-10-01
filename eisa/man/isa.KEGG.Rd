@@ -64,5 +64,11 @@ ISAKEGG (modules,ann = annotation(modules), features = featureNames(modules),
 
   The \code{KEGG.db} and \code{Category} packages.
 }
-\examples{}
+\examples{
+data(ALLModulesSmall)
+KEGG <- ISAKEGG(ALLModulesSmall)
+KEGG
+sigCategories(KEGG)[[1]]
+summary(KEGG)[[1]][,1:5]
+}
 \keyword{cluster}

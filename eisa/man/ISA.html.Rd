@@ -71,7 +71,7 @@ ISAHTML (eset, modules, target.dir, template = system.file("autogen",
     \item An expression plot of the genes and samples in the module,
       including the ISA scores. This is done by calling
       \code{\link{expPlot}}.
-    \item Overlap plot of all modules, see \code{\link{overlap.plot}}
+    \item Overlap plot of all modules, see \code{\link{overlapPlot}}
     \item Gene Ontology tree plots for the enriched GO terms, separately
       for the three ontologies., These are produced by calling
       \code{\link{gograph}}.
@@ -103,5 +103,25 @@ ISAHTML (eset, modules, target.dir, template = system.file("autogen",
 \seealso{
   The vignette included in the \code{eisa} package.
 }
-\examples{}
+\examples{
+# Load data
+library(ALL)
+data(ALL)
+data(ALLModulesSmall)
+
+# Calculate enrichment
+GO <- ISAGO(ALLModulesSmall)
+KEGG <- ISAKEGG(ALLModulesSmall)
+CHR <- ISACHR(ALLModulesSmall)
+
+# Generate HTML summary
+htmldir <- tempdir()
+ISAHTML(ALL, modules=ALLModulesSmall, target.dir=htmldir,
+        GO=GO, KEGG=KEGG, CHR=CHR)
+
+# Open a browser to view the summary
+if (interactive()) {
+  browseURL(URLencode(paste("file://", htmldir, "/maintable.html", sep="")))
+}
+}
 \keyword{cluster}

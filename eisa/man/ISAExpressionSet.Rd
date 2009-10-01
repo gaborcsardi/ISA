@@ -67,5 +67,22 @@
 \seealso{
   \code{\link{ISANormalize}}, \code{\link[Biobase]{ExpressionSet}}
 }
-\examples{}
+\examples{
+library(ALL)
+data(ALL)
+
+# Do the normalization
+ALL.normed <- ISANormalize(ALL)
+class(ALL.normed)
+dim(exprs(ALL.normed))
+dim(featExprs(ALL.normed))
+dim(sampExprs(ALL.normed))
+
+# Check that we indeed have Z-scores
+all(abs(apply(featExprs(ALL.normed), 2, mean) ) < 1e-12)
+all(abs(1-apply(featExprs(ALL.normed), 2, sd)) < 1e-12)
+
+all(abs(apply(sampExprs(ALL.normed), 1, mean) ) < 1e-12)
+all(abs(1-apply(sampExprs(ALL.normed), 1, sd)) < 1e-12)
+}
 \keyword{classes}

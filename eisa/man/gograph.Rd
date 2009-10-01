@@ -58,5 +58,15 @@ gographPlot (graph, coords = FALSE, ...)
 \seealso{
   The \code{igraph} package for more about \code{igraph} graphs.
 }
-\examples{}
+\examples{
+data(ALLModulesSmall)
+GO <- ISAGO(ALLModulesSmall)
+gotab <- summary(GO$BP)[[1]][,"Pvalue",drop=FALSE]
+
+G <- gograph(gotab)
+if (interactive()) {
+  x11(width=G$width/15, height=G$height/15)
+  gographPlot(G)
+}
+}
 \keyword{cluster}

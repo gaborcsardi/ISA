@@ -56,5 +56,11 @@ ISAmnplot (modules, number, eset, norm = c("raw", "feature", "sample"),
 \seealso{The \code{\link[annotate]{GOmnplot}} and
   \code{\link[annotate]{KEGGmnplot}} functions in the \code{annotate}
   package.}
-\examples{}
+\examples{
+data(ALLModulesSmall)
+library(ALL)
+data(ALL)
+group <- ifelse(grepl("^B", ALL$BT), "B-cell", "T-cell")
+ISAmnplot(ALLModulesSmall, 2, ALL, norm="feature", group=group)
+}
 \keyword{cluster}

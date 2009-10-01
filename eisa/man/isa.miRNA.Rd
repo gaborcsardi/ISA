@@ -68,5 +68,12 @@ ISAmiRNA (modules, ann = annotation(modules), features = featureNames(modules),
 
   The \code{Category} package.
 }
-\examples{}
+\examples{
+data(ALLModulesSmall)
+
+if (require(targetscan.Hs.eg.db)) {
+  miRNA <- ISAmiRNA(ALLModulesSmall)
+  summary(miRNA, p=0.1)[[7]]
+}
+}
 \keyword{cluster}

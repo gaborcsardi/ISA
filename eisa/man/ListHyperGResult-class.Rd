@@ -98,6 +98,9 @@
 \title{Classes for quick GO/KEGG/CHR/miRNA target enrichment
   calculation for multiple gene sets}
 \description{
+  These classes extend the \code{HyperGResult}
+  class from the \code{Category} package to perform enrichment
+  calculation quickly for multiple gene sets.
 }
 \usage{
 \S4method{summary}{ListHyperGResult}(object, pvalue = pvalueVutoff(object), 
@@ -251,5 +254,11 @@
   
   Perhaps see also the vignette in the \code{GOstats} package.
 }
-\examples{}
+\examples{
+data(ALLModulesSmall)
+GO <- ISAGO(ALLModulesSmall)
+GO$CC
+sigCategories(GO$CC)[[1]]
+summary(GO$CC)[[1]][,1:5]
+}
 \keyword{cluster}

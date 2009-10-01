@@ -90,5 +90,10 @@ ISA (data, flist = filterfun(function(x) IQR(x) > 0.5),
 \seealso{
   The vignette included in the \code{eisa} package.
 }
-\examples{}
+\examples{
+library(ALL)
+data(ALL)
+modules <- ISA(ALL, thr.gene=2.7, thr.cond=1.4)
+modules
+}
 \keyword{cluster}

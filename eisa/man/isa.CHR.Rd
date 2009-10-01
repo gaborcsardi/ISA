@@ -8,7 +8,7 @@
   ISA module are on the same chromosome.
 }
 \usage{
-ISACHR (modules,ann = annotation(modules), features = featureNames(modules), 
+ISACHR (modules, ann = annotation(modules), features = featureNames(modules), 
     hgCutoff = 0.05, correction = TRUE, correction.method = "holm") 
 }
 \arguments{
@@ -56,5 +56,11 @@ ISACHR (modules,ann = annotation(modules), features = featureNames(modules),
 
   The \code{Category} package.
 }
-\examples{}
+\examples{
+data(ALLModulesSmall)
+CHR <- ISACHR(ALLModulesSmall)
+CHR
+sigCategories(CHR)[[2]]
+geneIdsByCategory(CHR)[[2]][[1]]
+}
 \keyword{cluster}

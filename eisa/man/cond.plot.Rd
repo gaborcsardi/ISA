@@ -78,5 +78,12 @@ condPlot (modules, number, eset, col = "white", all = TRUE, sep = NULL,
     Nonlin Soft Matter Phys.} 2003 Mar;67(3 Pt 1):031902. Epub 2003 Mar 11.
 }
 \seealso{\code{\link{ISA}} and \code{\link{ISAModules}}.}
-\examples{}
+\examples{
+data(ALLModulesSmall)
+library(ALL)
+data(ALL)
+
+col <- ifelse(grepl("^B", ALL$BT), "darkolivegreen", "orange")
+condPlot(ALLModulesSmall, 1, ALL, col=col)
+}
 \keyword{cluster}

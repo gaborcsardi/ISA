@@ -50,7 +50,7 @@ expPlotColbar (epo)
   \item{width}{Numeric scalar, the optimal width of the plot.}
   \item{height}{Numeric scalar, the optimal height of the plot.}
 
-  \code{expPlot} returns a named list with members:
+  \code{expPlot} returns, invisibly, a named list with members:
   \item{coords}{A list with two entries: \code{x} and \code{y}, both
     numeric vectors of length two. They give the position of the actual
     expression matrix on the plot.}
@@ -70,5 +70,16 @@ expPlotColbar (epo)
 \seealso{The vignette in the \code{eisa} package for other ISA
   visualizations. The \code{ExpressionView} package for an interactive
   version.}
-\examples{}
+\examples{
+data(ALLModulesSmall)
+library(ALL)
+data(ALL)
+
+ep <- expPlotCreate(ALL, ALLModulesSmall, 1)
+ep
+
+if (interactive()) {
+  expPlot(ep)
+}
+}
 \keyword{cluster}
