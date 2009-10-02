@@ -84,8 +84,8 @@ eisa/inst/doc/EISA_tutorial.pdf: vignettes/EISA_tutorial.pdf
 	cp $< $@
 
 vignettes/EISA_tutorial.pdf: vignettes/EISA_tutorial.tex
-	cd vignettes && pdflatex EISA_tutorial.tex && pdflatex EISA_tutorial.tex && \
-		pdflatex EISA_tutorial.tex
+	cd vignettes && pdflatex EISA_tutorial.tex && bibtex EISA_tutorial && \
+                pdflatex EISA_tutorial.tex && pdflatex EISA_tutorial.tex
 
 vignettes/EISA_module_trees.tex: $(EISAFILES) vignettes/EISA_module_trees.Rnw
 	R CMD build --no-vignettes isa2
@@ -101,7 +101,8 @@ eisa/inst/doc/EISA_module_trees.pdf: vignettes/EISA_module_trees.pdf
 	cp $< $@
 
 vignettes/EISA_module_trees.pdf: vignettes/EISA_module_trees.tex
-	cd vignettes && pdflatex EISA_module_trees.tex && pdflatex EISA_module_trees.tex && \
+	cd vignettes && pdflatex EISA_module_trees.tex && \
+                bibtex EISA_module_trees && pdflatex EISA_module_trees.tex && \
 		pdflatex EISA_module_trees.tex
 
 vignettes/EISA_biclust.tex: $(EISAFILES) vignettes/EISA_biclust.Rnw
@@ -118,8 +119,8 @@ eisa/inst/doc/EISA_biclust.pdf: vignettes/EISA_biclust.pdf
 	cp $< $@
 
 vignettes/EISA_biclust.pdf: vignettes/EISA_biclust.tex
-	cd vignettes && pdflatex EISA_biclust.tex && pdflatex EISA_biclust.tex && \
-		pdflatex EISA_biclust.tex
+	cd vignettes && pdflatex EISA_biclust.tex && bibtex EISA_biclust && \
+		pdflatex EISA_biclust.tex && pdflatex EISA_biclust.tex
 
 # ExpressionView
 
@@ -174,7 +175,9 @@ RExpressionView/inst/doc/ExpressionView_tutorial.pdf: vignettes/ExpressionView_t
 	cp $< $@
 
 vignettes/ExpressionView_tutorial.pdf: vignettes/ExpressionView_tutorial.tex
-	cd vignettes && pdflatex ExpressionView_tutorial.tex && pdflatex ExpressionView_tutorial.tex && \
+	cd vignettes && pdflatex ExpressionView_tutorial.tex && \
+		bibtex ExpressionView_tutorial && \
+		pdflatex ExpressionView_tutorial.tex && \
 		pdflatex ExpressionView_tutorial.tex
 	cp vignettes/ExpressionView_tutorial.pdf RExpressionView/inst/doc/
 
