@@ -1,0 +1,310 @@
+% \VignetteIndexEntry{The eisa and the biclust packages}
+\documentclass{article}
+\usepackage{ragged2e}
+\usepackage{url}
+
+\newcommand{\Rfunction}[1]{\texttt{#1()}}
+\newcommand{\Rpackage}[1]{\texttt{#1}}
+\newcommand{\Rclass}[1]{\texttt{#1}}
+\newcommand{\Rargument}[1]{\textsl{#1}}
+\newcommand{\filename}[1]{\texttt{#1}}
+\newcommand{\variable}[1]{\texttt{#1}}
+
+\SweaveOpts{cache=TRUE}
+\SweaveOpts{prefix.string=graphics/plot}
+
+\setlength{\parindent}{2em}
+
+\begin{document}
+
+\title{The \Rpackage{eisa} and \Rpackage{biclust} packages}
+\author{G\'abor Cs\'ardi}
+\maketitle
+
+\tableofcontents
+
+\RaggedRight
+
+<<set width,echo=FALSE,print=FALSE>>=
+options(width=60)
+options(continue=" ")
+@ 
+
+\section{Introduction}
+
+Biclustering is technique that simultaneously clusters the rows and
+columns of a matrix~\cite{madeira04}. In other words, the problem is
+finding blocks in the reordered input matrix that exhibit correlated
+behavior, both across the rows and columns of the block.
+
+Biclustering is used increasingly in the analysis of gene expression
+data sets, because it reduces the complexity of the data: instead of
+tens of thousands of individual genes, one can focus on a handful of
+biclusters, in which the genes behave similarly.
+
+The Iterative Signature Algorithm (ISA)~\cite{isa} is a biclustering
+method, that can efficiently find potentially overlapping biclusters
+(modules, according to the ISA terminology) in a matrix. The ISA is
+implemented in the \Rpackage{eisa} package~\cite{eisapackage} it uses
+standard BioConductor classes and includes a number of visualization
+tools as well.
+
+The \Rpackage{biclust} R package~\cite{biclust} is a general
+biclustering package, it contains several biclustering methods, and
+these can be invoked with a common interface. It provides a set of
+visualization tools for the results. 
+
+In this short document, we show examples on how to use the
+visualization tools of \Rpackage{eisa} for the biclusters found with
+\Rpackage{biclust}, and vice-versa.
+
+\section{From \Rclass{Biclust} to \Rclass{ISAModules}}
+
+For all examples in this document, we will use the acute lymphoblastic
+leukemia data set, that is included in the standard BioConductor
+\Rpackage{ALL} package. Let's load this data set and the required
+packages first.
+<<packages>>=
+library(biclust)
+library(eisa)
+library(ALL)
+data(ALL)
+@ 
+
+Next, we select a subset of the genes in the data set. We do this to speed 
+up the computation for our simple examples. We select the genes that are 
+annotated to involved in immune system processes, according to the Gene
+Ontology database.
+
+<<filter>>=
+library(GO.db)
+library(hgu95av2.db)
+gotable <- toTable(GOTERM)
+myterms <- unique(gotable$go_id[gotable$Term %in% c("immune system process")])
+myprobes <- unique(unlist(mget(myterms, hgu95av2GO2ALLPROBES)))
+ALL.filtered <- ALL[myprobes,]
+@
+
+We have kept only \Sexpr{nrow(ALL.filtered)} probes:
+<<filtered>>=
+nrow(ALL.filtered)
+@ 
+
+For consistent results, we set the random seed.
+<<seed>>=
+set.seed(0xf00)
+@ 
+
+Next, we apply the Plaid Model Biclustering method~\cite{turner03} to the 
+reduced data set.
+<<bcplaid>>=
+Bc <- biclust(exprs(ALL.filtered), BCPlaid(),
+              fit.model = ~m + a + b, verbose = FALSE)
+@ 
+The method finds \Sexpr{Bc@Number} biclusters, and returns a 
+\Rclass{Biclust} object:
+<<bcplaid result>>=
+class(Bc)
+Bc
+@
+
+Now we will convert the \Rclass{Biclust} object to an \Rclass{ISAModules} 
+object, that is used in the \Rpackage{eisa} package. To help
+some \Rpackage{eisa} functions, we add the name of the annotation package to 
+the parameters stored in the \Rclass{Biclust} object, this is always adwised.
+The procedure makes use of the probe and sample names that are kept and stored 
+in the \Rclass{Biclust} object, this information will be used later, e.g. for 
+the enrichment analysis. The conversion itself can be performed with
+the usual \Rfunction{as} function. 
+<<convert bc to isa>>=
+Bc@Parameters$annotation <- annotation(ALL.filtered)
+modules <- as(Bc, "ISAModules")
+modules
+@
+
+Now we are able apply the usual \Rclass{ISAModules} methods to 
+the biclusters. See more about these functions in the documentation of the 
+\Rpackage{eisa} package. 
+
+Doing some enrichment analysis is easy:
+<<biclust enrichment>>=
+library(KEGG.db)
+KEGG <- ISAKEGG(modules)
+sigCategories(KEGG)[[2]]
+unlist(mget(sigCategories(KEGG)[[2]], KEGGPATHID2NAME))
+@ 
+
+The \Rfunction{ISA2heatmap} function creates a heatmap for a module. Let us
+annotate the heatmap with the leukemia sample type, white means B-cell, black 
+means T-cell leukemia. See Fig.~\ref{fig:heatmap}.
+<<heatmap,eval=FALSE>>=
+col <- ifelse(grepl("^B", ALL.filtered$BT), "white", "black")
+modcol <- col[ getSamples(modules, 2)[[1]] ]
+ISA2heatmap(modules, 2, ALL.filtered, 
+            ColSideColors=modcol)
+@
+
+\begin{figure}
+\centering
+<<heatmap-real,fig=TRUE,echo=FALSE>>=
+<<heatmap>>
+@
+\caption{Heatmap of the second module, found with the Plaid Model
+  biclustering algorithm. The black squares denote the T-cell samples;
+  all samples in the module belong to T-cell samples.}
+\label{fig:heatmap}
+\end{figure}
+
+It turns out, that all samples in the second bicluster belong to
+patients with T-cell leukemia.
+
+Profile plots visualize the mean expression levels, both for the
+genes/samples in the module and in the background (i.e. the background
+means all genes and samples \emph{not} in the module). 
+See Fig.~\ref{fig:profile}.
+<<profilePlot,eval=FALSE>>=
+profilePlot(modules, 2, ALL, plot="both")
+@
+\begin{figure}
+\centering
+<<profilePlot-real,fig=TRUE,echo=FALSE>>=
+<<profilePlot>>
+@ 
+\caption{Profile plot for the second module. The red lines show the
+  average exression of the samples/genes in the module. The green
+  lines show the same for the samples/genes not in the module.}
+\label{fig:profile}
+\end{figure}
+
+The \Rfunction{gograph} and \Rfunction{gographPlot} functions 
+create a plot of the part of the Gene Ontology tree that contains 
+the enriched categories. See Fig.~\ref{fig:gotree}.
+<<psoptions,results=hide,echo=FALSE>>=
+ps.options(fonts=c("serif", "mono"))
+@
+<<GOtreeplot,eval=FALSE>>=
+library(GO.db)
+GO <- ISAGO(modules)
+gog <- gograph(summary(GO$CC)[[2]])
+summary(gog)
+gographPlot(gog)
+@ 
+\begin{figure}
+\centering
+<<GOtreeplot-real,fig=TRUE,width=10,height=4,echo=FALSE>>=
+<<GOtreeplot>>
+@
+\caption{Part of the Gene Ontology tree, Cellular Components ontology.
+  The plot includes all terms with significant enrichment for the
+  second module, and their parent terms, up to the most general term.
+}
+\label{fig:gotree}
+\end{figure}
+
+The \Rfunction{ISAHTML} function creates a HTML overview of all modules.
+<<html>>=
+CHR <- ISACHR(modules)
+htmldir <- tempdir()
+ISAHTML(eset=ALL.filtered, modules=modules, target.dir=htmldir, 
+        GO=GO, KEGG=KEGG, CHR=CHR, condPlot=FALSE)
+if (interactive()) {
+  browseURL(URLencode(paste("file://", htmldir, "/index.html", sep="")))
+}
+@ 
+
+The \Rfunction{ISAmnplot} funtion plots group means of expression
+levels againts each other, for all genes in the module. Here we plot
+the mean expression of the B-cell samples against the T-cell samples, 
+for the second module. See Fig.~\ref{fig:mnplot}.
+<<mnplot,eval=FALSE>>=
+group <- ifelse(grepl("^B", ALL.filtered$BT), "B-cell", "T-cell")
+ISAmnplot(modules, 2, ALL.filtered, norm="raw", group=group)
+@ 
+\begin{figure}
+\centering
+<<mnplot-real,fig=TRUE,echo=FALSE>>=
+<<mnplot>>
+@ 
+\caption{Group means against each other, for B-cell and T-cell
+  samples, for all genes in the second bicluster.}
+\label{fig:mnplot}
+\end{figure}
+
+\section{From \Rclass{ISAModules} to \Rclass{Biclust}}
+
+It is also possible to convert an \Rclass{ISAModules} object to a 
+\Rclass{Biclust} object, but this involves some information loss. The reason
+for this is, that ISA biclusters are not binary, but the genes and 
+the samples both have scores between minus one and one; whereas 
+\Rclass{Biclust} biclusters are required to be binary. 
+
+We make use of the small sample set of modules that is included in the
+\Rpackage{eisa} package. These were generated for the ALL data set.
+<<load isa data>>=
+data(ALLModules)
+ALLModules
+@ 
+
+The conversion from \Rclass{ISAModules} to \Rclass{Biclust} can be done
+the usual way:
+<<isa to biclust>>=
+BcMods <- as(ALLModules, "Biclust")
+BcMods
+@
+
+The usual methods of the \Rclass{Biclust} class can be applied to 
+\texttt{BcMods} now. E.g. we can calculate the coherence of the 
+biclusters:
+<<coherence>>=
+data <- exprs(ALL[featureNames(ALLModules),])
+constantVariance(data, BcMods, 1)
+additiveVariance(data, BcMods, 1)
+multiplicativeVariance(data, BcMods, 1)
+signVariance(data, BcMods, 1)
+@
+
+As another example, we calculate these coherence measures for all 
+modules and compare them to the ISA robustness measure.
+<<coherence vs robustness>>=
+cV <- sapply(1:BcMods@Number, function(x) constantVariance(data, BcMods, x))
+aV <- sapply(1:BcMods@Number, function(x) additiveVariance(data, BcMods, x))
+mV <- sapply(1:BcMods@Number, function(x) multiplicativeVariance(data, BcMods, x))
+sV <- sapply(1:BcMods@Number, function(x) signVariance(data, BcMods, x))
+rob <- ISARobustness(ALL, ALLModules)
+@
+
+Let's create a pairs-plot to visualize the relationship of these measures
+for our data set, the result is in Fig.~\ref{fig:coherence}.
+<<pairs,eval=FALSE>>=
+pairs( cbind(cV, aV, mV, sV, rob) )
+@
+\begin{figure}
+\centering
+<<pairs-real,fig=TRUE,echo=FALSE>>=
+<<pairs>>
+@ 
+\caption{Relationship of the various bicluster coherence measueres and
+  the ISA robustness measure. They show high correlation.}
+\label{fig:coherence}
+\end{figure}
+
+\section{More information}
+
+For more information about the ISA, please see the references
+below. The ISA homepage at
+\url{http://www.unil.ch/cbg/homepage/software.html} has example data
+sets, and all ISA related tutorials and papers.
+
+\section{Session information}
+
+The version number of R and packages loaded for generating this
+vignette were:
+
+<<sessioninfo,results=tex,echo=FALSE>>=
+toLatex(sessionInfo())
+@ 
+
+\bibliographystyle{apalike}
+\bibliography{EISA}
+
+\end{document}

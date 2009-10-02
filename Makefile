@@ -62,7 +62,8 @@ EISAFILES = eisa/DESCRIPTION eisa/NAMESPACE eisa/R/*.R eisa/man/*.Rd \
 	eisa/inst/CITATION
 
 EISAVIGNETTES = eisa/inst/doc/EISA_tutorial.vignette eisa/inst/doc/EISA_tutorial.pdf \
-	eisa/inst/doc/EISA_module_trees.vignette eisa/inst/doc/EISA_module_trees.pdf
+	eisa/inst/doc/EISA_module_trees.vignette eisa/inst/doc/EISA_module_trees.pdf \
+	eisa/inst/doc/EISA_biclust.vignette eisa/inst/doc/EISA_biclust.pdf
 
 eisa: eisa_$(VERSION).tar.gz
 
@@ -102,6 +103,23 @@ eisa/inst/doc/EISA_module_trees.pdf: vignettes/EISA_module_trees.pdf
 vignettes/EISA_module_trees.pdf: vignettes/EISA_module_trees.tex
 	cd vignettes && pdflatex EISA_module_trees.tex && pdflatex EISA_module_trees.tex && \
 		pdflatex EISA_module_trees.tex
+
+vignettes/EISA_biclust.tex: $(EISAFILES) vignettes/EISA_biclust.Rnw
+	R CMD build --no-vignettes isa2
+	R CMD build --no-vignettes eisa
+	R CMD INSTALL -l /tmp/ isa2_$(VERSION).tar.gz
+	R CMD INSTALL -l /tmp/ eisa_$(VERSION).tar.gz
+	cd vignettes && R_LIBS=/tmp/ R CMD Sweave EISA_biclust.Rnw || rm EISA_biclust.tex
+
+eisa/inst/doc/EISA_biclust.vignette: vignettes/EISA_biclust.Rnw
+	cp $< $@
+
+eisa/inst/doc/EISA_biclust.pdf: vignettes/EISA_biclust.pdf
+	cp $< $@
+
+vignettes/EISA_biclust.pdf: vignettes/EISA_biclust.tex
+	cd vignettes && pdflatex EISA_biclust.tex && pdflatex EISA_biclust.tex && \
+		pdflatex EISA_biclust.tex
 
 # ExpressionView
 
@@ -175,6 +193,7 @@ vignettes: homepage/ISA_tutorial.html homepage/ISA_tutorial.pdf \
 	homepage/ISA_parallel.html homepage/ISA_parallel.pdf \
 	homepage/EISA_tutorial.html homepage/EISA_tutorial.pdf \
 	homepage/EISA_module_trees.html homepage/EISA_module_trees.pdf \
+	homepage/EISA_biclust.html homepage/EISA_biclust.pdf \
 	homepage/ExpressionView_tutorial.html homepage/ExpressionView_tutorial.pdf \
 	vignettes/style.cfg
 
@@ -216,6 +235,16 @@ homepage/EISA_module_trees.html: vignettes/EISA_module_trees.tex
 	cp vignettes/graphics/*.png homepage/graphics/
 
 homepage/EISA_module_trees.pdf: vignettes/EISA_module_trees.pdf
+	cp $< $@
+
+homepage/EISA_biclust.html: vignettes/EISA_biclust.tex
+	cd vignettes && $(SWEAVE2HTML) EISA_biclust $(SWEAVE2HTMLOPTIONS)
+	cp vignettes/EISA_biclust.html homepage
+	cp vignettes/EISA_biclust.css homepage
+	cp vignettes/EISA_biclust*.png homepage/
+	cp vignettes/graphics/*.png homepage/graphics/
+
+homepage/EISA_biclust.pdf: vignettes/EISA_biclust.pdf
 	cp $< $@
 
 homepage/ExpressionView_tutorial.html: vignettes/ExpressionView_tutorial.tex

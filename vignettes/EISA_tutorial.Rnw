@@ -500,6 +500,7 @@ it on the previously calculated enrichment scores:
 <<goplot1>>=
 goplot.2 <- gograph(summary(GO$BP, p=0.05)[[1]])
 @ 
+% $
 
 \Rfunction{goplot} uses the \Rpackage{igraph} package to create a
 graph with the associated meta data:
@@ -569,6 +570,7 @@ vs. T-cell leukemia (Fig.~\ref{fig:condplot}).
 col <- ifelse( grepl("^B", pData(modules)$BT), "darkolivegreen", "orange")
 condPlot(modules, 2, ALL, col=col)
 @
+% $
 
 \begin{figure}
 \centering
