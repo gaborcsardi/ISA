@@ -206,8 +206,8 @@ ISASweepGraphPlot <- function(graph, vertex.label=V(graph)$id,
   plot(NA, xlim=xlim, ylim=ylim, xlab=xlab, ylab=ylab, axes=FALSE)
   
   if (thresholds) {
-    la <- sort(unique(V(G)$thr))
-    at <- sort(unique(G$layout[,1]))
+    la <- sort(unique(V(graph)$thr))
+    at <- sort(unique(graph$layout[,1]))
     axis(1, at=at, labels=la)
     axis(3, at=at, labels=la)
     par(xpd=FALSE)
@@ -221,19 +221,19 @@ ISASweepGraphPlot <- function(graph, vertex.label=V(graph)$id,
               vertex.label.cex=vertex.label.cex, ...)
 
   if (any(!is.na(vertex.label.topleft))) {
-    text(G$layout[,1]-V(G)$size/200, G$layout[,2], pos=3,
+    text(graph$layout[,1]-V(graph)$size/200, graph$layout[,2], pos=3,
          vertex.label.topleft, cex=vertex.label.cex)
   }
   if (any(!is.na(vertex.label.topright))) {
-    text(G$layout[,1]+V(G)$size/200, G$layout[,2], pos=3,
+    text(graph$layout[,1]+V(graph)$size/200, graph$layout[,2], pos=3,
          vertex.label.topright, cex=vertex.label.cex)
   }
   if (any(!is.na(vertex.label.bottomleft))) {
-    text(G$layout[,1]-V(G)$size/200, G$layout[,2], pos=1,
+    text(graph$layout[,1]-V(graph)$size/200, graph$layout[,2], pos=1,
          vertex.label.bottomleft, cex=vertex.label.cex)
   }
   if (any(!is.na(vertex.label.bottomright))) {
-    text(G$layout[,1]+V(G)$size/200, G$layout[,2], pos=1,
+    text(graph$layout[,1]+V(graph)$size/200, graph$layout[,2], pos=1,
          vertex.label.bottomright, cex=vertex.label.cex)
   }
 
