@@ -12,10 +12,11 @@
 ISASweep (expset, modules, \dots)
 ISASweepGraph (sweep.result)
 ISASweepGraphPlot (graph, vertex.label=V(graph)$id,
-  vertex.label.upleft=NA, vertex.label.upright=NA,
+  vertex.label.topleft=NA, vertex.label.topright=NA,
   vertex.label.bottomleft=NA, vertex.label.bottomright=NA,
   vertex.label.cex=0.8, edge.label=NA, asp=FALSE, rescale=FALSE,
-  xlim=range(graph$layout[,1]), ylim=range(graph$layout[,2]), \dots)
+  xlim=range(graph$layout[,1]), ylim=range(graph$layout[,2]),
+  thresholds=TRUE, xlab=NA, ylab=NA, \dots)
 }
 \arguments{
   \item{expset}{The expression set object, if it is not an
@@ -45,6 +46,10 @@ ISASweepGraphPlot (graph, vertex.label=V(graph)$id,
     coordinates to the [-1,1] interval.}
   \item{xlim}{Numeric vector of length two, the X limits of the plot.}
   \item{ylim}{Numeric vector of length two, the Y limits of the plot.}
+  \item{thresholds}{Logical scalar, whether to add the (non-constant)
+    thresholds to the plot.}
+  \item{xlab}{The label of the horizontal axis, by default omitted.}
+  \item{ylab}{The label of the vertical axis, by default omitted.}
 }
 \details{
   The ISA uses two threshold parameters that tune the sizes of the

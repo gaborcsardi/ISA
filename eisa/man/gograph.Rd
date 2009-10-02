@@ -7,7 +7,7 @@
 \usage{
 gograph (table, colbar.length = 30, label.cex = 1, GOGRAPHS = NULL, 
     go.terms = NULL)
-gographPlot (graph, coords = FALSE, ...)
+gographPlot (graph, coords = FALSE, \dots)
 }
 \arguments{
   \item{table}{A data frame with one column, containing the
@@ -21,6 +21,8 @@ gographPlot (graph, coords = FALSE, ...)
     function.}
   \item{coords}{Logical scalar, whether to return the coordinates of the
     vertices on the plot.}
+  \item{\dots}{Additional arguments. These are passed to
+    \code{igraph.plot}.}
 }
 \details{
   A GO plot can be created in two steps. \code{gograph} creates an
