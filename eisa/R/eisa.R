@@ -35,7 +35,9 @@ eisa.get.nm <- function(data, modules) {
     data
   } else {
     if (!is.null(modules)) {
-      ISANormalize(data, prenormalize=runData(modules)$prenormalize)
+      pre <- runData(modules)$prenormalize
+      if (is.null(pre)) { pre <- FALSE }
+      ISANormalize(data, prenormalize=pre)
     } else {
       ISANormalize(data)
     }
