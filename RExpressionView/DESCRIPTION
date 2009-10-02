@@ -10,5 +10,5 @@ Description: ExpressionView visualizes possibly overlapping biclusters
 	package. The program itself was developed using Adobe Flex and
 	runs in a flash-enabled web browser.
 Depends: isa2, eisa, GO.db, KEGG.db, caTools, bitops, AnnotationDbi
-License: GPL
+License: GPL (>= 2)
 Packaged: Mon Jul 28 09:19:47 2008; csardi

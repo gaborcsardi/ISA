@@ -11,5 +11,5 @@ Depends: methods, isa2, Biobase, AnnotationDbi, Category, genefilter, DBI
 Suggests: ExpressionView, igraph (>= 0.5.2), Matrix, GOstats,
 	  targetscan.Hs.eg.db, targetscan.Mm.eg.db, Cairo, GO.db, KEGG.db, 
 	  biclust, MASS, xtable, ALL
-License: GPL
+License: GPL (>= 2)
 Packaged: Mon Jul 28 09:19:47 2008; csardi
