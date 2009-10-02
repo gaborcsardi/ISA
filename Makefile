@@ -3,7 +3,7 @@ VERSION=0.1
 
 all: homepage isa2 eisa ExpressionView
 
-.PHONY: homepage isa2 eisa ExpressionView clean alivepdf vignettes
+.PHONY: homepage isa2 eisa ExpressionView clean alivepdf vignettes manuals
 
 clean: 
 	bzr clean-tree --force
@@ -59,7 +59,7 @@ vignettes/ISA_parallel.pdf: vignettes/ISA_parallel.tex
 # eisa
 
 EISAFILES = eisa/DESCRIPTION eisa/NAMESPACE eisa/R/*.R eisa/man/*.Rd \
-	eisa/inst/CITATION
+	eisa/inst/CITATION eisa/data/*.rda
 
 EISAVIGNETTES = eisa/inst/doc/EISA_tutorial.vignette eisa/inst/doc/EISA_tutorial.pdf \
 	eisa/inst/doc/EISA_module_trees.vignette eisa/inst/doc/EISA_module_trees.pdf \
@@ -187,7 +187,7 @@ vignettes/ExpressionView_tutorial.pdf: vignettes/ExpressionView_tutorial.tex
 SWEAVE2HTML = htlatex
 SWEAVE2HTMLOPTIONS = style,xhtml,graphics-,charset=utf-8 " -cunihtf -utf8" -cvalidate
 
-homepage: vignettes homepage/.stamp
+homepage: vignettes manuals homepage/.stamp
 
 homepage/.stamp: homepage/*.in homepage/template.html
 	cd homepage && ./generate.py && touch .stamp
@@ -259,3 +259,30 @@ homepage/ExpressionView_tutorial.html: vignettes/ExpressionView_tutorial.tex
 
 homepage/ExpressionView_tutorial.pdf: vignettes/ExpressionView_tutorial.pdf
 	cp $< $@
+
+manuals: homepage/manuals/isa2/.stamp homepage/manuals/eisa/.stamp \
+	homepage/manuals/ExpressionView/.stamp \
+	homepage/manuals/isa2.pdf homepage/manuals/eisa.pdf \
+	homepage/manuals/ExpressionView.pdf
+
+homepage/manuals/isa2/.stamp: isa2_$(VERSION).tar.gz
+	scripts/manual.sh isa2 $(VERSION)
+
+homepage/manuals/isa2.pdf: isa2_$(VERSION).tar.gz
+	rm -f isa2.pdf && R CMD Rd2dvi --pdf --no-preview isa2 && \
+	mv isa2.pdf homepage/manuals/
+
+homepage/manuals/eisa/.stamp: eisa_$(VERSION).tar.gz
+	scripts/manual.sh eisa $(VERSION)
+
+homepage/manuals/eisa.pdf: eisa_$(VERSION).tar.gz
+	rm -f eisa.pdf && R CMD Rd2dvi --pdf --no-preview eisa && \
+	mv eisa.pdf homepage/manuals/
+
+homepage/manuals/ExpressionView/.stamp: ExpressionView_$(VERSION).tar.gz
+	scripts/manual.sh ExpressionView $(VERSION)
+
+homepage/manuals/ExpressionView.pdf: ExpressionView_$(VERSION).tar.gz
+	rm -rf RExpressionView.pdf && \
+	R CMD Rd2dvi --pdf --no-preview RExpressionView && \
+	mv RExpressionView.pdf homepage/manuals/ExpressionView.pdf
