@@ -3,7 +3,8 @@ ISAHTML <- function(eset, modules, target.dir,
                      template=system.file("autogen", package="eisa"),
                      GO, KEGG, miRNA=NULL, CHR=NULL, htmltitle=NULL,
                      notes=NULL, seed=NULL,
-                     cond.to.include=NULL, cond.col="white", sep=NULL) {
+                     cond.to.include=NULL, cond.col="white", sep=NULL,
+                     condPlot=TRUE) {
 
   ISAHTMLTable(modules=modules, target.dir=target.dir, template=template,
                  GO=GO, KEGG=KEGG, miRNA=miRNA, CHR=CHR, htmltitle=htmltitle,
@@ -12,7 +13,7 @@ ISAHTML <- function(eset, modules, target.dir,
   ISAHTMLModules(eset=eset, modules=modules, target.dir=target.dir,
                    template=template, GO=GO, KEGG=KEGG, miRNA=miRNA, CHR=CHR,
                    cond.to.include=cond.to.include,
-                   cond.col=cond.col, sep=sep, seed=seed)
+                   cond.col=cond.col, sep=sep, seed=seed, condPlot=condPlot)
 
   invisible(NULL)
 }
@@ -193,7 +194,7 @@ ISAHTMLModules <- function(eset, modules, which=seq_len(length(modules)),
                              GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL,
                              cond.to.include=NULL,
                              cond.col="white",
-                             sep=NULL, seed=NULL) {
+                             sep=NULL, seed=NULL, condPlot=TRUE) {
 
   isa2:::isa.status("Generating module pages", "in")
 
@@ -266,7 +267,7 @@ ISAHTMLModules <- function(eset, modules, which=seq_len(length(modules)),
                        target.dir=target.dir, template=template,
                        GO=GO, KEGG=KEGG, miRNA=miRNA, CHR=CHR,
                        cond.to.include=cond.to.include,
-                       cond.col=cond.col, sep=sep,
+                       cond.col=cond.col, sep=sep, condPlot=condPlot,
                        seed=seed, drive.BP=drive.BP, drive.CC=drive.CC,
                        drive.MF=drive.MF, drive.KEGG=drive.KEGG,
                        drive.miRNA=drive.miRNA, drive.CHR=drive.CHR,
@@ -284,7 +285,7 @@ ISAHTMLModules <- function(eset, modules, which=seq_len(length(modules)),
 
 isa.autogen.module <- function(eset, modules, which, target.dir, template,
                                GO, KEGG, miRNA, CHR, cond.to.include,
-                               cond.col="white", sep=NULL,
+                               cond.col="white", sep=NULL, condPlot=TRUE,
                                seed=NULL, drive.BP=NULL, drive.CC=NULL,
                                drive.MF=NULL, drive.KEGG=NULL,
                                drive.miRNA=NULL, drive.CHR=NULL,
@@ -428,6 +429,8 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
 
   my.gth <- seedData(modules)$thr.row[m]
   my.cth <- seedData(modules)$thr.col[m]
+  if (is.null(my.gth)) { my.gth <- NA }
+  if (is.null(my.cth)) { my.cth <- NA }
 
   ## Write the coordinates to the javascript file, to have
   ## the cross
@@ -636,7 +639,11 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
 
   ## rather arbitrary
   if (is.null(cond.to.include)) {
-    cond.to.include <- 1:6
+    if (ncol(pData(modules)) < 6) {
+      cond.to.include <- seq_len(ncol(pData(modules)))
+    } else { 
+      cond.to.include <- 1:6
+    }
   }
 
   score <- round(getSampleMatrix(modules, mods=m), 2)
@@ -646,7 +653,7 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   pd <- pd[, cond.to.include,drop=FALSE]
 
   ## workaround for NAs
-  for (i in 1:ncol(pd)) {
+  for (i in seq_len(ncol(pd))) {
     pd[[i]] <- as.character(pd[[i]])
   }
 
@@ -671,12 +678,14 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
 
 
   ## Create the condition plot
-  
-  png(file=paste(sep="", target.dir, "/condplot-", m, ".png"),
-      width=1200, height=400)
-  condPlot(modules, number=m, eset=eset,
-            col=cond.col, sep=sep)
-  dev.off()
+
+  if (condPlot) {
+    png(file=paste(sep="", target.dir, "/condplot-", m, ".png"),
+        width=1200, height=400)
+    condPlot(modules, number=m, eset=eset,
+             col=cond.col, sep=sep)
+    dev.off()
+  }
   
   ## Gene names for expression matrix cross
   nam <- getFeatureNames(modules, m)[[1]]
