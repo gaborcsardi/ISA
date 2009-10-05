@@ -70,7 +70,7 @@ images(matrices, names=NULL, \dots)
 \author{ Gabor Csardi \email{Gabor.Csardi@unil.ch}}
 %\references{}
 \seealso{
-  \code{\link{image}} and the other version: \code{\link[Matrix]{image}}
+  \code{\link{image}} and the other version: \code{image}
   from the \code{Matrix} package, for alternatives to create image
   plots.
 }
