@@ -82,14 +82,11 @@ ISAKEGG <- function(modules,
 
   ENTREZ <- get(paste(sep="", ann, "ENTREZID"))
 
-  cat(" -- Extracting Entrez genes\n")
-
   selectedEntrezIds <- getFeatureNames(modules)
   selectedEntrezIds <- lapply(selectedEntrezIds,
                               function(x) unlist(mget(x, ENTREZ)))
   selectedEntrezIds <- lapply(selectedEntrezIds, unique)
 
-  cat(" -- Extracting Entrez Universe\n")
   entrezUniverse <- unique(unlist(mget(features, ENTREZ)))
 
   params <-
@@ -97,7 +94,6 @@ ISAKEGG <- function(modules,
              universeGeneIds = entrezUniverse, annotation = ann,
              pvalueCutoff = hgCutoff, testDirection = "over", drive=TRUE) )
 
-  cat(" -- Doing test\n")
   hgOver <- hyperGTest(params)
 
   if (correction) {

@@ -167,14 +167,11 @@ ISAGO <- function(modules,
   
   ENTREZ <- get(paste(sep="", ann, "ENTREZID"))
 
-  cat(" -- Extracting Entrez genes\n")
-
   selectedEntrezIds <- getFeatureNames(modules)
   selectedEntrezIds <- lapply(selectedEntrezIds,
                               function(x) unlist(mget(x, ENTREZ)))
   selectedEntrezIds <- lapply(selectedEntrezIds, unique)
 
-  cat(" -- Extracting Entrez Universe\n")
   entrezUniverse <- unique(unlist(mget(features, ENTREZ)))
   
   paramsBP <- paramsCC <- paramsMF <-
@@ -186,11 +183,8 @@ ISAGO <- function(modules,
   ontology(paramsCC) <- "CC"
   ontology(paramsMF) <- "MF"
   
-  cat(" -- Doing BP test\n")
   hgOverBP <- hyperGTest(paramsBP)
-  cat(" -- Doing CC test\n")
   hgOverCC <- hyperGTest(paramsCC)
-  cat(" -- Doing MF test\n")
   hgOverMF <- hyperGTest(paramsMF)
 
   res <- list(BP=hgOverBP, CC=hgOverCC, MF=hgOverMF)

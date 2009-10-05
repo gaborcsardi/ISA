@@ -601,7 +601,7 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   haveEntrezId <- names(entrezIds)[sapply(entrezIds, function(x) !is.na(x))]
   
   if (! all( sapply(entrezIds, length)==1 )) {
-    print("trouble");
+    stop("A probe maps to more than one Entrez genes")
   } else {
     entrezIds <- unlist(entrezIds)
     entrezNums <- unlist(entrezNums)
@@ -693,11 +693,7 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
 #  longname <- mget(nam, envir = get(paste(sep="", chip, "GENENAME")))
   haveEntrezId <- names(entrezIds)[sapply(entrezIds, function(x) !is.na(x))]
   
-  if (! all( sapply(entrezIds, length)==1 )) {
-    print("trouble");
-  } else {
-    entrezIds <- unlist(entrezIds)
-  }
+  entrezIds <- unlist(entrezIds)
 
   ord <- order(getFeatureScores(modules, m)[[1]], decreasing=TRUE)
   nam <- nam[ ord ]
