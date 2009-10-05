@@ -11,9 +11,9 @@ import glob
 import os.path
 
 template = [string.Template(line) for line in open("template.html")]
-tokens = { "ISA_VERSION": "0.1", 
-           "EISA_VERSION": "0.1", 
-           "EXPRESSIONVIEW_VERSION": "0.1",
+tokens = { "ISA_VERSION": "0.2", 
+           "EISA_VERSION": "0.2", 
+           "EXPRESSIONVIEW_VERSION": "0.2",
            "TARGETSCAN_VERSION": "5.0-1",
            }
 
