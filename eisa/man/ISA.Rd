@@ -30,7 +30,8 @@ ISA (data, flist = filterfun(function(x) IQR(x) > 0.5),
 }
 \details{
   Please read tutorial vignette included in this package for an
-  introduction on ISA. \link[isa2]{isa2-package} is also useful.
+  introduction on ISA. The \code{isa2-package} manual page in the
+  \code{isa2} package is also useful.
 
   The \code{ISA} function performs the ISA algorithm on the supplied
   expression data. This involves the following steps:
@@ -59,14 +60,14 @@ ISA (data, flist = filterfun(function(x) IQR(x) > 0.5),
       \item Merging similar modules, separately for each threshold
       combination, by calling \code{\link[isa2]{isa.unique}}.
       \item Filtering the modules separately for each threshold combination,
-      by calling \code{\link[isa2]{isa.filter.robust}}.
+      by calling \code{isa.filter.robust} in the \code{isa2} package.
       \item Putting all modules from the runs with different thresholds into
       a single object.
       \item Merging similar modules, across all threshold combinations, if
       two modules are similar, then the one with the
       milder thresholds is kept.
     }
-    \item Creates an \code{\link{ISAModules-class}} object from the ISA
+    \item Creates an \code{ISAModules} object from the ISA
     results.
   }
 }

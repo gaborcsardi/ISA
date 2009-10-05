@@ -54,7 +54,7 @@
   some meta information about the ISA run and the input data.
 }
 \usage{
-\S4method{dim}{ISAModules}(modules)
+\S4method{dim}{ISAModules}(x)
 \S4method{featureNames}{ISAModules}(modules)
 \S4method{sampleNames}{ISAModules}(modules)
 \S4method{annotation}{ISAModules}(modules)
@@ -66,7 +66,7 @@
 \S4method{featureThreshold}{ISAModules}(modules, mods)
 \S4method{sampleThreshold}{ISAModules}(modules, mods)
 
-\S4method{length}{ISAModules}(modules)
+\S4method{length}{ISAModules}(x)
 \S4method{getNoFeatures}{ISAModules}(modules, mods)
 \S4method{getNoSamples}{ISAModules}(modules, mods)
 
@@ -83,11 +83,11 @@
 \S4method{getFullFeatureMatrix}{ISAModules}(modules, eset, mods)
 \S4method{getFullSampleMatrix}{ISAModules}(modules, eset, mods)
 
-\S4method{[}{ISAModules,ANY,ANY}(modules, i, j, \dots, drop = FALSE)
-\S4method{[[}{ISAModules,ANY,ANY}(modules, i, j, \dots, drop = FALSE)
+\S4method{[}{ISAModules,ANY,ANY}(x, i, j, \dots, drop = FALSE)
+\S4method{[[}{ISAModules,ANY,ANY}(x, i, j, \dots, drop = FALSE)
 }
 \arguments{
-  \item{modules}{An \code{ISAModules} object.}
+  \item{x,modules}{An \code{ISAModules} object.}
   \item{mods}{An optional numeric index vector for the modules. If given
     the information is only returned only for the specified modules.}
   \item{binary}{Logical scalar. Whether to binarize the feature or

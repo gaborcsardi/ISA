@@ -8,30 +8,30 @@ setGeneric("hasNA<-", function(object, value) standardGeneric("hasNA<-"))
 
 ###########
 
-setGeneric("drive", function(r) standardGeneric("drive"))
-setGeneric("drive<-", function(r, value) standardGeneric("drive<-"))
+setGeneric("drive", function(p) standardGeneric("drive"))
+setGeneric("drive<-", function(p, value) standardGeneric("drive<-"))
 
-setGeneric("seedData", function(object) standardGeneric("seedData"))
-setGeneric("runData", function(object) standardGeneric("runData"))
-setGeneric("getOrganism", function(object) standardGeneric("getOrganism"))
+setGeneric("seedData", function(modules) standardGeneric("seedData"))
+setGeneric("runData", function(modules) standardGeneric("runData"))
+setGeneric("getOrganism", function(modules) standardGeneric("getOrganism"))
 
-setGeneric("getFeatures", function(object, ...) standardGeneric("getFeatures"))
-setGeneric("getSamples", function(object, ...) standardGeneric("getSamples"))
+setGeneric("getFeatures", function(modules, ...) standardGeneric("getFeatures"))
+setGeneric("getSamples", function(modules, ...) standardGeneric("getSamples"))
 
-setGeneric("getFeatureNames", function(object, ...) standardGeneric("getFeatureNames"))
-setGeneric("getSampleNames", function(object, ...) standardGeneric("getSampleNames"))
+setGeneric("getFeatureNames", function(modules, ...) standardGeneric("getFeatureNames"))
+setGeneric("getSampleNames", function(modules, ...) standardGeneric("getSampleNames"))
 
-setGeneric("getFeatureMatrix", function(object, ...) standardGeneric("getFeatureMatrix"))
-setGeneric("getSampleMatrix", function(object, ...) standardGeneric("getSampleMatrix"))
+setGeneric("getFeatureMatrix", function(modules, ...) standardGeneric("getFeatureMatrix"))
+setGeneric("getSampleMatrix", function(modules, ...) standardGeneric("getSampleMatrix"))
 
-setGeneric("getFullFeatureMatrix", function(object, ...) standardGeneric("getFullFeatureMatrix"))
-setGeneric("getFullSampleMatrix", function(object, ...) standardGeneric("getFullSampleMatrix"))
+setGeneric("getFullFeatureMatrix", function(modules, ...) standardGeneric("getFullFeatureMatrix"))
+setGeneric("getFullSampleMatrix", function(modules, ...) standardGeneric("getFullSampleMatrix"))
 
-setGeneric("getFeatureScores", function(object, ...) standardGeneric("getFeatureScores"))
-setGeneric("getSampleScores", function(object, ...) standardGeneric("getSampleScores"))
+setGeneric("getFeatureScores", function(modules, ...) standardGeneric("getFeatureScores"))
+setGeneric("getSampleScores", function(modules, ...) standardGeneric("getSampleScores"))
 
-setGeneric("getNoFeatures", function(object, ...) standardGeneric("getNoFeatures"))
-setGeneric("getNoSamples", function(object, ...) standardGeneric("getNoSamples"))
+setGeneric("getNoFeatures", function(modules, ...) standardGeneric("getNoFeatures"))
+setGeneric("getNoSamples", function(modules, ...) standardGeneric("getNoSamples"))
 
-setGeneric("featureThreshold", function(object, ...) standardGeneric("featureThreshold"))
-setGeneric("sampleThreshold", function(object, ...) standardGeneric("sampleThreshold"))
+setGeneric("featureThreshold", function(modules, ...) standardGeneric("featureThreshold"))
+setGeneric("sampleThreshold", function(modules, ...) standardGeneric("sampleThreshold"))

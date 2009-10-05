@@ -16,7 +16,7 @@ ISAFilterRobust(data, isaresult, \dots)
     \code{\link{ISANormalize}} on it.}
   \item{isaresult}{An \code{ISAModules} object, a set of modules.}
   \item{\dots}{Additional arguments, they are passed to the
-    \code{\link[isa1]{isa.filter.robust}} function.}
+    \code{isa.filter.robust} function in the \code{isa2} package.}
 }
 \details{
   \code{ISARobustness} calculates robustness scores for ISA modules. The

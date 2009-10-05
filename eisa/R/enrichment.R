@@ -21,13 +21,13 @@ setMethod("makeValidParams", "ListHyperGParams",
 ##################
 ## drive
 
-setMethod("drive", signature("ListHyperGParams"), function(r) { r@drive })
+setMethod("drive", signature("ListHyperGParams"), function(p) { p@drive })
 setReplaceMethod("drive", c("ListHyperGParams", "logical"),
-                 function(r, value) {
+                 function(p, value) {
                      if (is.na(value))
                        stop("value must be TRUE or FALSE")
-                     r@drive <- value
-                     r
+                     p@drive <- value
+                     p
                  })
 
 ##################

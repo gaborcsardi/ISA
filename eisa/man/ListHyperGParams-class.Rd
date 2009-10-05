@@ -52,19 +52,19 @@
   calculation quickly for multiple gene sets.
 }
 \usage{
-\S4method{makeValidParams}{ListHyperGParams}(p)
+\S4method{makeValidParams}{ListHyperGParams}(object)
 \S4method{drive}{ListHyperGParams}(p)
 \S4method{drive}{ListHyperGParams,logical}(p) <- dri
 
-\S4method{ontology}{GOListHyperGParams}(p)
-\S4method{ontology}{GOListHyperGParams,character}(p) <- go
-\S4method{conditional}{GOListHyperGParams}(p)
-\S4method{conditional}{GOListHyperGParams,logical}(p) <- cond
+\S4method{ontology}{GOListHyperGParams}(object)
+\S4method{ontology}{GOListHyperGParams,character}(object) <- go
+\S4method{conditional}{GOListHyperGParams}(r)
+\S4method{conditional}{GOListHyperGParams,logical}(r) <- cond
 
 \S4method{hyperGTest}{ListHyperGParams}(p)
 }
 \arguments{
-  \item{p}{A \code{ListHyperGParams} object.}
+  \item{object,p,r}{A \code{ListHyperGParams} object.}
   \item{dri}{Logical scalar, whether to store the genes that are in the
     intersection of the specified gene set and the annotation category.}
   \item{go}{Character scalar, the ontology for GO, possible values:
@@ -77,10 +77,10 @@
   and allows to specify a list of gene sets for the enrichment
   calculation instead of a single set.
 
-  \code{ListHyperGParams} calculates the enrichment must faster than the
-  original \code{\link[Category]{HyperGParams}} classes, especially if
-  the calculation is performed against the same gene universe for many
-  gene sets.
+  \code{ListHyperGParams} calculates the enrichment much faster than the
+  original \code{HyperGParams} classes in the \code{Category} package,
+  especially if the calculation is performed against the same gene
+  universe for many gene sets.
 
   \code{ListHyperGParams} is an abstract class, it is not possible to
   instantiate objects from it. Instead, its various extensions must be

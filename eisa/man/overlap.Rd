@@ -25,8 +25,8 @@ overlapPlot (graph, xsize = 400, ysize = 400, vertex.size = 20,
     the return value, it does not influence the plot itself.}
   \item{vertex.size}{The width of the vertices on the plot.}
   \item{vertex.size2}{The height of the vertices on the plot.}
-  \item{\dots}{Additional arguments, these are passed to
-    \code{\link[igraph]{plot.igraph}}.}
+  \item{\dots}{Additional arguments, these are passed to the
+    \code{plot.igraph} function from the \code{igraph} package.}
 }
 \details{
   An \code{\link{ISAModules}} object may potentially contain many
@@ -42,12 +42,13 @@ overlapPlot (graph, xsize = 400, ysize = 400, vertex.size = 20,
   \code{overlap} can use various algorithm, depending on the
   \code{algorithm} argument. If it is \sQuote{\code{mds}}, then
   multi-dimensional scaling is used, by calling the
-  \code{\link[MASS]{isaMDS}} function. If it is \sQuote{\code{fr}}, then
+  \code{isaMDS} function in the \code{MASS} package.
+  If it is \sQuote{\code{fr}}, then
   the Fruchterman-Reingold algorithm is used, through the
-  \code{\link[igraph]{layout.fruchterman.reingold}} function. If it is
-  \sQuote{\code{drl}}, then the DrL graph layout algorithm is used, see
-  the \code{\link[igraph]{layout.drl}} function in the \code{igraph}
-  package.
+  \code{layout.fruchterman.reingold} function of the \code{igraph}
+  package. If it is \sQuote{\code{drl}}, then the DrL graph layout
+  algorithm is used, see the \code{layout.drl} function
+  in the \code{igraph} package.
 }
 \value{
   \code{overlap} returns an igraph graph.

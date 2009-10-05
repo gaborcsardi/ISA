@@ -12,8 +12,8 @@ ISAmnplot (modules, number, eset, norm = c("raw", "feature", "sample"),
 \arguments{
   \item{x}{A character vector, the feature names for which the plot is
     created.}
-  \item{expset}{An \code{\link[biobase]{ExpressionSet}} object, or an
-    expression matrix, with row names as feature names.}
+  \item{expset}{An \code{ExpressionSet} object (\code{Biobase} package),
+    or an expression matrix, with row names as feature names.}
   \item{eset}{An \code{ExpressionSet} or \code{ISAExpressionSet}
     object. If an \code{ExpressionSet} object is
     supplied (and the \code{norm} argument is not set to \sQuote{raw}),
@@ -54,7 +54,7 @@ ISAmnplot (modules, number, eset, norm = c("raw", "feature", "sample"),
     Nonlin Soft Matter Phys.} 2003 Mar;67(3 Pt 1):031902. Epub 2003 Mar 11.
 }
 \seealso{The \code{\link[annotate]{GOmnplot}} and
-  \code{\link[annotate]{KEGGmnplot}} functions in the \code{annotate}
+  \code{KEGGmnplot} functions in the \code{annotate}
   package.}
 \examples{
 data(ALLModulesSmall)

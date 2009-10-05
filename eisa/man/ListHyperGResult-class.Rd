@@ -103,7 +103,7 @@
   calculation quickly for multiple gene sets.
 }
 \usage{
-\S4method{summary}{ListHyperGResult}(object, pvalue = pvalueVutoff(object), 
+\S4method{summary}{ListHyperGResult}(object, pvalue = pvalueCutoff(object), 
   categorySize = NULL)
 \S4method{htmlReport}{ListHyperGResult}(r, file = "", append = FALSE,
   label = "", digits = 3, summary.args = NULL)

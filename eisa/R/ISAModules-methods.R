@@ -36,14 +36,14 @@ setMethod("pData", signature(object="ISAModules"),
             object@rundata$pData
           })
 
-setMethod("seedData", signature(object="ISAModules"),
-          function(object) {
-            object@seeddata
+setMethod("seedData", signature(modules="ISAModules"),
+          function(modules) {
+            modules@seeddata
           })
 
-setMethod("runData", signature(object="ISAModules"),
-          function(object) {
-            res <- object@rundata
+setMethod("runData", signature(modules="ISAModules"),
+          function(modules) {
+            res <- modules@rundata
             res[["pData"]] <- NULL
             res
           })
@@ -53,50 +53,50 @@ setMethod("annotation", signature(object="ISAModules"),
             object@rundata$annotation
           })
 
-setMethod("getOrganism", signature(object="ISAModules"),
-          function(object) {
-            if (!is.null(object@rundata$organism)) {
-              object@rundata$organism
-            } else if (!is.null(object@rundata$annotation)) {
-              library(paste(sep="", annotation(object), ".db"), character.only=TRUE)
-              get(paste(sep="", annotation(object), "ORGANISM"))
+setMethod("getOrganism", signature(modules="ISAModules"),
+          function(modules) {
+            if (!is.null(modules@rundata$organism)) {
+              modules@rundata$organism
+            } else if (!is.null(modules@rundata$annotation)) {
+              library(paste(sep="", annotation(modules), ".db"), character.only=TRUE)
+              get(paste(sep="", annotation(modules), "ORGANISM"))
             } else {
               NULL
             }
           })
 
-setMethod("getFeatures", signature(object="ISAModules"),
-          function(object, mods) {
-            if (missing(mods)) { mods <- seq_len(ncol(object@genes)) }
-            lapply(mods, function(x) which(object@genes[,x] != 0))
+setMethod("getFeatures", signature(modules="ISAModules"),
+          function(modules, mods) {
+            if (missing(mods)) { mods <- seq_len(ncol(modules@genes)) }
+            lapply(mods, function(x) which(modules@genes[,x] != 0))
           })
 
-setMethod("getFeatureNames", signature(object="ISAModules"),
-          function(object, mods) {
-            if (missing(mods)) { mods <- seq_len(ncol(object@genes)) }
+setMethod("getFeatureNames", signature(modules="ISAModules"),
+          function(modules, mods) {
+            if (missing(mods)) { mods <- seq_len(ncol(modules@genes)) }
             lapply(mods, function(x)
-                   featureNames(object)[ object@genes[,x] != 0 ])
+                   featureNames(modules)[ modules@genes[,x] != 0 ])
           })
 
-setMethod("getSamples", signature(object="ISAModules"),
-          function(object, mods) {
-            if (missing(mods)) { mods <- seq_len(ncol(object@genes)) }
-            lapply(mods, function(x) which(object@conditions[,x] != 0))
+setMethod("getSamples", signature(modules="ISAModules"),
+          function(modules, mods) {
+            if (missing(mods)) { mods <- seq_len(ncol(modules@genes)) }
+            lapply(mods, function(x) which(modules@conditions[,x] != 0))
           })
 
-setMethod("getSampleNames", signature(object="ISAModules"),
-          function(object, mods) {
-            if (missing(mods)) { mods <- seq_len(ncol(object@genes)) }
+setMethod("getSampleNames", signature(modules="ISAModules"),
+          function(modules, mods) {
+            if (missing(mods)) { mods <- seq_len(ncol(modules@genes)) }
             lapply(mods, function(x)
-                   sampleNames(object)[ object@conditions[,x] != 0 ])
+                   sampleNames(modules)[ modules@conditions[,x] != 0 ])
           })
 
-setMethod("getFeatureMatrix", signature(object="ISAModules"),
-          function(object, binary=FALSE, sparse=FALSE, mods) {
+setMethod("getFeatureMatrix", signature(modules="ISAModules"),
+          function(modules, binary=FALSE, sparse=FALSE, mods) {
             if (missing(mods)) {
-              res <- object@genes
+              res <- modules@genes
             } else {
-              res <- object@genes[,mods,drop=FALSE]
+              res <- modules@genes[,mods,drop=FALSE]
             }
             if (binary) {
               res <- res != 0
@@ -108,12 +108,12 @@ setMethod("getFeatureMatrix", signature(object="ISAModules"),
             res
           })
 
-setMethod("getSampleMatrix", signature(object="ISAModules"),
-          function(object, binary=FALSE, sparse=FALSE, mods) {
+setMethod("getSampleMatrix", signature(modules="ISAModules"),
+          function(modules, binary=FALSE, sparse=FALSE, mods) {
             if (missing(mods)) {
-              res <- object@conditions
+              res <- modules@conditions
             } else {
-              res <- object@conditions[,mods,drop=FALSE]
+              res <- modules@conditions[,mods,drop=FALSE]
             }
             if (binary) {
               res <- res != 0
@@ -125,18 +125,18 @@ setMethod("getSampleMatrix", signature(object="ISAModules"),
             res
           })            
 
-setMethod("getFullFeatureMatrix", signature(object="ISAModules"),
-          function(object, eset, mods) {
-            eset <- eisa.get.nm(eset, object)
+setMethod("getFullFeatureMatrix", signature(modules="ISAModules"),
+          function(modules, eset, mods) {
+            eset <- eisa.get.nm(eset, modules)
             nm2 <- sampExprs(eset)
             if (missing(mods)) {
-              genes <- getFeatureMatrix(object)
-              samp  <- getSampleMatrix(object)
-              thr <- featureThreshold(object)
+              genes <- getFeatureMatrix(modules)
+              samp  <- getSampleMatrix(modules)
+              thr <- featureThreshold(modules)
             } else {
-              genes <- getFeatureMatrix(object, mods=mods)
-              samp <- getSampleMatrix(object, mods=mods)
-              thr <- featureThreshold(object)[mods]
+              genes <- getFeatureMatrix(modules, mods=mods)
+              samp <- getSampleMatrix(modules, mods=mods)
+              thr <- featureThreshold(modules)[mods]
             }
             scores <- nm2 %*% samp
             n.scores <- ifelse(genes != 0, scores, 0)
@@ -149,18 +149,18 @@ setMethod("getFullFeatureMatrix", signature(object="ISAModules"),
             scores            
           })
 
-setMethod("getFullSampleMatrix", signature(object="ISAModules"),
-          function(object, eset, mods) {
-            eset <- eisa.get.nm(eset, object)
+setMethod("getFullSampleMatrix", signature(modules="ISAModules"),
+          function(modules, eset, mods) {
+            eset <- eisa.get.nm(eset, modules)
             nm1 <- t(featExprs(eset))
             if (missing(mods)) {
-              genes <- getFeatureMatrix(object)
-              samp  <- getSampleMatrix(object)
-              thr <- sampleThreshold(object)
+              genes <- getFeatureMatrix(modules)
+              samp  <- getSampleMatrix(modules)
+              thr <- sampleThreshold(modules)
             } else {
-              genes <- getFeatureMatrix(object, mods=mods)
-              samp <- getSampleMatrix(object, mods=mods)
-              thr <- sampleThreshold(object)[mods]
+              genes <- getFeatureMatrix(modules, mods=mods)
+              samp <- getSampleMatrix(modules, mods=mods)
+              thr <- sampleThreshold(modules)[mods]
             }
             scores <- nm1 %*% genes
             n.scores <- ifelse(samp != 0, scores, 0)
@@ -173,31 +173,31 @@ setMethod("getFullSampleMatrix", signature(object="ISAModules"),
             scores
           })
 
-setMethod("getFeatureScores", signature(object="ISAModules"),
-          function(object, mods) {
-            if (missing(mods)) { mods <- seq_len(ncol(object@genes)) }
+setMethod("getFeatureScores", signature(modules="ISAModules"),
+          function(modules, mods) {
+            if (missing(mods)) { mods <- seq_len(ncol(modules@genes)) }
             lapply(mods, function(x)
-                   object@genes[,x][ object@genes[,x] != 0 ])
+                   modules@genes[,x][ modules@genes[,x] != 0 ])
           })
 
 
-setMethod("getSampleScores", signature(object="ISAModules"),
-          function(object, mods) {
-            if (missing(mods)) { mods <- seq_len(ncol(object@genes)) }
+setMethod("getSampleScores", signature(modules="ISAModules"),
+          function(modules, mods) {
+            if (missing(mods)) { mods <- seq_len(ncol(modules@genes)) }
             lapply(mods, function(x)
-                   object@conditions[,x][ object@conditions[,x] != 0 ])
+                   modules@conditions[,x][ modules@conditions[,x] != 0 ])
           })
 
-setMethod("getNoFeatures", signature(object="ISAModules"),
-          function(object, mods) {
-            if (missing(mods)) { mods <- seq_len(ncol(object@genes)) }
-            colSums(object@genes[,mods,drop=FALSE] != 0)
+setMethod("getNoFeatures", signature(modules="ISAModules"),
+          function(modules, mods) {
+            if (missing(mods)) { mods <- seq_len(ncol(modules@genes)) }
+            colSums(modules@genes[,mods,drop=FALSE] != 0)
           })
             
-setMethod("getNoSamples", signature(object="ISAModules"),
-          function(object, mods) {
-            if (missing(mods)) { mods <- seq_len(ncol(object@genes)) }
-            colSums(object@conditions[,mods,drop=FALSE] != 0)
+setMethod("getNoSamples", signature(modules="ISAModules"),
+          function(modules, mods) {
+            if (missing(mods)) { mods <- seq_len(ncol(modules@genes)) }
+            colSums(modules@conditions[,mods,drop=FALSE] != 0)
           })
             
 setMethod("[", signature(x="ISAModules"),
@@ -222,14 +222,14 @@ setMethod("[[", signature(x="ISAModules"),
             x
           })
 
-setMethod("featureThreshold", signature(object="ISAModules"),
-          function(object, mods) {
-            if (missing(mods)) { mods <- seq_len(ncol(object@genes)) }
-            object@seeddata$thr.row[mods]
+setMethod("featureThreshold", signature(modules="ISAModules"),
+          function(modules, mods) {
+            if (missing(mods)) { mods <- seq_len(ncol(modules@genes)) }
+            modules@seeddata$thr.row[mods]
           })
 
-setMethod("sampleThreshold", signature(object="ISAModules"),
-          function(object, mods) {
-            if (missing(mods)) { mods <- seq_len(ncol(object@genes)) }
-            object@seeddata$thr.col[mods]
+setMethod("sampleThreshold", signature(modules="ISAModules"),
+          function(modules, mods) {
+            if (missing(mods)) { mods <- seq_len(ncol(modules@genes)) }
+            modules@seeddata$thr.col[mods]
           })

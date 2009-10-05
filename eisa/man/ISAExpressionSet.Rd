@@ -16,8 +16,9 @@
 \alias{prenormalized<-,ISAExpressionSet-method}
 \title{Expression Set, normalized for using with ISA}
 \description{
-  An \code{\link[Biobase]{ExpressionSet}} object that contains expression values
-  normalized for use with the Iterative Signature Algorithm.
+  An \code{ExpressionSet} object (\code{Biobase} package) that contains
+  expression values normalized for use with the Iterative Signature
+  Algorithm.
 }
 \usage{
 \S4method{featExprs}{ISAExpressionSet}(object)
@@ -65,7 +66,8 @@
     Nonlin Soft Matter Phys.} 2003 Mar;67(3 Pt 1):031902. Epub 2003 Mar 11.
 }
 \seealso{
-  \code{\link{ISANormalize}}, \code{\link[Biobase]{ExpressionSet}}
+  \code{\link{ISANormalize}}, \code{ExpressionSet} in the \code{Biobase}
+  package.
 }
 \examples{
 library(ALL)
