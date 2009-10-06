@@ -4,8 +4,6 @@
 - things for homepage:
   - add EV stuff as well (A)
 - write eisa application note (G)
-- check whether EV package can be added to BioC (G)
 - add a Makefile to EV R package that builds the swf (A)
 - test EV, fix bugs (A)
 - sample data for EV on the homepage (G)
-- submit package, either to BioC or to CRAN (G)
