@@ -23,14 +23,17 @@ class Clusters {
 		int findbestposition(int, int);
 
 		double getfitness();
+		double getsimilarity(int, int);
 		double getoptimalfitness();
 
 		int reposition(int);
 		int exchange(int, int);
 		
 		clock_t starttime;
-		int elapsedtime();
-				
+		double elapsedtime();
+		double t;
+		int count;
+
 	public:
 		int debug;
 		int maxtime;

@@ -20,8 +20,8 @@ int Clusters::random(int x, int y) {
 	return rand() % (y-x+1) + x;
 }
 
-int Clusters::elapsedtime() {
-	return (clock() - starttime) / CLOCKS_PER_SEC;
+double Clusters::elapsedtime() {
+	return (clock() - starttime) / ( double ) CLOCKS_PER_SEC;
 }
 
 Clusters::Clusters(vector<vector<int> > _data, vector<int> _order) {
@@ -164,6 +164,9 @@ void Clusters::simplify() {
 		}
 		optimallength[cluster] = length;
 	}
+	
+	t = 0.;
+	count = 0;
 
 }
 
@@ -229,7 +232,9 @@ void Clusters::prearrange() {
 
 		for ( int slot2 = 0; slot2 <= slot1; slot2++ ) {
 			swap(slot1, slot2);
+			//double fitness = ( nSlots * nClusters < 10000 ) ? getfitness() : getsimilarity(slot1, slot2);
 			double fitness = getfitness();
+			//double fitness = getsimilarity(slot1, slot2);
 			if ( fitness <= bestfitness ) {
 				swap(slot1, slot2);
 			} else {
@@ -252,7 +257,15 @@ void Clusters::prearrange() {
 	
 }
 
+double Clusters::getsimilarity(int slot1, int slot2) {
+	double result = inner_product(data[order[slot1]].begin(), data[order[slot1]].end(), data[order[slot2]].begin(), 0.);
+	return result;
+}
+
 double Clusters::getfitness() {
+
+	double t1 = elapsedtime();
+	count++;
 
 	double result = 0.;
 	
@@ -274,6 +287,8 @@ double Clusters::getfitness() {
 		}
 		result += maxlength;
 	}
+	
+	t += elapsedtime() - t1;
 
 	return result;
 	
@@ -396,7 +411,7 @@ int Clusters::reposition(int cluster) {
 
 			if ( modified ) { 
 				go = true;
-				result = 1;				
+				result = 1;
 			}
 			
 			start = end + 1;
@@ -491,7 +506,7 @@ int Clusters::exchange(int cluster, int what) {
 		if ( what ) {
 			print("\t\texchange zeroes: (%d) -> (%d)\n", (int) initialfitness, (int) bestfitness);
 		} else {
-			print("\t\texchange ones: (%d) -> (%d)\n", (int) initialfitness, (int) bestfitness);			
+			print("\t\texchange ones: (%d) -> (%d)\n", (int) initialfitness, (int) bestfitness);
 		}
 	}
 	return result;
@@ -517,9 +532,6 @@ void Clusters::arrange() {
 	
 			if ( elapsedtime() > maxtime && maxtime != 0 ) {
 				go =  false;
-				if ( debug > 0 ) {
-					print("reached time limit.\n");
-				}
 				break;
 			}
 
@@ -530,8 +542,16 @@ void Clusters::arrange() {
 			if ( reposition(cluster) ) {
 				go = true;
 			}
+			if ( elapsedtime() > maxtime && maxtime != 0 ) {
+				go =  false;
+				break;
+			}
 			if ( exchange(cluster, 1) ) {
 				go = true;
+			}
+			if ( elapsedtime() > maxtime && maxtime != 0 ) {
+				go =  false;
+				break;
 			}
 			if ( exchange(cluster, 0) ) {
 				go = true;
@@ -551,6 +571,10 @@ void Clusters::arrange() {
 	
 	if ( elapsedtime() < maxtime || maxtime == 0 ) {
 		status = 1;
+	} else {
+		if ( debug > 0 ) {
+			print("time limit reached.\n");
+		}
 	}
 	
 	if ( debug > 0 ) {
@@ -573,5 +597,7 @@ void Clusters::output() {
 		print("\n");
 	}
 	print("fitness: %d\n\n", (int) getfitness());
+	print("time spent in fitness function: %10.4f, called it %d times\n", t, count);
+	print("average time spent in fitness function: %10.4f\n", t / (double) count);
 	
 }
