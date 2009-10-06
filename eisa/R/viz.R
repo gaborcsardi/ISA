@@ -412,7 +412,6 @@ expPlot <- function(epo, scores=TRUE) {
     layout( matrix(c(5,2,4, 6,1,3, 7,8,9), nc=3, byrow=TRUE),
            c( 50/epo$width, epo$exp.width/epo$width, 100/epo$width ),
            c( 70/epo$height, epo$exp.height/epo$height, 50/epo$height) )
-    layout.show(9)
 
   }
   
