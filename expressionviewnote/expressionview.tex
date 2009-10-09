@@ -2,7 +2,9 @@
 
 \usepackage{color}
 \newcommand{\cred}{\color{red}}
-%\usepackage[pdftex,colorlinks,bookmarks=false,citecolor=blue,linkcolor=red,urlcolor=blue]{hyperref}
+
+\usepackage[pdftex,colorlinks,bookmarks=false,citecolor=blue,linkcolor=red,urlcolor=blue]{hyperref}
+\newcommand{\thefirstpage}{1} \newcommand{\thelastpage}{1}
 
 \copyrightyear{2009}
 \pubyear{2009}
@@ -46,7 +48,7 @@ Biclustering is an unsupervised learning technique used to analyse microarray da
 \section{Package design and workflow}
 The ExpressionView package contains two independent parts: An ordering algorithm implemented in C++ and a Adobe Flash applet written in ActionScript and Adobe Flex. Fig.~\ref{fig:workflow} schematically summarises the typical workflow that uses the genomic data available as a Bioconductor ExpressionSet and combines it with the biclustering results to produce an ExpressionView data file that can be explored with the Flash applet. In the following, we describe the different steps in more detail.
 \begin{figure*}[!tpb]
-\centerline{\includegraphics[width=\linewidth]{fig1-crop}}
+\centerline{\includegraphics[width=0.9\linewidth]{fig1-crop}}
 \caption{How to use ExpressionView: Starting from gene expression data in the form of a Bioconductor ExpressionSet, the user first runs a biclustering algorithm to determine co-regulated groups of genes and samples. In a second step, the rows and columns of the gene expression matrix are rearranged to produce an easily readable overview of the results. The last step consist in combining the gene expression data and its associated metadata with the results from the biclustering and produce an ExpressionView data file that can be explored with the interactive Flash applet.}\label{fig:workflow}
 \end{figure*}
 For users who prefer to install the viewer as a standalone program, we also provide a platform independent Adobe AIR version that can be downloaded from the \href{http://maya:7575/ExpressionView}{website}.
