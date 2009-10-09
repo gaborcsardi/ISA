@@ -1,7 +1,7 @@
 Package: ExpressionView
 Version: 0.1
 Date: aug 6, 2009
-Title: Visualize overlapping biclusters
+Title: Visualize biclusters
 Author: Andreas Luscher <andreas.luescher@a3.epfl.ch>
 Maintainer: Andreas Luscher <andreas.luescher@a3.epfl.ch>
 Description: ExpressionView visualizes possibly overlapping biclusters

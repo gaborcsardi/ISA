@@ -8,7 +8,6 @@
   - add EV stuff as well (A)
 - write eisa application note (G)
 - check whether EV package can be added to BioC (G)
-- add a Makefile to EV R package that builds the swf (A)
 - sweep tree generation (G)
 - test EV, fix bugs (A)
 - fix eisa bug with non-conforming matrices (G)
