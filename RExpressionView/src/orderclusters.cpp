@@ -39,7 +39,12 @@ Clusters::Clusters(vector<vector<int> > _data, vector<int> _order) {
 	
 	multiplicity.resize(nSlots, 1);
 	optimallength.resize(nClusters);
-		
+	maximalcluster.resize(3);
+	for ( int i = 0; i < 3; i++ ) {
+		maximalcluster[i].resize(nClusters);
+	}
+	
+
 };
 
 Clusters::Clusters(int _nClusters, int _nSlots) {
@@ -62,7 +67,11 @@ Clusters::Clusters(int _nClusters, int _nSlots) {
 	
 	multiplicity.resize(nSlots, 1);
 	optimallength.resize(nClusters);
-	
+	maximalcluster.resize(3);
+	for ( int i = 0; i < 3; i++ ) {
+		maximalcluster[i].resize(nClusters);
+	}
+
 }
 
 void Clusters::orderedsample() {
@@ -79,7 +88,9 @@ void Clusters::orderedsample() {
 		}
 		optimallength[cluster] = right - left + 1;
 	}
-	
+
+	getfullfitness();
+
 }
 
 void Clusters::randomsample() {
@@ -95,7 +106,9 @@ void Clusters::randomsample() {
 			}
 		}
 	}
-	
+
+	getfullfitness();
+
 };
 
 void Clusters::simplify() {
@@ -165,6 +178,8 @@ void Clusters::simplify() {
 		optimallength[cluster] = length;
 	}
 	
+	getfullfitness();
+	
 	t = 0.;
 	count = 0;
 
@@ -197,6 +212,9 @@ void Clusters::complexify() {
 	
 	multiplicity.clear();
 	multiplicity.resize(nSlots, 1);
+
+	getfullfitness();
+
 }
 
 
@@ -214,26 +232,40 @@ void Clusters::permute() {
 		order[slot1] = order[slot2];
 		order[slot2] = temp;
 	}
-	
+
+	getfullfitness();
+
 }
 
 void Clusters::prearrange() {
 
+	// decide whether to use fitness or similarity
+	// average time spent in fitness function 0.00002s
+	bool usefitness = true;
+	if ( maxtime > 0 && maxtime < nSlots / 2 * (nSlots+1) * 0.00002 ) {
+		usefitness = false;
+	}
+
 	if ( debug > 0 ) {
-		print("prearrange()\n");
+		print("prearrange() using ");
+		if ( usefitness ) {
+			print("fitness\n");
+		} else {
+			print("similarity\n");
+		}
 	}
 	
 	vector<int> oldorder(order);
 	double initialfitness = getfitness();
-	
+		
 	for ( int slot1 = 1; slot1 < nSlots; slot1++ ) {
 
 		double bestfitness = getfitness();
 
-		for ( int slot2 = 0; slot2 <= slot1; slot2++ ) {
+		for ( int slot2 = 0; slot2 < slot1; slot2++ ) {
 			swap(slot1, slot2);
-			//double fitness = ( nSlots * nClusters < 10000 ) ? getfitness() : getsimilarity(slot1, slot2);
-			double fitness = getfitness();
+			double fitness = ( usefitness ) ? getfitness() : getsimilarity(slot1, slot2);
+			//double fitness = getfitness();
 			//double fitness = getsimilarity(slot1, slot2);
 			if ( fitness <= bestfitness ) {
 				swap(slot1, slot2);
@@ -262,13 +294,107 @@ double Clusters::getsimilarity(int slot1, int slot2) {
 	return result;
 }
 
+void Clusters::getclusters() {
+	
+	/*
+	print("\t\t\t\tmodified slots: ");
+	for( set<int>::const_iterator slot = modifiedslots.begin(); slot != modifiedslots.end(); slot++ ) {
+		print("%d ", *slot);
+	}
+	print("\n");
+	*/
+	
+	if ( modifiedslots.size() > 1 ) {
+		for ( int cluster = 0; cluster < nClusters; cluster++ ) {
+			int l1 = maximalcluster[1][cluster];
+			int l2 = maximalcluster[2][cluster];
+			for( set<int>::const_iterator slot = modifiedslots.begin(); slot != modifiedslots.end(); slot++ ) {
+				if ( *slot >= l1-1 && *slot <= l2+1 ) {
+					recalculateclusters.insert(cluster);
+				}
+			}
+		}
+	}
+	else if ( modifiedslots.size() == 1 && *modifiedslots.begin() == -1 ) {
+		for ( int cluster = 0; cluster < nClusters; cluster++ ) {
+			recalculateclusters.insert(cluster);
+		}
+	}
+	
+	/*
+	print("\t\t\t\trecalculate clusters: ");
+	for( set<int>::const_iterator cluster = recalculateclusters.begin(); cluster != recalculateclusters.end(); cluster++ ) {
+		print("%d ", *cluster);
+	}
+	print("\n");
+	*/
+	
+	modifiedslots.clear();
+}
+
+double Clusters::getfullfitness() {
+	modifiedslots.clear();
+	modifiedslots.insert(-1);
+	return getfitness();
+}
+
 double Clusters::getfitness() {
 
+#ifdef TIMING
 	double t1 = elapsedtime();
 	count++;
+#endif
 
 	double result = 0.;
+	getclusters();
 	
+	for( set<int>::const_iterator cluster = recalculateclusters.begin(); cluster != recalculateclusters.end(); cluster++ ) {
+
+		int l1 = 0;
+		int length = 0;
+		int maxlength = 0;
+		int maxl1 = 0;
+		int maxl2 = 0;
+		bool on = false;
+
+		for ( int slot = 0; slot < nSlots; slot++ ) {
+			if ( data[order[slot]][*cluster] ) {
+				length += multiplicity[order[slot]];
+				if ( !on ) {
+					l1 = slot;
+					on = true;
+				}
+				if ( slot == nSlots - 1 && length > maxlength ) {
+					maxlength = length;
+					maxl1 = l1;
+					maxl2 = nSlots - 1;
+				}
+			} else {
+				if ( on ) {
+					if ( length > maxlength ) {
+						maxlength = length;
+						maxl1 = l1;
+						maxl2 = slot - 1;
+					}
+					length = 0;
+					on = false;
+				}
+			}
+		}
+
+		maximalcluster[0][*cluster] = maxlength;
+		maximalcluster[1][*cluster] = maxl1;
+		maximalcluster[2][*cluster] = maxl2;
+
+	}
+
+	recalculateclusters.clear();
+	result = accumulate(maximalcluster[0].begin(), maximalcluster[0].end(), 0.);
+
+
+/*
+	double result = 0.;
+
 	for ( int cluster = 0; cluster < nClusters; cluster++ ) {
 		int length = data[order[0]][cluster] * multiplicity[order[0]];
 		int maxlength = length;
@@ -287,9 +413,15 @@ double Clusters::getfitness() {
 		}
 		result += maxlength;
 	}
-	
-	t += elapsedtime() - t1;
+*/
 
+#ifdef TIMING
+	t += elapsedtime() - t1;
+#endif
+
+/*
+	print("\t\t\t\tfitness = %d\n", (int) result);
+*/
 	return result;
 	
 }
@@ -305,14 +437,23 @@ double Clusters::getoptimalfitness() {
 }
 
 void Clusters::swap(int slot1, int slot2) {
+	if ( debug > 2 ) {
+		print("\t\t\tswap: %d <-> %d\n", slot1, slot2);
+	}
 	int temp = order[slot1];
 	order[slot1] = order[slot2];
 	order[slot2] = temp;
+	modifiedslots.insert(slot1);
+	modifiedslots.insert(slot2);
 }
 
 void Clusters::shift(int slot1, int slot2, int dslot) {
 	
 	if ( dslot == 0 ) { return; }
+
+	if ( debug > 2 ) {
+		print("\t\t\tshift: [%d, %d] -> %d\n", slot1, slot2, dslot);
+	}
 	
 	vector<int> neworder;
 	if ( dslot < 0 ) {
@@ -334,6 +475,7 @@ void Clusters::shift(int slot1, int slot2, int dslot) {
 	int slotp = 0;
 	for ( int slot = slot1 + min(dslot,0); slot <= slot2 + max(dslot,0); slot++ ) {
 		order[slot] = neworder[slotp++];
+		modifiedslots.insert(slot);
 	}
 
 }
@@ -344,7 +486,7 @@ int Clusters::findbestposition(int start, int end) {
 	
 	int length = end - start + 1;
 
-	double bestfitness = getfitness();
+	double bestfitness = getfullfitness();
 	double initialfitness = bestfitness;
 		
 	shift(start, end, -start);
@@ -365,6 +507,7 @@ int Clusters::findbestposition(int start, int end) {
 	} while ( true );
 	
 	shift(startp, nSlots - 1, beststart - startp);
+	getfullfitness();
 
 	if ( beststart == start ) {
 		return 0;
@@ -409,6 +552,16 @@ int Clusters::reposition(int cluster) {
 				endp++;
 			} while ( !modified && endp <= end );
 
+/* 
+			// start backwards
+			int modified = 0;
+			int endp = end;
+			do { 
+				modified = findbestposition(start, endp);
+				endp--;
+			} while ( !modified && endp >= start );
+*/
+			
 			if ( modified ) { 
 				go = true;
 				result = 1;
@@ -435,7 +588,7 @@ int Clusters::exchange(int cluster, int what) {
 
 	int maxslots = 6;
 	int maxlength = ( what ) ? optimallength[cluster] : nSlots - optimallength[cluster];
-	int maxiter = maxlength / maxslots;
+	int maxiter = min(20, maxlength / maxslots);
 
 	int nslots = min(maxlength, maxslots);
 	vector<int> possibleslots;
@@ -457,13 +610,15 @@ int Clusters::exchange(int cluster, int what) {
 		permutation[i] = i;
 	}
 
-	double bestfitness = getfitness();
+	double bestfitness = getfullfitness();
 	double initialfitness = bestfitness;
 
 	for ( int iter = 0; iter < maxiter; iter++ ) {
 		
 		vector<int> bestpermutation = permutation;
 		vector<int> initialpermutation = permutation;
+
+		set<int> modifiedslotstemp;
 
 		vector<pair<int, int> > swapslots;
 		set<int> collectslots;
@@ -472,14 +627,24 @@ int Clusters::exchange(int cluster, int what) {
 			collectslots.insert(slot);
 			if ( collectslots.size() > swapslots.size() ) {
 				swapslots.push_back(make_pair(slot,order[slot]));
+				modifiedslotstemp.insert(slot);
 			}
 		} while ( swapslots.size() < nslots );
+
+		if ( debug > 2 ) {
+			print("\t\t\texchange: ");
+			for ( int i = 0; i < nslots; i++ ) {
+				print("%d ", swapslots[i].first);
+			}
+			print("\n");
+		}
 
 		bool go;
 		do {
 			for ( int slot = 0; slot < nslots; slot++ ) {
 				order[swapslots[slot].first] = swapslots[permutation[slot]].second;
 			}
+			modifiedslots = modifiedslotstemp;
 			double fitness = getfitness();
 			if ( fitness > bestfitness ) {
 				bestpermutation = permutation;
@@ -559,7 +724,7 @@ void Clusters::arrange() {
 
 		}
 		
-		actualfitness = getfitness();
+		actualfitness = getfullfitness();
 		if ( actualfitness == optimalfitness ) {
 			if ( debug > 0 ) {
 				print("optimal solution found.\n");
@@ -584,7 +749,7 @@ void Clusters::arrange() {
 }
 
 double Clusters::quality() {
-	return getfitness() / getoptimalfitness();
+	return getfullfitness() / getoptimalfitness();
 }
 
 void Clusters::output() {
@@ -596,8 +761,18 @@ void Clusters::output() {
 		}
 		print("\n");
 	}
-	print("fitness: %d\n\n", (int) getfitness());
-	print("time spent in fitness function: %10.4f, called it %d times\n", t, count);
-	print("average time spent in fitness function: %10.4f\n", t / (double) count);
+	print("fitness: %d\n\n", (int) getfullfitness());
+	
+	/*
+	for ( int cluster = 0; cluster < nClusters; cluster++ ) {
+		print("cluster %d: [%d, %d], %d\n", cluster, maximalcluster[1][cluster], maximalcluster[2][cluster], maximalcluster[0][cluster]);
+	}
+	print("\n\n");
+	*/
+
+#ifdef TIMING
+	print("time spent in fitness function: %10.8f, called it %d times\n", t, count);
+	print("average time spent in fitness function: %10.8f\n", t / (double) count);
+#endif
 	
 }
