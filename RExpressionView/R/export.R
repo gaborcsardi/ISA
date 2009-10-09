@@ -22,7 +22,7 @@ if (require(eisa)) {
 	setMethod("ExportEV", signature(modules="ISAModules"), function(modules, ...) ExportEV.ISAModules(modules, ...))
 }
 
-ExportEV.ISAModules <- function(modules, eset, order, go=NULL, kegg=NULL, filename="", norm=c("sample", "feature", "raw")) {
+ExportEV.ISAModules <- function(modules, eset, order, filename="", norm=c("sample", "feature", "raw"), go=NULL, kegg=NULL) {
 	
 	if ( filename == "" ) {
 		con <- file(file.choose(TRUE), open="w")
