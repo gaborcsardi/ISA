@@ -81,15 +81,35 @@ OrderEV.list <- function(modules, initialorder=NULL, debuglevel=0, maxtime=60) {
 	}
 	
 	# allocate time according to scaling
-	timelimits <- list()
+	# log t = 1.87 log(no.mods) + 2.63 log(no.slots) - 15.20
+	estimates <- list()
+	estimatedtotal <- 0
+
 	for ( i in 1:2 ) {
-		timelimits[[i]] <- list(maxtime / 4)
+		estimates[[i]] <- list( exp(1.87*log(no.mods) + 2.63*log(no.slots[[i]]) - 15.20)*(1-initialorder$status[[i]][[1]]) )
+		estimatedtotal <- estimatedtotal + estimates[[i]][[1]]
 		for ( mod in 1:no.mods ) {
-			timelimits[[i]][[mod+1]] <- maxtime / 4 / no.mods * length(intersections[[mod]])
+			estimates[[i]][[mod+1]] <- exp(1.87*log(length(intersections[[mod]])) + 2.63*log(no.slots[[i]]) - 15.20)*(1-initialorder$status[[i]][[mod+1]])
+			estimatedtotal <- estimatedtotal + estimates[[i]][[mod+1]]
+		}
+	}
+			
+	timelimits <- list()
+	#cat("timelimits:\n")
+	for ( i in 1:2 ) {
+		timelimits[[i]] <- list(maxtime * estimates[[i]][[1]] / estimatedtotal)
+		if ( maxtime > 0 && timelimits[[i]][[1]] < 1 ) {
+			timelimits[[i]][[1]] <- 1
+		}
+		#cat(timelimits[[i]][[1]], " ")
+		for ( mod in 1:no.mods ) {
+			timelimits[[i]][[mod+1]] <- maxtime * estimates[[i]][[mod+1]] / estimatedtotal
 			if ( maxtime > 0 && timelimits[[i]][[mod+1]] < 1 ) {
 				timelimits[[i]][[mod+1]] <- 1
 			}
+		#	cat(timelimits[[i]][[mod+1]], " ")
 		}
+		#cat("\n")
 	}
 	
 	for ( i in 1:2 ) {
