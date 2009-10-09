@@ -1,3 +1,4 @@
+\encoding{UTF-8}
 \name{ExportEV}
 \alias{ExportEV}
 \title{Export ExpressionView file}
@@ -6,16 +7,15 @@
 ExportEV(biclusters, eset, order=NULL, filename="", norm=c("sample", "feature", "raw"))
 }
 \arguments{
-\item{biclusters}{An \code{\link[ISAModules]{ISAModules}} object, a \code{\link[Biclust]{Biclust}} object or \code{list}}
+\item{biclusters}{An \code{\link[ISAModules]{ISAModules}} object, a \code{\link[Biclust]{Biclust}} object or a \code{list} resulting from an \code{\link{isa}} run.}
 \item{order}{A \code{\link[list]{list}} containing the optimal order. If not specified, an ordering with the default parameters is performed.}
 \item{filename}{The filename of the output file. If not specified, the file is selected via the user interface.}
 \item{norm}{The normalization of the gene expression data. The \code{\link[isa.normalize]{isa.normalize}} function can normalize (zero mean and unit variance) the data with respect to the genes or the samples.}
 }
 \details{}
-\value{}
-\seealso{}
-\author{Andreas Luscher \email{andreas.luescher@a3.epfl.ch}}
-\references{Luscher A, ...}
+\seealso{\code{\link{OrderEV}}, \code{\link{OpenEV}}, \code{\link{ISA}}, \code{\link{biclust}}}
+\author{Andreas \enc{Lüscher}{Luscher} \email{andreas.luescher@a3.epfl.ch}}
+\references{\enc{Lüscher}{Luscher}, A., ...}
 \examples{
 ## We apply the Iterative Signature Algorithm (ISA) 
 library(eisa)
@@ -33,4 +33,4 @@ optimalorder <- order.clusters(modules)
 
 ExportEV(modules, ALL, optimalorder, filename="")
 }
-\keyword{order, cluster, bicluster, isa}
+\keyword{export, ExpressionView, bicluster, order, isa}
