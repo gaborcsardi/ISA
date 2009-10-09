@@ -1,7 +1,9 @@
 % \VignetteIndexEntry{ExpressionView}
 \documentclass{article}
 \usepackage{ragged2e}
+\usepackage{hyperref}
 \usepackage{url}
+\usepackage[margin=3cm]{geometry}
 
 \newcommand{\Rfunction}[1]{\texttt{#1}}
 \newcommand{\Rpackage}[1]{\texttt{#1}}
@@ -10,8 +12,9 @@
 \newcommand{\filename}[1]{\texttt{#1}}
 \newcommand{\variable}[1]{\texttt{#1}}
 
-\SweaveOpts{cache=TRUE}
 \SweaveOpts{prefix.string=graphics/plot}
+
+%\textwidth 6.0in 
 
 \begin{document}
 
@@ -37,11 +40,10 @@ and the biclustering methods available in the \Rpackage{Biclust} package~\cite{k
 
 \section{Loading the gene expression data}
 The \Rpackage{ExpressionView} package requires the gene expression data to be available in the
-form of a \Rpackage{Bioconductor} \Rclass{ExpressionSet}.
-
-In this tutorial we will use the \Rpackage{Bioconductor} sample data from a 
+form of a \Rpackage{Bioconductor} \Rclass{ExpressionSet}. In this tutorial we will use the 
+\Rpackage{Bioconductor} sample data from a 
 clinical trial in acute lymphoblastic leukemia provided by the \Rpackage{ALL} package.
-<<load the data>>=
+<<load the data, cache=FALSE>>=
 library(ALL)
 library(hgu95av2.db)
 data(ALL)
@@ -52,7 +54,7 @@ The data set contains \Sexpr{ncol(ALL)} samples and \Sexpr{nrow(ALL)} features.
 There are many biclustering algorithms described in the literature~\cite{madeira04}.
 All of them aim to reduce the complexity of the gene expression data by identifying 
 suitable groups of genes and samples that are co-regulated. In what follows we
-show how to use the freely available biclustering methods.
+show how to use two of the freely available biclustering methods.
 
 \subsection{Iterative Signature Algorithm (ISA)}
 The ISA~\cite{bergmann03} for gene expression data is implemented in the \Rpackage{eisa} package:
@@ -76,13 +78,11 @@ set.seed(1)
 modules <- ISA(ALL, thr.gene=threshold.genes, thr.cond=threshold.conditions)
 @
 If you leave the thresholds undefined, as in the first example, the ISA runs with the 
-default values, i.e., $thr.gene=c(2, 2.5, 3, 3.5, 4)$ and $thr.cond=c(1,1.5,2,2.5,3)$.
-In both cases, the ISA runs from \Sexpr{formals(eisa:::ISA)$no.seeds} random seeds, to
-give reproducible results.
-
-The \Rfunction{isa} function returns an \Rclass{ISAModules} object. Typing its name
-returns a brief summary of the results:
-<<ISAModules summary>>=
+default values, i.e., \variable{thr.gene=c(2, 2.5, 3, 3.5, 4)} and \variable{thr.cond=c(1,1.5,2,2.5,3)}.
+In both cases, the random number generator is initialized manually using \Rfunction{set.seed(1)}, 
+to give reproducible results. The \Rfunction{isa} function returns an \Rclass{ISAModules} object. 
+Typing its name returns a brief summary of the results:
+<<ISAModules summary, cache=TRUE>>=
 modules
 @
 
@@ -96,17 +96,17 @@ opposite, then they are anti-correlated.
 \subsection{Algorithms of the \Rpackage{Biclust} package}
 The \Rpackage{biclust} R package implements several biclustering
 algorithms in a unified framework. It uses the \Rclass{Biclust} class 
-to store a set of biclusters. Let us use the Plaid Model Bicluster Algorithm~\cite{turner03}
+to store a set of biclusters. Let us use the Plaid Model Bicluster Algorithm~\cite{turner04}
 on the \Rpackage{ALL} data set
 <<biclust bcplaid,cache=TRUE>>=
 library(biclust)
 biclusters <- biclust(exprs(ALL), BCPlaid(), fit.model = ~m + a + b, verbose = FALSE)
 @
 
-The standard R \Rfunction{as} function
-can be used to convert ISA modules to a \Rclass{Biclust} object. This
+The standard R function \Rfunction{as} 
+can be used to convert \Rclass{ISAModules} to \Rclass{Biclust} objects. This
 requires the binarization of the modules, i.e., the ISA scores are
-lost, they are converted to zeros and ones:
+lost since they are converted to zeros and ones:
 <<biclust>>=
 as(modules, "Biclust")
 @
@@ -127,8 +127,8 @@ binary matrices
 modules.genes <- matrix(as.integer(runif(dim(ALL)[1]*length(modules),0,1)>0.8),nrow=dim(ALL)[1])
 modules.conditions <- matrix(as.integer(runif(dim(ALL)[2]*length(modules),0,1)>0.8),nrow=dim(ALL)[2])
 @
-indicating if a given gene $i$ is contained in module $j$ if $modules.genes[i,j]\ne0$.
-Using these matrices, it is straightforward to define the \Rclass{ISAModules} variable:
+indicating if a given gene \variable{i} is contained in module \variable{j} if \variable{modules.genes[i,j]$\ne$0}.
+Using these matrices, it is straightforward to create an \Rclass{ISAModules} object:
 <<toisa>>=
 new("ISAModules",
 genes=modules.genes, conditions=modules.conditions,rundata=data.frame(),seeddata=data.frame())
@@ -139,13 +139,13 @@ To present the tens of possibly overlapping biclusters in a visually appealing f
 it is necessary to regroup the rows and columns of the gene expression matrix in 
 such a way that biclusters form contiguous rectangles. Since for more than two 
 mutually overlapping biclusters, it is in general impossible to find such an arrangement,
- one has to make concessions. In contrast to \cite{grothaus06}, who proposed to repeat 
+ one has to make concessions. In contrast to~\cite{grothaus06}, who proposed to repeat 
  rows and columns as necessary to achieve this goal, we prefer to optimize the 
  arrangement within the original data by maximizing the area of the largest contiguous biclusters. 
 
-The \Rfunction{order.clusters} function implemented in the \Rpackage{ExpressionView}Êpackage
+The \Rfunction{OrderEV} function implemented in the \Rpackage{ExpressionView} package
 determines the optimal order of the gene expression matrix for a given set of biclusters:
-<<expressionview>>=
+<<expressionview, results=HIDE>>=
 library(ExpressionView)
 optimalorder <- OrderEV(modules)
 @
@@ -153,18 +153,18 @@ optimalorder <- OrderEV(modules)
 The result is a list containing various mappings between the original data and the optimal arrangement.
 Note that the genes and the samples can be ordered separately. Apart form reordering the 
 full gene expression matrix, the algorithm also determines the best arrangement of individual biclusters.
-The mapping of the genes and the samples contained in bicluster $i$ can be accessed by 
+The mapping of the genes and the samples contained in bicluster \variable{i} can be accessed by 
 <<gene maps,eval=FALSE>>=
 optimalorder$genes[i+1]
 optimalorder$samples[i+1]
 @
-Here, $i=0$, returns the map of the complete data set. By default, the \Rfunction{OrderEV}
+Here, \variable{i=0}, returns the map of the complete data set. By default, the \Rfunction{OrderEV}
 runs for roughly one minute, this might not be sufficient to find the optimal order for data 
 containing many overlapping biclusters. The status of the ordering is stored in 
 <<status ordering>>=
 optimalorder$status
 @
-If the status is set to 1, the algorithm has found the optimal solution. A 0 indicates that the
+If the status is set to \variable{1}, the algorithm has found the optimal solution. A \variable{0} indicates that the
 the calculation could not be terminated within the given timeframe. The \Rfunction{OrderEV} 
 accepts two additional parameters to circumvent the problem of partial alignment:
 One can start the ordering from a given initial configuration, i.e., the result of a previous arrangement
@@ -172,22 +172,26 @@ by defining the \Rargument{initialorder} argument
 <<status ordering,eval=FALSE>>=
 optimalorderp <- order.clusters(modules, initialorder=optimalorder, maxtime=120)
 @
-and one can increase the time limit by specifying \Rargument{maxtime}.
+and one can increase the time limit by specifying \Rargument{maxtime}. Note that the time is indicated in seconds
+and cannot be  smaller than 1.
 
 \section{Export}
 The \Rfunction{ExportEV} function allows the user to combine the available data and export it to an XML file that can be read by the Flash applet:
-<<export>>=
-ExportEV(modules, ALL, optimalorder, filename="")
+<<export, eval=FALSE>>=
+ExportEV(modules, ALL, optimalorder, filename="file.xml")
 @
-
+The function gathers the data contained in the \Rclass{ExpressionSet} \variable{ALL}, orders it according to the optimal arrangement 
+\variable{optimalorder} and adds the biclusters defined in \variable{modules}. Since the output is an uncompressed XML file, it
+is helpful to use the appropriate extension. The XML layout is described in the R help file. Before exporting the data, the 
+\Rfunction{ExportEV} function automatically calculates GO~\cite{ashburner00} and KEGG~\cite{kanehisa04} enrichments for the given biclusters.
 
 \section{Visualize}
-
-The \Rfunction{ExportEV} function allows the user to combine the available data and export it to an XML file that can be read by the Flash applet:
-<<export>>=
-ExportEV(modules, ALL, optimalorder, filename="")
+The ExpressionView Flash applet can be launched from the R environment:
+<<export, eval=FALSE>>=
+OpenEV()
 @
-
+Video tutorials describing how to use the applet can be found on the ExpressionView \
+href{http://serverdgm.unil.ch/bergmann/software/expressionview}{website}.
 
 \section{Session information}
 
@@ -198,8 +202,9 @@ vignette were:
 toLatex(sessionInfo())
 @ 
 
-\bibliographystyle{apalike}
-\bibliography{ExpressionView}
-\nocite{*}
+%\bibliographystyle{apalike}
+\bibliographystyle{unsrt}
+\bibliography{expressionview}
+%\nocite{*}
 
 \end{document}

@@ -10,6 +10,8 @@
 \newcommand{\filename}[1]{\texttt{#1}}
 \newcommand{\variable}[1]{\texttt{#1}}
 
+\newcommand{\code}[1]{\texttt{#1}}
+
 \SweaveOpts{cache=TRUE}
 \SweaveOpts{prefix.string=graphics/plot}
 
@@ -42,29 +44,45 @@ Given a matrix in which each element is part of at least one bicluster, arrange 
 in such a way that the biclusters are easily recognizable on a two-dimensional graphic.
 Since biclusters are rectangular, rows and columns can be ordered separately.
 The problem thus reduces to finding the optimal arrangement of a set of $n$ elements 
-that are part of at least one of $m$ clusters. 
+that are part of at least one of $m$ clusters. In what follows, we refer to the $n$ elements as
+slots.
 
 \section{Quantifying the order}
 There are several ways of quantifying a ``visually appealing layout''. We have chosen to
 define the quality of the order $Q$ as sum over the maximal number of neighboring elements 
-in every cluster
-\begin{equation}
-Q = \sum_{i=1}^{\text{\# clusters}} {}
-\end{equation}
-
-The quality of the order is defined as the sum over the maximal number of neighbouring elements in every cluster and the tasks thus consists in maximizing this quantity by changing the order of the elements. Starting from an initial configuration determined by similarity, this is achieved by either shifting well aligned subsequences of a given cluster, herby enlarging the longest contiguous part, or permuting the individual elements of a given subcluster. 
-
-To determine the efficiency of this method, we have studied a large number of perfectly orderable, but initially scrambled, test cases. We find that in almost every situation, the proposed algorithm finds an order that recovers more than 99\% of the score of the optimal solution and in most cases, it actually recovers the correct alignment. For random samples, which are more representative for actual gene expression data than orderable situations, execution time increases polynomially with the number of clusters $m$ as ${\mathcal O}(m^\alpha)$, where $\alpha \in [1.6, 2]$, almost independent of the number of elements $n$. For a given number of clusters, we find ${\mathcal O}(n^\alpha)$, with $\alpha \in [2.5, 2.7]$.
-
-
+in every cluster, as illustrated in Fig.~\ref{fig:ordering}.
+\begin{figure} 
+	\begin{center} 
+		\includegraphics{graphics/ordering.pdf}
+	\end{center} 
+	\caption{The initial configuration (a) with a score $Q$=58 can be rearranged by modifying the order of the slots. The optimal 
+	solution (b) maximizes $Q$.} 
+	\label{fig:ordering} 
+\end{figure}
 
 \section{Optimizing the order}
-Optimizing the order thus consists in maximizing this quantity by changing the order
-of the elements.
+Optimizing the order thus consists in maximizing $Q$ by changing the order of the slots.
+To achieve this goal we use a brute-force approach that 
+\begin{itemize}
+	\item{shifts parts of a given cluster to better positions and}
+	\item{permutes elements contained in a given cluster.}
+\end{itemize}
 
+The \code{C++} code contains the functions \code{reposition} and \code{exchange} that 
+execute two the basic moves described above. 
+
+Before optimizing the arrangement, the matrix is simplified (\code{simplify}) to get rid of duplicate slots.
+The multiplicity of each slot is taken into account when calculating the score $Q$. 
+At the end of the ordering the initial dimensions of the data are restored with the \code{complexify} 
+function. 
+
+The \code{C++} can also be compiled to a standalone executable. Simply define \code{-DSTANDALONE}
+to exclude the R-specific functions.
 
 \section{Calculation time}
-
+To get an idea of the complexity of the algorithm, we determined the scaling of the calculation time 
+with the dimensions of the data, i.e., the number of clusters $m$ and the slots $n$. The results, obtained as
+the average over at least 40 runs, are summarized in Figs.~\ref{fig:clusters} and \ref{fig:slots}. 
 \begin{figure} 
 	\begin{center} 
 		\includegraphics{graphics/nclusters.pdf}
@@ -74,9 +92,15 @@ of the elements.
 	from random samples and is thus more representative of gene expression data. Both sets scale polynomially
 	with the number of clusters $m$ as $\mathcal{O}(m^\alpha)$, with $\alpha \in [1.6, 2]$ for random samples and
 	$\alpha \in [2.3, 4.2]$ in the case of orderable samples.} 
-	\label{fig:one} 
+	\label{fig:clusters} 
 \end{figure}
+We consider orderable and completely random samples. In both cases, the time increases polynomially with the number
+of clusters as $\mathcal{O}(m^\alpha)$, but with different exponents, see Fig.~\ref{fig:clusters}. For random samples, we find $\alpha 
+\in [1.6, 2]$, almost independent of the number of elements $n$, while for orderable samples, 
+$\alpha \in [2.3, 4.3]$. We note that despite of having a slower increase of computation time with $m$, 
+it takes considerably more time to order random samples.
 
+The scaling of the computation time with the number of slots $n$ is shown in Fig.~\ref{fig:nslots}. 
 \begin{figure} 
 	\begin{center} 
 		\includegraphics{graphics/nslots.pdf}
@@ -85,8 +109,12 @@ of the elements.
 	from random samples and is thus more representative of gene expression data. The random set scales polynomially
 	with the number of slots $n$ as $\mathcal{O}(n^\beta)$, with $\beta \in [2.5, 2.7]$. The orderable data set shows an initially
 	polynomial increase and then saturates for larger $n$.} 
-	\label{fig:one} 
+	\label{fig:slots} 
 \end{figure}
+Here, only the random samples exhibit a polynomial dependence $\mathcal{O}(n^\beta)$, with $\beta \in [2.5, 2.7]$. 
+The orderable batch saturates for larger $n$. This is due to the fact that by increasing the number of slots $n$ while keeping
+the number of clusters constant, the complexity of the problem stays roughly the same because most of the additional slots are 
+equal to those already contained in the data.
 
 \bibliographystyle{apalike}
 \bibliography{ExpressionView}
