@@ -16,13 +16,20 @@ class Clusters {
 		vector<set<int> > redundantslots;
 		vector<int> optimallength;
 		double optimalfitness;
-		
+
+		vector<vector<int> > maximalcluster;
+		set<int> modifiedslots;
+		set<int> recalculateclusters;
+
 		int random(int, int);
 		void swap(int, int);
 		void shift(int, int, int);
 		int findbestposition(int, int);
 
+		void getclusters();
+
 		double getfitness();
+		double getfullfitness();
 		double getsimilarity(int, int);
 		double getoptimalfitness();
 
@@ -61,6 +68,5 @@ class Clusters {
 		double quality();
 		
 };
-
 
 #endif
