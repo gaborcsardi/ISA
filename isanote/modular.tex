@@ -10,8 +10,7 @@
 \begin{document}
 \firstpage{1}
 
-\title[Modular analysis]{Modular analysis of gene expression data with
-  GNU R}
+\title[Modular analysis]{Modular analysis of gene expression data with R}
 \author[G\'abor Cs\'ardi \textit{et~al}]{G\'abor Cs\'ardi\,,$^{1,2}$,
   Zolt\'an Kutalik\,$^{1,2}$ and Sven Bergmann\,$^{1,2}$}
 \address{$^{1}$Department of Medical Genetics, and 
@@ -26,35 +25,16 @@
 \maketitle
 
 \begin{abstract}
-TODO
-\section{Summary:} TODO
-\section{Availability:}
-\href{http://www.unil.ch/cbg/homepage/software.html}%
-{http://www.unil.ch/cbg/homepage/software.html}
-\section{Contact:} \href{Sven.Bergmann@unil.ch}{Sven.Bergmann@unil.ch}
-\end{abstract}
+\section{Summary:} 
+Biclustering means clustering the rows and the columns of a
+data matrix together, usually not independently. A bicluster is, then,
+a block of the reordered input matrix. When it comes to gene
+expression data, a bicluster means a subset of genes ($G$) (or probes,
+probe sets) and a subset of samples ($S$), such that genes $G$ are
+exactly coexpressed across $S$ and samples $S$ have correlated
+expression profile exactly across $G$. 
 
-\section{Introduction}
-
-% What is biclustering.
-
-Biclustering is the idea of clustering the rows and the columns of a
-data matrix together, usually not independently. In other words, the
-goal of a biclustering algorithm is to find blocks in the reordered
-data matrix that have, such that the blocks have correlated rows and
-columns. It is important to note that these blocks (or biclusters,
-modules) have context, i.e. the rows only need to be correlated across
-the columns of the block, but not across other columns of the data
-matrix; and vice-versa.
-
-When it comes to gene expression data, a bicluster means a subset of
-genes ($G$) (or probes, probe sets) and a subset of samples ($S$),
-such that genes $G$ are exactly coexpressed across $S$ and samples $S$
-have correlated expression profile exactly across $G$.
-
-% What is the ISA.
-
-The Iterative Signature Algorithm (ISA), \cite{sa,isa,isamod}, is a 
+The Iterative Signature Algorithm (ISA), \cite{sa,isa}, is a 
 powerful biclustering algorithm. It is able to identify biclusters
 that overlap and it is resilient to noise.
 
@@ -64,11 +44,40 @@ biclustering method, provide a convenient interface to run it using
 the BioConductor, \cite{BioC}, software package, and also contain
 visualization tools.
 
-\section{Methods}
+\section{Availability:}
+\href{http://www.unil.ch/cbg/homepage/software.html}%
+{http://www.unil.ch/cbg/homepage/software.html}
+\section{Contact:} \href{Sven.Bergmann@unil.ch}{Sven.Bergmann@unil.ch}
+\end{abstract}
+
+\section{Introduction}
+
+% How the ISA works
+
+The ISA iteration is started from an input seed, this is 
+refined it by adding and/or removing more genes and/or
+samples until the process converges to a stable bicluster. The
+procedure is typically performed to a large number of seeds; these can
+be either chosen randomly (random seeding, unsupervised method), or
+based on the data (smart seeding, semi-supervised method).
+
+The output of ISA is a set of potentially overlapping
+biclusters. These biclusters are not binary, both genes and samples of
+a bicluster have scores, normalized between minus one and one. Genes
+and samples with scores further away from zero have a stronger
+association to the module.
+
+In this short note has two parts, in Section~\ref{sec:methods} we look
+over the steps of a typical modular analysis, and in
+Section~\ref{sec:implementation} introduce the R packages that
+implement the ISA.
+
+\section{Methods}%
+\label{sec:methods}
 
 \begin{figure*}
 \centering
-\includegraphics[width=0.9\textwidth]{isa2workflow3}
+\includegraphics[width=\textwidth]{isa2workflow3}
 \caption{Work flow of a typical modular analysis study, with the
   \Rpackage{eisa} package (left); and four bicluster visualization
   techniques (right). The input of the \Rpackage{eisa} pipeline is a
@@ -85,31 +94,30 @@ visualization tools.
   represented as a bar, its height is its score in the bicluster. 
   Samples above the red (none in this case) and samples
   below the green line are part of the biclusters. The coloring
-  indicates cases and controls. This module can separate control and
-  case samples.
-  \subfig{(B)} A module tree. Each rectangle is a bicluster. See the
-  definition of the module tree in the text. The modules are colored
+  indicates cases and controls.
+  \subfig{(B)} A module tree. Each rectangle is a bicluster; see the
+  definition of the edges in the text. The modules are colored
   according to their Gene Ontology enrichment $p$-values, the codes of
   the enriched GO categories are shown in the top-left corner of the
   rectangles. The top-right corner shows the number of genes and
-  conditions in the bicluster. The numbers on the horizontal axes are
-  the gene thresholds used for finding the modules.
+  conditions in the bicluster. The gene thresholds used for finding
+  the modules is shown on the horizontal axes.
   \subfig{(C)} Heatmap for a single module, showing correlated
-  expression and the genes and samples. The red lines are the gene and
+  expression for the genes and samples. The red lines are the gene and
   sample scores.
   \subfig{(D)} Profile plot, for a single module. On the top plot the
-  expression of all samples are plotted, the samples of the module
+  expression of all samples is plotted, the samples of the module
   with black. The red and green lines show the mean of the two
   groups. The bottom plot is the same for the genes of the module.
 }
 \label{fig:workflow}
 \end{figure*}
 
-Let us first explain the briefly the steps of a typical modular
+Let us first explain briefly the steps of a typical modular
 analysis study for gene expression data.
 
 % Batch correction
-\paragraph{Batch correction}
+\emph{Batch correction.}
 Often, the ISA is applied to samples from different experiments. In
 this case it is crucial to address the question of experimental
 variation. Several methods exist to solve this problem,
@@ -117,13 +125,13 @@ see e.g. \cite{johnson07} for an algorithm that has a GNU R
 implementation.
 
 % Filtering
-\paragraph{Gene filtering}
+\emph{Gene filtering.}
 Depending on the application, it can be advantageous to remove genes
 that are not expressed in any of the samples, especially because the
 ISA normalization (next step) tends to amplify their effect.
 
 % Normalization. 
-\paragraph{ISA normalization}
+\emph{ISA normalization.}
 ISA is an iterative algorithm. In each step it computes weighted sums
 of expression levels for a number of genes or a number of
 samples. Since different genes typically show different levels of base
@@ -133,30 +141,28 @@ calculated for each gene across all samples, the other for each sample
 across all genes.
 
 % Random and smart seeding.
-\paragraph{Random and smart seeding}
-The ISA used with random seeds is an unsupervised algorithm, it uses no
-external knowledge to find the biclusters. ISA with smart seeds is
-biased towards genes or pathways of interest, or sample annotation.
-This latter form can be considered as a semi-supervised approach.
+\emph{Random and smart seeding.}
+As mentioned previously, ISA can be performed with random or smart
+seeds, based on the application.
 
 % The ISA iteration. 
-\paragraph{The ISA iteration}
+\emph{The ISA iteration.}
 This step is essentially performing the ISA and finding the biclusters
 from the starting seeds.
 
 % Merging the modules.
-\paragraph{Merging the modules}
+\emph{Merging the modules.}
 It is possible that more seeds converge to the same, or very similar
 biclusters. This step eliminates such duplicates.
 
 % The robustness measure and filtering the modules. 
-\paragraph{Robustness of biclusters}
+\emph{Robustness of biclusters.}
 To access the significance of a bicluster, we designed a robustness
 measure, that can be used to filter out spurious modules. This is done
 based on performing ISA on the scrambled input data.
 
 % Module trees.
-\paragraph{Module trees}
+\emph{Module trees.}
 The ISA works with two stringency threshold parameters, the gene
 threshold and the sample threshold. ISA modules can be organized into
 a directed graph, a module tree, in which there is an edge from module
@@ -165,7 +171,8 @@ with the same threshold parameters  that were used to find module
 $B$. A module tree provides a hierarchical modular description of a
 data set.
 
-\section{Implementation}
+\section{Implementation}%
+\label{sec:implementation}
 
 The ISA and accompanying visualization tools are implemented in two R
 packages. The \Rpackage{isa2} package contains the implementation of
@@ -207,9 +214,7 @@ packages.
 \section*{Acknowledgement}
 
 TODO
-
 \paragraph{Funding\textcolon} TODO
-
 \paragraph{Conflict of interest\textcolon} None declared.
 
 \bibliographystyle{natbib}
