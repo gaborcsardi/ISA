@@ -79,10 +79,10 @@ ISAHTMLTable <- function(modules, target.dir,
     ec <- ifelse(pv <= pvalue, format(sapply(expectedCounts(obj), "[", 1)), "")
     gc <- ifelse(pv <= pvalue, format(sapply(geneCounts(obj), "[", 1)), "")
     ca <- names(pv)
-    ca <- switch(type,
-         "GO"=go.terms$term[ match(ca,rownames(go.terms)) ],
-         "KEGG"=as.character(mget(ca, KEGGPATHID2NAME)),
-                 ca)
+    ca[ca!=""] <- switch(type,
+         "GO"=go.terms$term[ match(ca[ca!=""],rownames(go.terms)) ],
+         "KEGG"=as.character(mget(ca[ca!=""], KEGGPATHID2NAME)),
+                 ca[ca!=""])
 
     res <- paste(sep="", ca, " <span class=\"pvalue\"><br/>(", format(pv), "/", ec,
                  "/", gc, "/", uc, ")</span>")
