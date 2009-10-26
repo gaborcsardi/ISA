@@ -1,0 +1,53 @@
+\begin{thebibliography}{}
+
+\bibitem[Bergmann et~al., 2003]{isa}
+Bergmann, S., Ihmels, J., and Barkai, N. (2003).
+\newblock Iterative signature algorithm for the analysis of large-scale gene
+  expression data.
+\newblock {\em Phys Rev E Nonlin Soft Matter Phys}, page 031902.
+
+\bibitem[Cs\'ardi, 2009a]{eisapackage}
+Cs\'ardi, G. (2009a).
+\newblock eisa: The iterative signature algorithm for gene expression data.
+\newblock R package version 0.2.
+
+\bibitem[Cs\'ardi, 2009b]{isapackage}
+Cs\'ardi, G. (2009b).
+\newblock isa2: The iterative signature algorithm.
+\newblock R package version 0.2.
+
+\bibitem[Ihmels et~al., 2004]{isamod}
+Ihmels, J., Bergmann, S., and Barkai, N. (2004).
+\newblock Defining transcription modules using large-scale gene expression
+  data.
+\newblock {\em Bioinformatics}, pages 1993--2003.
+
+\bibitem[Ihmels et~al., 2002]{sa}
+Ihmels, J., Friedlander, G., Bergmann, S., Sarig, O., Ziv, Y., and Barkai, N.
+  (2002).
+\newblock Revealing modular organization in the yeast transcriptional network.
+\newblock {\em Nat Genet}, pages 370--377.
+
+\bibitem[Kaiser et~al., 2009]{biclust}
+Kaiser, S., Santamaria, R., Theron, R., Quintales, L., and Leisch, F. (2009).
+\newblock biclust: Bicluster algorithms.
+\newblock R package version 0.7.2.
+
+\bibitem[Luscher, 2009]{ev}
+Luscher, A. (2009).
+\newblock Expressionview: Visualize overlapping biclusters.
+\newblock R package version 0.2.
+
+\bibitem[Madeira and Oliveira, 2004]{madeira04}
+Madeira, S. and Oliveira, A. (2004).
+\newblock Biclustering algorithms for biological data analysis: a survey.
+\newblock {\em IEEE/ACM Transactions on Computational Biology and
+  Bioinformatics}, 1:24--45.
+
+\bibitem[Turner et~al., 2003]{turner03}
+Turner, H., Bailey, T., and Krzanowski, W. (2003).
+\newblock Improved biclustering of microarray data demonstrated through
+  systematic performance tests.
+\newblock {\em Computational Statistics and Data Analysis}, 48:235--254.
+
+\end{thebibliography}

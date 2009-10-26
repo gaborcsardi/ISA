@@ -1,5 +1,5 @@
 
-VERSION=0.2
+VERSION=0.2.1
 
 all: homepage isa2 eisa ExpressionView
 
@@ -61,9 +61,16 @@ vignettes/ISA_parallel.pdf: vignettes/ISA_parallel.tex
 EISAFILES = eisa/DESCRIPTION eisa/NAMESPACE eisa/R/*.R eisa/man/*.Rd \
 	eisa/inst/CITATION eisa/data/*.rda
 
-EISAVIGNETTES = eisa/inst/doc/EISA_tutorial.vignette eisa/inst/doc/EISA_tutorial.pdf \
-	eisa/inst/doc/EISA_module_trees.vignette eisa/inst/doc/EISA_module_trees.pdf \
-	eisa/inst/doc/EISA_biclust.vignette eisa/inst/doc/EISA_biclust.pdf
+EISAVIGNETTES = \
+	eisa/inst/doc/EISA_tutorial.Rnw \
+	eisa/inst/doc/EISA_tutorial.pdf \
+	eisa/inst/doc/EISA_tutorial.bbl \
+	eisa/inst/doc/EISA_module_trees.Rnw \
+	eisa/inst/doc/EISA_module_trees.pdf \
+	eisa/inst/doc/EISA_module_trees.bbl \
+	eisa/inst/doc/EISA_biclust.Rnw \
+	eisa/inst/doc/EISA_biclust.pdf \
+	eisa/inst/doc/EISA_biclust.bbl
 
 eisa: eisa_$(VERSION).tar.gz
 
@@ -77,15 +84,18 @@ vignettes/EISA_tutorial.tex: $(EISAFILES) vignettes/EISA_tutorial.Rnw
 	R CMD INSTALL -l /tmp/ eisa_$(VERSION).tar.gz
 	cd vignettes && R_LIBS=/tmp/ R CMD Sweave EISA_tutorial.Rnw || rm EISA_tutorial.tex
 
-eisa/inst/doc/EISA_tutorial.vignette: vignettes/EISA_tutorial.Rnw
+eisa/inst/doc/EISA_tutorial.Rnw: vignettes/EISA_tutorial.Rnw
 	cp $< $@
 
 eisa/inst/doc/EISA_tutorial.pdf: vignettes/EISA_tutorial.pdf
 	cp $< $@
 
+eisa/inst/doc/EISA_tutorial.bbl: vignettes/EISA_tutorial.bbl
+	cp $< $@
+
 vignettes/EISA_tutorial.pdf: vignettes/EISA_tutorial.tex
-	cd vignettes && pdflatex EISA_tutorial.tex && bibtex EISA_tutorial && \
-                pdflatex EISA_tutorial.tex && pdflatex EISA_tutorial.tex
+	cd vignettes && pdflatex EISA_tutorial.tex && \
+		pdflatex EISA_tutorial.tex
 
 vignettes/EISA_module_trees.tex: $(EISAFILES) vignettes/EISA_module_trees.Rnw
 	R CMD build --no-vignettes isa2
@@ -94,15 +104,17 @@ vignettes/EISA_module_trees.tex: $(EISAFILES) vignettes/EISA_module_trees.Rnw
 	R CMD INSTALL -l /tmp/ eisa_$(VERSION).tar.gz
 	cd vignettes && R_LIBS=/tmp/ R CMD Sweave EISA_module_trees.Rnw || rm EISA_module_trees.tex
 
-eisa/inst/doc/EISA_module_trees.vignette: vignettes/EISA_module_trees.Rnw
+eisa/inst/doc/EISA_module_trees.Rnw: vignettes/EISA_module_trees.Rnw
 	cp $< $@
 
 eisa/inst/doc/EISA_module_trees.pdf: vignettes/EISA_module_trees.pdf
 	cp $< $@
 
+eisa/inst/doc/EISA_module_trees.bbl: vignettes/EISA_module_trees.bbl
+	cp $< $@
+
 vignettes/EISA_module_trees.pdf: vignettes/EISA_module_trees.tex
 	cd vignettes && pdflatex EISA_module_trees.tex && \
-                bibtex EISA_module_trees && pdflatex EISA_module_trees.tex && \
 		pdflatex EISA_module_trees.tex
 
 vignettes/EISA_biclust.tex: $(EISAFILES) vignettes/EISA_biclust.Rnw
@@ -112,15 +124,18 @@ vignettes/EISA_biclust.tex: $(EISAFILES) vignettes/EISA_biclust.Rnw
 	R CMD INSTALL -l /tmp/ eisa_$(VERSION).tar.gz
 	cd vignettes && R_LIBS=/tmp/ R CMD Sweave EISA_biclust.Rnw || rm EISA_biclust.tex
 
-eisa/inst/doc/EISA_biclust.vignette: vignettes/EISA_biclust.Rnw
+eisa/inst/doc/EISA_biclust.Rnw: vignettes/EISA_biclust.Rnw
 	cp $< $@
 
 eisa/inst/doc/EISA_biclust.pdf: vignettes/EISA_biclust.pdf
 	cp $< $@
 
+eisa/inst/doc/EISA_biclust.bbl: vignettes/EISA_biclust.bbl
+	cp $< $@
+
 vignettes/EISA_biclust.pdf: vignettes/EISA_biclust.tex
-	cd vignettes && pdflatex EISA_biclust.tex && bibtex EISA_biclust && \
-		pdflatex EISA_biclust.tex && pdflatex EISA_biclust.tex
+	cd vignettes && pdflatex EISA_biclust.tex && \
+		pdflatex EISA_biclust.tex
 
 # ExpressionView
 
@@ -137,7 +152,7 @@ REVFILES=RExpressionView/inst/ExpressionView.swf	\
 	RExpressionView/src/*.h RExpressionView/src/*.cpp 	\
 	RExpressionView/inst/CITATION
 
-REVVIGNETTES=RExpressionView/inst/doc/ExpressionView_tutorial.vignette \
+REVVIGNETTES=RExpressionView/inst/doc/ExpressionView_tutorial.Rnw \
 	RExpressionView/inst/doc/ExpressionView_tutorial.pdf
 
 ALIVEPDFFILES = $(shell find ExpressionView/src/org -name "*.as" -print)
@@ -168,7 +183,7 @@ vignettes/ExpressionView_tutorial.tex: $(REVFILES) vignettes/ExpressionView_tuto
 	R CMD INSTALL -l /tmp/ ExpressionView_$(VERSION).tar.gz
 	cd vignettes && R_LIBS=/tmp/ R CMD Sweave ExpressionView_tutorial.Rnw || rm ExpressionView_tutorial.tex
 
-RExpressionView/inst/doc/ExpressionView_tutorial.vignette: vignettes/ExpressionView_tutorial.Rnw
+RExpressionView/inst/doc/ExpressionView_tutorial.Rnw: vignettes/ExpressionView_tutorial.Rnw
 	cp $< $@
 
 RExpressionView/inst/doc/ExpressionView_tutorial.pdf: vignettes/ExpressionView_tutorial.pdf
@@ -176,8 +191,6 @@ RExpressionView/inst/doc/ExpressionView_tutorial.pdf: vignettes/ExpressionView_t
 
 vignettes/ExpressionView_tutorial.pdf: vignettes/ExpressionView_tutorial.tex
 	cd vignettes && pdflatex ExpressionView_tutorial.tex && \
-		bibtex ExpressionView_tutorial && \
-		pdflatex ExpressionView_tutorial.tex && \
 		pdflatex ExpressionView_tutorial.tex
 	cp vignettes/ExpressionView_tutorial.pdf RExpressionView/inst/doc/
 

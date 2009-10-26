@@ -11,7 +11,7 @@
 \newcommand{\variable}[1]{\texttt{#1}}
 
 \SweaveOpts{cache=TRUE}
-\SweaveOpts{prefix.string=graphics/plot}
+\SweaveOpts{prefix.string=plot}
 
 \setlength{\parindent}{2em}
 
@@ -304,7 +304,6 @@ vignette were:
 toLatex(sessionInfo())
 @ 
 
-\bibliographystyle{apalike}
-\bibliography{EISA}
+\input EISA_biclust.bbl
 
 \end{document}

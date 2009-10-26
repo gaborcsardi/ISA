@@ -11,7 +11,7 @@
 \newcommand{\variable}[1]{\texttt{#1}}
 
 \SweaveOpts{cache=TRUE}
-\SweaveOpts{prefix.string=graphics/plot}
+\SweaveOpts{prefix.string=plot}
 
 \setlength{\parindent}{2em}
 
@@ -84,11 +84,17 @@ and then call the \Rfunction{isa} function on the
 of the modules, less stringent (i.e. smaller) values result bigger,
 less correlated modules. The optimal values depend on your data and
 some experimentation is needed to determine them.
+
+Since running ISA might take a couple of minutes and the results 
+depend on the random number generator used, the ISA run is commented out 
+and we just load a precomputed set of modules in this vignette.
 <<simple ISA>>=
 thr.gene <- 2.7
 thr.cond <- 1.4
 set.seed(1) # to get the same results, always
-modules <- ISA(ALL, thr.gene=thr.gene, thr.cond=thr.cond)
+# modules <- ISA(ALL, thr.gene=thr.gene, thr.cond=thr.cond)
+data(ALLModulesSmall)
+modules <- ALLModulesSmall
 @ 
 
 This first applies a non-specific filter to the data set and then runs
@@ -427,9 +433,9 @@ plots, by calling the \Rfunction{drawHeatmap} function. The result is
 in Fig.~\ref{fig:drawHeatmap}.
 <<heatmap biclust pre,echo=FALSE,results=hide>>=
 if (require(Cairo)) {
-  CairoPNG("graphics/heatmap.png", 400, 400 )  
+  CairoPNG("plot=heatmap.png", 400, 400 )  
 } else {
-  png("graphics/heatmap.png", 400, 400 )
+  png("plot-heatmap.png", 400, 400 )
 }
 @ 
 <<heatmap>>=
@@ -440,7 +446,7 @@ dev.off()
 @ 
 \begin{figure}
   \centering
-  \includegraphics[width=0.7\textwidth]{graphics/heatmap.png}
+  \includegraphics[width=0.7\textwidth]{plot-heatmap.png}
   \caption{Heatmap of the first transcription module, plotted with the
   \Rfunction{drawHeatmap} function from the \Rpackage{biclust}
   package.}
@@ -456,9 +462,9 @@ that belong to the module have a different color, see
 Fig.~\ref{fig:parallel}.
 <<parallel.pre,echo=FALSE,results=hide>>=
 if (require(Cairo)) {
-  CairoPNG("graphics/parallel.png", 400, 400 )
+  CairoPNG("plot-parallel.png", 400, 400 )
 } else {
-  png("graphics/parallel.png", 400, 400 )
+  png("plot-parallel.png", 400, 400 )
 }
 @ 
 <<parallel>>=
@@ -469,7 +475,7 @@ dev.off()
 @ 
 \begin{figure}
 \centering
-\includegraphics[width=0.7\textwidth]{graphics/parallel.png}
+\includegraphics[width=0.7\textwidth]{plot-parallel.png}
 \caption{Profile plots for the second bicluster found by ISA.}
 \label{fig:parallel}
 \end{figure}
@@ -611,7 +617,7 @@ if (interactive()) {
 
 \begin{figure}
 \centering
-\includegraphics[width=\textwidth]{graphics/HTMLTable.png}
+\includegraphics[width=\textwidth]{plot-HTMLTable.png}
 \caption{A HTML summary table showing information for the first couple
 of modules found in the ALL data set. The ``Thr.'' column shows the
 ISA thresholds that were used to find the module; the next two columns
@@ -1155,8 +1161,6 @@ vignette were:
 toLatex(sessionInfo())
 @ 
 
-\bibliographystyle{apalike}
-\bibliography{EISA}
-\nocite{*}
+\input EISA_tutorial.bbl
 
 \end{document}

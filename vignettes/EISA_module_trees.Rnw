@@ -21,7 +21,7 @@
 \newcommand{\variable}[1]{\texttt{#1}}
 
 \SweaveOpts{cache=TRUE}
-\SweaveOpts{prefix.string=graphics/plot}
+\SweaveOpts{prefix.string=plot}
 
 \setlength{\parindent}{2em}
 
@@ -110,7 +110,7 @@ Next, we run the ISA, with keeping the condition threshold fixed, but
 varying the gene threshold.
 
 <<run ISA>>=
-set.seed(1)
+set.seed(2)
 modules <- ISA(ALL.filt2, flist=NA, thr.gene=seq(2,4,by=0.5), thr.cond=1)
 @
 
@@ -284,8 +284,6 @@ vignette were:
 toLatex(sessionInfo())
 @ 
 
-\bibliographystyle{apalike}
-\bibliography{EISA}
-\nocite{*}
+\input EISA_module_trees.bbl
 
 \end{document}
