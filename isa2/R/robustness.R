@@ -5,6 +5,12 @@ setMethod("robustness", signature(normed.data="list"),
 robustness.default <- function(normed.data, row.scores, col.scores) {
 
   isa.status("Calculating robustness", "in")
+
+  if (ncol(row.scores) != ncol(col.scores)) {
+    stop("Row and column column dimensions don't match")
+  }
+  
+  if (ncol(row.scores)==0) return(numeric())
   
   Ec <- normed.data$Ec
   Er <- normed.data$Er
