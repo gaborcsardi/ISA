@@ -1,5 +1,5 @@
 Package: eisa
-Version: 0.2
+Version: 0.2.0
 Date: Oct 5, 2009
 Title: Expression data analysis via the Iterative Signature Algorithm
 Author: Gabor Csardi <Gabor.Csardi@unil.ch>
@@ -7,7 +7,7 @@ Maintainer: Gabor Csardi <Gabor.Csardi@unil.ch>
 Description: The Iterative Signature Algorithm (ISA) is biclustering 
   method; it finds correlated blocks (transcription modules) in gene
   expression (or other tabular) data. The ISA is capable of finding
-  overlapping modules and it is resilient to noise. This packages
+  overlapping modules and it is resilient to noise. This package
   provides a convenient interface to the ISA, using standard
   BioConductor data structures; and also contains various
   visualization tools that can be used with other biclustering
