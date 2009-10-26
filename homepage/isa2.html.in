@@ -19,14 +19,14 @@ in your R session. Please try it before downloading from here.
 
 <ul class="download-links">
   <li class="download-windows">
-    <a href="downloads/isa_$ISA_VERSION.zip">Microsoft Windows (all versions)</a><br/>
+    <a href="downloads/isa2_$ISA_VERSION.zip">Microsoft Windows (all versions)</a><br/>
     Save this file, start R, and from
     the <code>Packages</code> menu choose <code>Install packages
       from local zip files</code>. Select the
     saved <code>isa_$ISA_VERSION.zip</code> file.
   </li>
   <li class="download-osx">
-    <a href="downloads/isa_$ISA_VERSION.tgz">Mac OSX (all versions)</a><br/>
+    <a href="downloads/isa2_$ISA_VERSION.tgz">Mac OSX (all versions)</a><br/>
     Save this file. Then use
     the <b><code>install.packages()</code></b> function to install it;
     give the full path to the downloaded file (<code>isa_$ISA_VERSION.tgz</code>)
@@ -34,7 +34,7 @@ in your R session. Please try it before downloading from here.
     the <code>repos=NULL</code> additional argument.
   </li>
   <li class="download-source">
-    <a href="downloads/isa_$ISA_VERSION.tar.gz">Linux variants, Unix systems</a><br/>
+    <a href="downloads/isa2_$ISA_VERSION.tar.gz">Linux variants, Unix systems</a><br/>
     This is an R source package. Save this file. Then use
     the <b><code>install.packages()</code></b> function to install it;
     give the full path to the downloaded file
