@@ -1,0 +1,40 @@
+\begin{thebibliography}{}
+
+\bibitem[Bergmann et~al., 2003]{bergmann03}
+Bergmann, S., Ihmels, J., and Barkai, N. (2003).
+\newblock Iterative signature algorithm for the analysis of large-scale gene
+  expression data.
+\newblock {\em Physical Review E}, 67(3):031902.
+
+\bibitem[Cs{\'a}rdi et~al., 2009]{csardi09}
+Cs{\'a}rdi, G., Kutalik, Z., and Bergmann, S. (2009).
+\newblock Eisa.
+\newblock {\em Bioinformatics}.
+
+\bibitem[Gentleman et~al., 2004]{gentleman04}
+Gentleman, R.~C., Carey, V.~J., Bates, D.~M., Bolstad, B., Dettling, M.,
+  Dudoit, S., Ellis, B., Gautier, L., Ge, Y., Gentry, J., Hornik, K., Hothorn,
+  T., Huber, W., Iacus, S., Irizarry, R., Leisch, F., Li, C., Maechler, M.,
+  Rossini, A.~J., Sawitzki, G., Smith, C., Smyth, G., Tierney, L., Yang, J.
+  Y.~H., and Zhang, J. (2004).
+\newblock Bioconductor: open software development for computational biology and
+  bioinformatics.
+\newblock {\em Genome Biol}, 5(10):R80.
+
+\bibitem[Grothaus et~al., 2006]{grothaus06}
+Grothaus, G., Mufti, A., and Murali, T. (2006).
+\newblock Automatic layout and visualization of biclusters.
+\newblock {\em Algorithms for Molecular Biology}, 1(1):15.
+
+\bibitem[Kaiser and Leisch, 2008]{kaiser08}
+Kaiser, S. and Leisch, F. (2008).
+\newblock A toolbox for bicluster analysis in r.
+\newblock Technical Report 028, Department of Statistics, University of Munich.
+
+\bibitem[Madeira and Oliveira, 2004]{madeira04}
+Madeira, S. and Oliveira, A. (2004).
+\newblock Biclustering algorithms for biological data analysis: a survey.
+\newblock {\em IEEE/ACM Transactions on Computational Biology and
+  Bioinformatics}, 1:24--45.
+
+\end{thebibliography}
