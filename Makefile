@@ -24,7 +24,7 @@ ISA2VIGNETTES = isa2/inst/doc/ISA_tutorial.vignette \
 	isa2/inst/doc/ISA_parallel.pdf
 
 isa2_$(VERSION).tar.gz: $(ISA2FILES) $(ISA2VIGNETTES)
-	R CMD build isa2
+	R_LIBS=~/.R/library R CMD build isa2
 
 vignettes/ISA_tutorial.tex: $(ISA2FILES) vignettes/ISA_tutorial.Rnw
 	R CMD build --no-vignettes isa2
@@ -65,6 +65,7 @@ EISAVIGNETTES = \
 	eisa/inst/doc/EISA_tutorial.Rnw \
 	eisa/inst/doc/EISA_tutorial.pdf \
 	eisa/inst/doc/EISA_tutorial.bbl \
+	eisa/inst/doc/plot-HTMLTable.png \
 	eisa/inst/doc/EISA_module_trees.Rnw \
 	eisa/inst/doc/EISA_module_trees.pdf \
 	eisa/inst/doc/EISA_module_trees.bbl \
@@ -75,7 +76,7 @@ EISAVIGNETTES = \
 eisa: eisa_$(VERSION).tar.gz
 
 eisa_$(VERSION).tar.gz:	$(EISAFILES) $(EISAVIGNETTES)
-	R CMD build eisa
+	R_LIBS=~/.R/library R CMD build eisa
 
 vignettes/EISA_tutorial.tex: $(EISAFILES) vignettes/EISA_tutorial.Rnw
 	R CMD build --no-vignettes isa2
@@ -91,6 +92,9 @@ eisa/inst/doc/EISA_tutorial.pdf: vignettes/EISA_tutorial.pdf
 	cp $< $@
 
 eisa/inst/doc/EISA_tutorial.bbl: vignettes/EISA_tutorial.bbl
+	cp $< $@
+
+eisa/inst/doc/plot-HTMLTable.png: vignettes/plot-HTMLTable.png
 	cp $< $@
 
 vignettes/EISA_tutorial.pdf: vignettes/EISA_tutorial.tex
@@ -149,8 +153,7 @@ REVFILES=RExpressionView/inst/ExpressionView.swf	\
 	RExpressionView/DESCRIPTION 				\
 	RExpressionView/NAMESPACE				\
 	RExpressionView/R/*.R RExpressionView/man/*.Rd 		\
-	RExpressionView/src/*.h RExpressionView/src/*.cpp 	\
-	RExpressionView/inst/CITATION
+	RExpressionView/src/*.h RExpressionView/src/*.cpp
 
 REVVIGNETTES=RExpressionView/inst/doc/ExpressionView_tutorial.Rnw \
 	RExpressionView/inst/doc/ExpressionView_tutorial.pdf
@@ -172,7 +175,7 @@ RExpressionView/inst/ExpressionView.swf: $(EVFILES) ExpressionView/libs/AlivePDF
 	cp ExpressionView/src/$(@F) $(@)
 
 ExpressionView_$(VERSION).tar.gz: $(REVFILES) $(REVVIGNETTES)
-	R CMD build RExpressionView
+	R_LIBS=~/.R/library R CMD build RExpressionView
 
 vignettes/ExpressionView_tutorial.tex: $(REVFILES) vignettes/ExpressionView_tutorial.Rnw
 	R CMD build --no-vignettes isa2

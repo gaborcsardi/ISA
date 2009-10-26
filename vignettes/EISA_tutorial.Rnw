@@ -433,7 +433,7 @@ plots, by calling the \Rfunction{drawHeatmap} function. The result is
 in Fig.~\ref{fig:drawHeatmap}.
 <<heatmap biclust pre,echo=FALSE,results=hide>>=
 if (require(Cairo)) {
-  CairoPNG("plot=heatmap.png", 400, 400 )  
+  CairoPNG("plot-heatmap.png", 400, 400 )  
 } else {
   png("plot-heatmap.png", 400, 400 )
 }
