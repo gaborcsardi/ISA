@@ -2,17 +2,23 @@
 \name{ExportEV}
 \alias{ExportEV}
 \title{Export ExpressionView file}
+\concept{biclustering, gene expression data, interactive}
 \description{Exports the biclusters identified in  gene expression data with all the relevant biological data to an XML file that can be read by the ExpressionView Flash applet.}
 \usage{
-ExportEV(biclusters, eset, order=NULL, filename="", norm=c("sample", "feature", "raw"))
+ExportEV(biclusters, eset, order=NULL, filename=NULL, norm=c("sample", "feature", "raw"))
 }
 \arguments{
-\item{biclusters}{An \code{\link[ISAModules]{ISAModules}} object, a \code{\link[Biclust]{Biclust}} object or a \code{list} resulting from an \code{\link{isa}} run.}
-\item{order}{A \code{\link[list]{list}} containing the optimal order. If not specified, an ordering with the default parameters is performed.}
+\item{biclusters}{An \code{\link[ISAModules]{ISAModules}} object or a \code{\link[Biclust]{Biclust}} object.}
+\item{eset}{An \code{\link[ExpressionSet]{ExpressionSet}} object containing the gene expression data.} 
+\item{order}{A \code{\link[list]{list}} (result of the \code{\link{OrderEV}} function) containing the optimal order. If not specified, an ordering with the default parameters is performed.}
 \item{filename}{The filename of the output file. If not specified, the file is selected via the user interface.}
 \item{norm}{The normalization of the gene expression data. The \code{\link[isa.normalize]{isa.normalize}} function can normalize (zero mean and unit variance) the data with respect to the genes or the samples.}
 }
-\details{}
+\details{
+While the ExpressionView Flash applet is optimized for exploring gene expression data, it can also be used to export a \code{\link{data.frame}}: \cr\cr
+\code{ExportEV(biclusters, data, order=NULL, filename=NULL, description=NULL)},\cr\cr
+where \code{data} is a \code{\link{data.frame}}.
+}
 \seealso{\code{\link{OrderEV}}, \code{\link{OpenEV}}, \code{\link{ISA}}, \code{\link{biclust}}}
 \author{Andreas \enc{Lüscher}{Luscher} \email{andreas.luescher@a3.epfl.ch}}
 \references{\enc{Lüscher}{Luscher}, A., ...}

@@ -3,14 +3,14 @@
 ########################################################################
 
 if (require(biclust)) {
- 	setMethod("ExportEV", signature(modules="Biclust"), function(modules, ...) ExportEV.Biclust(modules, ...))
+ 	setMethod("ExportEV", signature(biclusters="Biclust"), function(biclusters, ...) ExportEV.Biclust(biclusters, ...))
 }
 
-ExportEV.Biclust <- function(modules, eset, order, go=NULL, kegg=NULL, filename="", norm=c("sample", "feature", "raw")) {
-	eisamodules <- as(modules, "ISAModules")
+ExportEV.Biclust <- function(biclusters, eset, order, filename=NULL, norm=c("sample", "feature", "raw")) {
+	eisamodules <- as(biclusters, "ISAModules")
 	eisamodules@rundata$annotation <- annotation(eset)
 	eisamodules@rundata$prenormalize <- FALSE
-	export.ev(eisamodules, eset, order, go, kegg, filename, norm)
+	export.ev(eisamodules, eset, order, filename, norm)
 }
 
 
@@ -19,12 +19,16 @@ ExportEV.Biclust <- function(modules, eset, order, go=NULL, kegg=NULL, filename=
 ########################################################################
 
 if (require(eisa)) {
-	setMethod("ExportEV", signature(modules="ISAModules"), function(modules, ...) ExportEV.ISAModules(modules, ...))
+	setMethod("ExportEV", signature(biclusters="ISAModules"), function(biclusters, ...) ExportEV.ISAModules(biclusters, ...))
 }
 
-ExportEV.ISAModules <- function(modules, eset, order, filename="", norm=c("sample", "feature", "raw"), go=NULL, kegg=NULL) {
-	
-	if ( filename == "" ) {
+ExportEV.ISAModules <- function(biclusters, eset, order=NULL, filename=NULL, norm=c("sample", "feature", "raw")) {
+
+	if ( is.null(order) ) {
+		order = OrderEV(biclusters)
+	}
+
+	if ( is.null(filename) ) {
 		con <- file(file.choose(TRUE), open="w")
 	} else {
 		con <- file(filename, open="w", blocking = TRUE)
@@ -33,36 +37,28 @@ ExportEV.ISAModules <- function(modules, eset, order, filename="", norm=c("sampl
 	geneMaps <- order$genes
 	sampleMaps <- order$samples
 	
-	Genes <- featureNames(modules)[geneMaps[[1]]];
-	Samples <- sampleNames(modules)[sampleMaps[[1]]];
+	Genes <- featureNames(biclusters)[geneMaps[[1]]];
+	Samples <- sampleNames(biclusters)[sampleMaps[[1]]];
 		
-	nGenes <- (dim(modules))[1]
-	nSamples <- (dim(modules))[2]
-	nModules <- length(modules)
+	nGenes <- (dim(biclusters))[1]
+	nSamples <- (dim(biclusters))[2]
+	nBiclusters <- length(biclusters)
 
 	writeLines("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", con)
 	writeLines("<evf>", con)
 	writeLines("\t<summary>", con)
 	writeLines("\t\t<description>ExpressionView data file</description>", con)
 	writeLines("\t\t<version>1.0</version>", con)
-	writeLines(paste("\t\t<nmodules>", nModules, "</nmodules>", sep=""), con)
+	writeLines(paste("\t\t<nmodules>", nBiclusters, "</nmodules>", sep=""), con)
 	writeLines(paste("\t\t<ngenes>", nGenes, "</ngenes>", sep=""), con)
 	writeLines(paste("\t\t<nsamples>", nSamples, "</nsamples>", sep=""), con)
 	writeLines("\t</summary>", con)
 
 	go.table <- toTable(GOTERM)
-	if ( is.null(go) ) {
-		gos <- ISAGO(modules)
-	} else {
-		gos <- go
-	}
+	gos <- ISA.GO(biclusters)
 
 	kegg.table <- toTable(KEGGPATHID2NAME)
-	if ( is.null(kegg) ) {
-		keggs <- ISAKEGG(modules)
-	} else {
-		keggs <- kegg
-	}
+	keggs <- ISA.KEGG(biclusters)
 		
 	# get gene info
 	ann <- annotation(eset)
@@ -162,8 +158,8 @@ ExportEV.ISAModules <- function(modules, eset, order, filename="", norm=c("sampl
 			writeLines("\t\t\t<id>#</id>", con)
 			writeLines("\t\t\t<name>Name</name>", con)
 
-			if ( dim(modules@seeddata)[1] > 0 ) {
-				temp <- colnames(modules@seeddata)
+			if ( dim(biclusters@seeddata)[1] > 0 ) {
+				temp <- colnames(biclusters@seeddata)
 				# replace unallowed characters by underscores
 				tempp <- gsub("[^[:alnum:]]", "_", temp)
 				if ( length(temp) >= 1 ) {	
@@ -202,17 +198,17 @@ ExportEV.ISAModules <- function(modules, eset, order, filename="", norm=c("sampl
 
 	writeLines("", con)
 
-	for ( module in 1:nModules ) {
+	for ( module in 1:nBiclusters ) {
 		writeLines("\t\t<module>", con)
 
 			writeLines(paste("\t\t\t<id>", module, "</id>", sep=""), con)
 			writeLines(paste("\t\t\t<name>module ", module, "</name>", sep=""), con)
-			if ( dim(modules@seeddata)[1] > 0 ) {
-				temp <- colnames(modules@seeddata)
+			if ( dim(biclusters@seeddata)[1] > 0 ) {
+				temp <- colnames(biclusters@seeddata)
 				# replace unallowed characters by underscores
 				temp <- gsub("[^[:alnum:]]", "_", temp)
 				if ( length(temp) != 0 ) {
-					tempp <- modules@seeddata[module,]
+					tempp <- biclusters@seeddata[module,]
 					for ( i in 1:length(temp) ) {
 						value <- tempp[i]
 						if ( temp[i] == "rob" || temp[i] == "rob_limit" ) {
@@ -223,36 +219,36 @@ ExportEV.ISAModules <- function(modules, eset, order, filename="", norm=c("sampl
 				}
 			}
 
-			intersectingmodulesgenes = list();
-			genes <- modules@genes[,module][geneMaps[[1]]]
-			for ( modulep in 1:nModules ) {
-				if ( sum(genes * modules@genes[,modulep][geneMaps[[1]]]) != 0 && module != modulep ) {
-					intersectingmodulesgenes <- append(intersectingmodulesgenes, modulep)
+			intersectingbiclustersgenes = list();
+			genes <- biclusters@genes[,module][geneMaps[[1]]]
+			for ( modulep in 1:nBiclusters ) {
+				if ( sum(genes * biclusters@genes[,modulep][geneMaps[[1]]]) != 0 && module != modulep ) {
+					intersectingbiclustersgenes <- append(intersectingbiclustersgenes, modulep)
 				}
 			}
 
-			genesp <- match(as.vector(which(modules@genes[,module]!=0)),geneMaps[[1]])[geneMaps[[module+1]]]
+			genesp <- match(as.vector(which(biclusters@genes[,module]!=0)),geneMaps[[1]])[geneMaps[[module+1]]]
 			writeLines(paste("\t\t\t<containedgenes>", toString(genesp), "</containedgenes>", sep=""), con)
 			scores <- as.array(as.real(genes[genesp]))
 			scores <- apply(scores, 1, formatter)
 			writeLines(paste("\t\t\t<genescores>", toString(scores), "</genescores>", sep=""), con)
 
-			intersectingmodulessamples = list();
-			samples <- modules@conditions[,module][sampleMaps[[1]]]
-			for ( modulep in 1:nModules ) {
-				if ( sum(samples * modules@conditions[,modulep][sampleMaps[[1]]]) != 0 && module != modulep ) {
-					intersectingmodulessamples <- append(intersectingmodulessamples, modulep)
+			intersectingbiclusterssamples = list();
+			samples <- biclusters@conditions[,module][sampleMaps[[1]]]
+			for ( modulep in 1:nBiclusters ) {
+				if ( sum(samples * biclusters@conditions[,modulep][sampleMaps[[1]]]) != 0 && module != modulep ) {
+					intersectingbiclusterssamples <- append(intersectingbiclusterssamples, modulep)
 				}
 			}
 
-			samplesp <- match(as.vector(which(modules@conditions[,module]!=0)),sampleMaps[[1]])[sampleMaps[[module+1]]]
+			samplesp <- match(as.vector(which(biclusters@conditions[,module]!=0)),sampleMaps[[1]])[sampleMaps[[module+1]]]
 			writeLines(paste("\t\t\t<containedsamples>", toString(samplesp), "</containedsamples>", sep=""), con)
 			scores <- as.array(as.real(samples[samplesp]))
 			scores <- apply(scores, 1, formatter)
 			writeLines(paste("\t\t\t<samplescores>", toString(scores), "</samplescores>", sep=""), con)
 
-			intersectingmodules <- intersect(unique(intersectingmodulesgenes), unique(intersectingmodulessamples))
-			writeLines(paste("\t\t\t<intersectingmodules>", toString(intersectingmodules), "</intersectingmodules>", sep=""), con)
+			intersectingbiclusters <- intersect(unique(intersectingbiclustersgenes), unique(intersectingbiclusterssamples))
+			writeLines(paste("\t\t\t<intersectingmodules>", toString(intersectingbiclusters), "</intersectingmodules>", sep=""), con)
 
 			writeLines("", con)
 
@@ -310,7 +306,7 @@ ExportEV.ISAModules <- function(modules, eset, order, filename="", norm=c("sampl
 
 
 	norm <- match.arg(norm)
-	Data <- eisa:::select.eset(eset, modules, norm)
+	Data <- eisa:::select.eset(eset, biclusters, norm)
 	Data <- Data[ geneMaps[[1]], sampleMaps[[1]] ]
 	Data <- as.vector(t(Data))
         
@@ -345,34 +341,47 @@ ExportEV.ISAModules <- function(modules, eset, order, filename="", norm=c("sampl
 # export list ##########################################################
 ########################################################################
 
-setMethod("ExportEV", signature(modules="list"), function(modules, ...) ExportEV.list(modules, ...))
+setMethod("ExportEV", signature(biclusters="list"), function(biclusters, ...) ExportEV.list(biclusters, ...))
 
-ExportEV.list <- function(modules, eset, order, filename="", description=NULL, experimentdata=NULL) {
-	
-	if ( filename == "" ) {
+ExportEV.list <- function(biclusters, data, order=NULL, filename=NULL, description=NULL) {
+
+	if ( is.null(order) ) {
+		order = OrderEV(biclusters)
+	}
+
+	if ( is.null(filename) ) {
 		con <- file(file.choose(TRUE), open="w")
 	} else {
 		con <- file(filename, open="w", blocking = TRUE)
 	}
-		
+
 	geneMaps <- order$cols
 	sampleMaps <- order$rows
+
+	# get data description
+	experimentdata <- description$experiment
 	
-	Genes <- colnames(eset)[geneMaps[[1]]];
-	Samples <- rownames(eset)[sampleMaps[[1]]];
+	cnamesdata <- colnames(data)
+	rnamesdata <- rownames(data)
+	Genes <- cnamesdata[geneMaps[[1]]];
+	Samples <- rnamesdata[sampleMaps[[1]]];
 	
-	labels <- list(genes=description$cols[geneMaps[[1]]], samples=description$rows[sampleMaps[[1]]])
+	geneLabels <- description$collabels
+	geneLabelsData <- as.matrix(description$coldata[Genes, rownames(geneLabels)])
+
+	sampleLabels <- description$rowlabels
+	sampleLabelsData <- as.matrix(description$rowdata[Samples, rownames(sampleLabels)])
 	
-	nGenes <- dim(modules$columns)[1]
-	nSamples <- dim(modules$rows)[1]
-	nModules <- dim(modules$rows)[2]
+	nGenes <- dim(biclusters$columns)[1]
+	nSamples <- dim(biclusters$rows)[1]
+	nBiclusters <- dim(biclusters$rows)[2]
 
 	writeLines("<?xml version=\"1.0\" encoding=\"UTF-8\"?>", con)
 	writeLines("<evf>", con)
 	writeLines("\t<summary>", con)
 	writeLines("\t\t<description>ExpressionView data file</description>", con)
 	writeLines("\t\t<version>1.0</version>", con)
-	writeLines(paste("\t\t<nmodules>", nModules, "</nmodules>", sep=""), con)
+	writeLines(paste("\t\t<nmodules>", nBiclusters, "</nmodules>", sep=""), con)
 	writeLines(paste("\t\t<ngenes>", nGenes, "</ngenes>", sep=""), con)
 	writeLines(paste("\t\t<nsamples>", nSamples, "</nsamples>", sep=""), con)
 	writeLines("\t</summary>", con)
@@ -399,9 +408,19 @@ ExportEV.list <- function(modules, eset, order, filename="", description=NULL, e
 			writeLines("\t\t\t<id>#</id>", con)
 			writeLines("\t\t\t<score>Score</score>", con)
 			writeLines("\t\t\t<name>Name</name>", con)
-			if ( !is.null(labels$genes) ) {
-				writeLines("\t\t\t<description>Description</description>", con)
+
+			if ( !is.null(geneLabels) ) {
+				temp <- rownames(geneLabels)
+				# replace unallowed characters by underscores
+				temp <- gsub("[^[:alnum:]]", "_", temp)
+				tempp <- geneLabels[,1]
+				if ( length(temp) >= 1 ) {	
+					for ( i in 1:length(temp) ) {
+						writeLines(paste("\t\t\t<", temp[i], ">", tempp[i], "</", temp[i], ">", sep=""), con)
+					}
+				}
 			}
+			
 		writeLines("\t\t</genetags>", con)
 
 		writeLines("", con)
@@ -411,9 +430,17 @@ ExportEV.list <- function(modules, eset, order, filename="", description=NULL, e
 				writeLines(paste("\t\t\t<id>", gene, "</id>", sep=""), con)
 				writeLines("\t\t\t<score/>", con)
 				writeLines(paste("\t\t\t<name>", Genes[gene], "</name>", sep=""), con)
-				if ( !is.null(labels$genes) ) {
-					writeLines(paste("\t\t\t<description>", xmlconf(labels$genes[gene]), "</description>", sep=""), con)
+
+				if ( !is.null(geneLabels) ) {
+					temp <- rownames(geneLabels)
+					# replace unallowed characters by underscores
+					temp <- gsub("[^[:alnum:]]", "_", temp)
+					tempp <- geneLabelsData[gene, ]
+					for ( i in 1:length(temp) ) {
+						writeLines(paste("\t\t\t<", temp[i], ">", xmlconf(tempp[i]), "</", temp[i], ">", sep=""), con)
+					}
 				}
+
 			writeLines("\t\t</gene>", con)
 		}
 			
@@ -426,9 +453,19 @@ ExportEV.list <- function(modules, eset, order, filename="", description=NULL, e
 			writeLines("\t\t\t<id>#</id>", con)
 			writeLines("\t\t\t<score>Score</score>", con)
 			writeLines("\t\t\t<name>Name</name>", con)
-			if ( !is.null(labels$samples) ) {
-				writeLines("\t\t\t<description>Description</description>", con)
+
+			if ( !is.null(sampleLabels) ) {
+				temp <- rownames(sampleLabels)
+				# replace unallowed characters by underscores
+				temp <- gsub("[^[:alnum:]]", "_", temp)
+				tempp <- sampleLabels[,1]
+				if ( length(temp) >= 1 ) {	
+					for ( i in 1:length(temp) ) {
+						writeLines(paste("\t\t\t<", temp[i], ">", tempp[i], "</", temp[i], ">", sep=""), con)
+					}
+				}
 			}
+
 		writeLines("\t\t</sampletags>", con)
 
 		writeLines("", con)
@@ -439,9 +476,18 @@ ExportEV.list <- function(modules, eset, order, filename="", description=NULL, e
 				writeLines(paste("\t\t\t<id>", sample, "</id>", sep=""), con)
 				writeLines("\t\t\t<score/>", con)
 				writeLines(paste("\t\t\t<name>", Samples[sample], "</name>", sep=""), con)
-				if ( !is.null(labels$samples) ) {
-					writeLines(paste("\t\t\t<description>", xmlconf(labels$samples[sample]), "</description>", sep=""), con)
+
+				if ( !is.null(sampleLabels) ) {
+					temp <- rownames(sampleLabels)
+					# replace unallowed characters by underscores
+					temp <- gsub("[^[:alnum:]]", "_", temp)
+					tempp <- sampleLabelsData[sample, ]
+					for ( i in 1:length(temp) ) {
+						writeLines(paste("\t\t\t<", temp[i], ">", xmlconf(tempp[i]), "</", temp[i], ">", sep=""), con)
+					}
 				}
+
+
 			writeLines("\t\t</sample>", con)
 		}
 	writeLines("\t</samples>", con)
@@ -455,8 +501,8 @@ ExportEV.list <- function(modules, eset, order, filename="", description=NULL, e
 			writeLines("\t\t\t<id>#</id>", con)
 			writeLines("\t\t\t<name>Name</name>", con)
 
-			if ( dim(modules$seeddata)[1] > 0 ) {
-				temp <- colnames(modules$seeddata)
+			if ( dim(biclusters$seeddata)[1] > 0 ) {
+				temp <- colnames(biclusters$seeddata)
 				# replace unallowed characters by underscores
 				tempp <- gsub("[^[:alnum:]]", "_", temp)
 				if ( length(temp) >= 1 ) {	
@@ -467,17 +513,17 @@ ExportEV.list <- function(modules, eset, order, filename="", description=NULL, e
 			}
 		writeLines("\t\t</moduletags>", con)
 	
-		for ( module in 1:nModules ) {
+		for ( module in 1:nBiclusters ) {
 			writeLines("\t\t<module>", con)
 
 				writeLines(paste("\t\t\t<id>", module, "</id>", sep=""), con)
 				writeLines(paste("\t\t\t<name>module ", module, "</name>", sep=""), con)
-				if ( dim(modules$seeddata)[1] > 0 ) {
-					temp <- colnames(modules$seeddata)
+				if ( dim(biclusters$seeddata)[1] > 0 ) {
+					temp <- colnames(biclusters$seeddata)
 					# replace unallowed characters by underscores
 					temp <- gsub("[^[:alnum:]]", "_", temp)
 					if ( length(temp) != 0 ) {
-						tempp <- modules$seeddata[module,]
+						tempp <- biclusters$seeddata[module,]
 						for ( i in 1:length(temp) ) {
 							value <- tempp[i]
 							if ( temp[i] == "rob" || temp[i] == "rob_limit" ) {
@@ -488,36 +534,36 @@ ExportEV.list <- function(modules, eset, order, filename="", description=NULL, e
 					}
 				}
 
-				intersectingmodulesgenes = list();
-				genes <- modules$columns[,module][geneMaps[[1]]]
-				for ( modulep in 1:nModules ) {
-					if ( sum(genes * modules$columns[,modulep][geneMaps[[1]]]) != 0 && module != modulep ) {
-						intersectingmodulesgenes <- append(intersectingmodulesgenes, modulep)
+				intersectingbiclustersgenes = list();
+				genes <- biclusters$columns[,module][geneMaps[[1]]]
+				for ( modulep in 1:nBiclusters ) {
+					if ( sum(genes * biclusters$columns[,modulep][geneMaps[[1]]]) != 0 && module != modulep ) {
+						intersectingbiclustersgenes <- append(intersectingbiclustersgenes, modulep)
 					}
 				}
 
-				genesp <- match(as.vector(which(modules$columns[,module]!=0)),geneMaps[[1]])[geneMaps[[module+1]]]
+				genesp <- match(as.vector(which(biclusters$columns[,module]!=0)),geneMaps[[1]])[geneMaps[[module+1]]]
 				writeLines(paste("\t\t\t<containedgenes>", toString(genesp), "</containedgenes>", sep=""), con)
 				scores <- as.array(as.real(genes[genesp]))
 				scores <- apply(scores, 1, formatter)
 				writeLines(paste("\t\t\t<genescores>", toString(scores), "</genescores>", sep=""), con)
 
-				intersectingmodulessamples = list();
-				samples <- modules$rows[,module][sampleMaps[[1]]]
-				for ( modulep in 1:nModules ) {
-					if ( sum(samples * modules$rows[,modulep][sampleMaps[[1]]]) != 0 && module != modulep ) {
-						intersectingmodulessamples <- append(intersectingmodulessamples, modulep)
+				intersectingbiclusterssamples = list();
+				samples <- biclusters$rows[,module][sampleMaps[[1]]]
+				for ( modulep in 1:nBiclusters ) {
+					if ( sum(samples * biclusters$rows[,modulep][sampleMaps[[1]]]) != 0 && module != modulep ) {
+						intersectingbiclusterssamples <- append(intersectingbiclusterssamples, modulep)
 					}
 				}
 
-				samplesp <- match(as.vector(which(modules$rows[,module]!=0)),sampleMaps[[1]])[sampleMaps[[module+1]]]
+				samplesp <- match(as.vector(which(biclusters$rows[,module]!=0)),sampleMaps[[1]])[sampleMaps[[module+1]]]
 				writeLines(paste("\t\t\t<containedsamples>", toString(samplesp), "</containedsamples>", sep=""), con)
 				scores <- as.array(as.real(samples[samplesp]))
 				scores <- apply(scores, 1, formatter)
 				writeLines(paste("\t\t\t<samplescores>", toString(scores), "</samplescores>", sep=""), con)
 
-				intersectingmodules <- intersect(unique(intersectingmodulesgenes), unique(intersectingmodulessamples))
-				writeLines(paste("\t\t\t<intersectingmodules>", toString(intersectingmodules), "</intersectingmodules>", sep=""), con)
+				intersectingbiclusters <- intersect(unique(intersectingbiclustersgenes), unique(intersectingbiclusterssamples))
+				writeLines(paste("\t\t\t<intersectingmodules>", toString(intersectingbiclusters), "</intersectingmodules>", sep=""), con)
 
 				writeLines("", con)
 
@@ -527,7 +573,7 @@ ExportEV.list <- function(modules, eset, order, filename="", description=NULL, e
 		
 	writeLines("\t</modules>", con)
 
-	Data <- t(isa.normalize(as.matrix(eset))[[1]])
+	Data <- t(isa.normalize(as.matrix(data))[[1]])
 	Data[is.na(Data)] <- 0
 	Data <- Data[sampleMaps[[1]], geneMaps[[1]]]
 	Data <- as.vector(Data)

@@ -1,7 +1,9 @@
 % \VignetteIndexEntry{ExpressionView}
 \documentclass{article}
 \usepackage{ragged2e}
+\usepackage{hyperref}
 \usepackage{url}
+\usepackage[margin=3cm]{geometry}
 
 \newcommand{\Rfunction}[1]{\texttt{#1}}
 \newcommand{\Rpackage}[1]{\texttt{#1}}
@@ -41,7 +43,7 @@ that maximizes the areas of the largest contiguous parts of the biclusters.
 \section{Problem}
 The problem can be formulated very generally:
 Given a matrix in which each element is part of at least one bicluster, arrange the rows and columns
-in such a way that the biclusters are easily recognizable on a two-dimensional graphic.
+in such a way that the biclusters are easily recognizable on a two-dimensional plot.
 Since biclusters are rectangular, rows and columns can be ordered separately.
 The problem thus reduces to finding the optimal arrangement of a set of $n$ elements 
 that are part of at least one of $m$ clusters. In what follows, we refer to the $n$ elements as
@@ -49,7 +51,7 @@ slots.
 
 \section{Quantifying the order}
 There are several ways of quantifying a ``visually appealing layout''. We have chosen to
-define the quality of the order $Q$ as sum over the maximal number of neighboring elements 
+define the quality of the order $Q$ as the sum over the maximal number of neighboring elements 
 in every cluster, as illustrated in Fig.~\ref{fig:ordering}.
 \begin{figure} 
 	\begin{center} 
@@ -69,15 +71,16 @@ To achieve this goal we use a brute-force approach that
 \end{itemize}
 
 The \code{C++} code contains the functions \code{reposition} and \code{exchange} that 
-execute two the basic moves described above. 
+execute these two basic moves.
 
 Before optimizing the arrangement, the matrix is simplified (\code{simplify}) to get rid of duplicate slots.
 The multiplicity of each slot is taken into account when calculating the score $Q$. 
 At the end of the ordering the initial dimensions of the data are restored with the \code{complexify} 
 function. 
 
-The \code{C++} can also be compiled to a standalone executable. Simply define \code{-DSTANDALONE}
-to exclude the R-specific functions.
+The \code{C++} program can also be compiled to a standalone executable by defining \code{-DSTANDALONE}
+to exclude R-specific functions. You can also define \code{-DTIMING} to measure the time spent in the function
+that calculates $Q$ (\code{getfitness}).
 
 \section{Calculation time}
 To get an idea of the complexity of the algorithm, we determined the scaling of the calculation time 
@@ -95,12 +98,12 @@ the average over at least 40 runs, are summarized in Figs.~\ref{fig:clusters} an
 	\label{fig:clusters} 
 \end{figure}
 We consider orderable and completely random samples. In both cases, the time increases polynomially with the number
-of clusters as $\mathcal{O}(m^\alpha)$, but with different exponents, see Fig.~\ref{fig:clusters}. For random samples, we find $\alpha 
-\in [1.6, 2]$, almost independent of the number of elements $n$, while for orderable samples, 
+of clusters as $\mathcal{O}(m^\alpha)$, but with different exponents, see Fig.~\ref{fig:clusters}: For random samples, we find 
+$\alpha \in [1.6, 2]$, almost independent of the number of elements $n$, while for orderable samples, 
 $\alpha \in [2.3, 4.3]$. We note that despite of having a slower increase of computation time with $m$, 
 it takes considerably more time to order random samples.
 
-The scaling of the computation time with the number of slots $n$ is shown in Fig.~\ref{fig:nslots}. 
+The scaling of the computation time with the number of slots $n$ is shown in Fig.~\ref{fig:slots}. 
 \begin{figure} 
 	\begin{center} 
 		\includegraphics{graphics/nslots.pdf}
@@ -112,12 +115,17 @@ The scaling of the computation time with the number of slots $n$ is shown in Fig
 	\label{fig:slots} 
 \end{figure}
 Here, only the random samples exhibit a polynomial dependence $\mathcal{O}(n^\beta)$, with $\beta \in [2.5, 2.7]$. 
-The orderable batch saturates for larger $n$. This is due to the fact that by increasing the number of slots $n$ while keeping
+The orderable batch saturates at larger $n$. This is due to the fact that by increasing the number of slots $n$ while keeping
 the number of clusters constant, the complexity of the problem stays roughly the same because most of the additional slots are 
 equal to those already contained in the data.
 
-\bibliographystyle{apalike}
-\bibliography{ExpressionView}
+\section{Possible improvements}
+More than 90\% of the calculation time is spent to recalculate the length of the longest contiguous subclusters. Optimizing the \code{getfitness} routine
+thus has a direct impact on the overall performance of the algorithm. Since the different clusters can be treated independently, it is
+straightforward to parallelize the calculation, maybe even on the graphic chip.
+
+\bibliographystyle{unsrt}
+\bibliography{expressionview}
 \nocite{*}
 
 \end{document}

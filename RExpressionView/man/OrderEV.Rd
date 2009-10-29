@@ -2,6 +2,7 @@
 \name{OrderEV}
 \alias{OrderEV}
 \title{Find optimal arrangement of biclusters for visualization in ExpressionView}
+\concept{biclustering, gene expression data, interactive}
 \description{Finds the optimal arrangement of possibly overlapping biclusters that maximizes the areas of the largest contiguous parts of the biclusters. The reordering is necessary to obtain a visually appealing layout of the biclusters.}
 \usage{
 OrderEV(biclusters, initialorder=NULL, maxtime=60, debuglevel=0)

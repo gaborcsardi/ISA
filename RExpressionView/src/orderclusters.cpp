@@ -16,14 +16,17 @@
 
 using namespace std;
 
+// creates a random number which lies between x and y (values included)
 int Clusters::random(int x, int y) {
 	return rand() % (y-x+1) + x;
 }
 
+// calculates elapsed time since beginning of execution
 double Clusters::elapsedtime() {
 	return (clock() - starttime) / ( double ) CLOCKS_PER_SEC;
 }
 
+// constructor (with matrix and initial order)
 Clusters::Clusters(vector<vector<int> > _data, vector<int> _order) {
 	
 	starttime = clock();
@@ -47,6 +50,7 @@ Clusters::Clusters(vector<vector<int> > _data, vector<int> _order) {
 
 };
 
+// constructor (with number of clusters and slots)
 Clusters::Clusters(int _nClusters, int _nSlots) {
 
 	starttime = clock();
@@ -74,6 +78,7 @@ Clusters::Clusters(int _nClusters, int _nSlots) {
 
 }
 
+// initialize an ordered sample 
 void Clusters::orderedsample() {
 
 	if ( debug > 0 ) {
@@ -93,6 +98,7 @@ void Clusters::orderedsample() {
 
 }
 
+// initialize a random sample 
 void Clusters::randomsample() {
 
 	if ( debug > 0 ) {
@@ -111,6 +117,7 @@ void Clusters::randomsample() {
 
 };
 
+// simplifies the initialdata by removing duplicate rows
 void Clusters::simplify() {
 
 	if ( debug > 0 ) {
@@ -185,6 +192,7 @@ void Clusters::simplify() {
 
 }
 
+// reinstates the original dimensions by adding the duplicate rows at the appropriate slots
 void Clusters::complexify() {
 	
 	if ( debug > 0 ) {
@@ -217,7 +225,7 @@ void Clusters::complexify() {
 
 }
 
-
+// permute order
 void Clusters::permute() {
 
 	if ( debug > 0 ) {
@@ -237,10 +245,13 @@ void Clusters::permute() {
 
 }
 
+// starting from slot 0 of the original ordering, add one slot at the time and place it
+// at the best possible position, epending on the size of the matrix, either use the fitness 
+// (for smaller matrices) or the similarity measure (for larger matrices)
 void Clusters::prearrange() {
 
 	// decide whether to use fitness or similarity
-	// average time spent in fitness function 0.00002s
+	// (assuming average time spent in fitness function 0.00002s)
 	bool usefitness = true;
 	if ( maxtime > 0 && maxtime < nSlots / 2 * (nSlots+1) * 0.00002 ) {
 		usefitness = false;
@@ -289,21 +300,15 @@ void Clusters::prearrange() {
 	
 }
 
+// scalar product between rows slot1 and slot2
 double Clusters::getsimilarity(int slot1, int slot2) {
 	double result = inner_product(data[order[slot1]].begin(), data[order[slot1]].end(), data[order[slot2]].begin(), 0.);
 	return result;
 }
 
+// figures out which clusters to update (depending on modifiedslots)
 void Clusters::getclusters() {
-	
-	/*
-	print("\t\t\t\tmodified slots: ");
-	for( set<int>::const_iterator slot = modifiedslots.begin(); slot != modifiedslots.end(); slot++ ) {
-		print("%d ", *slot);
-	}
-	print("\n");
-	*/
-	
+
 	if ( modifiedslots.size() > 1 ) {
 		for ( int cluster = 0; cluster < nClusters; cluster++ ) {
 			int l1 = maximalcluster[1][cluster];
@@ -320,24 +325,18 @@ void Clusters::getclusters() {
 			recalculateclusters.insert(cluster);
 		}
 	}
-	
-	/*
-	print("\t\t\t\trecalculate clusters: ");
-	for( set<int>::const_iterator cluster = recalculateclusters.begin(); cluster != recalculateclusters.end(); cluster++ ) {
-		print("%d ", *cluster);
-	}
-	print("\n");
-	*/
-	
+
 	modifiedslots.clear();
 }
 
+// calculates the new fitness
 double Clusters::getfullfitness() {
 	modifiedslots.clear();
 	modifiedslots.insert(-1);
 	return getfitness();
 }
 
+// calculates the new fitness (sum of longest contiguous subclusters), updating only the one in recalculateclusters
 double Clusters::getfitness() {
 
 #ifdef TIMING
@@ -391,41 +390,15 @@ double Clusters::getfitness() {
 	recalculateclusters.clear();
 	result = accumulate(maximalcluster[0].begin(), maximalcluster[0].end(), 0.);
 
-
-/*
-	double result = 0.;
-
-	for ( int cluster = 0; cluster < nClusters; cluster++ ) {
-		int length = data[order[0]][cluster] * multiplicity[order[0]];
-		int maxlength = length;
-		for ( int slot = 1; slot < nSlots; slot++ ) {
-			if ( data[order[slot]][cluster] ) {
-				length += multiplicity[order[slot]];
-				if ( slot == nSlots - 1 && length > maxlength ) {
-					maxlength = length;
-				}
-			} else {
-				if ( length > maxlength ) {
-					maxlength = length;
-				}
-				length = 0;
-			}
-		}
-		result += maxlength;
-	}
-*/
-
 #ifdef TIMING
 	t += elapsedtime() - t1;
 #endif
 
-/*
-	print("\t\t\t\tfitness = %d\n", (int) result);
-*/
 	return result;
-	
+
 }
 
+// calculates the sum of the slots contained in each cluster
 double Clusters::getoptimalfitness() {
 	double optimum = 0.;
 	for ( int slot = 0; slot < nSlots; slot++ ) {
@@ -436,6 +409,7 @@ double Clusters::getoptimalfitness() {
 	return optimum;
 }
 
+// swaps slot1 with slot2
 void Clusters::swap(int slot1, int slot2) {
 	if ( debug > 2 ) {
 		print("\t\t\tswap: %d <-> %d\n", slot1, slot2);
@@ -447,6 +421,7 @@ void Clusters::swap(int slot1, int slot2) {
 	modifiedslots.insert(slot2);
 }
 
+// shifts the slots between slot1 and slot2 by dslot
 void Clusters::shift(int slot1, int slot2, int dslot) {
 	
 	if ( dslot == 0 ) { return; }
@@ -480,6 +455,7 @@ void Clusters::shift(int slot1, int slot2, int dslot) {
 
 }
 
+// finds the best position of slots between the first and the second argument
 int Clusters::findbestposition(int start, int end) {
 
 	int result = 0;
@@ -522,6 +498,7 @@ int Clusters::findbestposition(int start, int end) {
 	
 }
 
+// repositions a cluster (executes findbestposition on all appropriate slots in the cluster)
 int Clusters::reposition(int cluster) {
 	
 	int result = 0;
@@ -582,6 +559,8 @@ int Clusters::reposition(int cluster) {
 	
 }
 
+// exchange appropriate slots in a given cluster, permuting either slots contained in the cluster 
+// (what = 1) or outside (what = 0)
 int Clusters::exchange(int cluster, int what) {
 
 	int result = 0;
@@ -678,6 +657,8 @@ int Clusters::exchange(int cluster, int what) {
 	
 }
 
+// finds optimal order (executes the reposition and exchange routines until maxtime is reached or until 
+// the order cannot be improved further)
 void Clusters::arrange() {
 
 	if ( debug > 0 ) {
@@ -748,10 +729,12 @@ void Clusters::arrange() {
 	
 }
 
+// calculates the ratio fitness/optimalfitness
 double Clusters::quality() {
 	return getfullfitness() / getoptimalfitness();
 }
 
+// prints the ordering, multiplicity and the data
 void Clusters::output() {
 	
 	for ( int slot = 0; slot < nSlots; slot++ ) {

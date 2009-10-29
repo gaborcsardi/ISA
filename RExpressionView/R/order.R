@@ -3,11 +3,11 @@
 ########################################################################
 
 if (require(eisa)) {
-	setMethod("OrderEV", signature(modules="ISAModules"), function(modules, ...) OrderEV.ISAModules(modules, ...))
+	setMethod("OrderEV", signature(biclusters="ISAModules"), function(biclusters, ...) OrderEV.ISAModules(biclusters, ...))
 }
 
-OrderEV.ISAModules <- function(modules, initialorder=NULL, debuglevel=0, maxtime=60) {
-	isamodules <- eisa:::ISAModules.to.isa.result(modules)
+OrderEV.ISAModules <- function(biclusters, initialorder=NULL, debuglevel=0, maxtime=60) {
+	isamodules <- eisa:::ISAModules.to.isa.result(biclusters)
 	if ( !is.null(initialorder) ) {
 		initialorder <- list(rows=initialorder$genes, cols=initialorder$samples, status=initialorder$status)
 	}
@@ -22,11 +22,11 @@ OrderEV.ISAModules <- function(modules, initialorder=NULL, debuglevel=0, maxtime
 ########################################################################
 
 if (require(biclust)) {
-	setMethod("OrderEV", signature(modules="Biclust"), function(modules, ...) OrderEV.Biclust(modules, ...))
+	setMethod("OrderEV", signature(biclusters="Biclust"), function(biclusters, ...) OrderEV.Biclust(biclusters, ...))
 }
 
-OrderEV.Biclust <- function(modules, initialorder=NULL, debuglevel=0, maxtime=60) {
-	eisamodules <- as(modules, "ISAModules")
+OrderEV.Biclust <- function(biclusters, initialorder=NULL, debuglevel=0, maxtime=60) {
+	eisamodules <- as(biclusters, "ISAModules")
 	OrderEV(eisamodules, initialorder, debuglevel, maxtime)
 }
 
@@ -36,13 +36,13 @@ OrderEV.Biclust <- function(modules, initialorder=NULL, debuglevel=0, maxtime=60
 ########################################################################
 
 if (require(isa2)) {
-	setMethod("OrderEV", signature(modules="list"), function(modules, ...) OrderEV.list(modules, ...))
+	setMethod("OrderEV", signature(biclusters="list"), function(biclusters, ...) OrderEV.list(biclusters, ...))
 }
 
-OrderEV.list <- function(modules, initialorder=NULL, debuglevel=0, maxtime=60) {	
-	no.mods <- ncol(modules$rows)
-	no.rows <- nrow(modules$rows)
-	no.cols <- nrow(modules$columns)
+OrderEV.list <- function(biclusters, initialorder=NULL, debuglevel=0, maxtime=60) {	
+	no.bics <- ncol(biclusters$rows)
+	no.rows <- nrow(biclusters$rows)
+	no.cols <- nrow(biclusters$columns)
 		
 	no.slots <- c(no.rows, no.cols)
 	
@@ -52,24 +52,24 @@ OrderEV.list <- function(modules, initialorder=NULL, debuglevel=0, maxtime=60) {
 		row.map[[1]] <- c(1:no.rows)
 		col.map <- list()
 		col.map[[1]] <- c(1:no.rows)		
-		for ( mod in 1:no.mods ) {
-			row.map[[mod + 1]] <- c(1:sum(modules[[1]][,mod] != 0))
-			col.map[[mod + 1]] <- c(1:sum(modules[[2]][,mod] != 0))
+		for ( mod in 1:no.bics ) {
+			row.map[[mod + 1]] <- c(1:sum(biclusters[[1]][,mod] != 0))
+			col.map[[mod + 1]] <- c(1:sum(biclusters[[2]][,mod] != 0))
 		}
-		initialorder <- list(rows=row.map, cols=col.map, status=list(vector("numeric",no.mods+1), vector("numeric",no.mods+1)))
+		initialorder <- list(rows=row.map, cols=col.map, status=list(vector("numeric",no.bics+1), vector("numeric",no.bics+1)))
 	}
 
-	clusters <- list(matrix(as.integer(modules[[1]] != 0), nrow=dim(modules[[1]])[1]), 
-					matrix(as.integer(modules[[2]] != 0), nrow=dim(modules[[2]])[1]))
+	clusters <- list(matrix(as.integer(biclusters[[1]] != 0), nrow=dim(biclusters[[1]])[1]), 
+					matrix(as.integer(biclusters[[2]] != 0), nrow=dim(biclusters[[2]])[1]))
 
 	intersections <- list()
-	for ( mod in 1:no.mods ) {
+	for ( mod in 1:no.bics ) {
 
 		temp <- list()
 		for ( i in 1:2 ) {
 
 			temp[[i]] <- vector("integer", 0)
-			for ( modp in mod:no.mods) {
+			for ( modp in mod:no.bics) {
 				if ( sum(clusters[[i]][,mod]*clusters[[i]][,modp]) > 0 && mod != modp ) {
 					temp[[i]] <- append(temp[[i]], modp)
 				}
@@ -81,14 +81,14 @@ OrderEV.list <- function(modules, initialorder=NULL, debuglevel=0, maxtime=60) {
 	}
 	
 	# allocate time according to scaling
-	# log t = 1.87 log(no.mods) + 2.63 log(no.slots) - 15.20
+	# log t = 1.87 log(no.bics) + 2.63 log(no.slots) - 15.20
 	estimates <- list()
 	estimatedtotal <- 0
 
 	for ( i in 1:2 ) {
-		estimates[[i]] <- list( exp(1.87*log(no.mods) + 2.63*log(no.slots[[i]]) - 15.20)*(1-initialorder$status[[i]][[1]]) )
+		estimates[[i]] <- list( exp(1.87*log(no.bics) + 2.63*log(no.slots[[i]]) - 15.20)*(1-initialorder$status[[i]][[1]]) )
 		estimatedtotal <- estimatedtotal + estimates[[i]][[1]]
-		for ( mod in 1:no.mods ) {
+		for ( mod in 1:no.bics ) {
 			estimates[[i]][[mod+1]] <- exp(1.87*log(length(intersections[[mod]])) + 2.63*log(no.slots[[i]]) - 15.20)*(1-initialorder$status[[i]][[mod+1]])
 			estimatedtotal <- estimatedtotal + estimates[[i]][[mod+1]]
 		}
@@ -102,7 +102,7 @@ OrderEV.list <- function(modules, initialorder=NULL, debuglevel=0, maxtime=60) {
 			timelimits[[i]][[1]] <- 1
 		}
 		#cat(timelimits[[i]][[1]], " ")
-		for ( mod in 1:no.mods ) {
+		for ( mod in 1:no.bics ) {
 			timelimits[[i]][[mod+1]] <- maxtime * estimates[[i]][[mod+1]] / estimatedtotal
 			if ( maxtime > 0 && timelimits[[i]][[mod+1]] < 1 ) {
 				timelimits[[i]][[mod+1]] <- 1
@@ -132,7 +132,7 @@ OrderEV.list <- function(modules, initialorder=NULL, debuglevel=0, maxtime=60) {
 		}
 
 		# modules
-		for ( mod in 1:no.mods ) {
+		for ( mod in 1:no.bics ) {
 						
 			if ( i == 1 ) {
 				cat("ordering rows in module", mod, "\r")
@@ -152,7 +152,7 @@ OrderEV.list <- function(modules, initialorder=NULL, debuglevel=0, maxtime=60) {
 				for ( slot in 1:no.slots[i] ) {
 					if ( clusters[[i]][slot, mod] == 1 ) {
 						slotp <- slotp + 1
-						for ( modp in 1:no.mods) {
+						for ( modp in 1:no.bics) {
 							if ( clusters[[i]][slot, modp] == 1 && modp %in% contains ) {
 								subclusters[slotp, which(contains==modp)] <- as.integer(1)
 							}
