@@ -1,5 +1,5 @@
 setGeneric("OrderEV",
-           function(modules, ...) standardGeneric("OrderEV"))
+           function(biclusters, ...) standardGeneric("OrderEV"))
 
 setGeneric("ExportEV",
-           function(modules, ...) standardGeneric("ExportEV"))
+           function(biclusters, ...) standardGeneric("ExportEV"))

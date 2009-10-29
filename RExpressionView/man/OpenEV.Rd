@@ -2,6 +2,7 @@
 \name{OpenEV}
 \alias{OpenEV}
 \title{Open an ExpressionView file}
+\concept{biclustering, gene expression data, interactive}
 \description{Opens the ExpressionView Flash applet that comes with the R package.}
 \usage{
 OpenEV()

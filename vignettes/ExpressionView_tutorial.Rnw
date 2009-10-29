@@ -14,8 +14,6 @@
 
 \SweaveOpts{prefix.string=graphics/plot}
 
-%\textwidth 6.0in 
-
 \begin{document}
 
 \title{ExpressionView}
@@ -34,7 +32,7 @@ options(continue=" ")
 \section{Introduction}
 Clustering genes according to their expression profiles is an important task 
 in analyzing microarray data. In this tutorial, we explain how to use ExpressionView, 
-a \Rpackage{Bioconductor} package designed to interactively explore biclusters identified in gene 
+an R package designed to interactively explore biclusters identified in gene 
 expression data in conjunction with the Iterative Signature Algorithm (ISA)~\cite{bergmann03} 
 and the biclustering methods available in the \Rpackage{Biclust} package~\cite{kaiser08}.
 
@@ -53,7 +51,7 @@ The data set contains \Sexpr{ncol(ALL)} samples and \Sexpr{nrow(ALL)} features.
 \section{Find biclusters}
 There are many biclustering algorithms described in the literature~\cite{madeira04}.
 All of them aim to reduce the complexity of the gene expression data by identifying 
-suitable groups of genes and samples that are co-regulated. In what follows we
+suitable groups of genes and conditions that are co-regulated. In what follows we
 show how to use two of the freely available biclustering methods.
 
 \subsection{Iterative Signature Algorithm (ISA)}
@@ -70,7 +68,7 @@ modules <- ISA(ALL)
 @ 
 Depending on your computing resources, this should take roughly two minutes. If you do not
 want to wait that long, you can shorten the calculation by selecting the thresholds for genes and
-samples:
+conditions:
 <<fast ISA, cache=TRUE>>=
 threshold.genes <- 2.7 
 threshold.conditions <- 1.4 
@@ -78,7 +76,7 @@ set.seed(1)
 modules <- ISA(ALL, thr.gene=threshold.genes, thr.cond=threshold.conditions)
 @
 If you leave the thresholds undefined, as in the first example, the ISA runs with the 
-default values, i.e., \variable{thr.gene=c(2, 2.5, 3, 3.5, 4)} and \variable{thr.cond=c(1,1.5,2,2.5,3)}.
+default values, i.e., \variable{thr.gene=c(2,2.5,3,3.5,4)} and \variable{thr.cond=c(1,1.5,2,2.5,3)}.
 In both cases, the random number generator is initialized manually using \Rfunction{set.seed(1)}, 
 to give reproducible results. The \Rfunction{isa} function returns an \Rclass{ISAModules} object. 
 Typing its name returns a brief summary of the results:
@@ -87,14 +85,13 @@ modules
 @
 
 The ISA biclustering is not binary, every gene (and
-similarly, every sample) has a score between -1 and 1; the further the
+similarly, every sample or condition) has a score between -1 and 1; the further the
 score is from zero, the stronger the association between the gene
 (or sample) and the module. If two features both have scores with the
-same sign, then they are correlated, if the sign of their scores is
-opposite, then they are anti-correlated.
+same sign, they are correlated, otherwise, they are anti-correlated.
 
 \subsection{Algorithms of the \Rpackage{Biclust} package}
-The \Rpackage{biclust} R package implements several biclustering
+The \Rpackage{biclust} package implements several biclustering
 algorithms in a unified framework. It uses the \Rclass{Biclust} class 
 to store a set of biclusters. Let us use the Plaid Model Bicluster Algorithm~\cite{turner04}
 on the \Rpackage{ALL} data set
@@ -115,7 +112,7 @@ The conversion also works in the other direction. Starting from a \Rclass{Biclus
 <<isa>>=
 as(biclusters, "ISAModules")
 @
-to get an \Rclass{ISAModules} class.
+to get an \Rclass{ISAModules} object.
 
 \subsection{External clustering programs}
 Since the structure of biclustering results is independent of the applied method, it is straightforward to
@@ -159,7 +156,7 @@ optimalorder$genes[i+1]
 optimalorder$samples[i+1]
 @
 Here, \variable{i=0}, returns the map of the complete data set. By default, the \Rfunction{OrderEV}
-runs for roughly one minute, this might not be sufficient to find the optimal order for data 
+runs for roughly one minute, this might not be sufficient to find an appropriate order for data 
 containing many overlapping biclusters. The status of the ordering is stored in 
 <<status ordering>>=
 optimalorder$status
@@ -190,7 +187,7 @@ The ExpressionView Flash applet can be launched from the R environment:
 <<export, eval=FALSE>>=
 OpenEV()
 @
-Video tutorials describing how to use the applet can be found on the ExpressionView \
+Video tutorials describing how to use the applet can be found on the ExpressionView \\ \
 href{http://serverdgm.unil.ch/bergmann/software/expressionview}{website}.
 
 \section{Session information}
