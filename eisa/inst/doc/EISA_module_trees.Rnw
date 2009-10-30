@@ -284,6 +284,8 @@ vignette were:
 toLatex(sessionInfo())
 @ 
 
-\input EISA_module_trees.bbl
+\bibliographystyle{apalike}
+\bibliography{EISA}
+\nocite{*}
 
 \end{document}

@@ -1,9 +1,12 @@
 
 VERSION=0.2.1
 
-all: homepage isa2 eisa ExpressionView
+all: isa2 eisa
 
-.PHONY: homepage isa2 eisa ExpressionView clean alivepdf vignettes manuals
+all-final: homepage isa2-final eisa-final ExpressionView
+
+.PHONY: homepage isa2 eisa ExpressionView clean alivepdf vignettes manuals \
+	isa2-final eisa-final ExpressionView-final
 
 clean: 
 	bzr clean-tree --force
@@ -14,132 +17,30 @@ clean:
 
 # isa2
 
-isa2: isa2_$(VERSION).tar.gz
+isa2-final: isa2_$(VERSION).tar.gz
+isa: isa2_$(VERSION)-nv.tar.gz
 
 ISA2FILES = isa2/DESCRIPTION isa2/LICENCE isa2/NAMESPACE isa2/R/*.R isa2/man/*.Rd \
 	isa2/src/*.c isa2/inst/CITATION 
 
-ISA2VIGNETTES = isa2/inst/doc/ISA_tutorial.vignette \
-	isa2/inst/doc/ISA_tutorial.pdf isa2/inst/doc/ISA_parallel.vignette \
-	isa2/inst/doc/ISA_parallel.pdf
-
-isa2_$(VERSION).tar.gz: $(ISA2FILES) $(ISA2VIGNETTES)
+isa2_$(VERSION).tar.gz: $(ISA2FILES)
 	R_LIBS=~/.R/library R CMD build isa2
 
-vignettes/ISA_tutorial.tex: $(ISA2FILES) vignettes/ISA_tutorial.Rnw
-	R CMD build --no-vignettes isa2
-	R CMD INSTALL -l /tmp/ isa2_$(VERSION).tar.gz
-	cd vignettes && R_LIBS=/tmp/ R CMD Sweave ISA_tutorial.Rnw || rm ISA_tutorial.tex
-
-isa2/inst/doc/ISA_tutorial.vignette: vignettes/ISA_tutorial.Rnw
-	cp $< $@
-
-isa2/inst/doc/ISA_tutorial.pdf: vignettes/ISA_tutorial.pdf
-	cp $< $@
-
-vignettes/ISA_tutorial.pdf: vignettes/ISA_tutorial.tex
-	cd vignettes && pdflatex ISA_tutorial.tex && pdflatex ISA_tutorial.tex && \
-		pdflatex ISA_tutorial.tex
-
-vignettes/ISA_parallel.tex: $(ISA2FILES) vignettes/ISA_parallel.Rnw
-	R CMD build --no-vignettes isa2
-	R CMD INSTALL -l /tmp/ isa2_$(VERSION).tar.gz
-	cd vignettes && R_LIBS=/tmp/ R CMD Sweave ISA_parallel.Rnw || rm ISA_parallel.tex
-
-isa2/inst/doc/ISA_parallel.vignette: vignettes/ISA_parallel.Rnw
-	cp $< $@
-
-isa2/inst/doc/ISA_parallel.pdf: vignettes/ISA_parallel.pdf
-	cp $< $@
-
-vignettes/ISA_parallel.pdf: vignettes/ISA_parallel.tex
-	cd vignettes && pdflatex ISA_parallel.tex && pdflatex ISA_parallel.tex \
-		&& pdflatex ISA_parallel.tex
+isa2_$(VERSION)-nv.tar.gz: $(ISA2FILES)
+	R_LIBS=~/.R/library R CMD build --no-vignettes isa2
 
 # eisa
 
 EISAFILES = eisa/DESCRIPTION eisa/NAMESPACE eisa/R/*.R eisa/man/*.Rd \
 	eisa/inst/CITATION eisa/data/*.rda
 
-EISAVIGNETTES = \
-	eisa/inst/doc/EISA_tutorial.Rnw \
-	eisa/inst/doc/EISA_tutorial.pdf \
-	eisa/inst/doc/EISA_tutorial.bbl \
-	eisa/inst/doc/plot-HTMLTable.png \
-	eisa/inst/doc/EISA_module_trees.Rnw \
-	eisa/inst/doc/EISA_module_trees.pdf \
-	eisa/inst/doc/EISA_module_trees.bbl \
-	eisa/inst/doc/EISA_biclust.Rnw \
-	eisa/inst/doc/EISA_biclust.pdf \
-	eisa/inst/doc/EISA_biclust.bbl
+eisa-final: eisa_$(VERSION).tar.gz
+eisa: eisa_$(VERSION)-nv.tar.gz
 
-eisa: eisa_$(VERSION).tar.gz
-
-eisa_$(VERSION).tar.gz:	$(EISAFILES) $(EISAVIGNETTES)
+eisa_$(VERSION).tar.gz: $(EISAFILES)
 	R_LIBS=~/.R/library R CMD build eisa
-
-vignettes/EISA_tutorial.tex: $(EISAFILES) vignettes/EISA_tutorial.Rnw
-	R CMD build --no-vignettes isa2
-	R CMD build --no-vignettes eisa
-	R CMD INSTALL -l /tmp/ isa2_$(VERSION).tar.gz
-	R CMD INSTALL -l /tmp/ eisa_$(VERSION).tar.gz
-	cd vignettes && R_LIBS=/tmp/ R CMD Sweave EISA_tutorial.Rnw || rm EISA_tutorial.tex
-
-eisa/inst/doc/EISA_tutorial.Rnw: vignettes/EISA_tutorial.Rnw
-	cp $< $@
-
-eisa/inst/doc/EISA_tutorial.pdf: vignettes/EISA_tutorial.pdf
-	cp $< $@
-
-eisa/inst/doc/EISA_tutorial.bbl: vignettes/EISA_tutorial.bbl
-	cp $< $@
-
-eisa/inst/doc/plot-HTMLTable.png: vignettes/plot-HTMLTable.png
-	cp $< $@
-
-vignettes/EISA_tutorial.pdf: vignettes/EISA_tutorial.tex
-	cd vignettes && pdflatex EISA_tutorial.tex && \
-		pdflatex EISA_tutorial.tex
-
-vignettes/EISA_module_trees.tex: $(EISAFILES) vignettes/EISA_module_trees.Rnw
-	R CMD build --no-vignettes isa2
-	R CMD build --no-vignettes eisa
-	R CMD INSTALL -l /tmp/ isa2_$(VERSION).tar.gz
-	R CMD INSTALL -l /tmp/ eisa_$(VERSION).tar.gz
-	cd vignettes && R_LIBS=/tmp/ R CMD Sweave EISA_module_trees.Rnw || rm EISA_module_trees.tex
-
-eisa/inst/doc/EISA_module_trees.Rnw: vignettes/EISA_module_trees.Rnw
-	cp $< $@
-
-eisa/inst/doc/EISA_module_trees.pdf: vignettes/EISA_module_trees.pdf
-	cp $< $@
-
-eisa/inst/doc/EISA_module_trees.bbl: vignettes/EISA_module_trees.bbl
-	cp $< $@
-
-vignettes/EISA_module_trees.pdf: vignettes/EISA_module_trees.tex
-	cd vignettes && pdflatex EISA_module_trees.tex && \
-		pdflatex EISA_module_trees.tex
-
-vignettes/EISA_biclust.tex: $(EISAFILES) vignettes/EISA_biclust.Rnw
-	R CMD build --no-vignettes isa2
-	R CMD build --no-vignettes eisa
-	R CMD INSTALL -l /tmp/ isa2_$(VERSION).tar.gz
-	R CMD INSTALL -l /tmp/ eisa_$(VERSION).tar.gz
-	cd vignettes && R_LIBS=/tmp/ R CMD Sweave EISA_biclust.Rnw || rm EISA_biclust.tex
-
-eisa/inst/doc/EISA_biclust.Rnw: vignettes/EISA_biclust.Rnw
-	cp $< $@
-
-eisa/inst/doc/EISA_biclust.pdf: vignettes/EISA_biclust.pdf
-	cp $< $@
-
-eisa/inst/doc/EISA_biclust.bbl: vignettes/EISA_biclust.bbl
-	cp $< $@
-
-vignettes/EISA_biclust.pdf: vignettes/EISA_biclust.tex
-	cd vignettes && pdflatex EISA_biclust.tex && \
-		pdflatex EISA_biclust.tex
+eisa_$(VERSION)-nv.tar.gz: $(EISAFILES)
+	R_LIBS=~/.R/library R CMD build --no-vignettes eisa
 
 # ExpressionView
 
@@ -202,79 +103,95 @@ vignettes/ExpressionView_tutorial.pdf: vignettes/ExpressionView_tutorial.tex
 
 SWEAVE2HTML = htlatex
 SWEAVE2HTMLOPTIONS = style,xhtml,graphics-,charset=utf-8 " -cunihtf -utf8" -cvalidate
+REMOVEHTML = sed '/<div class="maketitle">/,/<\/body>/!d' | sed '/<\/body>/d'
+REWRITEIMG = sed 's/src="\([^"]*\)"/src="htmlets\/graphics\/\1"/g'
 
-homepage: vignettes manuals homepage/.stamp
-
-homepage/.stamp: homepage/*.in homepage/template.html
-	cd homepage && ./generate.py && touch .stamp
+homepage: vignettes manuals
 
 vignettes: homepage/ISA_tutorial.html homepage/ISA_tutorial.pdf \
 	homepage/ISA_parallel.html homepage/ISA_parallel.pdf \
 	homepage/EISA_tutorial.html homepage/EISA_tutorial.pdf \
 	homepage/EISA_module_trees.html homepage/EISA_module_trees.pdf \
 	homepage/EISA_biclust.html homepage/EISA_biclust.pdf \
-	homepage/ExpressionView_tutorial.html homepage/ExpressionView_tutorial.pdf \
 	vignettes/style.cfg
 
-homepage/ISA_tutorial.html: vignettes/ISA_tutorial.tex
-	cd vignettes && $(SWEAVE2HTML) ISA_tutorial $(SWEAVE2HTMLOPTIONS)
-	cp vignettes/ISA_tutorial.html homepage
-	cp vignettes/ISA_tutorial.css homepage
-	cp vignettes/ISA_tutorial*.png homepage/
-	cp vignettes/graphics/*.png homepage/graphics/
-
-homepage/ISA_tutorial.pdf: vignettes/ISA_tutorial.pdf
+homepage/ISA_tutorial.html: isa2/inst/doc/ISA_tutorial.tex
+	cp vignettes/style.cfg isa2/inst/doc/
+	cd isa2/inst/doc && $(SWEAVE2HTML) ISA_tutorial $(SWEAVE2HTMLOPTIONS)
+	cat isa2/inst/doc/ISA_tutorial.html | $(REMOVEHTML) | $(REWRITEIMG) >homepage/ISA_tutorial.html
+	cp isa2/inst/doc/ISA_tutorial.css homepage/
+	cp isa2/inst/doc/ISA_tutorial*.png homepage/
+	cp isa2/inst/doc/*.png homepage/
+homepage/ISA_tutorial.pdf: isa2/inst/doc/ISA_tutorial.pdf
 	cp $< $@
+isa2/inst/doc/ISA_tutorial.pdf: isa2/inst/doc/ISA_tutorial.tex
+	cd isa2/inst/doc/ && pdflatex ISA_tutorial.tex && \
+		pdflatex ISA_tutorial && \
+		pdflatex ISA_tutorial
+isa2/inst/doc/ISA_tutorial.tex: isa2/inst/doc/ISA_tutorial.Rnw
+	cd isa2/inst/doc/ && R CMD Sweave ISA_tutorial.Rnw
 
-homepage/ISA_parallel.html: vignettes/ISA_parallel.tex
-	cd vignettes && $(SWEAVE2HTML) ISA_parallel $(SWEAVE2HTMLOPTIONS)
-	cp vignettes/ISA_parallel.html homepage
-	cp vignettes/ISA_parallel.css homepage
-#	cp vignettes/ISA_parallel*.png homepage/
-	cp vignettes/graphics/*.png homepage/graphics/
-
-homepage/ISA_parallel.pdf: vignettes/ISA_parallel.pdf
+homepage/ISA_parallel.html: isa2/inst/doc/ISA_parallel.tex
+	cp vignettes/style.cfg isa2/inst/doc/
+	cd isa2/inst/doc && $(SWEAVE2HTML) ISA_parallel $(SWEAVE2HTMLOPTIONS)
+	cat isa2/inst/doc/ISA_parallel.html | $(REMOVEHTML) | $(REWRITEIMG) >homepage/ISA_parallel.html
+	cp isa2/inst/doc/ISA_parallel.css homepage/
+#	cp isa2/inst/doc/ISA_parallel*.png homepage/
+#	cp isa2/inst/doc/*.png homepage/graphics/
+homepage/ISA_parallel.pdf: isa2/inst/doc/ISA_parallel.pdf
 	cp $< $@
+isa2/inst/doc/ISA_parallel.pdf: isa2/inst/doc/ISA_parallel.tex
+	cd isa2/inst/doc/ && pdflatex ISA_parallel.tex
+isa2/inst/doc/ISA_parallel.tex: isa2/inst/doc/ISA_parallel.Rnw
+	cd isa2/inst/doc/ && R CMD Sweave ISA_parallel.Rnw
 
-homepage/EISA_tutorial.html: vignettes/EISA_tutorial.tex
-	cd vignettes && $(SWEAVE2HTML) EISA_tutorial $(SWEAVE2HTMLOPTIONS)
-	cp vignettes/EISA_tutorial.html homepage
-	cp vignettes/EISA_tutorial.css homepage
-	cp vignettes/EISA_tutorial*.png homepage/
-	cp vignettes/graphics/*.png homepage/graphics/
-
-homepage/EISA_tutorial.pdf: vignettes/EISA_tutorial.pdf
+homepage/EISA_tutorial.html: eisa/inst/doc/EISA_tutorial.tex
+	cp vignettes/style.cfg eisa/inst/doc/
+	cd eisa/inst/doc/ && pdflatex EISA_tutorial.tex && \
+		bibtex EISA_tutorial && pdflatex EISA_tutorial
+	cd eisa/inst/doc && $(SWEAVE2HTML) EISA_tutorial $(SWEAVE2HTMLOPTIONS)
+	cat eisa/inst/doc/EISA_tutorial.html | $(REMOVEHTML) | $(REWRITEIMG) >homepage/EISA_tutorial.html
+	cp eisa/inst/doc/EISA_tutorial.css homepage/
+	cp eisa/inst/doc/EISA_tutorial*.png homepage/
+	cp eisa/inst/doc/*.png homepage/
+homepage/EISA_tutorial.pdf: eisa/inst/doc/EISA_tutorial.pdf
 	cp $< $@
+eisa/inst/doc/EISA_tutorial.pdf: eisa/inst/doc/EISA_tutorial.tex
+	cd eisa/inst/doc/ && pdflatex EISA_tutorial.tex
+eisa/inst/doc/EISA_tutorial.tex: eisa/inst/doc/EISA_tutorial.Rnw
+	cd eisa/inst/doc/ && R CMD Sweave EISA_tutorial.Rnw
 
-homepage/EISA_module_trees.html: vignettes/EISA_module_trees.tex
-	cd vignettes && $(SWEAVE2HTML) EISA_module_trees $(SWEAVE2HTMLOPTIONS)
-	cp vignettes/EISA_module_trees.html homepage
-	cp vignettes/EISA_module_trees.css homepage
-	cp vignettes/EISA_module_trees*.png homepage/
-	cp vignettes/graphics/*.png homepage/graphics/
-
-homepage/EISA_module_trees.pdf: vignettes/EISA_module_trees.pdf
+homepage/EISA_module_trees.html: eisa/inst/doc/EISA_module_trees.tex
+	cp vignettes/style.cfg eisa/inst/doc/
+	cd eisa/inst/doc/ && pdflatex EISA_module_trees.tex && \
+		bibtex EISA_module_trees && pdflatex EISA_module_trees
+	cd eisa/inst/doc && $(SWEAVE2HTML) EISA_module_trees $(SWEAVE2HTMLOPTIONS)
+	cat eisa/inst/doc/EISA_module_trees.html | $(REMOVEHTML) | $(REWRITEIMG) >homepage/EISA_module_trees.html
+	cp eisa/inst/doc/EISA_module_trees.css homepage/
+	cp eisa/inst/doc/EISA_module_trees*.png homepage/
+	cp eisa/inst/doc/*.png homepage/
+homepage/EISA_module_trees.pdf: eisa/inst/doc/EISA_module_trees.pdf
 	cp $< $@
+eisa/inst/doc/EISA_module_trees.pdf: eisa/inst/doc/EISA_module_trees.tex
+	cd eisa/inst/doc/ && pdflatex EISA_module_trees.tex
+eisa/inst/doc/EISA_module_trees.tex: eisa/inst/doc/EISA_module_trees.Rnw
+	cd eisa/inst/doc/ && R CMD Sweave EISA_module_trees.Rnw
 
-homepage/EISA_biclust.html: vignettes/EISA_biclust.tex
-	cd vignettes && $(SWEAVE2HTML) EISA_biclust $(SWEAVE2HTMLOPTIONS)
-	cp vignettes/EISA_biclust.html homepage
-	cp vignettes/EISA_biclust.css homepage
-	cp vignettes/EISA_biclust*.png homepage/
-	cp vignettes/graphics/*.png homepage/graphics/
-
-homepage/EISA_biclust.pdf: vignettes/EISA_biclust.pdf
+homepage/EISA_biclust.html: eisa/inst/doc/EISA_biclust.tex
+	cp vignettes/style.cfg eisa/inst/doc/
+	cd eisa/inst/doc/ && pdflatex EISA_biclust.tex && \
+		bibtex EISA_biclust && pdflatex EISA_biclust
+	cd eisa/inst/doc && $(SWEAVE2HTML) EISA_biclust $(SWEAVE2HTMLOPTIONS)
+	cat eisa/inst/doc/EISA_biclust.html | $(REMOVEHTML) | $(REWRITEIMG) >homepage/EISA_biclust.html
+	cp eisa/inst/doc/EISA_biclust.css homepage/
+	cp eisa/inst/doc/EISA_biclust*.png homepage/
+	cp eisa/inst/doc/*.png homepage/
+homepage/EISA_biclust.pdf: eisa/inst/doc/EISA_biclust.pdf
 	cp $< $@
-
-homepage/ExpressionView_tutorial.html: vignettes/ExpressionView_tutorial.tex
-	cd vignettes && $(SWEAVE2HTML) ExpressionView_tutorial $(SWEAVE2HTMLOPTIONS)
-	cp vignettes/ExpressionView_tutorial.html homepage
-	cp vignettes/ExpressionView_tutorial.css homepage
-#	cp vignettes/ExpressionView*.png homepage/
-	cp vignettes/graphics/*.png homepage/graphics/
-
-homepage/ExpressionView_tutorial.pdf: vignettes/ExpressionView_tutorial.pdf
-	cp $< $@
+eisa/inst/doc/EISA_biclust.pdf: eisa/inst/doc/EISA_biclust.tex
+	cd eisa/inst/doc/ && pdflatex EISA_biclust.tex
+eisa/inst/doc/EISA_biclust.tex: eisa/inst/doc/EISA_biclust.Rnw
+	cd eisa/inst/doc/ && R CMD Sweave EISA_biclust.Rnw
 
 manuals: homepage/manuals/isa2/.stamp homepage/manuals/eisa/.stamp \
 	homepage/manuals/ExpressionView/.stamp \

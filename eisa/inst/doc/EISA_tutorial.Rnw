@@ -1161,6 +1161,8 @@ vignette were:
 toLatex(sessionInfo())
 @ 
 
-\input EISA_tutorial.bbl
+\bibliographystyle{apalike}
+\bibliography{EISA}
+\nocite{*}
 
 \end{document}

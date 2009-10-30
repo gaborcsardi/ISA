@@ -1,7 +1,7 @@
 % \VignetteIndexEntry{ExpressionView}
 \documentclass{article}
 \usepackage{ragged2e}
-\usepackage{hyperref}
+%\usepackage{hyperref}
 \usepackage{url}
 \usepackage[margin=3cm]{geometry}
 

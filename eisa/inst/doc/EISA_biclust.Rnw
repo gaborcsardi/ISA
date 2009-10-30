@@ -304,6 +304,8 @@ vignette were:
 toLatex(sessionInfo())
 @ 
 
-\input EISA_biclust.bbl
+\bibliographystyle{apalike}
+\bibliography{EISA}
+\nocite{*}
 
 \end{document}
