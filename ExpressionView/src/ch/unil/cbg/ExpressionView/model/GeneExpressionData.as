@@ -1,3 +1,19 @@
+//     ExpressionView - A package to visualize biclusters
+//     Copyright (C) 2009 Computational Biology Group, University of Lausanne
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package ch.unil.cbg.ExpressionView.model {
 	
 	import __AS3__.vec.Vector;
@@ -474,11 +490,11 @@ package ch.unil.cbg.ExpressionView.model {
 			var gene:int;
 			for ( gene = startgene; gene <= startgene + 200; ++gene ) {
 
-				if ( gene == nGenes ) {
+				if ( gene == nGenes + 1 ) {
 					setTimeout(finishTreatBitmap, 10);
 					return;
 				}
-						
+				
 				for ( var sample:int = 1; sample <= nSamples; ++sample ) {
 					var value:int = int(Data.readByte());
 					var red:uint; var green:uint;
