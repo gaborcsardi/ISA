@@ -28,13 +28,16 @@
 	horizontalScrollPolicy="off" 
 	verticalScrollPolicy="off" 
 	applicationComplete="applicationCompleteHandler()" 
-	viewSourceURL="srcview/index.html" >
+	viewSourceURL="srcview/index.html"
+	backgroundColor="#d5e5f5" >
 	
 	<mx:Script>
 		<![CDATA[
+			import mx.containers.Canvas;
 			import ch.unil.cbg.ExpressionView.view.*;
 			import ch.unil.cbg.ExpressionView.events.*;
 			import ch.unil.cbg.ExpressionView.model.*;
+			import ch.unil.cbg.ExpressionView.styles.*;
 			
 			import mx.events.ResizeEvent;
 			import mx.controls.Alert;
@@ -43,14 +46,11 @@
 			import flash.display.StageScaleMode;
 			import flash.system.Capabilities;
 			
-
 			private var menuBar:MenuBar;
+			private var backgroundCanvas:BackgroundCanvas;
 			private var mainCanvas:MainCanvas;
 			private var statusBar:StatusBar;
 
-			// raw data
-			private var rawged:GeneExpressionData = new GeneExpressionData();
-			// possibly filtered data
 			private var ged:GeneExpressionData = new GeneExpressionData();
 			private var bytes:ByteArray = new ByteArray();
 			
@@ -70,13 +70,21 @@
 					addChild(menuBar);
 				}
 				
-				if ( !mainCanvas ) {
-					mainCanvas = new MainCanvas();
-					mainCanvas.setStyle("borderStyle", "solid");
-					mainCanvas.horizontalScrollPolicy = "off";
-					mainCanvas.verticalScrollPolicy = "off";
-					mainCanvas.visible = false;
-					addChild(mainCanvas);
+				if ( !backgroundCanvas ) {
+					backgroundCanvas = new BackgroundCanvas();
+					backgroundCanvas.horizontalScrollPolicy = "off";
+					backgroundCanvas.verticalScrollPolicy = "off";
+					addChild(backgroundCanvas);
+
+					if ( !mainCanvas ) {
+						mainCanvas = new MainCanvas();
+						mainCanvas.setStyle("borderStyle", "solid");
+						mainCanvas.horizontalScrollPolicy = "off";
+						mainCanvas.verticalScrollPolicy = "off";
+						mainCanvas.visible = false;
+						backgroundCanvas.addChild(mainCanvas);
+					}
+
 				}
 
 				if ( !statusBar ) {
@@ -84,13 +92,12 @@
 					statusBar.setStyle("borderStyle", "solid");
 					statusBar.horizontalScrollPolicy = "off";
 					statusBar.verticalScrollPolicy = "off";
-					statusBar.visible = false;
 					addChild(statusBar);
 				}
 
 				addEventListener(MenuEvent.OPEN, processFileHandler);
-				rawged.addEventListener(GEDCompleteEvent.GEDCOMPLETEEVENT, GEDCompleteHandler);
-				rawged.addEventListener(UpdateStatusBarEvent.UPDATESTATUSBAREVENT, updateStatusBarHandler);
+				ged.addEventListener(GEDCompleteEvent.GEDCOMPLETEEVENT, GEDCompleteHandler);
+				ged.addEventListener(UpdateStatusBarEvent.UPDATESTATUSBAREVENT, updateStatusBarHandler);
 
 				stage.scaleMode = StageScaleMode.NO_SCALE;
 				stage.align = StageAlign.TOP_LEFT;
@@ -132,16 +139,21 @@
 					menuBar.x = 0;
 					menuBar.y = 0
 					menuBar.percentWidth = 100;
-					menuBar.height = 50;
+					menuBar.height = 70;
+				}
+
+				if ( backgroundCanvas ) {
+					backgroundCanvas.x = 0;
+					backgroundCanvas.y = 70;
+					backgroundCanvas.percentWidth = 100;
+					backgroundCanvas.height = stage.stageHeight - 90;
 				}
 
 				if ( mainCanvas ) {
-					mainCanvas.x = 0;
-					mainCanvas.y = 50;
 					mainCanvas.percentWidth = 100;
-					mainCanvas.height = stage.stageHeight - 70;
+					mainCanvas.percentHeight = 100;
 				}
-				
+		
 				if ( statusBar ) {
 					statusBar.x = 0;
 					statusBar.y = stage.stageHeight - 20;
@@ -210,14 +222,14 @@
 				}
 				
 				dispatchEvent(new UpdateStatusBarEvent("parsing file"));
-				rawged.initialize(data);
+				ged.initialize(data);
 
 			}
 			
 			private function GEDCompleteHandler(event:GEDCompleteEvent): void {
 				mainCanvas.visible = true;
-				ged = rawged;
-				dispatchEvent(new UpdateGEDataEvent([rawged,ged]));
+				backgroundCanvas.show = false;
+				dispatchEvent(new UpdateGEDataEvent([ged]));
 				dispatchEvent(new UpdateStatusBarEvent("")); 			
 			}
 
@@ -229,8 +241,6 @@
 	</mx:Script>
 
 	<mx:Style source="ch/unil/cbg/ExpressionView/styles/global.css"/>
-	<mx:Style source="ch/unil/cbg/ExpressionView/styles/panel.css"/>
-	<mx:Style source="ch/unil/cbg/ExpressionView/styles/menu.css"/>
 	<mx:Style source="ch/unil/cbg/ExpressionView/styles/tabnavigator.css"/>
 	
 </mx:Application>

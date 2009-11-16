@@ -27,10 +27,28 @@ package ch.unil.cbg.ExpressionView.view.components {
 	public class LinkRenderer extends Label implements IDataRenderer, IDropInListItemRenderer {
 
 		public var dataProvider:String;
+		private var shortOrganism:String;
 				
 		public function LinkRenderer() {
 			super();
+			shortOrganism = new String();
 			dataProvider = new String();
+		}
+
+		public function set organism(longname:String):void {
+			var temp:String = longname.toLowerCase()
+			switch (temp) {
+				case "homo sapiens":
+					shortOrganism = "hsa";
+					break;
+				case "mus musculus":
+					shortOrganism = "mmu";
+					break;	
+			}
+		}
+				
+		override protected function commitProperties():void{
+			this.styleName = "linkrenderer";
 		}
 
 		override protected function createChildren():void {
@@ -58,6 +76,12 @@ package ch.unil.cbg.ExpressionView.view.components {
 				url = "http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=gene&cmd=Retrieve&dopt=full_report&list_uids=" + event.currentTarget.data.entrezid; 
 			} else if ( dataProvider == "go" ) {
 				url = "http://amigo.geneontology.org/cgi-bin/amigo/term-details.cgi?term=" + event.currentTarget.data.go
+			} else if ( dataProvider == "kegg" ) {
+				var tag:String = shortOrganism;
+				if ( shortOrganism == "" ) { 
+					tag = "map";
+				} 
+				url = "http://www.genome.jp/dbget-bin/www_bget?" + shortOrganism + event.currentTarget.data.kegg;
 			}
 			var request:URLRequest = new URLRequest(url);
 			navigateToURL(request, "_blank");

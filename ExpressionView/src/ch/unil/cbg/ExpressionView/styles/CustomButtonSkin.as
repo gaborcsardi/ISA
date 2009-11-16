@@ -14,29 +14,29 @@
 //     You should have received a copy of the GNU General Public License
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package ch.unil.cbg.ExpressionView.events {
-	
-	import flash.events.Event;
-	
-	public class ResizablePanelEvent extends Event {
+package ch.unil.cbg.ExpressionView.styles { 
 
-		// events
-		public static const CLOSE:String = "Close";
-		public static const MINIMIZE:String = "Minimize";
-		public static const MAXIMIZE:String = "Maximize";
-		public static const RESIZE:String = "REsize";
+	import mx.skins.halo.ButtonSkin;
+	
+	public class CustomButtonSkin extends ButtonSkin {
 
-		// data
-		public var data:Array;
-		
-		public function ResizablePanelEvent(_type:String, _data:Array=null, _bubbles:Boolean=true, _cancelable:Boolean=true) {
-			super(_type, _bubbles, _cancelable);
-			data = _data;
+		public function CustomButtonSkin() {
+			super();
 		}
 		
-		override public function clone(): Event {
-			return new ResizablePanelEvent(type, data, bubbles, cancelable);
-		}
+		override protected function updateDisplayList(w:Number, h:Number):void {
 
+			var swap:Boolean = false;
+			if ( name == "selectedUpSkin" ) {
+				name = "downSkin";
+				swap = true;
+			}
+
+			super.updateDisplayList(w,h);
+
+			if ( swap ) {
+				name = "selectedUpSkin";
+			}			
+	    }
 	}
 }

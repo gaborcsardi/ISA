@@ -42,18 +42,18 @@ package ch.unil.cbg.ExpressionView.view {
 		override protected function createChildren():void {
 			super.createChildren();
 			parentApplication.addEventListener(UpdateStatusBarEvent.UPDATESTATUSBAREVENT, updateStatusBarEventHandler);
-			
+
 			if ( !footerBox ) {
 				footerBox = new HBox();
-				footerBox.setStyle("verticalAlign", "middle");				
+				footerBox.styleName = "footerBox";				
 				addChild(footerBox);
-				
+
 				if ( !footerText ) {
 					footerText = new Text();
 					footerBox.addChild(footerText);
 				}
 			}
-						
+		
 		}
 		
 		override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void {

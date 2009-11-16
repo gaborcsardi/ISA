@@ -25,12 +25,17 @@ package ch.unil.cbg.ExpressionView.view {
 	import flash.events.ProgressEvent;
 	import flash.net.FileFilter;
 	import flash.net.FileReference;
+	import flash.net.URLRequest;
+	import flash.net.navigateToURL;
 	
 	import mx.containers.Canvas;
 	import mx.containers.HBox;
+	import mx.containers.VBox;
 	import mx.controls.Button;
 	import mx.controls.CheckBox;
 	import mx.controls.HSlider;
+	import mx.controls.Image;
+	import mx.controls.Text;
 	import mx.controls.ToggleButtonBar;
 	import mx.events.ItemClickEvent;
 	import mx.events.SliderEvent;
@@ -38,11 +43,24 @@ package ch.unil.cbg.ExpressionView.view {
 	public class MenuBar extends Canvas {
 		
 		private var menuBox:HBox;
-		private var fileBox:HBox;
-		private var exportBox:HBox;
-		private var navigationBox:HBox;
-		private var selectionBox:HBox;
-		private var windowBox:HBox;
+		private var fileBox:VBox;
+		private var fileBoxP:HBox;
+		private var fileBoxTitle:Text;
+		private var exportBox:VBox;
+		private var exportBoxP:HBox;
+		private var exportBoxTitle:Text;
+		private var navigationBox:VBox;
+		private var navigationBoxP:HBox;
+		private var navigationBoxTitle:Text;
+		private var viewBox:VBox;
+		private var viewBoxP:HBox;
+		private var viewBoxTitle:Text
+		private var windowBox:VBox;
+		private var windowBoxP:HBox;
+		private var windowBoxTitle:Text;
+		private var helpBox:VBox;
+		private var helpBoxP:HBox;
+		private var helpBoxTitle:Text;
 		
 		[Embed(source='/ch/unil/cbg/ExpressionView/assets/menu/inspect.png')]
 		public var inspectIcon:Class; 
@@ -55,16 +73,19 @@ package ch.unil.cbg.ExpressionView.view {
 		private var pdfExportButton:Button;
 		private var excelExportButton:Button;
 		private var navigationMenu:ToggleButtonBar;
+		private var highlightingVisibility:CheckBox;
 		private var outlineVisibility:CheckBox;
 		private var fillingVisibility:CheckBox;
 		private var alphaSlider:HSlider;
 		private var defaultPositionsButton:Button;
 		private var fullScreenButton:Button;
+		private var websiteButton:Button;
 
 		private var file:FileReference = new FileReference();
 
 		public function MenuBar() {
 			super();
+			super.styleName = "menuBox";
 		}
 				
 		// open
@@ -96,31 +117,78 @@ package ch.unil.cbg.ExpressionView.view {
 		
 		// inspect, zoom, and pan
 		private function keyHandler(event:KeyboardEvent): void {
-			// i = 73, z = 89, and p = 80;
-			if ( event.keyCode == 73 ) {
-				dispatchEvent(new MenuEvent(MenuEvent.MODE, [0]))
-				navigationMenu.selectedIndex = 0;
-			} else if ( event.keyCode == 89 ) {
-				dispatchEvent(new MenuEvent(MenuEvent.MODE, [1]))
-				navigationMenu.selectedIndex = 1;
-			}
-			if ( event.keyCode == 80 ) {
-				dispatchEvent(new MenuEvent(MenuEvent.MODE, [2]))
-				navigationMenu.selectedIndex = 2;
+			var focus:String = getFocus().name;
+			if ( focus.search("TextField") == -1 ) {
+				// i = 73, z = 89, and p = 80;
+				if ( event.keyCode == 73 ) {
+					dispatchEvent(new MenuEvent(MenuEvent.MODE, [0]))
+					navigationMenu.selectedIndex = 0;
+				} else if ( event.keyCode == 89 ) {
+					dispatchEvent(new MenuEvent(MenuEvent.MODE, [1]))
+					navigationMenu.selectedIndex = 1;
+				}
+				if ( event.keyCode == 80 ) {
+					dispatchEvent(new MenuEvent(MenuEvent.MODE, [2]))
+					navigationMenu.selectedIndex = 2;
+				}
 			}
 		}
 		private function navigationMenuClickHandler(event:ItemClickEvent): void {
 			dispatchEvent(new MenuEvent(MenuEvent.MODE, [event.index]));
 		}
+
+		// checkbox for highlighting
+		private function highlightingVisibilityChangeHandler(event:MouseEvent): void {
+			dispatchEvent(new MenuEvent(MenuEvent.HIGHLIGHTING, [highlightingVisibility.selected]));
+			if ( event.shiftKey ) {
+				dispatchEvent(new MenuEvent(MenuEvent.OUTLINE, [highlightingVisibility.selected]));
+				dispatchEvent(new MenuEvent(MenuEvent.FILLING, [highlightingVisibility.selected]));
+				outlineVisibility.selected = highlightingVisibility.selected;
+				fillingVisibility.selected = highlightingVisibility.selected;
+				if ( !highlightingVisibility.selected ) {
+					alphaSlider.value = 1;
+					dispatchEvent(new MenuEvent(MenuEvent.ALPHA, [alphaSlider.value]));
+				} else {
+					alphaSlider.value = 0.4;
+					dispatchEvent(new MenuEvent(MenuEvent.ALPHA, [alphaSlider.value]));
+				}
+			}
+		}
 		
 		// checkbox for outlines
 		private function outlineVisibilityChangeHandler(event:MouseEvent): void {
 			dispatchEvent(new MenuEvent(MenuEvent.OUTLINE, [outlineVisibility.selected]));
+			if ( event.shiftKey ) {
+				dispatchEvent(new MenuEvent(MenuEvent.HIGHLIGHTING, [outlineVisibility.selected]));
+				dispatchEvent(new MenuEvent(MenuEvent.FILLING, [outlineVisibility.selected]));
+				highlightingVisibility.selected = outlineVisibility.selected;
+				fillingVisibility.selected = outlineVisibility.selected;
+				if ( !outlineVisibility.selected ) {
+					alphaSlider.value = 1;
+					dispatchEvent(new MenuEvent(MenuEvent.ALPHA, [alphaSlider.value]));
+				} else {
+					alphaSlider.value = 0.4;
+					dispatchEvent(new MenuEvent(MenuEvent.ALPHA, [alphaSlider.value]));
+				}
+			}
 		}
 		
 		// checkbox for fillings
 		private function fillingVisibilityChangeHandler(event:MouseEvent): void {
 			dispatchEvent(new MenuEvent(MenuEvent.FILLING, [fillingVisibility.selected]));
+			if ( event.shiftKey ) {
+				dispatchEvent(new MenuEvent(MenuEvent.HIGHLIGHTING, [fillingVisibility.selected]));
+				dispatchEvent(new MenuEvent(MenuEvent.OUTLINE, [fillingVisibility.selected]));
+				highlightingVisibility.selected = fillingVisibility.selected;
+				outlineVisibility.selected = fillingVisibility.selected;
+				if ( !fillingVisibility.selected ) {
+					alphaSlider.value = 1;
+					dispatchEvent(new MenuEvent(MenuEvent.ALPHA, [alphaSlider.value]));
+				} else {
+					alphaSlider.value = 0.4;
+					dispatchEvent(new MenuEvent(MenuEvent.ALPHA, [alphaSlider.value]));
+				}
+			}
 		}
 
 		// alpha slider
@@ -149,165 +217,277 @@ package ch.unil.cbg.ExpressionView.view {
 			}
 			dispatchEvent(new MenuEvent(MenuEvent.FULLSCREEN, [screen]));
 		}
+		// fullscreen
+		private function websiteHandler(event:MouseEvent): void {
+			var urlRequest:URLRequest = new URLRequest("http://www2.unil.ch/cbg/index.php?title=ExpressionView");
+			navigateToURL(urlRequest, String("_blank"))
+		}
 		
 		// layout	
 		override protected function createChildren() : void{	
 			super.createChildren();
 			
 			if ( !menuBox ) {
-				menuBox = new HBox;
+				menuBox = new HBox();
 				menuBox.styleName = "menuBox";
 				addChild(menuBox);
 			}
-			
+						
+			// file
 			if ( !fileBox ) {
-				fileBox = new HBox();
-				fileBox.styleName = "menuItemBox";
+				fileBox = new VBox();
+				fileBox.styleName = "menuGroupBox";
 				menuBox.addChild(fileBox);
+								
+				if ( !fileBoxTitle ) {
+					fileBoxTitle = new Text();
+					fileBoxTitle.text = "File";
+					fileBox.addChild(fileBoxTitle);
+				}
 				
-				if ( !openButton ) {
-					openButton = new Button();
-					openButton.label = "Open";
-					openButton.styleName = "openButton";
-					openButton.toolTip = "Open ExpressionView file.";
-					openButton.addEventListener(MouseEvent.CLICK, fileOpenHandler);
-					fileBox.addChild(openButton);
+				if ( !fileBoxP ) {
+					fileBoxP = new HBox;
+					fileBoxP.styleName = "menuItemBox";
+					fileBox.addChild(fileBoxP);
+				
+					if ( !openButton ) {
+						openButton = new Button();
+						openButton.label = "Open";
+						openButton.styleName = "openButton";
+						openButton.toolTip = "Open ExpressionView file.";
+						openButton.addEventListener(MouseEvent.CLICK, fileOpenHandler);
+						fileBoxP.addChild(openButton);
+					}
 				}
 			}
 			
+			// export
 			if ( !exportBox ) {
-				exportBox = new HBox();
-				exportBox.styleName = "menuItemBox";
+				exportBox = new VBox();
+				exportBox.styleName = "menuGroupBox";
 				menuBox.addChild(exportBox);
 				
-				if ( !pdfExportButton ) {
-					pdfExportButton = new Button();
-					pdfExportButton.label = "PDF";
-					pdfExportButton.toolTip = "Export PDF file of currently viewed area.";
-					pdfExportButton.styleName = "pdfExportButton";
-					
-					pdfExportButton.addEventListener(MouseEvent.CLICK, pdfExportHandler);
-					exportBox.addChild(pdfExportButton);
+				if ( !exportBoxTitle ) {
+					exportBoxTitle = new Text();
+					exportBoxTitle.text = "Export";
+					exportBox.addChild(exportBoxTitle);
 				}
 				
-				if ( !excelExportButton ) {
-					excelExportButton = new Button();
-					excelExportButton.label = "CSV";
-					excelExportButton.toolTip = "Export Excel (CSV) file containing all the information\n associated with the currently viewed module.";
-					excelExportButton.styleName = "excelExportButton";
+				if ( !exportBoxP ) { 
+					exportBoxP = new HBox();
+					exportBoxP.styleName = "menuItemBoxP";
+					exportBox.addChild(exportBoxP);
+				
+					if ( !pdfExportButton ) {
+						pdfExportButton = new Button();
+						pdfExportButton.label = "PDF";
+						pdfExportButton.toolTip = "Export PDF file of currently viewed area.";
+						pdfExportButton.styleName = "pdfExportButton";
+						
+						pdfExportButton.addEventListener(MouseEvent.CLICK, pdfExportHandler);
+						exportBoxP.addChild(pdfExportButton);
+					}
 					
-					excelExportButton.addEventListener(MouseEvent.CLICK, excelExportHandler);
-					exportBox.addChild(excelExportButton);
+					if ( !excelExportButton ) {
+						excelExportButton = new Button();
+						excelExportButton.label = "CSV";
+						excelExportButton.toolTip = "Export Excel (CSV) file containing all the information\n associated with the currently viewed bicluster.";
+						excelExportButton.styleName = "excelExportButton";
+						
+						excelExportButton.addEventListener(MouseEvent.CLICK, excelExportHandler);
+						exportBoxP.addChild(excelExportButton);
+					}
 				}
 			}
 
+			// navigation
 			if ( !navigationBox ) {
-				navigationBox = new HBox();
-				navigationBox.styleName = "menuItemBox";
+				navigationBox = new VBox();
+				navigationBox.styleName = "menuGroupBox";
 				menuBox.addChild(navigationBox);
 
-				if ( !navigationMenu ) {
-					navigationMenu = new ToggleButtonBar();
-					var buttons:Array = [];
-					var item:Object = new Object();
-					item.label = "Inspect";
-					item.icon = inspectIcon;
-					item.toolTip = "Inspect";
-					buttons.push(item);
-					item = new Object();
-					item.label = "Zoom";
-					item.icon = zoomIcon;
-					item.toolTip = "Zoom";
-					buttons.push(item);
-					item = new Object();
-					item.label = "Pan";
-					item.icon = panIcon;
-					item.toolTip = "Pan";
-					buttons.push(item);
-					navigationMenu.dataProvider = buttons;
-					navigationMenu.addEventListener(ItemClickEvent.ITEM_CLICK, navigationMenuClickHandler);
-					navigationMenu.styleName = "navigationMenu";
-					navigationBox.addChild(navigationMenu);
+				if ( !navigationBoxTitle ) {
+					navigationBoxTitle = new Text();
+					navigationBoxTitle.text = "Navigation";
+					navigationBox.addChild(navigationBoxTitle);
+				}
+
+				if ( !navigationBoxP ) {
+					navigationBoxP = new HBox();
+					navigationBoxP.styleName = "menuItemBoxP";
+					navigationBox.addChild(navigationBoxP);
+					
+					if ( !navigationMenu ) {
+						navigationMenu = new ToggleButtonBar();
+						var buttons:Array = [];
+						var item:Object = new Object();
+						item.label = "Inspect";
+						item.icon = inspectIcon;
+						item.toolTip = "Inspect";
+						buttons.push(item);
+						item = new Object();
+						item.label = "Zoom";
+						item.icon = zoomIcon;
+						item.toolTip = "Zoom";
+						buttons.push(item);
+						item = new Object();
+						item.label = "Pan";
+						item.icon = panIcon;
+						item.toolTip = "Pan";
+						buttons.push(item);
+						navigationMenu.dataProvider = buttons;
+						navigationMenu.addEventListener(ItemClickEvent.ITEM_CLICK, navigationMenuClickHandler);
+						navigationMenu.styleName = "navigationMenu";
+						navigationBoxP.addChild(navigationMenu);
+					}
 				}
 			}
 			
-			if ( !selectionBox ) {
-				selectionBox = new HBox();
-				selectionBox.styleName = "menuSpecialItemBox";
-				menuBox.addChild(selectionBox);
+			// view
+			if ( !viewBox ) {
+				viewBox = new VBox();
+				viewBox.styleName = "menuGroupBox";
+				menuBox.addChild(viewBox);
 
-				if ( !outlineVisibility ) {
-					outlineVisibility = new CheckBox();
-					outlineVisibility.selected = true;
-					outlineVisibility.labelPlacement = "top";
-					outlineVisibility.label = "Outline";
-					outlineVisibility.addEventListener(MouseEvent.CLICK, outlineVisibilityChangeHandler);
-					selectionBox.addChild(outlineVisibility);
+				if ( !viewBoxTitle ) {
+					viewBoxTitle = new Text();
+					viewBoxTitle.text = "View";
+					viewBox.addChild(viewBoxTitle);
 				}
 
-				if ( !fillingVisibility ) {
-					fillingVisibility = new CheckBox();
-					fillingVisibility.selected = true;
-					fillingVisibility.labelPlacement = "top";
-					fillingVisibility.label = "Filling";
-					fillingVisibility.addEventListener(MouseEvent.CLICK, fillingVisibilityChangeHandler);
-					selectionBox.addChild(fillingVisibility);
-				}
+				if ( !viewBoxP ) {
+					viewBoxP = new HBox();
+					viewBoxP.styleName = "menuItemBoxP";
+					viewBox.addChild(viewBoxP);
 
-				if ( !alphaSlider ) {
-					alphaSlider = new HSlider();
-					alphaSlider.minimum = 0;
-					alphaSlider.maximum = 1;
-					alphaSlider.tickInterval = 1;
-					alphaSlider.snapInterval = 0.1;
-					alphaSlider.labels = ["Modules", "GE Data"];
-					alphaSlider.tickValues = [0, 1]
-					alphaSlider.liveDragging = true;
-					alphaSlider.value = 0.2;
-					alphaSlider.addEventListener(SliderEvent.CHANGE, alphaSliderChangeHandler);
-					selectionBox.addChild(alphaSlider);
+					if ( !highlightingVisibility ) {
+						highlightingVisibility = new CheckBox();
+						highlightingVisibility.selected = true;
+						highlightingVisibility.labelPlacement = "top";
+						highlightingVisibility.label = "Highlighting";
+						highlightingVisibility.toolTip = "Highlight biclusters under mouse pointer.";
+						highlightingVisibility.addEventListener(MouseEvent.CLICK, highlightingVisibilityChangeHandler);
+						viewBoxP.addChild(highlightingVisibility);
+					}
+	
+					if ( !outlineVisibility ) {
+						outlineVisibility = new CheckBox();
+						outlineVisibility.selected = true;
+						outlineVisibility.labelPlacement = "top";
+						outlineVisibility.label = "Outline";
+						outlineVisibility.toolTip = "Show outlines of the largest contiguous part of every bicluster.";
+						outlineVisibility.addEventListener(MouseEvent.CLICK, outlineVisibilityChangeHandler);
+						viewBoxP.addChild(outlineVisibility);
+					}
+	
+					if ( !fillingVisibility ) {
+						fillingVisibility = new CheckBox();
+						fillingVisibility.selected = true;
+						fillingVisibility.labelPlacement = "top";
+						fillingVisibility.label = "Filling";
+						fillingVisibility.toolTip = "Show biclusters.";
+						fillingVisibility.addEventListener(MouseEvent.CLICK, fillingVisibilityChangeHandler);
+						viewBoxP.addChild(fillingVisibility);
+					}
+	
+					if ( !alphaSlider ) {
+						alphaSlider = new HSlider();
+						alphaSlider.minimum = 0;
+						alphaSlider.maximum = 1;
+						alphaSlider.tickInterval = 1;
+						alphaSlider.snapInterval = 0.1;
+						alphaSlider.labels = ["Biclusters", "Data"];
+						alphaSlider.toolTip = "Choose to either focus on the biclusters (slide to the left) or on the underlying data (slide to the right)";
+						alphaSlider.tickValues = [0, 1]
+						alphaSlider.liveDragging = true;
+						alphaSlider.value = 0.4;
+						alphaSlider.addEventListener(SliderEvent.CHANGE, alphaSliderChangeHandler);
+						viewBoxP.addChild(alphaSlider);
+					}
 				}
 			}
 
+			// window
 			if ( !windowBox ) {
-				windowBox = new HBox();
-				windowBox.styleName = "menuItemBox";
+				windowBox = new VBox();
+				windowBox.styleName = "menuGroupBox";
 				menuBox.addChild(windowBox);				
 
-				if ( !defaultPositionsButton ) {
-					defaultPositionsButton = new Button();
-					defaultPositionsButton.label = "Default";
-					defaultPositionsButton.styleName = "defaultPositionsButton";
-					defaultPositionsButton.toolTip = "Align panels at default positions.";
-					defaultPositionsButton.addEventListener(MouseEvent.CLICK, resizeHandler);
-					windowBox.addChild(defaultPositionsButton);
-				}
-				if ( !fullScreenButton ) {
-					fullScreenButton = new Button();
-					fullScreenButton.label = "Fullscreen";
-					fullScreenButton.toggle = true;
-					fullScreenButton.selected = false;
-					fullScreenButton.styleName = "fullScreenButton";
-					fullScreenButton.toolTip = "Change to fullscreen view.";
-					fullScreenButton.addEventListener(MouseEvent.CLICK, fullScreenHandler);
-					windowBox.addChild(fullScreenButton);
+				if ( !windowBoxTitle ) {
+					windowBoxTitle = new Text();
+					windowBoxTitle.text = "Window";
+					windowBox.addChild(windowBoxTitle);
 				}
 				
-				parentApplication.addEventListener(KeyboardEvent.KEY_UP, keyHandler);
+				if ( !windowBoxP ) {
+					windowBoxP = new HBox();
+					windowBoxP.styleName = "menuItemBox";
+					windowBox.addChild(windowBoxP);
+
+					if ( !defaultPositionsButton ) {
+						defaultPositionsButton = new Button();
+						defaultPositionsButton.label = "Default";
+						defaultPositionsButton.styleName = "defaultPositionsButton";
+						defaultPositionsButton.toolTip = "Align panels at default positions.";
+						defaultPositionsButton.addEventListener(MouseEvent.CLICK, resizeHandler);
+						windowBoxP.addChild(defaultPositionsButton);
+					}
+					if ( !fullScreenButton ) {
+						fullScreenButton = new Button();
+						fullScreenButton.label = "Fullscreen";
+						fullScreenButton.toggle = true;
+						fullScreenButton.selected = false;
+						fullScreenButton.styleName = "fullScreenButton";
+						fullScreenButton.toolTip = "Change to fullscreen view.";
+						fullScreenButton.addEventListener(MouseEvent.CLICK, fullScreenHandler);
+						windowBoxP.addChild(fullScreenButton);
+					}
+				}
 				
 			}
 			
+			// help
+			if ( !helpBox ) {
+				helpBox = new VBox();
+				helpBox.styleName = "menuGroupBox";
+				menuBox.addChild(helpBox);				
+
+				if ( !helpBoxTitle ) {
+					helpBoxTitle = new Text();
+					helpBoxTitle.text = "Help";
+					helpBox.addChild(helpBoxTitle);
+				}
+
+				if ( !helpBoxP ) {
+					helpBoxP = new HBox();
+					helpBoxP.styleName = "menuItemBox";
+					helpBox.addChild(helpBoxP);
+
+					if ( !websiteButton ) {
+						websiteButton = new Button();
+						websiteButton.label = "Website";
+						websiteButton.styleName = "websiteButton";
+						websiteButton.toolTip = "Visit the ExpressionView website.";
+						websiteButton.addEventListener(MouseEvent.CLICK, websiteHandler);
+						helpBoxP.addChild(websiteButton);
+					}
+				}
+			}
+				
+			parentApplication.addEventListener(KeyboardEvent.KEY_UP, keyHandler);
+
 		}
 		
 		override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void {		
 			super.updateDisplayList(unscaledWidth, unscaledHeight);
 
+			//menuBox.x = 10;
 			menuBox.percentWidth = 100;
 			menuBox.percentHeight = 100;
-			
+									
 			alphaSlider.percentHeight = 100;
 			alphaSlider.width = 120;
-			 
+			
 		}
 		
 	}

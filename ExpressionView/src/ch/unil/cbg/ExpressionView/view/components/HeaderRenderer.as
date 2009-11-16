@@ -15,18 +15,23 @@
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package ch.unil.cbg.ExpressionView.view.components {
-	
-	import mx.containers.Box;
-
-	public class ProgressBox extends Box {
 		
-		public function ProgressBox() {
+	import mx.controls.Label;
+	import mx.controls.listClasses.IDropInListItemRenderer;
+	import mx.core.IDataRenderer;
+
+	public class HeaderRenderer extends Label implements IDataRenderer, IDropInListItemRenderer {
+
+		public function HeaderRenderer() {
 			super();
 		}
-		
-		override protected function createChildren():void {
-			
+
+		override protected function commitProperties():void{
+			this.styleName = "headerrenderer";
 		}
-		
+
+		override protected function createChildren():void {
+			super.createChildren();
+		}				
 	}
 }
