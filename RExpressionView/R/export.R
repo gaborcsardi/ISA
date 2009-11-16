@@ -10,7 +10,7 @@ ExportEV.Biclust <- function(biclusters, eset, order, filename=NULL, norm=c("sam
 	eisamodules <- as(biclusters, "ISAModules")
 	eisamodules@rundata$annotation <- annotation(eset)
 	eisamodules@rundata$prenormalize <- FALSE
-	export.ev(eisamodules, eset, order, filename, norm)
+	ExportEV(eisamodules, eset, order, filename, norm)
 }
 
 
@@ -55,10 +55,10 @@ ExportEV.ISAModules <- function(biclusters, eset, order=NULL, filename=NULL, nor
 	writeLines("\t</summary>", con)
 
 	go.table <- toTable(GOTERM)
-	gos <- ISA.GO(biclusters)
+	gos <- ISAGO(biclusters)
 
 	kegg.table <- toTable(KEGGPATHID2NAME)
-	keggs <- ISA.KEGG(biclusters)
+	keggs <- ISAKEGG(biclusters)
 		
 	# get gene info
 	ann <- annotation(eset)
@@ -134,7 +134,6 @@ ExportEV.ISAModules <- function(biclusters, eset, order=NULL, filename=NULL, nor
 		for ( sample in 1:nSamples ) {
 			
 			writeLines("\t\t<sample>", con)
-					
 				writeLines(paste("\t\t\t<id>", sample, "</id>", sep=""), con)
 				writeLines("\t\t\t<score/>", con)
 				writeLines(paste("\t\t\t<name>", Samples[sample], "</name>", sep=""), con)
@@ -363,14 +362,19 @@ ExportEV.list <- function(biclusters, data, order=NULL, filename=NULL, descripti
 	
 	cnamesdata <- colnames(data)
 	rnamesdata <- rownames(data)
-	Genes <- cnamesdata[geneMaps[[1]]];
-	Samples <- rnamesdata[sampleMaps[[1]]];
+	Genes <- cnamesdata[geneMaps[[1]]]
+	Samples <- rnamesdata[sampleMaps[[1]]]
 	
 	geneLabels <- description$collabels
-	geneLabelsData <- as.matrix(description$coldata[Genes, rownames(geneLabels)])
-
+	geneLabelsData <- NULL
+	if ( !is.null(description$coldata) ) {
+		geneLabelsData <- as.matrix(description$coldata[Genes, rownames(geneLabels)])
+	}
 	sampleLabels <- description$rowlabels
-	sampleLabelsData <- as.matrix(description$rowdata[Samples, rownames(sampleLabels)])
+	sampleLabelsData <- NULL
+	if ( !is.null(description$rowdata) ) {
+		sampleLabelsData <- as.matrix(description$rowdata[Samples, rownames(sampleLabels)])
+	}
 	
 	nGenes <- dim(biclusters$columns)[1]
 	nSamples <- dim(biclusters$rows)[1]

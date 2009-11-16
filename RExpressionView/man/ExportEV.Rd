@@ -21,7 +21,6 @@ where \code{data} is a \code{\link{data.frame}}.
 }
 \seealso{\code{\link{OrderEV}}, \code{\link{OpenEV}}, \code{\link{ISA}}, \code{\link{biclust}}}
 \author{Andreas \enc{Lüscher}{Luscher} \email{andreas.luescher@a3.epfl.ch}}
-\references{\enc{Lüscher}{Luscher}, A., ...}
 \examples{
 ## We apply the Iterative Signature Algorithm (ISA) 
 library(eisa)

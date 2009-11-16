@@ -12,7 +12,6 @@ OpenEV opens the ExpressionView Flash applet for visualizing biclusters identifi
 }
 \seealso{\code{\link{OrderEV}}, \code{\link{ExportEV}}, \code{\link{ISA}}, \code{\link{biclust}}}
 \author{Andreas \enc{Lüscher}{Luscher} \email{andreas.luescher@a3.epfl.ch}}
-\references{\enc{Lüscher}{Luscher}, A., ...}
 \examples{
 ## Open the ExpressionView applet
 OpenEV()

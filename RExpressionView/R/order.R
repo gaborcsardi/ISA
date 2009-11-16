@@ -40,10 +40,16 @@ if (require(isa2)) {
 }
 
 OrderEV.list <- function(biclusters, initialorder=NULL, debuglevel=0, maxtime=60) {	
+	if( !is.null(initialorder) && sum(optimalorder$status[[1]], optimalorder$status[[2]]) == 
+		length(optimalorder$status[[1]])+length(optimalorder$status[[2]]) ) {
+		cat("initial order is already fully ordered.\n")
+		return(initialorder)
+	}
+	
 	no.bics <- ncol(biclusters$rows)
 	no.rows <- nrow(biclusters$rows)
 	no.cols <- nrow(biclusters$columns)
-		
+	
 	no.slots <- c(no.rows, no.cols)
 	
 	if ( is.null(initialorder) ) {
@@ -95,21 +101,17 @@ OrderEV.list <- function(biclusters, initialorder=NULL, debuglevel=0, maxtime=60
 	}
 			
 	timelimits <- list()
-	#cat("timelimits:\n")
 	for ( i in 1:2 ) {
 		timelimits[[i]] <- list(maxtime * estimates[[i]][[1]] / estimatedtotal)
 		if ( maxtime > 0 && timelimits[[i]][[1]] < 1 ) {
 			timelimits[[i]][[1]] <- 1
 		}
-		#cat(timelimits[[i]][[1]], " ")
 		for ( mod in 1:no.bics ) {
 			timelimits[[i]][[mod+1]] <- maxtime * estimates[[i]][[mod+1]] / estimatedtotal
 			if ( maxtime > 0 && timelimits[[i]][[mod+1]] < 1 ) {
 				timelimits[[i]][[mod+1]] <- 1
 			}
-		#	cat(timelimits[[i]][[mod+1]], " ")
 		}
-		#cat("\n")
 	}
 	
 	for ( i in 1:2 ) {
@@ -186,8 +188,8 @@ OrderEV.list <- function(biclusters, initialorder=NULL, debuglevel=0, maxtime=60
 	cat("ordering done.                                  \r\n")
 	flush.console()
 
-	res = list(rows=row.map, cols=col.map, status=list(rows=initialorder$status[[1]], cols=initialorder$status[[2]]))
+	res <- list(rows=row.map, cols=col.map, status=list(rows=initialorder$status[[1]], cols=initialorder$status[[2]]))
 
-	res
+	return(res)
 
 }
