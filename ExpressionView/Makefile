@@ -17,9 +17,9 @@ libs/AlivePDF.swc: $(ALIVEPDFFILES)
 	
 
 doc: $(EXPRESSIONVIEWFILES)
-	rm -rf asdoc-output
-	mkdir asdoc-output
-	asdoc -target-player 10 -source-path src -doc-sources src -external-library-path libs
+	rm -rf doc
+	mkdir doc
+	asdoc -target-player 10 -source-path src -exclude-classes $(ALIVEPDFCLASSES) -output doc -doc-sources src -external-library-path libs
 
 release: bin-release/ExpressionView.swf
 

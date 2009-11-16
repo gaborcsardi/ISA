@@ -1,4 +1,22 @@
+//     ExpressionView - A package to visualize biclusters
+//     Copyright (C) 2009 Computational Biology Group, University of Lausanne
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package ch.unil.cbg.ExpressionView.view.components {
+	
+	import __AS3__.vec.Vector;
 	
 	import ch.unil.cbg.ExpressionView.events.*;
 	import ch.unil.cbg.ExpressionView.model.*;
@@ -26,15 +44,17 @@ package ch.unil.cbg.ExpressionView.view.components {
 	public class ZoomPanCanvas extends Canvas {
 
 		[Embed(source='/ch/unil/cbg/ExpressionView/assets/menu/zoomin.png')]
-		public var zoomInIcon:Class; 
+		private var zoomInIcon:Class; 
 		[Embed(source='/ch/unil/cbg/ExpressionView/assets/menu/zoomout.png')]
-		public var zoomOutIcon:Class; 
+		private var zoomOutIcon:Class; 
 		[Embed(source='/ch/unil/cbg/ExpressionView/assets/menu/zoomauto.png')]
-		public var zoomAutoIcon:Class; 
+		private var zoomAutoIcon:Class; 
 		[Embed(source='/ch/unil/cbg/ExpressionView/assets/menu/zoomautox.png')]
-		public var zoomAutoXIcon:Class; 
+		private var zoomAutoXIcon:Class; 
 		[Embed(source='/ch/unil/cbg/ExpressionView/assets/menu/zoomautoy.png')]
-		public var zoomAutoYIcon:Class; 
+		private var zoomAutoYIcon:Class; 
+		[Embed(source='/ch/unil/cbg/ExpressionView/assets/menu/zoomall.png')]
+		private var zoomAllIcon:Class; 
 
 		private const MINIMAL_WIDTH:int = 2;
 		private const MINIMAL_HEIGHT:int = 2;
@@ -69,6 +89,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 		
 		private var lastClick:int;
 		
+		private var highlighting:Boolean = true;
 		private var highlightedModules:Array;
 		private var highlightedGenes:Array;
 		private var highlightedSamples:Array;
@@ -133,7 +154,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 					overlayCanvas.addEventListener(MouseEvent.MOUSE_DOWN, zoomMouseDownHandler);
 					parentApplication.addEventListener(KeyboardEvent.KEY_UP, zoomKeyUpHandler);
 					zoomMenu.visible = true;
-					dispatchEvent(new UpdateStatusBarEvent("click to zoom in, shift-click to zoom out, a to autozoom, g to autozoom genes, and s to autozoom samples.")); 
+					dispatchEvent(new UpdateStatusBarEvent("click to zoom in, shift-click to zoom out, a to autozoom on modules, e to see everything.")); 
 				} else if ( mode == PAN ) {
 					overlayCanvas.addEventListener(MouseEvent.MOUSE_DOWN, dragMouseDownHandler);
 				}
@@ -188,7 +209,8 @@ package ch.unil.cbg.ExpressionView.view.components {
 			selection = new Shape();
 			selection.alpha = 0.3;
 			selectionRectangle.bottomRight = new Point(event.localX, event.localY);
-			selection.graphics.beginFill(0x0000ff);
+			selection.graphics.beginFill(0xffff00);
+			//selection.graphics.beginFill(0xaaccee);
 			selection.graphics.drawRect(selectionRectangle.x, selectionRectangle.y, selectionRectangle.width, selectionRectangle.height); 
 			selection.graphics.endFill();
 			overlayCanvas.rawChildren.addChild(selection);
@@ -244,34 +266,45 @@ package ch.unil.cbg.ExpressionView.view.components {
 			overlayCanvas.addEventListener(MouseEvent.MOUSE_DOWN, zoomMouseDownHandler);
 		}
 		private function zoomKeyUpHandler(event:KeyboardEvent): void {
-			// a
-			if ( event.keyCode == 65 ) {
-				if ( modulesWidth > 0 && modulesHeight > 0 ) {
-					currentRectangle = new Rectangle(0, 0, modulesWidth, modulesHeight);
-					currentRectangle = adjustRectangle(currentRectangle);
-					drawImage();
-					lastRectangle = currentRectangle.clone();
-				}		
+			var focus:String = getFocus().name;
+			if ( focus.search("TextField") == -1 ) {
+				// a
+				if ( event.keyCode == 65 ) {
+					if ( modulesWidth > 0 && modulesHeight > 0 ) {
+						currentRectangle = new Rectangle(0, 0, modulesWidth, modulesHeight);
+						currentRectangle = adjustRectangle(currentRectangle);
+						drawImage();
+						lastRectangle = currentRectangle.clone();
+					}		
+				}
+				// g
+				if ( event.keyCode == 71 ) {
+					if ( modulesWidth > 0 ) {
+						currentRectangle = new Rectangle(0, 0, modulesWidth, currentRectangle.height);
+						currentRectangle = adjustRectangle(currentRectangle);
+						drawImage();
+						lastRectangle = currentRectangle.clone();
+					}		
+				}
+				// s
+				if ( event.keyCode == 83 ) {
+					if ( modulesHeight > 0 ) {
+						currentRectangle = new Rectangle(0, 0, currentRectangle.width, modulesHeight);
+						currentRectangle = adjustRectangle(currentRectangle);
+						drawImage();
+						lastRectangle = currentRectangle.clone();
+					}		
+				}
+				// e
+				if ( event.keyCode == 69 ) {
+					if ( modulesHeight > 0 ) {
+						currentRectangle = new Rectangle(0, 0, maximalWidth, maximalHeight);
+						currentRectangle = adjustRectangle(currentRectangle);
+						drawImage();
+						lastRectangle = currentRectangle.clone();
+					}		
+				}
 			}
-			// g
-			if ( event.keyCode == 71 ) {
-				if ( modulesWidth > 0 ) {
-					currentRectangle = new Rectangle(0, 0, modulesWidth, currentRectangle.height);
-					currentRectangle = adjustRectangle(currentRectangle);
-					drawImage();
-					lastRectangle = currentRectangle.clone();
-				}		
-			}
-			// s
-			if ( event.keyCode == 83 ) {
-				if ( modulesHeight > 0 ) {
-					currentRectangle = new Rectangle(0, 0, currentRectangle.width, modulesHeight);
-					currentRectangle = adjustRectangle(currentRectangle);
-					drawImage();
-					lastRectangle = currentRectangle.clone();
-				}		
-			}
-			
 		}
 
 		// drag events
@@ -327,7 +360,6 @@ package ch.unil.cbg.ExpressionView.view.components {
 			lastRectangle = currentRectangle.clone();
 		}
 
-
 		private function drawRectangles(): void {
 			if ( canvaswidth > 0 ) {
 				modulesCanvas.graphics.clear();
@@ -354,7 +386,9 @@ package ch.unil.cbg.ExpressionView.view.components {
 			var targetRect:Rectangle = new Rectangle(0, 0, canvaswidth, canvasheight);
 			currentgeimage.bitmapData = fullgeimage.getData(currentRectangle, targetRect);
 			currentmodulesimage.bitmapData = fullmodulesimage.getData(currentRectangle, targetRect);
-			dispatchEvent(new HighlightingEvent(HighlightingEvent.MODULE, [highlightedModules]));
+			if ( highlighting ) {
+				dispatchEvent(new HighlightingEvent(HighlightingEvent.MODULE, [highlightedModules]));
+			}
 			dispatchEvent(new HighlightingEvent(HighlightingEvent.GENE, [highlightedGenes]));
 			dispatchEvent(new HighlightingEvent(HighlightingEvent.SAMPLE, [highlightedSamples]));
 			updateScrollBars();
@@ -375,7 +409,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 				geimage = new Image();
 				geimage.maintainAspectRatio = false;
 				geimage.source = currentgeimage;
-				geimage.alpha = 0.2;
+				geimage.alpha = 0.4;
 				addChild(geimage);
 			}
 
@@ -414,29 +448,33 @@ package ch.unil.cbg.ExpressionView.view.components {
 			if ( !zoomMenu ) {
 				zoomMenu = new ButtonBar();
 				zoomMenu.visible = false;
-				zoomMenu.direction = "vertical";				
+				zoomMenu.direction = "vertical";			
 				
 				var buttons:Array = [];
 				var item:Object = new Object();
 				item.label = "+";
 				item.icon = zoomInIcon;
-				item.toolTip = "Zoom in";
+				item.toolTip = "Zoom in.";
 				buttons.push(item);
 				item = new Object();
 				item.icon = zoomOutIcon;
-				item.toolTip = "Zoom out";
+				item.toolTip = "Zoom out.";
 				buttons.push(item);
 				item = new Object();
 				item.icon = zoomAutoIcon;
-				item.toolTip = "Auto zoom";
+				item.toolTip = "Auto zoom on modules";
 				buttons.push(item);
 				item = new Object();
 				item.icon = zoomAutoXIcon;
-				item.toolTip = "Auto zoom x";
+				item.toolTip = "Auto zoom on modules along horizontal axis.";
 				buttons.push(item);
 				item = new Object();
 				item.icon = zoomAutoYIcon;
-				item.toolTip = "Auto zoom y";
+				item.toolTip = "Auto zoom on modules along vertical axis.";
+				buttons.push(item);
+				item = new Object();
+				item.icon = zoomAllIcon;
+				item.toolTip = "Show everything.";
 				buttons.push(item);
 				zoomMenu.dataProvider = buttons;
 				
@@ -445,6 +483,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 			}
 						
 			parentApplication.addEventListener(MenuEvent.ALPHA, alphaSliderChangeHandler);
+			parentApplication.addEventListener(MenuEvent.HIGHLIGHTING, setHighlightingVisibilityHandler);
 			parentApplication.addEventListener(MenuEvent.OUTLINE, setOutlineVisibilityHandler);
 			parentApplication.addEventListener(MenuEvent.FILLING, setFillingVisibilityHandler);
 			parentApplication.addEventListener(HighlightingEvent.MODULE, highlightModulesHandler);
@@ -465,6 +504,8 @@ package ch.unil.cbg.ExpressionView.view.components {
 				dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, 71));
 			} else if ( event.index == 4 ) {
 				dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, 83));
+			} else if ( event.index == 5 ) {
+				dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, 69));
 			}
 		}
 
@@ -500,8 +541,8 @@ package ch.unil.cbg.ExpressionView.view.components {
 			modulesCanvas.height = canvasheight;
 			overlayCanvas.width = canvaswidth;
 			overlayCanvas.height = canvasheight;
-			zoomMenu.width = 20;
-			zoomMenu.height = 160;
+			zoomMenu.width = 40;
+			zoomMenu.height = 220;
 			zoomMenu.x = overlayCanvas.width - 3/2 * zoomMenu.width;
 			zoomMenu.y = zoomMenu.width / 2;
 						
@@ -525,10 +566,11 @@ package ch.unil.cbg.ExpressionView.view.components {
 			modulesOutlines = data[2];
 			modulesColors = data[3];
 			modulesWidth = data[4][0];
-			modulesHeight = data[4][1];			
+			modulesHeight = data[4][1];
+			var showall:Boolean = data[5];			
 			maximalWidth = fullgeimage.width;
 			maximalHeight = fullgeimage.height;
-			if ( modulesWidth == 0 || modulesHeight == 0 ) {
+			if ( modulesWidth == 0 || modulesHeight == 0 || showall ) {
 				currentRectangle = new Rectangle(0, 0, maximalWidth, maximalHeight);
 			} else {
 				currentRectangle = new Rectangle(0, 0, modulesWidth, modulesHeight);
@@ -539,6 +581,10 @@ package ch.unil.cbg.ExpressionView.view.components {
 		
 		private function alphaSliderChangeHandler(event:MenuEvent): void {
 			geimage.alpha = event.data[0]
+		}
+
+		private function setHighlightingVisibilityHandler(event:MenuEvent): void {
+			highlighting = event.data[0];
 		}
 
 		private function setOutlineVisibilityHandler(event:MenuEvent): void {
@@ -563,6 +609,14 @@ package ch.unil.cbg.ExpressionView.view.components {
 				if ( highlightedModules[module] == null ) { 
 					continue;
 				}
+
+				// to draw arrow
+				var arrowCommands:Vector.<int> = new Vector.<int>(8, true);
+				arrowCommands[0] = 1;
+				for ( var move:int = 1; move < 8; ++move ) {
+					arrowCommands[move] = 2;
+				}
+
 				for ( var i:int = 0; i < highlightedModules[module].length; ++i ) {
 					var r:Rectangle = currentRectangle.intersection(highlightedModules[module][i]);
 					if ( r.width > 0 && r.height > 0 ) {
@@ -576,7 +630,25 @@ package ch.unil.cbg.ExpressionView.view.components {
 						shape.graphics.beginFill(modulesColors[module][1]);
 						shape.graphics.drawRect(x, y, dx, dy);
 						shape.graphics.endFill();
+						
+						// draw arrows
+						var h:Number = 30;
+						var w:Number = h * 2/3;
+					    var arrowCoordinates:Vector.<Number> = new Vector.<Number>(16, true);
+					    arrowCoordinates[0] = x; arrowCoordinates[1] = y;
+					    arrowCoordinates[2] = x+w/2; arrowCoordinates[3] = y-h/3;
+					    arrowCoordinates[4] = x+w/4; arrowCoordinates[5] = arrowCoordinates[3];
+					    arrowCoordinates[6] = arrowCoordinates[4]; arrowCoordinates[7] = y-h;
+					    arrowCoordinates[8] = x-w/4; arrowCoordinates[9] = arrowCoordinates[7];
+					    arrowCoordinates[10] = arrowCoordinates[8]; arrowCoordinates[11] = arrowCoordinates[3];
+					    arrowCoordinates[12] = x-w/2; arrowCoordinates[13] = arrowCoordinates[3];
+					    arrowCoordinates[14] = x; arrowCoordinates[15] = y;
+
+						shape.graphics.beginFill(modulesColors[module][1]);
+						shape.graphics.drawPath(arrowCommands, arrowCoordinates);
+						shape.graphics.endFill();
 					}
+					
 				}
 			}
 			highlightCanvas.rawChildren.addChild(shape);
@@ -585,7 +657,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 		private function highlightGenesHandler(event:HighlightingEvent): void {
 			try {
 				highlightCanvas.rawChildren.removeChild(highlightCanvas.rawChildren.getChildByName("genes"));
-			} catch (err:Error) { 
+			} catch (err:Error) {
 			}
 			
 			highlightedGenes = event.data[0];

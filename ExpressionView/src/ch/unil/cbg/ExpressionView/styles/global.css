@@ -1,10 +1,225 @@
+/* to see the available options, use
+http://examples.adobe.com/flex3/consulting/styleexplorer/Flex3StyleExplorer.html
+*/
+
 Application {
-	backgroundGradientColors:	#99ccff, #cccccc;
-	backgroundGradientAlphas:	0.75, 0.25;
+	backgroundColor: #d5e5f5;
+	backgroundGradientAlphas: 0, 0;
+	fontFamily: Verdana;
+}
+
+Canvas {
+	borderThickness: 1;
 }
 
 Button {
-   highlightAlphas:				1, 0.33;
-   fillAlphas:					1, 0.16, 0.18, 1;
-   fillColors:					#5f89b9, #697182, #ffffff, #eeeeee;
+	cornerRadius: 5;
+	fontWeight: normal;
+	fontFamily: Verdana;
+	fontSize: 12;
+	color: #000000;
+  	highlightAlphas: 0, 0;
+	fillAlphas: 0.5, 0.5, 0.9, 0.9;
+	fillColors: #ffffff, #ffffff, #ffffff, #ffffff;
+	/*
+	up-skin: ClassReference("CustomButtonSkin");
+	over-skin: ClassReference("CustomButtonSkin");
+	down-skin: ClassReference("CustomButtonSkin");
+	selected-disabled-skin: ClassReference("CustomButtonSkin");
+	selected-over-skin: ClassReference("CustomButtonSkin");
+	*/
+	selected-up-skin: ClassReference("ch.unil.cbg.ExpressionView.styles.CustomButtonSkin");
+}
+
+.selectedButton {
+	selected-up-skin: ClassReference("ch.unil.cbg.ExpressionView.styles.CustomButtonSkin");
+	fontWeight: bold;
+	fillAlphas: 0.2, 0.2, 0.6, 0.6;
+}
+
+CheckBox {
+	verticalGap: -0.5;
+	textAlign: center;
+	fontWeight: normal;
+	fontFamily: Verdana;
+	fontSize: 10;
+	color: #000000;
 }	
+
+HSlider {
+	tickOffset: -2;
+	labelOffset: -5;
+	fontWeight: normal;
+	fontFamily: Verdana;
+	fontSize: 10;
+	color: #000000;
+}	
+
+Panel {
+	borderThicknessLeft: 0;
+	borderThicknessTop: 0;
+	borderThicknessBottom: 0;
+	borderThicknessRight: 0;
+	cornerRadius: 0;
+	headerHeight: 25;	
+	backgroundColor: #d5e5f5;
+	headerColors: #b5c5d5, #b5c5d5;
+	titleStyleName: "panelTitle";
+	dropShadowEnabled: true;
+	backgroundAlpha: 0.95;
+	borderAlpha: 0.95;
+}
+
+.panelTitle {
+	letterSpacing: 0.2;
+	color: #000000;
+	fontFamily: Verdana;
+	fontSize: 12;
+	fontWeight: normal;
+}
+
+.selectModulesPanel {
+}
+
+TabNavigator {
+	tabOffset: 0;
+	borderColor: #aaccee;
+	borderColor: #ffffff;
+	borderThickness: 1;
+	tabOffset: 10;
+	color: #000000;
+	tabHeight: 25;
+	dropShadowEnabled: true;
+}
+
+ButtonBar {
+	buttonStyleName: "buttonBarButtons";
+}
+
+.buttonBarButtons {
+	fillAlphas: 1, 1;
+}
+
+ToolTip {
+   color: #000000;
+   fontFamily: Verdana;
+}
+
+HDividedBox, VDividedBox {
+	dividerAffordance: 30;
+	dividerAlpha: 1;
+	dividerColor: #999999;
+	dividerThickness: 5;
+}
+
+DataGrid {
+	horizontalGridLines: true;
+	horizontalGridLineColor: #cccccc;
+	verticalGridLineColor: #cccccc;
+	useRollOver: true;
+	textIndent: 0;
+	borderThickness: 0;
+	dropShadowEnabled: false;
+	headerStyleName: "dataGridHeaderStyle";
+}
+
+.dataGridHeaderStyle {
+	color: #000000;
+	textIndent: 0;
+	textAlign: left;
+}
+
+.linkrenderer {
+	textIndent: 5;
+}
+
+.headerrenderer {
+	textIndent: 5;
+}
+
+.navigationMenu {
+	buttonWidth: 100;
+	buttonStyleName: "toggleButton";
+	selectedButtonTextStyleName: "toggleButtonStyle"
+}
+
+.toggleButton {
+	selected-up-skin: ClassReference("ch.unil.cbg.ExpressionView.styles.CustomButtonBarButtonSkin");
+}
+
+.toggleButtonStyle {
+	fontWeight: bold;
+	fontStyle: normal;
+	textDecoration: none;
+}
+
+.infoTextContent {
+	color: #000000;
+	/*
+	borderStyle: solid;
+	*/
+	borderStyle: none;
+}
+
+/* menu and footer */
+.menuBox {
+	backgroundColor: #aaccee;
+	verticalAlign: middle;
+	horizontalAlign: center;
+	horizontalGap: 30;
+}
+
+.menuGroupBox {
+	horizontalAlign: left;
+	verticalGap: 0;
+}
+
+.menuItemBox {
+	horizontalAlign: left;
+}
+
+.openButton {
+	icon: Embed('/ch/unil/cbg/ExpressionView/assets/menu/open.png');
+}
+
+.pdfExportButton {
+	icon: Embed('/ch/unil/cbg/ExpressionView/assets/menu/pdf.png');
+}
+
+.excelExportButton {
+	icon: Embed('/ch/unil/cbg/ExpressionView/assets/menu/excel.png');
+}
+
+.defaultPositionsButton {
+	icon: Embed('/ch/unil/cbg/ExpressionView/assets/menu/default.png');
+}
+
+.fullScreenButton {
+	icon: Embed('/ch/unil/cbg/ExpressionView/assets/menu/fullscreen.png');
+}
+
+.websiteButton {
+	icon: Embed('/ch/unil/cbg/ExpressionView/assets/menu/website.png');
+}
+
+.footerBox {
+	backgroundColor: #aaccee;
+	color: #000000;
+	verticalAlign: middle;
+	horizontalAlign: left;
+}
+
+/* searchable datagrid and info Panel*/
+.clearButton {
+	upSkin: Embed('/ch/unil/cbg/ExpressionView/assets/tabnavigator/closeButton.png');
+	overSkin: Embed('/ch/unil/cbg/ExpressionView/assets/tabnavigator/closeButtonOver.png');
+	downSkin: Embed('/ch/unil/cbg/ExpressionView/assets/tabnavigator/closeButton.png');
+	disabledSkin: Embed('/ch/unil/cbg/ExpressionView/assets/tabnavigator/closeButton.png');
+}
+
+.openModuleButton {
+	upSkin: Embed('/ch/unil/cbg/ExpressionView/assets/menu/openButton.png');
+	overSkin: Embed('/ch/unil/cbg/ExpressionView/assets/menu/openButtonOver.png');
+	downSkin: Embed('/ch/unil/cbg/ExpressionView/assets/menu/openButton.png');
+	disabledSkin: Embed('/ch/unil/cbg/ExpressionView/assets/menu/openButton.png');
+}

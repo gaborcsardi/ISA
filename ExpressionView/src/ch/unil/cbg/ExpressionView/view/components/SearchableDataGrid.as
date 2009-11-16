@@ -1,3 +1,19 @@
+//     ExpressionView - A package to visualize biclusters
+//     Copyright (C) 2009 Computational Biology Group, University of Lausanne
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package ch.unil.cbg.ExpressionView.view.components {
 	
 	import ch.unil.cbg.ExpressionView.events.SearchableDataGridSelectionEvent;
@@ -10,6 +26,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 	import mx.collections.XMLListCollection;
 	import mx.containers.Canvas;
 	import mx.containers.HBox;
+	import mx.controls.Button;
 	import mx.controls.DataGrid;
 	import mx.controls.Text;
 	import mx.controls.TextInput;
@@ -30,6 +47,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 		private var headerBox:HBox;
 		protected var searchField:TextInput;
 		private var searchText:Text;
+		private var clearButton:Button;
 		
 		private var shift:Boolean;
 		private var searchColumn:int;
@@ -65,6 +83,14 @@ package ch.unil.cbg.ExpressionView.view.components {
 					searchField.addEventListener(Event.CHANGE, handleChange);
 					headerBox.addChild(searchField);
 				}
+				
+				if ( !clearButton ) {
+					clearButton = new Button();
+					clearButton.addEventListener(MouseEvent.CLICK, clearButtonClickHandler);
+					clearButton.visible = false;
+					clearButton.styleName = "clearButton";
+					headerBox.addChild(clearButton);
+				}
 			}
 				
 			if ( !dataGrid ) {
@@ -81,12 +107,13 @@ package ch.unil.cbg.ExpressionView.view.components {
 				dataGrid.addEventListener(DataGridEvent.HEADER_RELEASE, headerReleaseHandler);
 				addChild(dataGrid);
 			}
+			
 		}
-		
+
 		private function getSelection(selected:Array): Array {
 			var selection:Array = [];
 			for ( var i:int = 0; i < selected.length; ++ i ) {
-				selection.push(dataprovider[selected[i]].children()[0])
+				selection.push(dataprovider[selected[i]].id)
 			}
 			return selection;
 		}
@@ -113,6 +140,13 @@ package ch.unil.cbg.ExpressionView.view.components {
 		
 		private function clickHandler(event:ListEvent): void {
 			dispatchEvent(new SearchableDataGridSelectionEvent(SearchableDataGridSelectionEvent.ITEM_CLICK, getSelection(dataGrid.selectedIndices)));
+		}
+		
+		private function clearButtonClickHandler(event:MouseEvent):void {
+			searchField.text = "";
+			dataprovider.filterFunction = null;
+			dataprovider.refresh();
+			clearButton.visible = false;
 		}
 		
 		private function doubleClickHandler(event:ListEvent): void {
@@ -158,13 +192,16 @@ package ch.unil.cbg.ExpressionView.view.components {
 		
 		override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void {		
 			super.updateDisplayList(unscaledWidth, unscaledHeight);
-			
-			searchField.width = parent.width - searchText.width;
-			
+						
 			headerBox.x = 0; 
 			headerBox.y = 0;
 			headerBox.percentWidth = 100;
 			headerBox.height = 30;
+			
+			searchField.width = unscaledWidth - searchText.measuredWidth - 30;
+			
+			clearButton.x = unscaledWidth - 15;
+			clearButton.y = searchField.y + (searchField.measuredHeight - clearButton.measuredHeight) / 2;
 			
 			dataGrid.x = 0;
 			dataGrid.y = headerBox.height;
@@ -184,8 +221,10 @@ package ch.unil.cbg.ExpressionView.view.components {
 		private function handleChange(e:Event) : void{
             if (searchField.text.length == 0) {
                 dataprovider.filterFunction = null;
+                clearButton.visible = false;
             } else {
                 dataprovider.filterFunction = filterFunction;
+                clearButton.visible = true;
             }
             dataprovider.refresh();			
 		}
@@ -214,6 +253,15 @@ package ch.unil.cbg.ExpressionView.view.components {
 	            }
 			}
             return false;
+		}
+
+		public function set selectedIndices(selection:Array):void{
+			selection.sort(Array.NUMERIC);
+			var temp:Array = [];
+			for ( var i:int = 0; i < selection.length; ++i ) {
+				temp.push(selection[i]-1);
+			}
+			dataGrid.selectedIndices = temp;
 		}
 		
 		public function set dataProvider(value:Object):void{

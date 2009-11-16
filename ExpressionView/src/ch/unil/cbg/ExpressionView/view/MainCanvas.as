@@ -1,3 +1,19 @@
+//     ExpressionView - A package to visualize biclusters
+//     Copyright (C) 2009 Computational Biology Group, University of Lausanne
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package ch.unil.cbg.ExpressionView.view {
 	
 	import __AS3__.vec.Vector;
@@ -14,16 +30,21 @@ package ch.unil.cbg.ExpressionView.view {
 	
 	import mx.collections.XMLListCollection;
 	import mx.containers.Canvas;
+	import mx.containers.HBox;
 	import mx.containers.HDividedBox;
 	import mx.containers.Panel;
 	import mx.containers.TabNavigator;
+	import mx.containers.VBox;
 	import mx.containers.VDividedBox;
 	import mx.controls.Alert;
-	import mx.controls.Label;
+	import mx.controls.Button;
+	import mx.controls.HRule;
 	import mx.controls.TextArea;
 	import mx.controls.dataGridClasses.DataGridColumn;
 	import mx.core.ClassFactory;
+	import mx.core.mx_internal;
 	import mx.events.IndexChangedEvent;
+	import mx.managers.PopUpManager;
 	import mx.utils.ObjectUtil;
 	
 	import org.alivepdf.colors.RGBColor;
@@ -40,15 +61,21 @@ package ch.unil.cbg.ExpressionView.view {
 		private var useDefaultPositions:Boolean;
 		private var scoreColumnsVisible:Boolean;
 		
-		private var rawged:GeneExpressionData;
 		private var ged:GeneExpressionData;
 		
 		private var selectedMode:int;
-		private var selectedAlpha:Number = 0.2;
+		private var selectedAlpha:Number = 0.4;
+		private var selectedHighlighting:Boolean = true;
 		private var selectedOutline:Boolean = true;
 		private var selectedFilling:Boolean = true;
 		
+		private const LABELS:Array = ["Genes", "Samples", "Modules", "GOs", "KEGGs"];
+		private var selections:Vector.<Array>;
+		private var intersections:Vector.<Array>;
+		
 		private var lastHighlightedModules:Array;
+		private var gos:String;
+		private var keggs:String;
 		
 		private var divider:HDividedBox;
 		
@@ -59,8 +86,14 @@ package ch.unil.cbg.ExpressionView.view {
 		
 		private var infoPanel:Panel;
 		private var infoDivider:VDividedBox;
-		private var infoContent:TextArea;
+		private var infoContent:VBox;
+		private var infoTextContent:Array;
 		private var infoNavigator:TabNavigator;
+		private var openButtons:Array;
+		private var clearButtons:Array;
+		private var infoContentBoxes:Array;
+		private var ruler1:HRule;
+		private var ruler2:HRule;
 		
 		private var modulesSearchableDataGrid:SearchableDataGrid;
 		private var genesSearchableDataGrid:SearchableDataGrid;		
@@ -69,13 +102,23 @@ package ch.unil.cbg.ExpressionView.view {
 		private var KEGGSearchableDataGrid:SearchableDataGrid;
 		private var experimentData:Canvas;
 		private var experimentDataContent:TextArea
+		 
+		private var popup:Panel;
 
 		public function MainCanvas() {
 			super();
 
 			ged = new GeneExpressionData();
-			lastHighlightedModules = new Array();
+			lastHighlightedModules = [];
 			useDefaultPositions = true;
+
+			selections = new Vector.<Array>(5, true);
+			intersections = new Vector.<Array>(5, true);
+			for ( var i:int = 0; i < LABELS.length; ++i ) {
+				selections[i] = [];
+				intersections[i] = [];
+			}
+			
 		}
 		
 		override protected function createChildren(): void {
@@ -101,8 +144,8 @@ package ch.unil.cbg.ExpressionView.view {
 					
 					openTabs = new Vector.<ZoomPanCanvas>;
 					mapOpenTabs = new Vector.<int>;
-
 				}
+				
 			}
 			
 			if ( !infoPanel ) {
@@ -116,9 +159,79 @@ package ch.unil.cbg.ExpressionView.view {
 					infoPanel.addChild(infoDivider);
 				
 					if ( !infoContent ) {
-						infoContent = new TextArea();
+						infoContent = new VBox();
 						infoContent.setStyle("backgroundAlpha", infoPanel.getStyle("backgroundAlpha"));
+						infoContent.setStyle("backgroundColor", "#ffffff");
+						infoContent.setStyle("verticalGap", "0");
+						infoContent.verticalScrollPolicy = "off";
+						infoContent.styleName = "infoContent";
 						infoDivider.addChild(infoContent);
+
+						if ( !ruler1 ) {
+							ruler1 = new HRule();
+							ruler1.visible = false;
+						}
+						if ( !ruler2 ) {
+							ruler2 = new HRule();
+							ruler2.visible = false;
+						}
+
+						infoContentBoxes = [];
+						for ( var i:int = 0; i < 7; ++i ) {
+							var hbox:HBox = new HBox();
+							hbox.visible = false;
+							hbox.setStyle("verticalAlign", "middle");
+							infoContentBoxes.push(hbox);
+						}
+
+						for ( i = 0; i < 2; ++i ) {
+							infoContent.addChild(infoContentBoxes[i]);
+						}
+						infoContent.addChild(ruler1);
+						for ( i = 2; i < 5; ++i ) {
+							infoContent.addChild(infoContentBoxes[i]);
+						}
+						infoContent.addChild(ruler2);
+						for ( i = 5; i < 7; ++i ) {
+							infoContent.addChild(infoContentBoxes[i]);
+						}
+
+						infoTextContent = [];
+						for ( i = 0; i < infoContentBoxes.length; ++i ) {
+							var textContent:TextArea = new TextArea();
+							textContent.editable = false;
+							textContent.selectable = true;
+							textContent.verticalScrollPolicy = "off";
+							textContent.styleName = "infoTextContent";
+							infoTextContent.push(textContent);
+							infoContentBoxes[i].addChild(infoTextContent[i]);
+						}
+
+						var LABELS:Array = ["Genes", "Samples", "Modules", "GO", "KEGG"];
+
+						openButtons = [];
+						for ( i = 0; i < 7; ++i ) {
+							var button:Button = new Button();
+							button.styleName = "openModuleButton";
+							button.name = "openButton" + i;
+							button.toolTip = "Open intersecting modules";
+							button.addEventListener(MouseEvent.CLICK, openModuleButtonClickHandler);
+							openButtons.push(button);
+						}						
+						
+						clearButtons = [];
+						for ( i = 0; i < 5; ++i ) {
+							button = new Button();
+							button.styleName = "clearButton";
+							button.name = "clearButton" + i;
+							button.toolTip = "Clear selected " + LABELS[i];
+							button.addEventListener(MouseEvent.CLICK, clearButtonClickHandler);
+							clearButtons.push(button);
+							infoContentBoxes[i+2].addChild(openButtons[i]);
+							infoContentBoxes[i+2].addChild(button);
+							infoContentBoxes[i+2].addChild(infoTextContent[i+2])
+						}						
+
 					}
 					
 					if ( !infoNavigator ) {
@@ -152,12 +265,14 @@ package ch.unil.cbg.ExpressionView.view {
 						if ( !GOSearchableDataGrid ) {
 							GOSearchableDataGrid = new SearchableDataGrid();
 							GOSearchableDataGrid.label = "GO";
+							GOSearchableDataGrid.addEventListener(SearchableDataGridSelectionEvent.ITEM_CLICK, clickGOHandler);
 							infoNavigator.addChild(GOSearchableDataGrid);
 						}
 
 						if ( !KEGGSearchableDataGrid ) {
 							KEGGSearchableDataGrid = new SearchableDataGrid();
 							KEGGSearchableDataGrid.label = "KEGG";
+							KEGGSearchableDataGrid.addEventListener(SearchableDataGridSelectionEvent.ITEM_CLICK, clickKEGGHandler);
 							infoNavigator.addChild(KEGGSearchableDataGrid);
 						}
 
@@ -167,6 +282,8 @@ package ch.unil.cbg.ExpressionView.view {
 							infoNavigator.addChild(experimentData);
 							if ( !experimentDataContent ) {
 								experimentDataContent = new TextArea();
+								experimentDataContent.editable = false;
+								experimentDataContent.selectable = true;
 								experimentData.addChild(experimentDataContent);
 							}
 						}
@@ -187,14 +304,51 @@ package ch.unil.cbg.ExpressionView.view {
 			parentApplication.addEventListener(MenuEvent.EXCEL_EXPORT, excelExportHandler);
 			parentApplication.addEventListener(ResizeBrowserEvent.RESIZEBROWSEREVENT, resizeBrowserHandler);
 			parentApplication.addEventListener(MenuEvent.ALPHA, alphaSliderChangeHandler);
+			parentApplication.addEventListener(MenuEvent.HIGHLIGHTING, highlightingChangeHandler);
 			parentApplication.addEventListener(MenuEvent.FILLING, fillingChangeHandler);
 			parentApplication.addEventListener(MenuEvent.OUTLINE, outlineChangeHandler);
 		}
 
+		private function openModuleButtonClickHandler(event:MouseEvent): void {
+			var temp:String = event.target.name;
+			var i:int = int(temp.slice(-1, temp.length));
+			modulesSearchableDataGrid.dispatchEvent(new SearchableDataGridSelectionEvent(SearchableDataGridSelectionEvent.ITEM_DOUBLE_CLICK, intersections[i]));			
+		}
+
+		private function clearButtonClickHandler(event:MouseEvent): void {
+			var module:int = mapOpenTabs[modulesNavigator.selectedIndex];
+			if ( event.target.name == "clearButton0" ) {
+				selections[0] = [];
+				genesSearchableDataGrid.selectedIndices = [];
+				infoTextContent[2].text = "";
+			} else if ( event.target.name == "clearButton1" ) {
+				selections[1] = [];
+				samplesSearchableDataGrid.selectedIndices = [];
+				infoTextContent[3].text = "";
+			} else if ( event.target.name == "clearButton2" ) {
+				selections[2] = [];
+				modulesSearchableDataGrid.selectedIndices = [];
+				infoTextContent[4].text = "";
+			} else if ( event.target.name == "clearButton3" ) {
+				selections[3] = [];
+				GOSearchableDataGrid.selectedIndices = [];
+				infoTextContent[5].text = "";
+			} else if ( event.target.name == "clearButton4" ) {
+				selections[4] = [];
+				KEGGSearchableDataGrid.selectedIndices = [];
+				infoTextContent[6].text = "";
+			}
+			updateHighlighting(module);
+		}
+	
 		private function alphaSliderChangeHandler(event:MenuEvent): void {
 			selectedAlpha = event.data[0];
 		}
 		
+		private function highlightingChangeHandler(event:MenuEvent): void {
+			selectedHighlighting = event.data[0];
+		}
+
 		private function fillingChangeHandler(event:MenuEvent): void {
 			selectedFilling = event.data[0];
 		}
@@ -243,10 +397,16 @@ package ch.unil.cbg.ExpressionView.view {
 			
 			infoDivider.percentWidth = 100;
 			infoDivider.percentHeight = 100;
+
 			infoContent.percentWidth = 100;
-			infoContent.percentHeight = 100;
+			for (var i:int = 0; i < infoContentBoxes.length; ++i ) {
+				infoContentBoxes[i].percentWidth = 100;
+				infoTextContent[i].percentWidth = 100;
+			}
+			ruler1.percentWidth = 100;
+			ruler2.percentWidth = 100;
+			
 			infoNavigator.percentWidth = 100;
-			infoNavigator.percentHeight = 100;
 			modulesSearchableDataGrid.percentWidth = 100;
 			modulesSearchableDataGrid.percentHeight = 100;
 			genesSearchableDataGrid.percentWidth = 100;
@@ -267,7 +427,6 @@ package ch.unil.cbg.ExpressionView.view {
 					useDefaultPositions = false;
 				}
 			}
-			
 		}
 
 		private function modeChangeHandler(event:MenuEvent): void {
@@ -297,22 +456,8 @@ package ch.unil.cbg.ExpressionView.view {
 		}
 		
 		private function tabChangeHandler(event:IndexChangedEvent): void {
-
 			openTabs[event.newIndex].addListener();
 			var module:int = mapOpenTabs[event.newIndex];
-			if ( module == 0 ) {
-				toggleScoreColumns(false);
-				infoNavigator.getTabAt(3).visible = false;
-				infoNavigator.getTabAt(4).visible = false;
-				infoNavigator.getTabAt(3).includeInLayout = false;
-				infoNavigator.getTabAt(4).includeInLayout = false;
-			} else {
-				toggleScoreColumns(true);
-				infoNavigator.getTabAt(3).visible = true;
-				infoNavigator.getTabAt(4).visible = true;				
-				infoNavigator.getTabAt(3).includeInLayout = true;
-				infoNavigator.getTabAt(4).includeInLayout = true;
-			} 
 			genesSearchableDataGrid.dataProvider = ged.getModule(module).Genes;
 			samplesSearchableDataGrid.dataProvider = ged.getModule(module).Samples;
 			GOSearchableDataGrid.dataProvider = ged.getModule(module).GO;
@@ -322,8 +467,66 @@ package ch.unil.cbg.ExpressionView.view {
 			if ( event.oldIndex < modulesNavigator.numChildren ) {
 				openTabs[event.oldIndex].removeListener();
 				var oldmodule:int = mapOpenTabs[event.oldIndex];
-			}			
+			}
+			if ( mapOpenTabs[event.oldIndex] == 0 ) {
+				toggleScoreColumns(true);
+			}
+			if ( module == 0 ) {
+				toggleScoreColumns(false);
+			}
+			updateHighlighting(module);
+		}
+				
+		private function updateHighlighting(module:int): void {			
+			var genes:Array = [];
+			for ( var gene:int = 0; gene < selections[0].length; ++gene ) {
+				var genep:int = (module==0) ? selections[0][gene] : ged.GenesLookupP[module][selections[0][gene].toString()];
+				if ( genep > 0 ) {
+					genes.push(genep);
+				}
+			}
+			genesSearchableDataGrid.selectedIndices = genes;
+			var rectangles:Array = getHRectangles(genes);
+			dispatchEvent(new HighlightingEvent(HighlightingEvent.GENE, [rectangles]));
 			
+			var samples:Array = [];
+			for ( var sample:int = 0; sample < selections[1].length; ++sample ) {
+				var samplep:int = (module==0) ? selections[1][sample] : ged.SamplesLookupP[module][selections[1][sample].toString()];
+				if ( samplep > 0 ) {
+					samples.push(samplep);
+				}
+			}
+			samplesSearchableDataGrid.selectedIndices = samples;
+			rectangles = getVRectangles(samples);
+			dispatchEvent(new HighlightingEvent(HighlightingEvent.SAMPLE, [rectangles]));
+			
+			modulesSearchableDataGrid.selectedIndices = selections[2];
+			var highlightedRectangles:Array = new Array(ged.nModules + 1);
+			for ( var i:int = 0; i < selections[2].length; ++i ) {
+				var modulep:int = selections[2][i];
+				highlightedRectangles[modulep] = ged.getModule(module).ModulesRectangles[modulep];
+			}
+			dispatchEvent(new HighlightingEvent(HighlightingEvent.MODULE, [highlightedRectangles]));
+			
+			var gos:Array = [];
+			for ( var go:int = 0; go < selections[3].length; ++go ) {
+				var gop:int = (module==0) ? selections[3][go] : ged.ModulesLookupGOsP[module][selections[3][go].toString()];
+				if ( gop > 0 ) {
+					gos.push(gop);
+				}
+			}
+			GOSearchableDataGrid.selectedIndices = gos;
+			
+			var keggs:Array = [];
+			for ( var kegg:int = 0; kegg < selections[4].length; ++kegg ) {
+				var keggp:int = (module==0) ? selections[4][kegg] : ged.ModulesLookupKEGGsP[module][selections[4][kegg].toString()];
+				if ( keggp > 0 ) {
+					keggs.push(keggp);
+				}
+			}
+			KEGGSearchableDataGrid.selectedIndices = keggs;
+
+			invalidateInfoText();
 		}
 		
 		private function tabCloseHandler(event:ClosableTabNavigatorEvent): void {
@@ -338,7 +541,7 @@ package ch.unil.cbg.ExpressionView.view {
 		
 		private function tabReorderHandler(event:IndexChangedEvent): void {
 			event.preventDefault();
-			Alert.show("Closing tabs is not yet supported.", 'Warning', mx.controls.Alert.OK)
+			Alert.show("Reordering tabs is not yet supported.", 'Warning', mx.controls.Alert.OK)
 			/*
 			trace(event.oldIndex, event.newIndex);
 			if ( event.oldIndex == 0 ) {
@@ -354,16 +557,58 @@ package ch.unil.cbg.ExpressionView.view {
 		private function clickModulesHandler(event:SearchableDataGridSelectionEvent): void {
 			var module:int = mapOpenTabs[modulesNavigator.selectedIndex];
 			var highlightedRectangles:Array = new Array(ged.nModules + 1);
+			selections[2] = [];
+			intersections[2] = [];
 			for ( var i:int = 0; i < event.selection.length; ++i ) {
 				var modulep:int = event.selection[i];
+				selections[2].push(modulep);
 				highlightedRectangles[modulep] = ged.getModule(module).ModulesRectangles[modulep];
+				intersections[2] = intersections[2].concat(ged.ModulesLookupModules[modulep]);
 			}
+			intersections[2] = removeDuplicates(intersections[2]);
+			var string:String = "<b>Selected Modules</b>: " + selections[2].join(", ");;
+			if ( intersections[2].length > 0 ) {
+				string += "\n<b>Intersecting Modules</b>: " +  intersections[2].join(", ");
+			}
+			infoTextContent[4].htmlText = string;
+			invalidateInfoText();
 			dispatchEvent(new HighlightingEvent(HighlightingEvent.MODULE, [highlightedRectangles]));
 		}
 				
 		private function doubleClickModulesHandler(event:SearchableDataGridSelectionEvent): void {
-			for ( var i:int = 0; i < event.selection.length; ++i ) {
-				var selectedModule:int = event.selection[i];
+			
+			var selection:Array = event.selection;
+			
+			if (selection.length > 2 ) { 
+				popup = new SelectModules(selection);
+				popup.title = "select modules to open...";
+				popup.addEventListener(PopUpEvent.CANCEL, selectModulesCancelHandler);
+				popup.addEventListener(PopUpEvent.OK, selectModulesOkHandler);
+        		mx.managers.PopUpManager.addPopUp(popup, gePanel, true);        		
+        		mx.managers.PopUpManager.centerPopUp(popup);
+			} else {
+				doubleClickModulesHandlerP(selection);
+			}
+		}
+		
+		private function selectModulesCancelHandler(event:PopUpEvent): void {
+			popup.removeEventListener(PopUpEvent.CANCEL, selectModulesCancelHandler);
+			popup.removeEventListener(PopUpEvent.OK, selectModulesOkHandler);
+			mx.managers.PopUpManager.removePopUp(popup);
+		}
+		
+		private function selectModulesOkHandler(event:PopUpEvent): void {
+			popup.removeEventListener(PopUpEvent.CANCEL, selectModulesCancelHandler);
+			popup.removeEventListener(PopUpEvent.OK, selectModulesOkHandler);
+			mx.managers.PopUpManager.removePopUp(popup);
+			var selection:Array = event.data[0];
+			doubleClickModulesHandlerP(selection);
+		}
+		
+		private function doubleClickModulesHandlerP(selection:Array):void {
+			
+			for ( var i:int = 0; i < selection.length; ++i ) {
+				var selectedModule:int = selection[i];
 				var selectedTab:int = mapOpenTabs.indexOf(selectedModule);
 				if ( selectedTab == -1 ) {
 					var gem:GeneExpressionModule = ged.getModule(selectedModule);
@@ -387,7 +632,7 @@ package ch.unil.cbg.ExpressionView.view {
 							largestRectangles[module] = new Rectangle();
 						}
 					}
-					openTabs[selectedTab].dataProvider = new Array(gem.GEImage, gem.ModulesImage, largestRectangles, ged.ModulesColors, [maxwidth, maxheight]);
+					openTabs[selectedTab].dataProvider = new Array(gem.GEImage, gem.ModulesImage, largestRectangles, ged.ModulesColors, [maxwidth, maxheight], true);
 					genesSearchableDataGrid.dataProvider = gem.Genes;
 					samplesSearchableDataGrid.dataProvider = gem.Samples;
 					if ( scoreColumnsVisible == false ) {
@@ -399,6 +644,7 @@ package ch.unil.cbg.ExpressionView.view {
 				}
 				var lastSelectedTab:int = modulesNavigator.selectedIndex;
 				dispatchEvent(new MenuEvent(MenuEvent.ALPHA, [selectedAlpha]));
+				dispatchEvent(new MenuEvent(MenuEvent.HIGHLIGHTING, [selectedHighlighting]));
 				dispatchEvent(new MenuEvent(MenuEvent.FILLING, [selectedFilling]));
 				dispatchEvent(new MenuEvent(MenuEvent.OUTLINE, [selectedOutline]));
 				if ( lastSelectedTab != selectedTab ) { 
@@ -407,25 +653,25 @@ package ch.unil.cbg.ExpressionView.view {
 					modulesNavigator.selectedIndex = selectedTab;
 				}
 				
+				updateHighlighting(selectedModule);
+				
 			}			
 		}
-
-		private function clickGenesHandler(event:SearchableDataGridSelectionEvent): void {
-			var genes:Array = event.selection;
-			genes.sort(Array.NUMERIC);
-			
+		
+		private function getHRectangles(slots:Array):Array {
+			slots.sort(Array.NUMERIC);
 			var rectxleft:Array = []; var rectxright:Array = [];
-			var oldgene:int = genes[0];
-			rectxleft.push(oldgene);
-			for ( var genep:int = 0; genep < genes.length; ++genep ) {
-				var gene:int = genes[genep];
-				if ( gene > oldgene + 1 ) {
-					rectxright.push(oldgene);
-					rectxleft.push(gene);
+			var oldslot:int = slots[0];
+			rectxleft.push(oldslot);
+			for ( var slotp:int = 0; slotp < slots.length; ++slotp ) {
+				var slot:int = slots[slotp];
+				if ( slot > oldslot + 1 ) {
+					rectxright.push(oldslot);
+					rectxleft.push(slot);
 				}
-				oldgene = gene;
+				oldslot = slot;
 			};
-			rectxright.push(oldgene);
+			rectxright.push(oldslot);
 			
 			var rectangles:Array = [];
 			for ( var i:int = 0; i < rectxleft.length; ++i ) {
@@ -435,27 +681,23 @@ package ch.unil.cbg.ExpressionView.view {
 				var dy:Number = ged.nSamples;
 				rectangles.push(new Rectangle(x, y, dx, dy));  
 			}
-			dispatchEvent(new HighlightingEvent(HighlightingEvent.GENE, [rectangles]));
+			return(rectangles);
 		}
-		private function doubleClickGenesHandler(event:SearchableDataGridSelectionEvent): void {
-		}
-
-		private function clickSamplesHandler(event:SearchableDataGridSelectionEvent): void {
-			var samples:Array = event.selection;
-			samples.sort(Array.NUMERIC);
-
+		
+		private function getVRectangles(slots:Array):Array {
+			slots.sort(Array.NUMERIC);
 			var rectytop:Array = []; var rectybottom:Array = [];				
-			var oldsample:int = samples[0];
-			rectytop.push(oldsample);
-			for ( var samplep:int = 0; samplep < samples.length; ++samplep ) {
-				var sample:int = samples[samplep];
-				if ( sample > oldsample + 1 ) {
-					rectybottom.push(oldsample);
-					rectytop.push(sample);
+			var oldslot:int = slots[0];
+			rectytop.push(oldslot);
+			for ( var slotp:int = 0; slotp < slots.length; ++slotp ) {
+				var slot:int = slots[slotp];
+				if ( slot > oldslot + 1 ) {
+					rectybottom.push(oldslot);
+					rectytop.push(slot);
 				}
-				oldsample = sample;
+				oldslot = slot;
 			};
-			rectybottom.push(oldsample);
+			rectybottom.push(oldslot);
 
 			var rectangles:Array = [];
 			for ( var i:int = 0; i < rectytop.length; ++i ) {
@@ -465,11 +707,157 @@ package ch.unil.cbg.ExpressionView.view {
 				var dy:Number = rectybottom[i] - y; 
 				rectangles.push(new Rectangle(x, y, dx, dy));  
 			}
+			return rectangles;
+		}
+		
+		private function removeDuplicates(data:Array):Array {
+			if ( data.length == 0 ) {
+				return [];
+			}
+			data.sort(Array.NUMERIC);
+			var temp:Array = [data[0]];
+			for ( var i:int = 1; i < data.length; ++i ) {
+				if ( data[i] != data[i-1] ) {
+					temp.push(data[i]);
+				}
+			}		
+			return temp;
+		}
 
+		private function invalidateInfoText(): void {
+			var first:Boolean = false;
+			for ( var i:int = 0; i < infoTextContent.length; ++i ) {
+				infoTextContent[i].validateNow();
+				var temp:Number = 0;
+				for( var j:int=0; j < infoTextContent[i].mx_internal::getTextField().numLines; ++j) {
+					temp += infoTextContent[i].mx_internal::getTextField().getLineMetrics(j).height;
+				}
+				if ( infoTextContent[i].text == "" ) {
+					infoTextContent[i].height = 0;
+					infoContentBoxes[i].height = 0;
+					infoContentBoxes[i].visible = false;
+				} else {
+					infoContentBoxes[i].visible = true;
+					infoTextContent[i].height = temp + 5;
+					infoContentBoxes[i].height = temp + 5;
+				}
+			}
+			var showruler:Boolean = false;
+			for ( i = 2; i < 5; ++i ) {
+				if ( infoContentBoxes[i].visible ) {
+					showruler = true;
+				}
+			}
+			ruler1.visible = ( showruler ) ? true : false;
+			showruler = false;
+			for ( i = 5; i < 7; ++i ) {
+				if ( infoContentBoxes[i].visible ) {
+					showruler = true;
+				}
+			}
+			ruler2.visible = ( showruler ) ? true : false;
+		}
+
+		private function clickGenesHandler(event:SearchableDataGridSelectionEvent): void {
+			var module:int = mapOpenTabs[modulesNavigator.selectedIndex];
+			var genes:Array = event.selection;
+			genes.sort(Array.NUMERIC);
+			selections[0] = [];
+			intersections[0] = [];
+			for ( var gene:int = 0; gene < genes.length; ++gene ) {
+				var genep:int = genes[gene];
+				selections[0].push( (module==0) ? genep : ged.GenesLookup[module][genep-1]);
+				intersections[0] = intersections[0].concat(ged.ModulesLookupGenes[genep]);
+			}
+			intersections[0] = removeDuplicates(intersections[0]);
+			var rectangles:Array = getHRectangles(genes);
+			dispatchEvent(new HighlightingEvent(HighlightingEvent.GENE, [rectangles]));
+			var genesp:Array = [];
+			for ( gene = 0; gene < genes.length; ++gene ) {
+				genesp.push(ged.getModule(module).Genes.source[genes[gene]-1].symbol.text());
+			}
+			var string:String = "<b>Selected Genes</b>: " +  genesp.join(", ");
+			if ( intersections[0].length > 0 ) {
+				string += "\n<b>Intersecting Modules</b>: " +  intersections[0].join(", ");
+			}
+			infoTextContent[2].htmlText = string;
+			invalidateInfoText();
+		}
+		private function doubleClickGenesHandler(event:SearchableDataGridSelectionEvent): void {
+		}
+
+		private function clickSamplesHandler(event:SearchableDataGridSelectionEvent): void {
+			var module:int = mapOpenTabs[modulesNavigator.selectedIndex];
+			var samples:Array = event.selection;
+			samples.sort(Array.NUMERIC);
+			selections[1] = [];
+			intersections[1] = [];
+			for ( var sample:int = 0; sample < samples.length; ++sample ) {
+				var samplep:int = samples[sample];
+				selections[1].push( (module==0) ? samplep: ged.SamplesLookup[module][samplep-1]);
+				intersections[1] = intersections[1].concat(ged.ModulesLookupSamples[samplep]);
+			}
+			intersections[1] = removeDuplicates(intersections[1]);
+			var rectangles:Array = getVRectangles(samples);
 			dispatchEvent(new HighlightingEvent(HighlightingEvent.SAMPLE, [rectangles]));
+			var samplesp:Array = [];
+			for ( sample = 0; sample < samples.length; ++sample ) {
+				samplesp.push(ged.getModule(module).Samples.source[samples[sample]-1].name.text());
+			}
+			var string:String = "<b>Selected Samples</b>: " +  samplesp.join(", ");
+			if ( intersections[1].length > 0 ) {
+				string += "\n<b>Intersecting Modules</b>: " +  intersections[1].join(", ");
+			}
+			infoTextContent[3].htmlText = string;
+			invalidateInfoText();
 		}
 		private function doubleClickSamplesHandler(event:SearchableDataGridSelectionEvent): void {
 		}
+
+		private function clickGOHandler(event:SearchableDataGridSelectionEvent): void {
+			var module:int = mapOpenTabs[modulesNavigator.selectedIndex];
+			var GOs:Array = event.selection;
+			GOs.sort(Array.NUMERIC);
+			selections[3] = [];
+			intersections[3] = [];
+			var gos:Array = [];
+			for ( var i:int = 0; i < GOs.length; ++i ) {
+				var j:int = (module==0) ? GOs[i] : ged.ModulesLookupGOs[module][GOs[i]];
+				selections[3].push(j);
+				gos.push(ged.getModule(module).GO.source[GOs[i]-1].term);
+				intersections[3].push(ged.ModulesLookupGOs[0][j-1]);
+			}
+			intersections[3] = removeDuplicates(intersections[3]);
+			var string:String = "<b>Selected GOs</b>: " +  gos.join(", ");
+			if ( intersections[3].length > 0 ) {
+				string += "\n<b>Found in Modules</b>: " +  intersections[3].join(", ");
+			}
+			infoTextContent[5].htmlText = string;
+			invalidateInfoText();
+		}
+
+		private function clickKEGGHandler(event:SearchableDataGridSelectionEvent): void {
+			var module:int = mapOpenTabs[modulesNavigator.selectedIndex];
+			var KEGGs:Array = event.selection;
+			KEGGs.sort(Array.NUMERIC);
+			selections[4] = [];
+			intersections[4] = [];
+			var keggs:Array = [];
+			for ( var i:int = 0; i < KEGGs.length; ++i ) {
+				var j:int = (module==0) ? KEGGs[i] : ged.ModulesLookupKEGGs[module][KEGGs[i]];
+				selections[4].push(j);
+				keggs.push(ged.getModule(module).KEGG.source[KEGGs[i]-1].pathname);
+				intersections[4].push(ged.ModulesLookupKEGGs[0][j-1]);
+			}
+			intersections[4] = removeDuplicates(intersections[4]);
+			var string:String = "<b>Selected KEGGs</b>: " +  keggs.join(", ");
+			if ( intersections[4].length > 0 ) {
+				string += "\n<b>Found in Modules</b>: " +  intersections[4].join(", ");
+			}
+			infoTextContent[6].htmlText = string;
+			invalidateInfoText();
+		}
+
 
 		private function broadcastPositionClickHandler(event:BroadcastPositionEvent): void {
 			var gene:int = event.data[0];
@@ -487,7 +875,6 @@ package ch.unil.cbg.ExpressionView.view {
 			var gene:int = event.data[0];
 			var sample:int = event.data[1];
 			
-			infoContent.text = "";
 			var module:int = mapOpenTabs[modulesNavigator.selectedIndex]
 			// Array returned is Array(geneDescription, sampleDescription, modules, data, modulesRectangles);
 			var infoArray:Array = ged.getInfo(module, gene, sample);
@@ -500,29 +887,118 @@ package ch.unil.cbg.ExpressionView.view {
 					if ( temp == "" ) {
 						temp = infoArray[0].description;
 					}
-					//infoString = infoString + "Gene: " + infoArray[0].symbol + " (" + infoArray[0].name + ")";
-					infoString = infoString + "Gene: " + temp + " (" + infoArray[0].name + ")";
-					infoString = infoString + "\nSample: " + infoArray[1].name;
-					infoString = infoString + "\nModules: " + infoArray[2];
-					infoString = infoString + "\nData: " + infoArray[3];
-				}
-				infoContent.text = infoString;
-	
-				// highlight module
-				if ( lastHighlightedModules != modules ) {
-					var highlightedRectangles:Array = new Array(ged.nModules + 1);
-					for ( var modulep:int = 0; modulep < modules.length; ++modulep ) {
-						if ( modules[modulep] != module ) {
-							highlightedRectangles[modules[modulep]] = ged.getModule(module).ModulesRectangles[modules[modulep]];
+					infoString += "<b>Gene</b>: " + temp + " (" + infoArray[0].name + ")";
+					infoString += "\n<b>Sample</b>: " + infoArray[1].name
+					infoString += "\n<b>Data</b>: " + infoArray[3]
+					infoTextContent[0].htmlText = infoString;
+					invalidateInfoText();
+					
+					infoString = "";
+					if ( modules.length > 0 ) {
+						infoString = "<b>Modules</b>: " + modules.join(", ");
+
+						if ( modules.length > 0 && module == 0 ) {
+								
+							// recalculate gos and keggs
+							if ( lastHighlightedModules != modules ) {
+
+								var tempsort:Array = [];
+								for ( var i:int = 0; i < modules.length; ++i ) {
+									var modulep:int = modules[i];
+									for ( var j:int = 0; j < ged.XMLData.modules.module[modulep-1].gos.go.length(); ++j ) {
+										var item:XML = new XML(ged.XMLData.modules.module[modulep-1].gos.go[j]);
+										tempsort.push(new Object());
+										tempsort[tempsort.length-1].pvalue = item.pvalue;
+										tempsort[tempsort.length-1].name = item.term;
+									}
+								}
+								tempsort.sortOn("pvalue", Array.NUMERIC);
+								var gosp:Array = [];
+								for ( i = 0; i < tempsort.length; ++i ) {
+									var duplicate:Boolean = false;
+									var name:String = tempsort[i].name
+									for ( j = 0; j < gosp.length; ++j ) {
+										if ( name == gosp[j] ) {
+											duplicate = true;
+											break;
+										}
+									}
+									if ( !duplicate ) {
+										gosp.push(name);
+									}
+									if ( gosp.length == 5 ) {
+										break;
+									}
+								}
+								gos = gosp.join(", ");
+								
+								tempsort = [];
+								for ( i = 0; i < modules.length; ++i ) {
+									modulep = modules[i];
+									for ( j = 0; j < ged.XMLData.modules.module[modulep-1].keggs.kegg.length(); ++j ) {
+										item = new XML(ged.XMLData.modules.module[modulep-1].keggs.kegg[j]);
+										tempsort.push(new Object());
+										tempsort[tempsort.length-1].pvalue = item.pvalue;
+										tempsort[tempsort.length-1].name = item.pathname;
+									}
+								}
+								tempsort.sortOn("pvalue", Array.NUMERIC);
+								var keggsp:Array = [];
+								for ( i = 0; i < tempsort.length; ++i ) {
+									duplicate = false;
+									name = tempsort[i].name
+									for ( j = 0; j < keggsp.length; ++j ) {
+										if ( name == keggsp[j] ) {
+											duplicate = true;
+											break;
+										}
+									}
+									if ( !duplicate ) {
+										keggsp.push(name);
+									}
+									if ( keggsp.length == 5 ) {
+										break;
+									}
+								}
+								keggs = keggsp.join(", ");
+							}
+							
+							if ( gos != "" ) {
+								infoString += "\n<b>GO</b>: " + gos;
+							}
+							if ( keggs != "" ) {
+								infoString += "\n<b>KEGG</b>: " + keggs;
+							}
 						}
 					}
-					dispatchEvent(new HighlightingEvent(HighlightingEvent.MODULE, [highlightedRectangles]));
-					lastHighlightedModules = modules;
+					infoTextContent[1].htmlText = infoString;
+					invalidateInfoText();
+					
+				}
+	
+				// highlight module
+				modules = modules.concat(selections[2]);
+				removeDuplicates(modules);
+				if ( selectedHighlighting ) {
+					if ( lastHighlightedModules != modules ) {
+						var highlightedRectangles:Array = new Array(ged.nModules + 1);
+						for ( modulep = 0; modulep < modules.length; ++modulep ) {
+							if ( modules[modulep] != module ) {
+								highlightedRectangles[modules[modulep]] = ged.getModule(module).ModulesRectangles[modules[modulep]];
+							}
+						}
+						dispatchEvent(new HighlightingEvent(HighlightingEvent.MODULE, [highlightedRectangles]));
+						lastHighlightedModules = modules;
+					}
 				}
 			
 			} else {
-				infoContent.text = "";
-				dispatchEvent(new HighlightingEvent(HighlightingEvent.MODULE, [new Array(ged.nModules + 1)]));
+				highlightedRectangles = new Array(ged.nModules + 1);
+				for ( i = 0; i < selections[2].length; ++i ) {
+					modulep = selections[2][i];
+					highlightedRectangles[modulep] = ged.getModule(module).ModulesRectangles[modulep];
+				}
+				dispatchEvent(new HighlightingEvent(HighlightingEvent.MODULE, [highlightedRectangles]));
 			}
 		}
 		
@@ -532,8 +1008,7 @@ package ch.unil.cbg.ExpressionView.view {
 		}
 				
 		private function updateGEDataHandler(event:UpdateGEDataEvent): void {
-			rawged = event.data[0];
-			ged = event.data[1];
+			ged = event.data[0];
 			var gem:GeneExpressionModule = ged.getModule(0);
 
 			var title:String = ged.XMLData.experimentdata.title;
@@ -543,15 +1018,12 @@ package ch.unil.cbg.ExpressionView.view {
 			title += ": " + ged.nGenes + " Genes, " + ged.nSamples + " Samples and " + ged.nModules + " Modules";
 			gePanel.title = title;
 			
-			// hide GO and KEGG tabs
-			infoNavigator.getTabAt(3).visible = false;
-			infoNavigator.getTabAt(4).visible = false;
-			infoNavigator.getTabAt(3).includeInLayout = false;
-			infoNavigator.getTabAt(4).includeInLayout = false;
-
 			modulesSearchableDataGrid.dataProvider = ged.Modules;
 			genesSearchableDataGrid.dataProvider = gem.Genes;
 			samplesSearchableDataGrid.dataProvider = gem.Samples;
+			GOSearchableDataGrid.dataProvider = gem.GO;
+			KEGGSearchableDataGrid.dataProvider = gem.KEGG;
+						
 			// genes
 			var wrap:Boolean = false;
 			var temp:Array = [];
@@ -560,7 +1032,7 @@ package ch.unil.cbg.ExpressionView.view {
 				column.dataField = ged.geneLabels[i][0];
 				column.headerText = ged.geneLabels[i][1];
 				column.headerWordWrap = wrap;
-				column.headerRenderer = new ClassFactory(Label);
+				column.headerRenderer = new ClassFactory(HeaderRenderer);
 				if ( column.dataField == "score" ) {
 					column.visible = false;
 				}
@@ -585,7 +1057,7 @@ package ch.unil.cbg.ExpressionView.view {
 				column.dataField = ged.sampleLabels[i][0];
 				column.headerText = ged.sampleLabels[i][1];
 				column.headerWordWrap = wrap;
-				column.headerRenderer = new ClassFactory(Label);
+				column.headerRenderer = new ClassFactory(HeaderRenderer);
 				if ( column.dataField == "score" ) {
 					column.visible = false;
 				}
@@ -600,7 +1072,7 @@ package ch.unil.cbg.ExpressionView.view {
 				column.dataField = ged.moduleLabels[i][0];
 				column.headerText = ged.moduleLabels[i][1];
 				column.headerWordWrap = wrap;
-				column.headerRenderer = new ClassFactory(Label);
+				column.headerRenderer = new ClassFactory(HeaderRenderer);
 				column.sortCompareFunction = sortFunction(column.dataField);
 				temp.push(column)
 			}
@@ -612,7 +1084,7 @@ package ch.unil.cbg.ExpressionView.view {
 				column.dataField = ged.goLabels[i][0];
 				column.headerText = ged.goLabels[i][1];
 				column.headerWordWrap = wrap;
-				column.headerRenderer = new ClassFactory(Label);
+				column.headerRenderer = new ClassFactory(HeaderRenderer);
 				// show hyperlinks
 				linkRenderer = new ClassFactory(LinkRenderer);
 				if ( ged.goLabels[i][0] == "go" ) {
@@ -631,12 +1103,12 @@ package ch.unil.cbg.ExpressionView.view {
 				column.dataField = ged.keggLabels[i][0];
 				column.headerText = ged.keggLabels[i][1];
 				column.headerWordWrap = wrap;
-				column.headerRenderer = new ClassFactory(Label);
+				column.headerRenderer = new ClassFactory(HeaderRenderer);
 				// show hyperlinks
 				linkRenderer = new ClassFactory(LinkRenderer);
 				if ( ged.keggLabels[i][0] == "kegg" ) {
 					database = "kegg";
-					linkRenderer.properties = { dataProvider : database }
+					linkRenderer.properties = { dataProvider : database, organism : ged.XMLData.experimentdata.organism }
 					column.itemRenderer = linkRenderer;	
 				}
 				column.sortCompareFunction = sortFunction(column.dataField);
@@ -686,7 +1158,7 @@ package ch.unil.cbg.ExpressionView.view {
 		}
 		
 		private function rollOutHandler(event:MouseEvent): void {
-			dispatchEvent(new HighlightingEvent(HighlightingEvent.MODULE, [[]]))
+			//dispatchEvent(new HighlightingEvent(HighlightingEvent.MODULE, [[]]))
 		}
 		
 		private function pdfExportHandler(event:MenuEvent): void {

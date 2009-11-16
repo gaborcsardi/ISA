@@ -1,3 +1,19 @@
+//     ExpressionView - A package to visualize biclusters
+//     Copyright (C) 2009 Computational Biology Group, University of Lausanne
+// 
+//     This program is free software: you can redistribute it and/or modify
+//     it under the terms of the GNU General Public License as published by
+//     the Free Software Foundation, either version 3 of the License, or
+//     (at your option) any later version.
+// 
+//     This program is distributed in the hope that it will be useful,
+//     but WITHOUT ANY WARRANTY; without even the implied warranty of
+//     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//     GNU General Public License for more details.
+// 
+//     You should have received a copy of the GNU General Public License
+//     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package ch.unil.cbg.ExpressionView.model {
 	
 	import __AS3__.vec.Vector;
@@ -10,6 +26,8 @@ package ch.unil.cbg.ExpressionView.model {
 	import flash.utils.ByteArray;
 	import flash.utils.setTimeout;
 	
+	import mx.collections.Sort;
+	import mx.collections.SortField;
 	import mx.collections.XMLListCollection;
 	import mx.utils.Base64Decoder;
 	
@@ -29,7 +47,9 @@ package ch.unil.cbg.ExpressionView.model {
 		public var sampleLabels:Vector.<Array>;
 		public var moduleLabels:Vector.<Array>;
 		public var goLabels:Vector.<Array>;
-		public var keggLabels:Vector.<Array>;		
+		public var keggLabels:Vector.<Array>;
+		private var keggs:XMLListCollection;
+		private var gos:XMLListCollection;		
 		
 		public var ModulesColors:Vector.<Array>;
 
@@ -40,12 +60,20 @@ package ch.unil.cbg.ExpressionView.model {
 		private var modulesbitmapdata:LargeBitmapData;
 		
 		private var ModulesLookup:Vector.<Array>;
-		private var ModulesLookupGenes:Vector.<Array>;
-		private var ModulesLookupSamples:Vector.<Array>;
-		private var ModulesLookupModules:Vector.<Array>;
+		public var ModulesLookupGenes:Vector.<Array>;
+		public var ModulesLookupSamples:Vector.<Array>;
+		public var ModulesLookupModules:Vector.<Array>;
+		public var ModulesLookupGOs:Vector.<Array>;
+		public var ModulesLookupGOsP:Vector.<Array>;
+		public var ModulesLookupKEGGs:Vector.<Array>;
+		public var ModulesLookupKEGGsP:Vector.<Array>;
 		
-		private var GenesLookup:Vector.<Array>;
-		private var SamplesLookup:Vector.<Array>;
+		public var GenesLookup:Vector.<Array>;
+		// inverted
+		public var GenesLookupP:Vector.<Array>;
+		public var SamplesLookup:Vector.<Array>;
+		// inverted
+		public var SamplesLookupP:Vector.<Array>;
 				
 		public function GeneExpressionData() {
 			super();
@@ -64,9 +92,13 @@ package ch.unil.cbg.ExpressionView.model {
 			ModulesLookupGenes = new Vector.<Array>();
 			ModulesLookupSamples = new Vector.<Array>();
 			ModulesLookupModules = new Vector.<Array>();
+			ModulesLookupGOs = new Vector.<Array>();
+			ModulesLookupKEGGs = new Vector.<Array>();
 			
 			GenesLookup = new Vector.<Array>();
+			GenesLookupP = new Vector.<Array>();
 			SamplesLookup = new Vector.<Array>();
+			SamplesLookupP = new Vector.<Array>();
 		}
 
 
@@ -136,26 +168,82 @@ package ch.unil.cbg.ExpressionView.model {
 				}
 			}
 
+			ModulesLookupGOs = new Vector.<Array>(nModules+1, true);
+			ModulesLookupGOsP = new Vector.<Array>(nModules+1, true);
+			gos = new XMLListCollection();
+			var tempsort:Array = [];
+			for ( module = 1; module <= nModules; ++module ) {
+				var length:int = XMLData.modules.module[module-1].gos.go.length();
+				ModulesLookupGOs[module] = new Array(length+1);
+				ModulesLookupGOsP[module] = new Array(length);
+				for ( var i:int = 0; i < length; ++i ) {
+					tempsort.push(new Object());
+					var item:XML = new XML(XMLData.modules.module[module-1].gos.go[i]);
+					tempsort[tempsort.length-1].pvalue = item.pvalue;
+					tempsort[tempsort.length-1].module = module;
+					tempsort[tempsort.length-1].slot = i+1;
+					item.id = gos.length + 1; 
+					gos.addItem(item);
+				}
+			}
+			ModulesLookupGOs[0] = [];
+			for ( i = 0; i < gos.length; ++i ) {
+				module = tempsort[i].module;
+				ModulesLookupGOs[module][tempsort[i].slot] = i+1;
+				ModulesLookupGOsP[module][i.toString()] = tempsort[i].slot - 1; 
+				ModulesLookupGOs[0].push(module);
+			} 
+			
+			ModulesLookupKEGGs = new Vector.<Array>(nModules+1, true);
+			ModulesLookupKEGGsP = new Vector.<Array>(nModules+1, true);
+			keggs = new XMLListCollection();
+			tempsort = [];
+			for ( module = 1; module <= nModules; ++module ) {
+				length = XMLData.modules.module[module-1].keggs.kegg.length();
+				ModulesLookupKEGGs[module] = new Array(length+1);
+				ModulesLookupKEGGsP[module] = new Array(length);
+				for ( i = 0; i < length; ++i ) {
+					tempsort.push(new Object());
+					item = new XML(XMLData.modules.module[module-1].keggs.kegg[i]);
+					tempsort[tempsort.length-1].pvalue = item.pvalue;
+					tempsort[tempsort.length-1].module = module;
+					tempsort[tempsort.length-1].slot = i+1;
+					item.id = keggs.length + 1; 
+					keggs.addItem(item);
+				}
+			}
+			ModulesLookupKEGGs[0] = [];
+			for ( i = 0; i < keggs.length; ++i ) {
+				module = tempsort[i].module;
+				ModulesLookupKEGGs[module][tempsort[i].slot] = i+1;
+				ModulesLookupKEGGsP[module][i.toString()] = tempsort[i].slot - 1;
+				ModulesLookupKEGGs[0].push(module);
+			}
+
 			// set modularData[0]
 			ModularData[0].nGenes = nGenes;
 			ModularData[0].Genes = new XMLListCollection(XMLData.genes.gene);
 			ModularData[0].nSamples = nSamples;
 			ModularData[0].Samples = new XMLListCollection(XMLData.samples.sample);
+			ModularData[0].GO = new XMLListCollection(gos.source);
+			ModularData[0].KEGG = new XMLListCollection(keggs.source);
 
 			ModulesLookup = new Vector.<Array>(nGenes * nSamples, true);
-			for ( var i:int = 0; i < ModulesLookup.length; ++i ) { ModulesLookup[i] = []; }
+			for ( i = 0; i < ModulesLookup.length; ++i ) { ModulesLookup[i] = []; }
 			
-			ModulesLookupGenes = new Vector.<Array>(nGenes, true);
+			ModulesLookupGenes = new Vector.<Array>(nGenes+1, true);
 			for ( i = 0; i < ModulesLookupGenes.length; ++i ) { ModulesLookupGenes[i] = []; }
 
-			ModulesLookupSamples = new Vector.<Array>(nSamples, true);
+			ModulesLookupSamples = new Vector.<Array>(nSamples+1, true);
 			for ( i = 0; i < ModulesLookupSamples.length; ++i ) { ModulesLookupSamples[i] = []; }
 
 			ModulesLookupModules = new Vector.<Array>(nModules+1, true);
 			for ( i = 0; i < ModulesLookupModules.length; ++i ) { ModulesLookupModules[i] = []; }
 
 			GenesLookup = new Vector.<Array>(nModules+1, true);
-			SamplesLookup = new Vector.<Array>(nModules+1, true);			
+			GenesLookupP = new Vector.<Array>(nModules+1, true);
+			SamplesLookup = new Vector.<Array>(nModules+1, true);
+			SamplesLookupP = new Vector.<Array>(nModules+1, true);			
 			ModularData[0].ModulesRectangles = new Vector.<Array>(nModules+1, true);
 			ModularData[0].ModulesOutlines = new Vector.<int>(nModules+1, true);
 
@@ -320,7 +408,6 @@ package ch.unil.cbg.ExpressionView.model {
 			newmodule.ModulesImage = modulesbitmapdata;
 			
 			ModularData[module] = newmodule;
-       					
 		}
 		
 		public function getInfo(module:int, gene:int, sample:int): Array {
@@ -359,22 +446,26 @@ package ch.unil.cbg.ExpressionView.model {
 	        	var string:String = Modules.source[module-1].containedgenes.toString();
 		   		var genes:Array = string.split(", ");
 				GenesLookup[module] = [];
+				GenesLookupP[module] = [];
 				for ( var genep:int = 0; genep < genes.length; ++genep ) {
 					var temp:int = int(genes[genep]);
 					genes[genep] = temp;
 					GenesLookup[module].push(temp);
-					ModulesLookupGenes[genep].push(module);
+					GenesLookupP[module][temp.toString()] = genep+1;
+					ModulesLookupGenes[temp].push(module);
 				}				 
 		   		genes.sort(Array.NUMERIC);
 
 				string = Modules.source[module-1].containedsamples.toString();
 				var samples:Array = string.split(", ");
 				SamplesLookup[module] = [];
+				SamplesLookupP[module] = [];
 				for ( var samplep:int = 0; samplep < samples.length; ++samplep ) {
 					temp = int(samples[samplep]);
 					samples[samplep] = temp;
 					SamplesLookup[module].push(temp);
-					ModulesLookupSamples[samplep].push(module);
+					SamplesLookupP[module][temp.toString()] = samplep+1;
+					ModulesLookupSamples[temp].push(module);
 				}
 				samples.sort(Array.NUMERIC);
 				
@@ -474,11 +565,11 @@ package ch.unil.cbg.ExpressionView.model {
 			var gene:int;
 			for ( gene = startgene; gene <= startgene + 200; ++gene ) {
 
-				if ( gene == nGenes ) {
+				if ( gene == nGenes + 1 ) {
 					setTimeout(finishTreatBitmap, 10);
 					return;
 				}
-						
+				
 				for ( var sample:int = 1; sample <= nSamples; ++sample ) {
 					var value:int = int(Data.readByte());
 					var red:uint; var green:uint;
@@ -546,7 +637,7 @@ package ch.unil.cbg.ExpressionView.model {
 		    green = Math.floor(green*255);
 		    blue = Math.floor(blue*255);
 		    return ( red << 16 | green << 8 | blue );
-		}
-			
+		}	
 	}
+		
 }

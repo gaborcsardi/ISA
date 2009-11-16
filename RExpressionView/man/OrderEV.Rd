@@ -21,7 +21,6 @@ OrderEV(biclusters, initialorder=NULL, maxtime=60, debuglevel=0)
 }
 \seealso{\code{\link{ExportEV}}, \code{\link{OpenEV}}, \code{\link{ISA}}, \code{\link{biclust}}}
 \author{Andreas \enc{Lüscher}{Luscher} \email{andreas.luescher@a3.epfl.ch}}
-\references{\enc{Lüscher}{Luscher}, A., ...}
 \examples{
 ## We generate some noisy in-silico data with biclusters,
 ## scramble the initially ordered arrangement

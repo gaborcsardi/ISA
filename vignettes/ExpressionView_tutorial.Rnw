@@ -41,7 +41,7 @@ The \Rpackage{ExpressionView} package requires the gene expression data to be av
 form of a \Rpackage{Bioconductor} \Rclass{ExpressionSet}. In this tutorial we will use the 
 \Rpackage{Bioconductor} sample data from a 
 clinical trial in acute lymphoblastic leukemia provided by the \Rpackage{ALL} package.
-<<load the data, cache=FALSE>>=
+<<load the data>>=
 library(ALL)
 library(hgu95av2.db)
 data(ALL)
@@ -63,7 +63,7 @@ library(eisa)
 To run the ISA for the given data set, simply call the \Rfunction{ISA} function on the
 \Rclass{ExpressionSet} object:
 <<ISA, cache=TRUE>>=
-set.seed(1) # set seed to get the same results, always
+set.seed(5) # initialize random number generator to get always the same results
 modules <- ISA(ALL)
 @ 
 Depending on your computing resources, this should take roughly two minutes. If you do not
@@ -72,15 +72,15 @@ conditions:
 <<fast ISA, cache=TRUE>>=
 threshold.genes <- 2.7 
 threshold.conditions <- 1.4 
-set.seed(1)
+set.seed(5)
 modules <- ISA(ALL, thr.gene=threshold.genes, thr.cond=threshold.conditions)
 @
 If you leave the thresholds undefined, as in the first example, the ISA runs with the 
 default values, i.e., \variable{thr.gene=c(2,2.5,3,3.5,4)} and \variable{thr.cond=c(1,1.5,2,2.5,3)}.
-In both cases, the random number generator is initialized manually using \Rfunction{set.seed(1)}, 
+In both cases, the random number generator is initialized manually using \Rfunction{set.seed(5)}, 
 to give reproducible results. The \Rfunction{isa} function returns an \Rclass{ISAModules} object. 
 Typing its name returns a brief summary of the results:
-<<ISAModules summary, cache=TRUE>>=
+<<ISAModules summary>>=
 modules
 @
 
@@ -167,7 +167,7 @@ accepts two additional parameters to circumvent the problem of partial alignment
 One can start the ordering from a given initial configuration, i.e., the result of a previous arrangement
 by defining the \Rargument{initialorder} argument
 <<status ordering,eval=FALSE>>=
-optimalorderp <- order.clusters(modules, initialorder=optimalorder, maxtime=120)
+optimalorderp <- OrderEV(modules, initialorder=optimalorder, maxtime=120)
 @
 and one can increase the time limit by specifying \Rargument{maxtime}. Note that the time is indicated in seconds
 and cannot be  smaller than 1.
