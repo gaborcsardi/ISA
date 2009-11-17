@@ -1,0 +1,43 @@
+<application xmlns="http://ns.adobe.com/air/application/1.5">
+	<id>ch.unil.cbg.ExpressionView</id>
+	<version>0.2.1</version>
+	<filename>ExpressionView</filename>
+	<name>ExpressionView</name>
+	<description>ExpressionView is an interactive environment to explore biclusters identified in gene expression data.</description>
+	<initialWindow>
+		<content>ExpressionView.swf</content>
+		<title>ExpressionView</title>
+		<systemChrome>standard</systemChrome>
+		<transparent>false</transparent>
+		<visible>true</visible>
+		<width>1400</width>
+		<height>800</height>
+		<x>0</x>
+		<y>50</y>
+	</initialWindow>
+<!--
+	<installFolder></installFolder>
+-->
+	<icon>
+		<image16x16>icons/expressionviewlogo16.png</image16x16>
+		<image32x32>icons/expressionviewlogo32.png</image32x32>
+		<image48x48>icons/expressionviewlogo48.png</image48x48>
+		<image128x128>icons/expressionviewlogo128.png</image128x128> 
+	</icon>
+	
+	<fileTypes>
+		<fileType>
+			<name>ch.unil.cbg.ExpressionViewFile</name>
+			<extension>evf</extension>
+			<description>ExpressionView data file</description>
+			<contentType>text/expressionview</contentType>
+			<icon>
+				<image16x16>icons/expressionviewlogo16.png</image16x16>      
+				<image32x32>icons/expressionviewlogo32.png</image32x32>      
+				<image48x48>icons/expressionviewlogo48.png</image48x48>
+				<image128x128>icons/expressionviewlogo128.png</image128x128>
+			</icon>
+		</fileType>
+	</fileTypes>
+
+</application>

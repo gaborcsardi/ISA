@@ -45,6 +45,12 @@
 			import flash.display.StageAlign;
 			import flash.display.StageScaleMode;
 			import flash.system.Capabilities;
+
+			CONFIG::air {
+				import flash.events.InvokeEvent;
+				import flash.desktop.NativeApplication;
+				import flash.filesystem.File;
+			}
 			
 			private var menuBar:MenuBar;
 			private var backgroundCanvas:BackgroundCanvas;
@@ -59,6 +65,10 @@
 			
 			private var filename:String;
 			private var loader:URLLoader;
+			
+			CONFIG::air {
+				private var file:File;
+			}
 			
 			private function applicationCompleteHandler(): void {
 
@@ -93,6 +103,10 @@
 					statusBar.horizontalScrollPolicy = "off";
 					statusBar.verticalScrollPolicy = "off";
 					addChild(statusBar);
+				}
+
+				CONFIG::air {
+					NativeApplication.nativeApplication.addEventListener(InvokeEvent.INVOKE, initializeArgumentsHandler);
 				}
 
 				addEventListener(MenuEvent.OPEN, processFileHandler);
@@ -130,6 +144,15 @@
 				loader.removeEventListener(ProgressEvent.PROGRESS, fileLoadProgressHandler);
         		dispatchEvent(new UpdateStatusBarEvent("")); 					
 				loader.removeEventListener(Event.COMPLETE, fileLoadCompleteHandler);		
+			}
+			
+			CONFIG::air {
+				private function fileLoadCompleteHandlerP(event:Event):void {
+					dispatchEvent(new MenuEvent(MenuEvent.OPEN, [file.data]));
+					loader.removeEventListener(ProgressEvent.PROGRESS, fileLoadProgressHandler);
+	        		dispatchEvent(new UpdateStatusBarEvent("")); 					
+					loader.removeEventListener(Event.COMPLETE, fileLoadCompleteHandlerP);		
+				}
 			}
 			
 			override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void {
@@ -236,6 +259,23 @@
 			private function updateStatusBarHandler(event:UpdateStatusBarEvent): void {
 				dispatchEvent(new UpdateStatusBarEvent(event.statusbarcontent)); 			
 			}
+			
+			CONFIG::air {
+				private function initializeArgumentsHandler(event:InvokeEvent):void {
+					var args:Array = event.arguments as Array;
+					if ( args.length ) {
+						filename = String(args[0]);
+						statusBar.visible = true;
+						
+						file = new File(filename);
+						file.addEventListener(Event.COMPLETE, fileLoadCompleteHandlerP);
+						file.addEventListener(ProgressEvent.PROGRESS, fileLoadProgressHandler);
+						file.load();
+
+					}
+				}
+			}
+
 			
 		]]>
 	</mx:Script>

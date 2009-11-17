@@ -28,11 +28,23 @@ package ch.unil.cbg.ExpressionView.view {
 	import mx.controls.HRule;
 	import mx.controls.Image;
 	import mx.controls.Text;
+	import mx.core.BitmapAsset;
 			
 	public class BackgroundCanvas extends Canvas {
 
 		private var box:VBox;
-		private var expressionviewlogo:Text;
+		private var title:HBox;
+		[Embed(source='/ch/unil/cbg/ExpressionView/assets/logos/expressionviewlogo.png')]
+		public var expressionviewlogop:Class; 
+		[Embed(source='/ch/unil/cbg/ExpressionView/assets/logos/cbglogo.png')]
+		public var cbglogop:Class; 
+		[Embed(source='/ch/unil/cbg/ExpressionView/assets/logos/unillogo.png')]
+		public var unillogop:Class; 
+		[Embed(source='/ch/unil/cbg/ExpressionView/assets/logos/siblogo.png')]
+		public var siblogop:Class; 
+
+		private var expressionviewlogo:Image;
+		private var expressionviewtitle:Text;
 		private var about:Text;
 		private var rule:HRule;
 		private var logos:HBox;
@@ -57,12 +69,30 @@ package ch.unil.cbg.ExpressionView.view {
 				box.setStyle("verticalAlign","middle");
 				box.setStyle("verticalGap","30");
 				addChild(box);
+								
+				var expressionviewlogopp:BitmapAsset = new expressionviewlogop() as BitmapAsset;
+				var cbglogopp:BitmapAsset = new cbglogop() as BitmapAsset;
+				var unillogopp:BitmapAsset = new unillogop() as BitmapAsset;
+				var siblogopp:BitmapAsset = new siblogop() as BitmapAsset;
 				
-				if ( !expressionviewlogo ) {
-					expressionviewlogo = new Text();
-					expressionviewlogo.htmlText = "<p align='center'><img src='ch/unil/cbg/ExpressionView/assets/logos/expressionviewlogo.png' width='60' height='60' align='left'>" +
-												 "<font size='0'><br></p><p><font family='Arial' color='#000000' size='40'>       ExpressionView</p>";
-					box.addChild(expressionviewlogo);
+				if ( !title ) {
+					title = new HBox();
+					title.setStyle("horizontalAlign", "center");
+					title.setStyle("horizontalGap", "40");
+					box.addChild(title);
+				
+					if ( !expressionviewlogo ) {
+						expressionviewlogo = new Image();
+						expressionviewlogo.source = expressionviewlogopp;
+						title.addChild(expressionviewlogo);
+					}
+					
+					if ( !expressionviewtitle ) {
+						expressionviewtitle = new Text();
+						expressionviewtitle.setStyle("fontSize", "40");
+						expressionviewtitle.text = "ExpressionView";
+						title.addChild(expressionviewtitle);
+					}
 				}
 										
 				if ( !about ) {
@@ -87,7 +117,7 @@ package ch.unil.cbg.ExpressionView.view {
 					if ( !cbg ) {
 						cbg = new Image();
 						cbg.name = "cbg";
-						cbg.source = "ch/unil/cbg/ExpressionView/assets/logos/cbglogo.png";
+						cbg.source = cbglogopp;
 						cbg.toolTip = "Computational Biology Group";
 						cbg.useHandCursor = true;
 						cbg.buttonMode = true;
@@ -97,7 +127,7 @@ package ch.unil.cbg.ExpressionView.view {
 					if ( !unil ) {
 						unil = new Image();
 						unil.name = "unil";
-						unil.source = "ch/unil/cbg/ExpressionView/assets/logos/unillogo.png";
+						unil.source = unillogopp;
 						unil.toolTip = "University of Lausanne";
 						unil.useHandCursor = true;
 						unil.buttonMode = true;
@@ -107,7 +137,7 @@ package ch.unil.cbg.ExpressionView.view {
 					if ( !sib ) {
 						sib = new Image();
 						sib.name = "sib";
-						sib.source = "ch/unil/cbg/ExpressionView/assets/logos/siblogo.png";
+						sib.source = siblogopp;
 						sib.toolTip = "Swiss Institute of Bioinformatics";
 						sib.useHandCursor = true;
 						sib.buttonMode = true;
@@ -128,7 +158,8 @@ package ch.unil.cbg.ExpressionView.view {
 				box.percentWidth = 100;
 				box.percentHeight = 100;
 				
-				var w:Number = Math.max(about.measuredWidth, logos.measuredWidth, expressionviewlogo.measuredWidth)
+				var w:Number = Math.max(title.measuredWidth, about.measuredWidth, logos.measuredWidth, expressionviewlogo.measuredWidth)
+				title.width = w;
 				about.width = w
 				rule.width = w
 				logos.width = w
