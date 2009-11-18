@@ -136,6 +136,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 					searchText.text = "Find";
 				}
 			}
+			dataprovider.refresh();
 		}
 		
 		private function clickHandler(event:ListEvent): void {

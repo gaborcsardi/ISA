@@ -45,7 +45,6 @@ package ch.unil.cbg.ExpressionView.utilities {
 	 public class LargeBitmapData {
 	
 		private const LIMIT:Number = 8000;
-		private const OVERLAP:Number = 1000;
 	
 		private var bitmaps:Vector.<BitmapData>;
 		private var rectangles:Vector.<Rectangle>;
