@@ -3,15 +3,28 @@
 ########################################################################
 
 if (require(eisa)) {
-	setMethod("OrderEV", signature(biclusters="ISAModules"), function(biclusters, ...) OrderEV.ISAModules(biclusters, ...))
+	setMethod("OrderEV", signature(biclusters="ISAModules"), 
+		function(biclusters, initialorder, maxtime, debuglevel) 
+		OrderEV.ISAModules(biclusters, initialorder, maxtime, debuglevel)
+	)
 }
 
-OrderEV.ISAModules <- function(biclusters, initialorder=NULL, debuglevel=0, maxtime=60) {
-	isamodules <- eisa:::ISAModules.to.isa.result(biclusters)
-	if ( !is.null(initialorder) ) {
+OrderEV.ISAModules <- function(biclusters, initialorder, maxtime, debuglevel) {
+
+	if ( missing(initialorder) ) {
+		initialorder <- NULL	
+	} else {
 		initialorder <- list(rows=initialorder$genes, cols=initialorder$samples, status=initialorder$status)
 	}
-	resp <- OrderEV(isamodules, initialorder, debuglevel, maxtime)
+	if ( missing(maxtime) ) {
+		maxtime <- 60
+	}
+	if ( missing(debuglevel) ) {
+		debuglevel <- 0
+	}
+	
+	isamodules <- eisa:::ISAModules.to.isa.result(biclusters)
+	resp <- OrderEV(isamodules, initialorder, maxtime, debuglevel)
 	res <- list(genes=resp$rows, samples=resp$cols, status=list(genes=resp$status[[1]], samples=resp$status[[2]]))
 	res
 }
@@ -22,12 +35,25 @@ OrderEV.ISAModules <- function(biclusters, initialorder=NULL, debuglevel=0, maxt
 ########################################################################
 
 if (require(biclust)) {
-	setMethod("OrderEV", signature(biclusters="Biclust"), function(biclusters, ...) OrderEV.Biclust(biclusters, ...))
+	setMethod("OrderEV", signature(biclusters="Biclust"), 
+		function(biclusters, initialorder, maxtime, debuglevel) 
+		OrderEV.Biclust(biclusters, initialorder, maxtime, debuglevel)
+	)
 }
 
-OrderEV.Biclust <- function(biclusters, initialorder=NULL, debuglevel=0, maxtime=60) {
+OrderEV.Biclust <- function(biclusters, initialorder, maxtime, debuglevel) {
+	if ( missing(initialorder) ) {
+		initialorder <- NULL	
+	}
+	if ( missing(maxtime) ) {
+		maxtime <- 60
+	}
+	if ( missing(debuglevel) ) {
+		debuglevel <- 0	
+	}
+
 	eisamodules <- as(biclusters, "ISAModules")
-	OrderEV(eisamodules, initialorder, debuglevel, maxtime)
+	OrderEV(eisamodules, initialorder, maxtime, debuglevel)
 }
 
 
@@ -36,13 +62,27 @@ OrderEV.Biclust <- function(biclusters, initialorder=NULL, debuglevel=0, maxtime
 ########################################################################
 
 if (require(isa2)) {
-	setMethod("OrderEV", signature(biclusters="list"), function(biclusters, ...) OrderEV.list(biclusters, ...))
+	setMethod("OrderEV", signature(biclusters="list"), 
+		function(biclusters, initialorder, maxtime, debuglevel)
+		OrderEV.list(biclusters, initialorder, maxtime, debuglevel)
+	)
 }
 
-OrderEV.list <- function(biclusters, initialorder=NULL, debuglevel=0, maxtime=60) {	
-	if( !is.null(initialorder) && sum(optimalorder$status[[1]], optimalorder$status[[2]]) == 
-		length(optimalorder$status[[1]])+length(optimalorder$status[[2]]) ) {
-		cat("initial order is already fully ordered.\n")
+OrderEV.list <- function(biclusters, initialorder, maxtime, debuglevel) {
+	
+	if ( missing(initialorder) ) {
+		initialorder <- NULL	
+	}
+	if ( missing(maxtime) ) {
+		maxtime <- 60
+	}
+	if ( missing(debuglevel) ) {
+		debuglevel <- 0	
+	}
+		
+	if( !is.null(initialorder) && sum(initialorder$status[[1]], initialorder$status[[2]]) == 
+		length(initialorder$status[[1]])+length(initialorder$status[[2]]) ) {
+		message("initial order is already fully ordered.")
 		return(initialorder)
 	}
 	
@@ -75,7 +115,7 @@ OrderEV.list <- function(biclusters, initialorder=NULL, debuglevel=0, maxtime=60
 		for ( i in 1:2 ) {
 
 			temp[[i]] <- vector("integer", 0)
-			for ( modp in mod:no.bics) {
+			for ( modp in 1:no.bics) {
 				if ( sum(clusters[[i]][,mod]*clusters[[i]][,modp]) > 0 && mod != modp ) {
 					temp[[i]] <- append(temp[[i]], modp)
 				}
@@ -126,7 +166,7 @@ OrderEV.list <- function(biclusters, initialorder=NULL, debuglevel=0, maxtime=60
 		flush.console()
 		
 		if ( !initialorder$status[[i]][[1]] ) {
-			res <- .Call("orderClusters", clusters[[i]], initialorder[[i]][[1]], as.integer(debuglevel), as.integer(timelimits[[i]][[1]]))
+			res <- .Call("orderClusters", clusters[[i]], initialorder[[i]][[1]], as.integer(timelimits[[i]][[1]]),  as.integer(debuglevel))
 			map[[1]] <- head(res, -1)
 			initialorder$status[[i]][[1]] <- tail(res, 1)
 		} else {
@@ -146,7 +186,7 @@ OrderEV.list <- function(biclusters, initialorder=NULL, debuglevel=0, maxtime=60
 			nslots <- sum(clusters[[i]][,mod])
 					
 			contains <- intersections[[mod]]
-						
+			
 			if ( length(contains) > 0 ) {
 
 				subclusters <- matrix(as.integer(0), nslots, length(contains))
@@ -163,7 +203,7 @@ OrderEV.list <- function(biclusters, initialorder=NULL, debuglevel=0, maxtime=60
 				}
 				
 				if ( !initialorder$status[[i]][[mod+1]] ) {
-					res <- .Call("orderClusters", subclusters, initialorder[[i]][[mod+1]], as.integer(debuglevel), as.integer(timelimits[[i]][[mod+1]]))
+					res <- .Call("orderClusters", subclusters, initialorder[[i]][[mod+1]], as.integer(timelimits[[i]][[mod+1]]), as.integer(debuglevel))
 					map[[mod+1]] <- head(res,-1)
 					initialorder$status[[i]][[mod+1]] <- tail(res, 1)
 				} else {

@@ -1,7 +1,7 @@
 % \VignetteIndexEntry{ExpressionView}
 \documentclass{article}
 \usepackage{ragged2e}
-%\usepackage{hyperref}
+\usepackage{hyperref}
 \usepackage{url}
 \usepackage[margin=3cm]{geometry}
 
@@ -12,7 +12,7 @@
 \newcommand{\filename}[1]{\texttt{#1}}
 \newcommand{\variable}[1]{\texttt{#1}}
 
-\SweaveOpts{prefix.string=graphics/plot}
+%\SweaveOpts{prefix.string=graphics/plot}
 
 \begin{document}
 
@@ -62,14 +62,14 @@ library(eisa)
 
 To run the ISA for the given data set, simply call the \Rfunction{ISA} function on the
 \Rclass{ExpressionSet} object:
-<<ISA, cache=TRUE>>=
+<<ISA, eval=FALSE>>=
 set.seed(5) # initialize random number generator to get always the same results
 modules <- ISA(ALL)
 @ 
 Depending on your computing resources, this should take roughly two minutes. If you do not
 want to wait that long, you can shorten the calculation by selecting the thresholds for genes and
 conditions:
-<<fast ISA, cache=TRUE>>=
+<<fast ISA, cache=FALSE>>=
 threshold.genes <- 2.7 
 threshold.conditions <- 1.4 
 set.seed(5)
@@ -95,7 +95,7 @@ The \Rpackage{biclust} package implements several biclustering
 algorithms in a unified framework. It uses the \Rclass{Biclust} class 
 to store a set of biclusters. Let us use the Plaid Model Bicluster Algorithm~\cite{turner04}
 on the \Rpackage{ALL} data set
-<<biclust bcplaid,cache=TRUE>>=
+<<biclust bcplaid,cache=FALSE>>=
 library(biclust)
 biclusters <- biclust(exprs(ALL), BCPlaid(), fit.model = ~m + a + b, verbose = FALSE)
 @
@@ -151,7 +151,7 @@ The result is a list containing various mappings between the original data and t
 Note that the genes and the samples can be ordered separately. Apart form reordering the 
 full gene expression matrix, the algorithm also determines the best arrangement of individual biclusters.
 The mapping of the genes and the samples contained in bicluster \variable{i} can be accessed by 
-<<gene maps,eval=FALSE>>=
+<<gene maps, eval=FALSE>>=
 optimalorder$genes[i+1]
 optimalorder$samples[i+1]
 @
@@ -166,7 +166,7 @@ the calculation could not be terminated within the given timeframe. The \Rfuncti
 accepts two additional parameters to circumvent the problem of partial alignment:
 One can start the ordering from a given initial configuration, i.e., the result of a previous arrangement
 by defining the \Rargument{initialorder} argument
-<<status ordering,eval=FALSE>>=
+<<status ordering, eval=FALSE>>=
 optimalorderp <- OrderEV(modules, initialorder=optimalorder, maxtime=120)
 @
 and one can increase the time limit by specifying \Rargument{maxtime}. Note that the time is indicated in seconds
@@ -175,11 +175,10 @@ and cannot be  smaller than 1.
 \section{Export}
 The \Rfunction{ExportEV} function allows the user to combine the available data and export it to an XML file that can be read by the Flash applet:
 <<export, eval=FALSE>>=
-ExportEV(modules, ALL, optimalorder, filename="file.xml")
+ExportEV(modules, ALL, optimalorder, filename="file.evf")
 @
 The function gathers the data contained in the \Rclass{ExpressionSet} \variable{ALL}, orders it according to the optimal arrangement 
-\variable{optimalorder} and adds the biclusters defined in \variable{modules}. Since the output is an uncompressed XML file, it
-is helpful to use the appropriate extension. The XML layout is described in the R help file. Before exporting the data, the 
+\variable{optimalorder} and adds the biclusters defined in \variable{modules}. The output is an uncompressed XML file that can be opened with any text viewer. We have chosen to use the extension \variable{.evf} (for ExpressionView file) for the data files. This extension is associated with the stand-alone version of the viewer, so that one can simply double-click on such a file to launch the program and load the data. The file association is the reason why we do not use the \variable{.xml} extension. A description of the XML layout can be found on the  href{http://www2.unil.ch/cbg/index.php?title=ExpressionView}{website}. Before exporting the data, the 
 \Rfunction{ExportEV} function automatically calculates GO~\cite{ashburner00} and KEGG~\cite{kanehisa04} enrichments for the given biclusters.
 
 \section{Visualize}
@@ -187,8 +186,8 @@ The ExpressionView Flash applet can be launched from the R environment:
 <<export, eval=FALSE>>=
 OpenEV()
 @
-Video tutorials describing how to use the applet can be found on the ExpressionView \\ \
-href{http://serverdgm.unil.ch/bergmann/software/expressionview}{website}.
+Video tutorials describing how to use the applet can be found on the ExpressionView \\
+\href{http://www2.unil.ch/cbg/index.php?title=ExpressionView}{website}.
 
 \section{Session information}
 
@@ -199,9 +198,7 @@ vignette were:
 toLatex(sessionInfo())
 @ 
 
-%\bibliographystyle{apalike}
 \bibliographystyle{unsrt}
-\bibliography{expressionview}
-%\nocite{*}
+\bibliography{ExpressionView}
 
 \end{document}

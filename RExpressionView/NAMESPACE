@@ -3,6 +3,6 @@ exportMethods("ExportEV")
 
 importFrom(AnnotationDbi, summary)
 
-export(OpenEV)
+export(LaunchEV)
 
 useDynLib(ExpressionView)

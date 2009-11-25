@@ -1,4 +1,4 @@
-% \VignetteIndexEntry{ExpressionView}
+% \VignetteIndexEntry{How the ordering algorithm works}
 \documentclass{article}
 \usepackage{ragged2e}
 \usepackage{hyperref}
@@ -15,7 +15,6 @@
 \newcommand{\code}[1]{\texttt{#1}}
 
 \SweaveOpts{cache=TRUE}
-\SweaveOpts{prefix.string=graphics/plot}
 
 \begin{document}
 
@@ -55,7 +54,7 @@ define the quality of the order $Q$ as the sum over the maximal number of neighb
 in every cluster, as illustrated in Fig.~\ref{fig:ordering}.
 \begin{figure} 
 	\begin{center} 
-		\includegraphics{graphics/ordering.pdf}
+		\includegraphics{figures/ordering.pdf}
 	\end{center} 
 	\caption{The initial configuration (a) with a score $Q$=58 can be rearranged by modifying the order of the slots. The optimal 
 	solution (b) maximizes $Q$.} 
@@ -88,7 +87,7 @@ with the dimensions of the data, i.e., the number of clusters $m$ and the slots 
 the average over at least 40 runs, are summarized in Figs.~\ref{fig:clusters} and \ref{fig:slots}. 
 \begin{figure} 
 	\begin{center} 
-		\includegraphics{graphics/nclusters.pdf}
+		\includegraphics{figures/nclusters.pdf}
 	\end{center} 
 	\caption{Scaling of the execution time as a function of the number of clusters. Data points connected
 	by dashed lines represent results obtained from orderable samples. The second set is obtained
@@ -106,7 +105,7 @@ it takes considerably more time to order random samples.
 The scaling of the computation time with the number of slots $n$ is shown in Fig.~\ref{fig:slots}. 
 \begin{figure} 
 	\begin{center} 
-		\includegraphics{graphics/nslots.pdf}
+		\includegraphics{figures/nslots.pdf}
 	\end{center} 
 	\caption{Scaling of the execution time as a function of the number of slots. The second set is obtained
 	from random samples and is thus more representative of gene expression data. The random set scales polynomially
@@ -125,7 +124,6 @@ thus has a direct impact on the overall performance of the algorithm. Since the 
 straightforward to parallelize the calculation, maybe even on the graphic chip.
 
 \bibliographystyle{unsrt}
-\bibliography{expressionview}
-\nocite{*}
+\bibliography{ExpressionView}
 
 \end{document}
