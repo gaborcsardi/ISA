@@ -455,7 +455,7 @@ package ch.unil.cbg.ExpressionView.view {
 			scoreColumnsVisible = true;
 		}
 		
-		private function tabChangeHandler(event:IndexChangedEvent): void {
+		private function tabChangeHandler(event:IndexChangedEvent):void {
 			openTabs[event.newIndex].addListener();
 			var module:int = mapOpenTabs[event.newIndex];
 			genesSearchableDataGrid.dataProvider = ged.getModule(module).Genes;
@@ -464,15 +464,10 @@ package ch.unil.cbg.ExpressionView.view {
 			KEGGSearchableDataGrid.dataProvider = ged.getModule(module).KEGG;
 			dispatchEvent(new MenuEvent(MenuEvent.MODE, [selectedMode]));
 			
-			if ( event.oldIndex < modulesNavigator.numChildren ) {
-				openTabs[event.oldIndex].removeListener();
-				var oldmodule:int = mapOpenTabs[event.oldIndex];
-			}
-			if ( mapOpenTabs[event.oldIndex] == 0 ) {
-				toggleScoreColumns(true);
-			}
 			if ( module == 0 ) {
-				toggleScoreColumns(false);
+				toggleScoreColumns( false );
+			} else {
+				toggleScoreColumns( true );
 			}
 			updateHighlighting(module);
 		}

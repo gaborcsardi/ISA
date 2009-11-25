@@ -25,12 +25,12 @@ extern "C" {
 
 using namespace std;
 
-SEXP orderClusters(SEXP _data, SEXP _order, SEXP _debug, SEXP _maxtime) {
+SEXP orderClusters(SEXP _data, SEXP _order, SEXP _maxtime, SEXP _debug) {
 
 	int nrows = INTEGER(GET_DIM(_data))[0];
 	int ncolumns = INTEGER(GET_DIM(_data))[1];
-	int debug = INTEGER(_debug)[0];
 	int maxtime = INTEGER(_maxtime)[0];
+	int debug = INTEGER(_debug)[0];
 	
 	if ( debug > 0 ) {
 		Rprintf("dimensions: %d x %d\n", nrows, ncolumns);
