@@ -48,7 +48,9 @@ package ch.unil.cbg.ExpressionView.view.components {
 		protected var searchField:TextInput;
 		private var searchText:Text;
 		private var clearButton:Button;
-		
+
+		private var selectedRows:Array;
+			
 		private var shift:Boolean;
 		private var searchColumn:int;
 		
@@ -58,7 +60,8 @@ package ch.unil.cbg.ExpressionView.view.components {
 			super();
 			searchColumn = -1;
 			shift = false;
-			optimalWidths = new Array();
+			optimalWidths = [];
+			selectedRows = [];
 		}
 
 		override protected function createChildren() : void{
@@ -115,6 +118,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 			for ( var i:int = 0; i < selected.length; ++ i ) {
 				selection.push(dataprovider[selected[i]].id)
 			}
+			selectedRows = selection;
 			return selection;
 		}
 		
@@ -147,6 +151,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 			searchField.text = "";
 			dataprovider.filterFunction = null;
 			dataprovider.refresh();
+			updateSelection();
 			clearButton.visible = false;
 		}
 		
@@ -161,7 +166,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 		}		
 		private function mouseUpHandler(event:MouseEvent): void {
 			shift = false;
-		}		
+		}
 
 		private function keyUHandler(event:KeyboardEvent): void {
 			// 40 = down arrow, 38 = up arrow
@@ -193,7 +198,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 		
 		override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void {		
 			super.updateDisplayList(unscaledWidth, unscaledHeight);
-						
+				
 			headerBox.x = 0; 
 			headerBox.y = 0;
 			headerBox.percentWidth = 100;
@@ -215,7 +220,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 					dataGrid.columns[col].width = optimalWidths[col] + 20;
 				}
 			}
-						
+			updateSelection();
 		}
 
 
@@ -227,7 +232,9 @@ package ch.unil.cbg.ExpressionView.view.components {
                 dataprovider.filterFunction = filterFunction;
                 clearButton.visible = true;
             }
-            dataprovider.refresh();			
+            updateSelection();
+            dataprovider.refresh();
+            updateSelection();
 		}
 		
 		
@@ -256,19 +263,42 @@ package ch.unil.cbg.ExpressionView.view.components {
             return false;
 		}
 
-		public function set selectedIndices(selection:Array):void{
+		private function updateSelection():void {
+			var temp:Array = [];
+			for ( var i:int = 0; i < selectedRows.length; ++i ) {
+				var id:int = selectedRows[i];
+				for ( var j:int = 0; j < dataprovider.length; ++j ) {
+					if ( id == dataprovider[j].id ) {
+						temp.push(j);
+					}
+				}
+			}
+			dataGrid.selectedIndices = temp;
+		}
+
+		public function set selectedIndices(selection:Array):void {
+			/*
 			selection.sort(Array.NUMERIC);
 			var temp:Array = [];
 			for ( var i:int = 0; i < selection.length; ++i ) {
 				temp.push(selection[i]-1);
 			}
 			dataGrid.selectedIndices = temp;
+			*/
+			selection.sort(Array.NUMERIC);
+			selectedRows = selection;
+			updateSelection();
 		}
 		
 		public function set dataProvider(value:Object):void{
-			dataprovider = value as XMLListCollection;
+			//dataprovider = value as XMLListCollection;
+			clearButton.dispatchEvent(new MouseEvent(MouseEvent.CLICK, true, false));
+			
+			dataprovider.source = value.source;
 			dataGrid.dataProvider = dataprovider;
-			calculateOptimalWidths();
+			calculateOptimalWidths();	
+			dataprovider.refresh();
+			updateSelection();
 		}
 
 		public function get columns():Array {
