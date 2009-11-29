@@ -1,3 +1,4 @@
+
 \documentclass{bioinfo}
 \usepackage{natbib}
 \copyrightyear{2009}
@@ -13,7 +14,7 @@
 \title[Modular analysis]{Modular analysis of gene expression data with R}
 \author[G\'abor Cs\'ardi \textit{et~al}]{G\'abor Cs\'ardi\,,$^{1,2}$,
   Zolt\'an Kutalik\,$^{1,2}$ and Sven Bergmann\,$^{1,2}$}
-\address{$^{1}$Department of Medical Genetics, and 
+\address{$^{1}$Department of Medical Genetics, and
   $^{2}$Swiss Institute of Bioinformatics,
   University of Lausanne, Rue de Bugnon 27, CH-1005 Lausanne,
   Switzerland.}
@@ -25,24 +26,28 @@
 \maketitle
 
 \begin{abstract}
-\section{Summary:} 
-Biclustering means clustering the rows and the columns of a
-data matrix together, usually not independently. A bicluster is, then,
-a block of the reordered input matrix. When it comes to gene
-expression data, a bicluster means a subset of genes ($G$) (or probes,
-probe sets) and a subset of samples ($S$), such that genes $G$ are
-exactly coexpressed across $S$ and samples $S$ have correlated
-expression profile exactly across $G$. 
+\section{Summary:}
+Large sets of data, like expression profile from many samples, require
+analytic tools to reduce their complexity. Classical (bi-)clustering
+algorithms typically attribute elements (genes, arrays) to disjoint groups
+(``clusters''). Yet, in some cases overlapping cluster assignments would suit
+the biological reality much better.
 
-The Iterative Signature Algorithm (ISA), \cite{sa,isa}, is a 
-powerful biclustering algorithm. It is able to identify biclusters
-that overlap and it is resilient to noise.
+The Iterative Signature Algorithm (ISA) was designed to overcome this and
+other limitations of standard clustering algorithms. It aims to reduce the
+complexity of very large sets of data by decomposing it into so-called
+``modules''. In the context of gene expression data these modules consist of
+subsets of genes that exhibit a coherent expression profile only over a
+subset of microarray experiments. Genes and arrays may be attributed to
+multiple modules and the level of required coherence can be varied resulting
+in different ``resolutions'' of the modular mapping. Since the ISA does not
+rely on the computation of correlation matrices (like many other tools), it
+is extremely fast even for very large datsets.
 
-In this short note, we introduce the \Rpackage{isa2} and
-\Rpackage{eisa} GNU R, \cite{R}, packages; these implement the ISA
-biclustering method, provide a convenient interface to run it using
-the BioConductor, \cite{BioC}, software package, and also contain
-visualization tools.
+In this short note, we introduce two BioConductor~\cite{BioC} software
+package written in GNU~R: The~\Rpackage{isa2} includes a highly optimized
+implementation of the ISA and~\Rpackage{eisa} provide a convenient interface
+to run the ISA and visualize its output.
 
 \section{Availability:}
 \href{http://www.unil.ch/cbg/homepage/software.html}%
@@ -53,24 +58,31 @@ visualization tools.
 \section{Introduction}
 
 % How the ISA works
+The ISA can be applied to identify coherent substructures (i.e. modules)
+from any rectangular matrix of data. To be specific we consider here the
+case of transcriptomics data corresponding to a selection of gene-expression
+profiles from a collection of samples. The method has been described in
+detail in Refs~\cite{BioISA,PREISA}. Here only give a brief summary:
 
-The ISA iteration is started from an input seed, this is 
-refined it by adding and/or removing more genes and/or
-samples until the process converges to a stable bicluster. The
-procedure is typically performed to a large number of seeds; these can
-be either chosen randomly (random seeding, unsupervised method), or
-based on the data (smart seeding, semi-supervised method).
+The ISA identifies modules by an iterative procedure. The algorithm starts
+from an input seed (corresponding to some set of genes or samples) which are
+refined at each iteration by adding and/or removing genes and/or samples
+until the process converges to a stable set, which is referred to as a
+transcription module. This iterative procedure is typically performed to a
+large number of seeds. In the unsupervised approach these seeds are chosen
+randomly to sample uniformly the immense search space. We also implemented a
+semi-supervised method, to which we refer as ``smart seeding'', where the
+seeds a biased to start with certain sets of genes or samples for which
+there is prior knowledge.
 
-The output of ISA is a set of potentially overlapping
-biclusters. These biclusters are not binary, both genes and samples of
-a bicluster have scores, normalized between minus one and one. Genes
-and samples with scores further away from zero have a stronger
-association to the module.
+The output of ISA is a collection of potentially overlapping modules. Each
+gene and each sample is attributed a score that reflects the strength of the
+association with the module.
 
-In this short note has two parts, in Section~\ref{sec:methods} we look
-over the steps of a typical modular analysis, and in
-Section~\ref{sec:implementation} introduce the R packages that
-implement the ISA.
+In the following we first outline how our software tool is commonly for a
+modular analysis (Section~\ref{sec:methods}) and then we describe in more
+detail the R packages that implement the ISA and visualize its output
+(Section~\ref{sec:implementation}).
 
 \section{Methods}%
 \label{sec:methods}
@@ -80,90 +92,28 @@ implement the ISA.
 \includegraphics[width=\textwidth]{isa2workflow3}
 \caption{Work flow of a typical modular analysis study, with the
   \Rpackage{eisa} package (left); and four bicluster visualization
-  techniques (right). The input of the \Rpackage{eisa} pipeline is a
-  BioConductor \Rclass{ExpressionSet} object. This is normalized to
-  $Z$-scores (1); the ISA iteration is performed on it using smart or
-  random seeds (2); and the biclusters are then merged and filtered
-  based on the robustness measure (3). The \Rpackage{eisa} package
-  contains tools to perform many GO, KEGG, etc. enrichment calculation
-  quickly (4), and several bicluster visualization tools (5).
-  Subfigures \subfig{A}, \subfig{B}, \subfig{C} and \subfig{D} were generated
-  using the acute lymphoblastic leukemia data set, see
-  \cite{chiaretti04} and the \Rpackage{ALL} R package.
-  \subfig{(A)} A condition plot for a simple bicluster. Each sample is
-  represented as a bar, its height is its score in the bicluster. 
-  Samples above the red (none in this case) and samples
-  below the green line are part of the biclusters. The coloring
-  indicates cases and controls.
-  \subfig{(B)} A module tree. Each rectangle is a bicluster; see the
-  definition of the edges in the text. The modules are colored
-  according to their Gene Ontology enrichment $p$-values, the codes of
-  the enriched GO categories are shown in the top-left corner of the
-  rectangles. The top-right corner shows the number of genes and
-  conditions in the bicluster. The gene thresholds used for finding
-  the modules is shown on the horizontal axes.
-  \subfig{(C)} Heatmap for a single module, showing correlated
-  expression for the genes and samples. The red lines are the gene and
-  sample scores.
-  \subfig{(D)} Profile plot, for a single module. On the top plot the
-  expression of all samples is plotted, the samples of the module
-  with black. The red and green lines show the mean of the two
-  groups. The bottom plot is the same for the genes of the module.
-}
-\label{fig:workflow}
-\end{figure*}
-
-Let us first explain briefly the steps of a typical modular
-analysis study for gene expression data.
-
-% Batch correction
-\emph{Batch correction.}
-Often, the ISA is applied to samples from different experiments. In
-this case it is crucial to address the question of experimental
-variation. Several methods exist to solve this problem,
-see e.g. \cite{johnson07} for an algorithm that has a GNU R
-implementation.
+  techniques (right). The input of the \Rpackagescriptional regulation one often combines several
+microarray experiments into a single dataset. In such a case it is important
+to properly normalize such data and reduce the bias due to constituent
+datasets. Several methods address this challenge,
+see e.g.~\cite{johnson07} for an algorithm that has a GNU R implementation.
+(S: Do we have a standard flag to call their software?)
 
 % Filtering
 \emph{Gene filtering.}
-Depending on the application, it can be advantageous to remove genes
-that are not expressed in any of the samples, especially because the
-ISA normalization (next step) tends to amplify their effect.
+Genes that have very low expression levels in all samples, carry little if
+any information and may reflect ineffective array probes, etc. Since these
+genes are likely to contribute only noise to the analysis, we integrated the
+possibility to remove such genes. (S: Describe how this is done, and if it
+requires setting a threshold!) 
 
-% Normalization. 
+% Normalization.
 \emph{ISA normalization.}
-ISA is an iterative algorithm. In each step it computes weighted sums
-of expression levels for a number of genes or a number of
-samples. Since different genes typically show different levels of base
+In each iteration of the ISA weighted sums of expression levels over either
+genes or samples are computed.  for a number of . Since different genes
+typically show different levels of base
 expression and variance, it is important to standardize expression
-levels to $Z$-scores. The ISA uses two sets of $Z$-scores, one
-calculated for each gene across all samples, the other for each sample
-across all genes.
-
-% Random and smart seeding.
-\emph{Random and smart seeding.}
-As mentioned previously, ISA can be performed with random or smart
-seeds, based on the application.
-
-% The ISA iteration. 
-\emph{The ISA iteration.}
-This step is essentially performing the ISA and finding the biclusters
-from the starting seeds.
-
-% Merging the modules.
-\emph{Merging the modules.}
-It is possible that more seeds converge to the same, or very similar
-biclusters. This step eliminates such duplicates.
-
-% The robustness measure and filtering the modules. 
-\emph{Robustness of biclusters.}
-To access the significance of a bicluster, we designed a robustness
-measure, that can be used to filter out spurious modules. This is done
-based on performing ISA on the scrambled input data.
-
-% Module trees.
-\emph{Module trees.}
-The ISA works with two stringency threshold parameters, the gene
+levels to $Z$-scores. The ISA uses two se, the gene
 threshold and the sample threshold. ISA modules can be organized into
 a directed graph, a module tree, in which there is an edge from module
 $A$ to module $B$, if the ISA converges to module $B$ from module $A$,
