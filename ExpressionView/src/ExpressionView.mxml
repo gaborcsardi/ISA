@@ -33,6 +33,7 @@
 	
 	<mx:Script>
 		<![CDATA[
+			import flash.text.engine.EastAsianJustifier;
 			import mx.containers.Canvas;
 			import ch.unil.cbg.ExpressionView.view.*;
 			import ch.unil.cbg.ExpressionView.events.*;
@@ -143,7 +144,7 @@
 				dispatchEvent(new MenuEvent(MenuEvent.OPEN, [loader.data]));
 				loader.removeEventListener(ProgressEvent.PROGRESS, fileLoadProgressHandler);
         		dispatchEvent(new UpdateStatusBarEvent("")); 					
-				loader.removeEventListener(Event.COMPLETE, fileLoadCompleteHandler);		
+				loader.removeEventListener(Event.COMPLETE, fileLoadCompleteHandler);	
 			}
 			
 			CONFIG::air {
@@ -207,7 +208,7 @@
 					}
 					alert += "Due to security reasons, the fullscreen mode does not allow ";
 					alert += "to enter text or catch keyboard events. All keyboard shortcuts are thus "; 
-					alert += "disabled. Sorry."; 
+					alert += "disabled."; 
 					Alert.show(alert , 'Warning', mx.controls.Alert.OK)
 					oldStageWidth = stage.stageWidth;
 					oldStageHeight = stage.stageHeight;
@@ -228,9 +229,15 @@
 
 			private function processFileHandler(event:MenuEvent): void {
 				statusBar.visible = true;
-				bytes = event.data[0];			
+				bytes = event.data[0];
 				bytes.position = 0;
 				
+				if ( ged.nGenes > 0 ) {
+					Alert.show('Please reload browser window before opening a new file.', 'Error', mx.controls.Alert.OK);
+					return;
+				}
+				
+				dispatchEvent(new UpdateStatusBarEvent("parsing XML"));
 				var data:XML = new XML();
 				try {
 					data = XML(bytes.readUTFBytes(bytes.length));
@@ -239,13 +246,23 @@
 					return;			
 				}
 				
-				if ( !data.summary.ngenes ) {
-					Alert.show('Not an ExpressionView file.', 'Error', mx.controls.Alert.OK);
-					return;		
+				try {
+					ged.initialize(data);
+				} catch ( error:Error ) {
+					var alert:String;
+					// 20 MB
+					if ( bytes.length > 20000000 ) { 
+						alert = "File is too big for browser applet. ";
+					} else {
+						alert = "Problem loading data in browser applet. ";
+					}
+					alert += "Try stand-alone version of ExpressionView instead."
+					if ( data.child("summary").length() == 0 ) {
+						alert = "Not an ExpressionView file.";
+					}
+					Alert.show(alert, 'Error', mx.controls.Alert.OK);
+					return;					
 				}
-				
-				dispatchEvent(new UpdateStatusBarEvent("parsing file"));
-				ged.initialize(data);
 
 			}
 			

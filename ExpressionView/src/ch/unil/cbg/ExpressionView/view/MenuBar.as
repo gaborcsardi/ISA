@@ -34,7 +34,6 @@ package ch.unil.cbg.ExpressionView.view {
 	import mx.controls.Button;
 	import mx.controls.CheckBox;
 	import mx.controls.HSlider;
-	import mx.controls.Image;
 	import mx.controls.Text;
 	import mx.controls.ToggleButtonBar;
 	import mx.events.ItemClickEvent;
@@ -54,6 +53,12 @@ package ch.unil.cbg.ExpressionView.view {
 		private var navigationBoxTitle:Text;
 		private var viewBox:VBox;
 		private var viewBoxP:HBox;
+		private var viewBoxPLeft:VBox;
+		private var viewBoxPLeftTitle:Text;
+		private var viewBoxPRight:VBox;
+		private var viewBoxPRightTitle:Text;
+		private var viewBoxPPLeft:HBox;
+		private var viewBoxPPRight:HBox;
 		private var viewBoxTitle:Text
 		private var windowBox:VBox;
 		private var windowBoxP:HBox;
@@ -73,7 +78,8 @@ package ch.unil.cbg.ExpressionView.view {
 		private var pdfExportButton:Button;
 		private var excelExportButton:Button;
 		private var navigationMenu:ToggleButtonBar;
-		private var highlightingVisibility:CheckBox;
+		private var outlineHighlighting:CheckBox;
+		private var fillingHighlighting:CheckBox;
 		private var outlineVisibility:CheckBox;
 		private var fillingVisibility:CheckBox;
 		private var alphaSlider:HSlider;
@@ -90,8 +96,7 @@ package ch.unil.cbg.ExpressionView.view {
 				
 		// open
 		private function fileOpenHandler(event:MouseEvent):void {
-			var filter:FileFilter = new FileFilter("Gene Expression Data", "*");
-			file.browse([filter]);
+			file.browse();
             file.addEventListener(Event.SELECT, fileSelectHandler);
 			file.addEventListener(ProgressEvent.PROGRESS, fileLoadProgressHandler);				
 			file.addEventListener(Event.COMPLETE, fileLoadHandler);
@@ -103,7 +108,7 @@ package ch.unil.cbg.ExpressionView.view {
 		}
         
         private function fileLoadHandler(event:Event):void {
-			dispatchEvent(new MenuEvent(MenuEvent.OPEN, [event.target.data]));        	
+			dispatchEvent(new MenuEvent(MenuEvent.OPEN, [event.target.data]));
 			file.removeEventListener(ProgressEvent.PROGRESS, fileLoadProgressHandler);
         	dispatchEvent(new UpdateStatusBarEvent("")); 					
 			file.removeEventListener(Event.COMPLETE, fileLoadHandler);								
@@ -137,31 +142,35 @@ package ch.unil.cbg.ExpressionView.view {
 			dispatchEvent(new MenuEvent(MenuEvent.MODE, [event.index]));
 		}
 
-		// checkbox for highlighting
-		private function highlightingVisibilityChangeHandler(event:MouseEvent): void {
-			dispatchEvent(new MenuEvent(MenuEvent.HIGHLIGHTING, [highlightingVisibility.selected]));
-			if ( event.shiftKey ) {
-				dispatchEvent(new MenuEvent(MenuEvent.OUTLINE, [highlightingVisibility.selected]));
-				dispatchEvent(new MenuEvent(MenuEvent.FILLING, [highlightingVisibility.selected]));
-				outlineVisibility.selected = highlightingVisibility.selected;
-				fillingVisibility.selected = highlightingVisibility.selected;
-				if ( !highlightingVisibility.selected ) {
-					alphaSlider.value = 1;
-					dispatchEvent(new MenuEvent(MenuEvent.ALPHA, [alphaSlider.value]));
-				} else {
-					alphaSlider.value = 0.4;
-					dispatchEvent(new MenuEvent(MenuEvent.ALPHA, [alphaSlider.value]));
+		// checkbox for outline highlighting
+		private function outlineHighlightingChangeHandler(event:MouseEvent): void {
+			var index:int = 0;
+			if ( outlineHighlighting.selected ) {
+				index = 1;
+				if ( fillingHighlighting.selected ) {
+					fillingHighlighting.selected = false;
 				}
 			}
+			dispatchEvent(new MenuEvent(MenuEvent.HIGHLIGHTING, [index]));
+		}
+
+		// checkbox for filling highlighting
+		private function fillingHighlightingChangeHandler(event:MouseEvent): void {
+			var index:int = 0;
+			if ( fillingHighlighting.selected ) {
+				index = 2;
+				if ( outlineHighlighting.selected ) {
+					outlineHighlighting.selected = false;
+				}
+			}
+			dispatchEvent(new MenuEvent(MenuEvent.HIGHLIGHTING, [index]));
 		}
 		
 		// checkbox for outlines
 		private function outlineVisibilityChangeHandler(event:MouseEvent): void {
 			dispatchEvent(new MenuEvent(MenuEvent.OUTLINE, [outlineVisibility.selected]));
 			if ( event.shiftKey ) {
-				dispatchEvent(new MenuEvent(MenuEvent.HIGHLIGHTING, [outlineVisibility.selected]));
 				dispatchEvent(new MenuEvent(MenuEvent.FILLING, [outlineVisibility.selected]));
-				highlightingVisibility.selected = outlineVisibility.selected;
 				fillingVisibility.selected = outlineVisibility.selected;
 				if ( !outlineVisibility.selected ) {
 					alphaSlider.value = 1;
@@ -177,9 +186,7 @@ package ch.unil.cbg.ExpressionView.view {
 		private function fillingVisibilityChangeHandler(event:MouseEvent): void {
 			dispatchEvent(new MenuEvent(MenuEvent.FILLING, [fillingVisibility.selected]));
 			if ( event.shiftKey ) {
-				dispatchEvent(new MenuEvent(MenuEvent.HIGHLIGHTING, [fillingVisibility.selected]));
 				dispatchEvent(new MenuEvent(MenuEvent.OUTLINE, [fillingVisibility.selected]));
-				highlightingVisibility.selected = fillingVisibility.selected;
 				outlineVisibility.selected = fillingVisibility.selected;
 				if ( !fillingVisibility.selected ) {
 					alphaSlider.value = 1;
@@ -352,57 +359,109 @@ package ch.unil.cbg.ExpressionView.view {
 				if ( !viewBoxTitle ) {
 					viewBoxTitle = new Text();
 					viewBoxTitle.text = "View";
-					viewBox.addChild(viewBoxTitle);
-				}
+					//viewBox.addChild(viewBoxTitle);
 
-				if ( !viewBoxP ) {
-					viewBoxP = new HBox();
-					viewBoxP.styleName = "menuItemBoxP";
-					viewBox.addChild(viewBoxP);
-
-					if ( !highlightingVisibility ) {
-						highlightingVisibility = new CheckBox();
-						highlightingVisibility.selected = true;
-						highlightingVisibility.labelPlacement = "top";
-						highlightingVisibility.label = "Highlighting";
-						highlightingVisibility.toolTip = "Highlight biclusters under mouse pointer.";
-						highlightingVisibility.addEventListener(MouseEvent.CLICK, highlightingVisibilityChangeHandler);
-						viewBoxP.addChild(highlightingVisibility);
-					}
+					if ( !viewBoxP ) {
+						viewBoxP = new HBox();
+						viewBoxP.setStyle("horizontalGap", "30")
+						//viewBoxP.styleName = "menuItemBoxP";
+						viewBox.addChild(viewBoxP);					
 	
-					if ( !outlineVisibility ) {
-						outlineVisibility = new CheckBox();
-						outlineVisibility.selected = true;
-						outlineVisibility.labelPlacement = "top";
-						outlineVisibility.label = "Outline";
-						outlineVisibility.toolTip = "Show outlines of the largest contiguous part of every bicluster.";
-						outlineVisibility.addEventListener(MouseEvent.CLICK, outlineVisibilityChangeHandler);
-						viewBoxP.addChild(outlineVisibility);
-					}
-	
-					if ( !fillingVisibility ) {
-						fillingVisibility = new CheckBox();
-						fillingVisibility.selected = true;
-						fillingVisibility.labelPlacement = "top";
-						fillingVisibility.label = "Filling";
-						fillingVisibility.toolTip = "Show biclusters.";
-						fillingVisibility.addEventListener(MouseEvent.CLICK, fillingVisibilityChangeHandler);
-						viewBoxP.addChild(fillingVisibility);
-					}
-	
-					if ( !alphaSlider ) {
-						alphaSlider = new HSlider();
-						alphaSlider.minimum = 0;
-						alphaSlider.maximum = 1;
-						alphaSlider.tickInterval = 1;
-						alphaSlider.snapInterval = 0.1;
-						alphaSlider.labels = ["Biclusters", "Data"];
-						alphaSlider.toolTip = "Choose to either focus on the biclusters (slide to the left) or on the underlying data (slide to the right)";
-						alphaSlider.tickValues = [0, 1]
-						alphaSlider.liveDragging = true;
-						alphaSlider.value = 0.4;
-						alphaSlider.addEventListener(SliderEvent.CHANGE, alphaSliderChangeHandler);
-						viewBoxP.addChild(alphaSlider);
+						if ( !viewBoxPLeft ) {
+							viewBoxPLeft = new VBox();
+							viewBoxPLeft.styleName = "menuGroupBox";
+							//viewBoxPLeft.setStyle("horizontalAlign", "center");
+							//viewBoxPLeft.setStyle("verticalGap", "0");
+							viewBoxP.addChild(viewBoxPLeft);					
+		
+							if ( !viewBoxPLeftTitle ) {
+								viewBoxPLeftTitle = new Text();
+								viewBoxPLeftTitle.text = "Highlight"
+								viewBoxPLeft.addChild(viewBoxPLeftTitle);
+							}
+		
+							if ( !viewBoxPPLeft ) {
+								viewBoxPPLeft = new HBox();
+								viewBoxPPLeft.styleName = "menuItemBoxP";
+								viewBoxPLeft.addChild(viewBoxPPLeft);
+			
+								if ( !outlineHighlighting ) {
+									outlineHighlighting = new CheckBox();
+									outlineHighlighting.selected = false;
+									outlineHighlighting.labelPlacement = "top";
+									outlineHighlighting.label = "Outline";
+									outlineHighlighting.toolTip = "Highlight only largest contiguous part of biclusters under mouse pointer.";
+									outlineHighlighting.addEventListener(MouseEvent.CLICK, outlineHighlightingChangeHandler);
+									viewBoxPPLeft.addChild(outlineHighlighting);
+								}
+			
+								if ( !fillingHighlighting ) {
+									fillingHighlighting = new CheckBox();
+									fillingHighlighting.selected = true;
+									fillingHighlighting.labelPlacement = "top";
+									fillingHighlighting.label = "Filling";
+									fillingHighlighting.toolTip = "Highlight biclusters under mouse pointer.";
+									fillingHighlighting.addEventListener(MouseEvent.CLICK, fillingHighlightingChangeHandler);
+									viewBoxPPLeft.addChild(fillingHighlighting);
+								}
+							}
+						}
+		
+						if ( !viewBoxPRight ) {
+							viewBoxPRight = new VBox();
+							viewBoxPRight.styleName = "menuGroupBox";
+							//viewBoxPRight.setStyle("horizontalAlign", "center");
+							//viewBoxPRight.setStyle("verticalGap", "0");
+							viewBoxP.addChild(viewBoxPRight);					
+		
+							if ( !viewBoxPRightTitle ) {
+								viewBoxPRightTitle = new Text();
+								viewBoxPRightTitle.text = "Show"
+								viewBoxPRight.addChild(viewBoxPRightTitle);
+							}
+		
+							if ( !viewBoxPPRight ) {
+								viewBoxPPRight = new HBox();
+								viewBoxPPRight.styleName = "menuItemBoxP";
+								viewBoxPRight.addChild(viewBoxPPRight);
+			
+								if ( !outlineVisibility ) {
+									outlineVisibility = new CheckBox();
+									outlineVisibility.selected = true;
+									outlineVisibility.labelPlacement = "top";
+									outlineVisibility.label = "Outline";
+									outlineVisibility.toolTip = "Show outlines of the largest contiguous part of every bicluster.";
+									outlineVisibility.addEventListener(MouseEvent.CLICK, outlineVisibilityChangeHandler);
+									viewBoxPPRight.addChild(outlineVisibility);
+								}
+				
+								if ( !fillingVisibility ) {
+									fillingVisibility = new CheckBox();
+									fillingVisibility.selected = true;
+									fillingVisibility.labelPlacement = "top";
+									fillingVisibility.label = "Filling";
+									fillingVisibility.toolTip = "Show biclusters.";
+									fillingVisibility.addEventListener(MouseEvent.CLICK, fillingVisibilityChangeHandler);
+									viewBoxPPRight.addChild(fillingVisibility);
+								}
+				
+								if ( !alphaSlider ) {
+									alphaSlider = new HSlider();
+									alphaSlider.minimum = 0;
+									alphaSlider.maximum = 1;
+									alphaSlider.tickInterval = 1;
+									alphaSlider.snapInterval = 0.1;
+									alphaSlider.labels = ["Biclusters", "Data"];
+									alphaSlider.toolTip = "Choose to either focus on the biclusters (slide to the left) or on the underlying data (slide to the right)";
+									alphaSlider.tickValues = [0, 1]
+									alphaSlider.liveDragging = true;
+									alphaSlider.value = 0.4;
+									alphaSlider.addEventListener(SliderEvent.CHANGE, alphaSliderChangeHandler);
+									viewBoxPPRight.addChild(alphaSlider);
+								}
+							}
+		
+						}
 					}
 				}
 			}

@@ -65,11 +65,10 @@ package ch.unil.cbg.ExpressionView.view {
 		
 		private var selectedMode:int;
 		private var selectedAlpha:Number = 0.4;
-		private var selectedHighlighting:Boolean = true;
+		private var selectedHighlighting:int = 2;
 		private var selectedOutline:Boolean = true;
 		private var selectedFilling:Boolean = true;
 		
-		private const LABELS:Array = ["Genes", "Samples", "Modules", "GOs", "KEGGs"];
 		private var selections:Vector.<Array>;
 		private var intersections:Vector.<Array>;
 		
@@ -114,7 +113,7 @@ package ch.unil.cbg.ExpressionView.view {
 
 			selections = new Vector.<Array>(5, true);
 			intersections = new Vector.<Array>(5, true);
-			for ( var i:int = 0; i < LABELS.length; ++i ) {
+			for ( var i:int = 0; i < 5; ++i ) {
 				selections[i] = [];
 				intersections[i] = [];
 			}
@@ -207,7 +206,7 @@ package ch.unil.cbg.ExpressionView.view {
 							infoContentBoxes[i].addChild(infoTextContent[i]);
 						}
 
-						var LABELS:Array = ["Genes", "Samples", "Modules", "GO", "KEGG"];
+						var LABELS:Array = [ged.xAxisLabel, ged.yAxisLabel, "Modules", "GO", "KEGG"];
 
 						openButtons = [];
 						for ( i = 0; i < 7; ++i ) {
@@ -248,7 +247,7 @@ package ch.unil.cbg.ExpressionView.view {
 	
 						if ( !genesSearchableDataGrid ) {
 							genesSearchableDataGrid = new SearchableDataGrid();
-							genesSearchableDataGrid.label = "Genes";
+							genesSearchableDataGrid.label = ged.xAxisLabel;
 							genesSearchableDataGrid.addEventListener(SearchableDataGridSelectionEvent.ITEM_CLICK, clickGenesHandler);
 							genesSearchableDataGrid.addEventListener(SearchableDataGridSelectionEvent.ITEM_DOUBLE_CLICK, doubleClickGenesHandler);
 							infoNavigator.addChild(genesSearchableDataGrid);
@@ -256,7 +255,7 @@ package ch.unil.cbg.ExpressionView.view {
 						
 						if ( !samplesSearchableDataGrid ) {
 							samplesSearchableDataGrid = new SearchableDataGrid();
-							samplesSearchableDataGrid.label = "Samples";
+							samplesSearchableDataGrid.label = ged.yAxisLabel;
 							samplesSearchableDataGrid.addEventListener(SearchableDataGridSelectionEvent.ITEM_CLICK, clickSamplesHandler);
 							samplesSearchableDataGrid.addEventListener(SearchableDataGridSelectionEvent.ITEM_DOUBLE_CLICK, doubleClickSamplesHandler);
 							infoNavigator.addChild(samplesSearchableDataGrid);
@@ -499,7 +498,15 @@ package ch.unil.cbg.ExpressionView.view {
 			var highlightedRectangles:Array = new Array(ged.nModules + 1);
 			for ( var i:int = 0; i < selections[2].length; ++i ) {
 				var modulep:int = selections[2][i];
-				highlightedRectangles[modulep] = ged.getModule(module).ModulesRectangles[modulep];
+				if ( selectedHighlighting > 1 ) {
+					highlightedRectangles[modulep] = ged.getModule(module).ModulesRectangles[modulep];
+				} else {
+					if ( ged.getModule(module).ModulesRectangles[modulep] != null ) {
+						highlightedRectangles[modulep] = [ged.getModule(module).ModulesRectangles[modulep][ged.getModule(module).ModulesOutlines[modulep]]];
+					} else {
+						highlightedRectangles[modulep] = [];
+					}
+				}
 			}
 			dispatchEvent(new HighlightingEvent(HighlightingEvent.MODULE, [highlightedRectangles]));
 			
@@ -557,7 +564,16 @@ package ch.unil.cbg.ExpressionView.view {
 			for ( var i:int = 0; i < event.selection.length; ++i ) {
 				var modulep:int = event.selection[i];
 				selections[2].push(modulep);
-				highlightedRectangles[modulep] = ged.getModule(module).ModulesRectangles[modulep];
+				if ( selectedHighlighting > 1 ) {
+					highlightedRectangles[modulep] = ged.getModule(module).ModulesRectangles[modulep];
+				} else {
+					if ( ged.getModule(module).ModulesRectangles[modulep] != null ) {
+						highlightedRectangles[modulep] = [ged.getModule(module).ModulesRectangles[modulep][ged.getModule(module).ModulesOutlines[modulep]]];
+					} else {
+						highlightedRectangles[modulep] = [];
+					}
+				}
+
 				intersections[2] = intersections[2].concat(ged.ModulesLookupModules[modulep]);
 			}
 			intersections[2] = removeDuplicates(intersections[2]);
@@ -771,7 +787,7 @@ package ch.unil.cbg.ExpressionView.view {
 			for ( gene = 0; gene < genes.length; ++gene ) {
 				genesp.push(ged.getModule(module).Genes.source[genes[gene]-1].symbol.text());
 			}
-			var string:String = "<b>Selected Genes</b>: " +  genesp.join(", ");
+			var string:String = "<b>Selected " + ged.xAxisLabel + "</b>: " +  genesp.join(", ");
 			if ( intersections[0].length > 0 ) {
 				string += "\n<b>Intersecting Modules</b>: " +  intersections[0].join(", ");
 			}
@@ -799,7 +815,7 @@ package ch.unil.cbg.ExpressionView.view {
 			for ( sample = 0; sample < samples.length; ++sample ) {
 				samplesp.push(ged.getModule(module).Samples.source[samples[sample]-1].name.text());
 			}
-			var string:String = "<b>Selected Samples</b>: " +  samplesp.join(", ");
+			var string:String = "<b>Selected " + ged.yAxisLabel + "</b>: " +  samplesp.join(", ");
 			if ( intersections[1].length > 0 ) {
 				string += "\n<b>Intersecting Modules</b>: " +  intersections[1].join(", ");
 			}
@@ -882,8 +898,13 @@ package ch.unil.cbg.ExpressionView.view {
 					if ( temp == "" ) {
 						temp = infoArray[0].description;
 					}
-					infoString += "<b>Gene</b>: " + temp + " (" + infoArray[0].name + ")";
-					infoString += "\n<b>Sample</b>: " + infoArray[1].name
+					if ( ged.dataOrigin ) {
+						infoString += "<b>Gene</b>: " + temp + " (" + infoArray[0].name + ")";
+						infoString += "\n<b>Sample</b>: " + infoArray[1].name;
+					} else {
+						infoString += "<b>" + ged.xAxisLabel + "</b>: " + infoArray[0].name;
+						infoString += "\n<b>" + ged.yAxisLabel + "</b>: " + infoArray[1].name;						
+					}
 					infoString += "\n<b>Data</b>: " + infoArray[3]
 					infoTextContent[0].htmlText = infoString;
 					invalidateInfoText();
@@ -979,7 +1000,17 @@ package ch.unil.cbg.ExpressionView.view {
 						var highlightedRectangles:Array = new Array(ged.nModules + 1);
 						for ( modulep = 0; modulep < modules.length; ++modulep ) {
 							if ( modules[modulep] != module ) {
-								highlightedRectangles[modules[modulep]] = ged.getModule(module).ModulesRectangles[modules[modulep]];
+								var modulepp:int = modules[modulep];
+								if ( selectedHighlighting > 1 ) {
+									highlightedRectangles[modulepp] = ged.getModule(module).ModulesRectangles[modulepp];
+								} else {
+									if ( ged.getModule(module).ModulesRectangles[modulepp] != null ) {
+										highlightedRectangles[modulepp] = [ged.getModule(module).ModulesRectangles[modulepp][ged.getModule(module).ModulesOutlines[modulepp]]];
+									} else {
+										highlightedRectangles[modulepp] = [];
+									}
+								}
+								
 							}
 						}
 						dispatchEvent(new HighlightingEvent(HighlightingEvent.MODULE, [highlightedRectangles]));
@@ -991,7 +1022,15 @@ package ch.unil.cbg.ExpressionView.view {
 				highlightedRectangles = new Array(ged.nModules + 1);
 				for ( i = 0; i < selections[2].length; ++i ) {
 					modulep = selections[2][i];
-					highlightedRectangles[modulep] = ged.getModule(module).ModulesRectangles[modulep];
+					if ( selectedHighlighting > 1 ) {
+						highlightedRectangles[modulep] = ged.getModule(module).ModulesRectangles[modulep];
+					} else {
+						if ( ged.getModule(module).ModulesRectangles[modulep] != null ) {
+							highlightedRectangles[modulep] = [ged.getModule(module).ModulesRectangles[modulep][ged.getModule(module).ModulesOutlines[modulep]]];
+						} else {
+							highlightedRectangles[modulep] = [];
+						}
+					}
 				}
 				dispatchEvent(new HighlightingEvent(HighlightingEvent.MODULE, [highlightedRectangles]));
 			}
@@ -1010,7 +1049,7 @@ package ch.unil.cbg.ExpressionView.view {
 			if ( title.length > 80 ) {
 				title = title.substr(0,80) + "..." 
 			}
-			title += ": " + ged.nGenes + " Genes, " + ged.nSamples + " Samples and " + ged.nModules + " Modules";
+			title += ": " + ged.nGenes + " " + ged.xAxisLabel + ", " + ged.nSamples + " " + ged.yAxisLabel + " and " + ged.nModules + " Modules";
 			gePanel.title = title;
 			
 			modulesSearchableDataGrid.dataProvider = ged.Modules;
@@ -1111,6 +1150,16 @@ package ch.unil.cbg.ExpressionView.view {
 			}
 			KEGGSearchableDataGrid.columns = temp;
 			generategedatainfo();
+
+			// do not show GO and KEGG datagrids if data is not derived from gene expression matrix  
+			if ( !ged.dataOrigin ) {
+				infoNavigator.getTabAt(3).visible = false;
+				infoNavigator.getTabAt(4).visible = false;
+				infoNavigator.getTabAt(3).includeInLayout = false;
+				infoNavigator.getTabAt(4).includeInLayout = false;
+				genesSearchableDataGrid.label = ged.xAxisLabel;
+				samplesSearchableDataGrid.label = ged.yAxisLabel;
+			}
 
 			modulesNavigator.removeAllChildren();
 			
@@ -1213,7 +1262,7 @@ package ch.unil.cbg.ExpressionView.view {
 			
 			var tag:String = "MODULE " + module.toString() + ": ";
 			if ( module == 0 ) { tag = ""; }
-			bytes.writeUTFBytes(tag + gem.nSamples + " samples (rows) x " + gem.nGenes + " genes (columns)");
+			bytes.writeUTFBytes(tag + gem.nSamples + " " + ged.yAxisLabel + " (rows) x " + gem.nGenes + " " + ged.xAxisLabel + " (columns)");
 			for ( var gene:int = 0; gene < genes.length; ++gene ) {
 				bytes.writeUTFBytes(", " + genes[gene].name);
 			}
