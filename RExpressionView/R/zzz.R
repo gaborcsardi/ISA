@@ -1,11 +1,11 @@
 .onLoad <- function(dir, package) {
-  library.dynam("ExpressionView", package, dir, local=FALSE);
+    library.dynam("ExpressionView", package, dir, local=FALSE);
 }
 
 .onUnload <- function(libpath) {
-  library.dynam.unload("ExpressionView", libpath)
+    library.dynam.unload("ExpressionView", libpath)
 }
 
 .Last.lib <- function(libpath) {
-  isa2::.onUnload(libpath)
+    isa2::.onUnload(libpath)
 }

@@ -129,8 +129,9 @@ package ch.unil.cbg.ExpressionView.view.components {
 			var mode:int = event.data[0];
 			if ( mode != lastMode ) {
 				if ( lastMode == INSPECT ) {
-					overlayCanvas.removeEventListener(MouseEvent.MOUSE_MOVE, inspectMouseMoveHandler);
-					overlayCanvas.removeEventListener(MouseEvent.MOUSE_OUT, inspectMouseOutHandler);
+					// show position also while zooming and panning
+					//overlayCanvas.removeEventListener(MouseEvent.MOUSE_MOVE, inspectMouseMoveHandler);
+					//overlayCanvas.removeEventListener(MouseEvent.MOUSE_OUT, inspectMouseOutHandler);
 					overlayCanvas.removeEventListener(MouseEvent.CLICK, inspectMouseClickHandler);
 				} else if ( lastMode == ZOOM ) {
 					overlayCanvas.removeEventListener(MouseEvent.MOUSE_DOWN, zoomMouseDownHandler);
@@ -616,7 +617,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 				for ( var move:int = 1; move < 8; ++move ) {
 					arrowCommands[move] = 2;
 				}
-
+				
 				for ( var i:int = 0; i < highlightedModules[module].length; ++i ) {
 					var r:Rectangle = currentRectangle.intersection(highlightedModules[module][i]);
 					if ( r.width > 0 && r.height > 0 ) {

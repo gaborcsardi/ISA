@@ -97,7 +97,7 @@ to store a set of biclusters. Let us use the Plaid Model Bicluster Algorithm~\ci
 on the \Rpackage{ALL} data set
 <<biclust bcplaid,cache=FALSE>>=
 library(biclust)
-biclusters <- biclust(exprs(ALL), BCPlaid(), fit.model = ~m + a + b, verbose = FALSE)
+biclusters <- biclust(exprs(ALL), BCPlaid(), fit.model=~m+a+b, verbose=FALSE)
 @
 
 The standard R function \Rfunction{as} 
@@ -187,7 +187,45 @@ The ExpressionView Flash applet can be launched from the R environment:
 OpenEV()
 @
 Video tutorials describing how to use the applet can be found on the ExpressionView \\
-\href{http://www2.unil.ch/cbg/index.php?title=ExpressionView}{website}.
+\href{http://www2.unil.ch/cbg/index.php?title=ExpressionView}{website}. The screenshot shown in Fig.~\ref{fig:screenshot} 
+and the description below illustrate the main features of the applet:
+\begin{figure} 
+	\begin{center} 
+		\includegraphics[width=0.95\textwidth]{figures/screenshot.pdf}
+	\end{center} 
+	\caption{Screenshot of the ExpressionView Flash applet.} 
+	\label{fig:screenshot} 
+\end{figure}
+\begin{description}
+	\item[a] Opens an ExpressionView data file. Note that before opening a new data file, you should restart the applet, i.e., refresh your browser window.
+	\item[b] Exports the current view to a pdf file. The file also includes the title (o) of the gene expression data.
+	\item[c] Exports the data of the currently viewed module(=bicluster) to a CSV file, that can be opened as a spreadsheet.
+	\item[d] In inspect mode, you can use the mouse to explore the gene expression data. The information about the data under the mouse pointer is shown in the Info Panel (t).
+	\item[e, f] Zoom and pan modes allow you to restrict the view to a particular part of the gene expression data. They behave like the functions used in graphic programs.
+	\item[e] In zoom mode, you can also use keyboard shortcuts: {\bf a} to auto-zoom onto the modules and {\bf e} to see the whole data. In addition to the simple zoom-in feature, you can also use the mouse to select the rectangular area you want to have a closer look at.
+	\item[f] Pan mode.
+	\item[g, h, i, j] Module highlighting and viewing. It is in general impossible to present mutually overlapping biclusters as single rectangles. They are made up of a collection of rectangles. The ordering algorithm used in the R package realigns the gene expression matrix in a way that maximizes the total area of the largest rectangle in every bicluster. The outlines of these parts are drawn in a slightly brighter color than the background, making them easily recognizable.
+	\item[g, h] Modules are highlighted as the user moves the moves over the gene expression data. The two check boxes allow you to choose between highlighting all the parts of a module (Filling) or alternatively only the largest rectangle (Outline). You can also turn it off completely. For data sets with many modules, it can be helpful to restrict highlighting to Outline.
+	\item[i, j] Similar to the highlighting, these two check boxes allow you to show either all the parts of the modules (Filling) or only the largest rectangles (Outline). By shift-clicking one of the check-boxes you can switch between showing only the modules or only the gene expression data.
+	\item[k] Sets the visibility of the modules layer. Moving the slider to the left fades out the gene expression data, focusing on the Biclusters, while towards the opposite direction, the gene expression data moves to the foreground.
+	\item[l] Realigns the windows at their initial positions.
+	\item[m] Puts the program in fullscreen mode. Note that due to security reasons, it is impossible to enter text in this mode. On Mac OS X, a bug in Flash player prevents you from exporting data in fullscreen mode.
+	\item[n] Opens the ExpressionView website, from where you can download sample files and tutorials.
+	\item[o] Description and dimensions of the data set.
+	\item[p] Modules navigator. The Global tab is always available and shows the complete gene expression data. Additional tabs appear as you open individual modules. To close a module, simply move the mouse over the tab and click the close button that appears. 
+	\item[q, r, s] Selected genes, samples and modules. The highlighting reflects the selection in the tables (w). The selection is maintained when switching tabs (p). 
+	\item[q] Selected genes (=probes).
+	\item[r] Selected samples (=conditions).
+	\item[s] Selected modules (=biclusters).
+	\item[t] Info panel showing the data associated with the current mouse position. The GO and KEGG list contain the five most significant categories and pathways associated with the modules under the mouse pointer.
+	\item[u] Lists the selected genes, samples and modules, together with the intersecting modules.
+	\item[u1] Opens intersecting modules.
+	\item[u2] Clears the selection.
+	\item[v] Lists the selected GO categories and KEGG pathways
+	\item[w] List navigator. Note that depending on the view (p), the lists only show genes and samples contained in the currently viewed module. Modules can also be opened by double-clicking on the corresponding row. The Experiment tab contains a brief description of the data.
+	\item[x] Searches the tables for a given expression and restricts the view to the matching entries. The search function uses Perl-style {\bf regular expressions}. By default, the search functions is applied to the whole table. To restrict it to a particular column, shift-click the corresponding column header.
+	\item[z] Select a column header to sort the entries according to that column. Shift-click to restrict the search function to that column.
+\end{description}
 
 \section{Session information}
 

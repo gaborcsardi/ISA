@@ -26,11 +26,10 @@ package ch.unil.cbg.ExpressionView.model {
 	import flash.utils.ByteArray;
 	import flash.utils.setTimeout;
 	
-	import mx.collections.Sort;
-	import mx.collections.SortField;
 	import mx.collections.XMLListCollection;
+	import mx.controls.Alert;
 	import mx.utils.Base64Decoder;
-	
+		
 	[Event(name=UpdateStatusBarEvent.UPDATESTATUSBAREVENT, type="ch.unil.cbg.expressionview.events.UpdateStatusBarEvent")];
 	[Event(name=GEDCompleteEvent.GEDCOMPLETEEVENT, type="ch.unil.cbg.expressionview.events.GEDCcmpleteEvent")];
 	public class GeneExpressionData extends EventDispatcher {
@@ -42,6 +41,10 @@ package ch.unil.cbg.ExpressionView.model {
 		public var nSamples:int;
 		
 		public var XMLData:XML;
+		// true if data is derived from gene expression matrix
+		public var dataOrigin:Boolean;
+		public var xAxisLabel:String;
+		public var yAxisLabel:String;
 		
 		public var geneLabels:Vector.<Array>;
 		public var sampleLabels:Vector.<Array>;
@@ -82,6 +85,10 @@ package ch.unil.cbg.ExpressionView.model {
 
 			nGenes = 0;
 			nSamples = 0;
+			
+			dataOrigin = true;
+			xAxisLabel = "Genes";
+			yAxisLabel = "Samples";
 					
 			XMLData = new XML();
 			Data = new ByteArray();
@@ -112,6 +119,23 @@ package ch.unil.cbg.ExpressionView.model {
 			nGenes = int(XMLData.summary.ngenes);
 			nSamples = int(XMLData.summary.nsamples);
 			
+			dataOrigin = ( XMLData.summary.dataorigin == "non-eisa" ) ? false : true;
+			if ( !dataOrigin ) {
+				var alert:String = "Data is not derived from a BioConductor ExpressSet. ";
+				alert += "Since ExpressionView is designed to explore gene expression data, ";
+				alert += "you might encounter unexpected behavior." 
+				Alert.show(alert , 'Warning', mx.controls.Alert.OK)
+			}
+			
+			var label:String = XMLData.summary.xaxislabel;
+			if ( label != "" ) {
+				xAxisLabel = label;
+			}
+			label = XMLData.summary.yaxislabel;
+			if ( label != "" ) {
+				yAxisLabel = label;
+			}
+
 			// read expression matrix
 			var decoder:Base64Decoder = new Base64Decoder();
 			decoder.decode(XMLData.data);
