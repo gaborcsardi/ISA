@@ -1,4 +1,7 @@
 # Makefile for the ExpressionView applet
+# Note that this makefile only builds the Flash applet itself (.swf file). 
+# Use Flex Builder to generate the html and javascript wrappers. 
+# The code compiles fine with SDK 3.4.1 
 
 all: alivepdf doc release
 
@@ -81,3 +84,6 @@ air/ExpressionView.pfx:
 clean: 
 	@ echo clean doc
 	@ rm -rf doc
+	@ rm -rf bin
+	@ rm -rf bin-debug
+	@ rm air/ExpressionView.air air/ExpressionView.swf
