@@ -43,8 +43,8 @@ modules <- ISA(ALL, thr.gene=2.7, thr.cond=1.4)
 ## Realign the gene exptression matrix to optimize arrangements of biclusters
 optimalorder <- OrderEV(modules)
 ## Export the data to an ExpressionView file
-ExportEV(modules, ALL, optimalorder, filename="")
-
+## Don't forget to change the filename
+ExportEV(modules, ALL, optimalorder, filename="file.evf")
 
 
 ## In-silico data
@@ -55,8 +55,8 @@ ExportEV(modules, ALL, optimalorder, filename="")
 ## Load the package
 library(ExpressionView)
 ## Generate noisy in-silico data with dimensions m x n
-m <- 200
-n <- 1000
+m <- 50
+n <- 500
 data <- isa.in.silico(num.rows=m, num.cols=n, noise=0.1, overlap.row=0)[[1]]
 ## Find biclusters (=modules)
 modules <- isa(data)
@@ -116,6 +116,7 @@ rowdata=rowdata
 ## Realign the gene exptression matrix to optimize arrangements of biclusters
 optimalorder <- OrderEV(modules)
 ## Export the data to an ExpressionView file
-ExportEV(modules, data, optimalorder, filename="", description=description)
+## Don't forget to change the filename
+ExportEV(modules, data, optimalorder, filename="file.evf", description=description)
 }
 \keyword{export, ExpressionView, bicluster, order, isa}

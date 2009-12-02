@@ -13,7 +13,7 @@ in analyzing microarray data. ExpressionView allows the user to
 explore the biclusters together with the underlying data in an interactive environment.
 The applet requires a browser with Adobe Flash player 10 installed. 
 
-The ExpressionView package can treat gene expression data in the form of a Bioconductor \code{\link[Biobase]{ExpressionSet}}. It recognizes biclusters identified by the Iterative Signature Algorithm (ISA) implemented in the \code{\link[eisa]{ISA}} package as well as the methods implemented in the \code{\link[biclust]{biclust}} package.
+The ExpressionView package can treat gene expression data in the form of a Bioconductor \code{\link[Biobase]{ExpressionSet}}. It recognizes biclusters identified by the Iterative Signature Algorithm (ISA) implemented in the \code{\link[eisa]{ISA}} package as well as the methods available in the \code{\link[biclust]{biclust}} package.
 }
 
 \section{Worflow}{

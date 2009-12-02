@@ -56,8 +56,11 @@ REVFILES=RExpressionView/inst/ExpressionView.swf	\
 	RExpressionView/R/*.R RExpressionView/man/*.Rd 		\
 	RExpressionView/src/*.h RExpressionView/src/*.cpp
 
-REVVIGNETTES=RExpressionView/inst/doc/ExpressionView_tutorial.Rnw \
-	RExpressionView/inst/doc/ExpressionView_tutorial.pdf
+REVVIGNETTES=RExpressionView/inst/doc/ExpressionView.tutorial.Rnw \
+	RExpressionView/inst/doc/ExpressionView.tutorial.pdf \
+	RExpressionView/inst/doc/ExpressionView.ordering.Rnw \
+	RExpressionView/inst/doc/ExpressionView.ordering.pdf \
+	RExpressionView/inst/doc/ExpressionView.xmldescription.pdf
 
 ALIVEPDFFILES = $(shell find ExpressionView/src/org -name "*.as" -print)
 ALIVEPDFCLASSES = $(subst ExpressionView.src.,,$(subst /,.,$(basename $(ALIVEPDFFILES))))

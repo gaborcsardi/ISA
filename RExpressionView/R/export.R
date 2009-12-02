@@ -36,6 +36,9 @@ ExportEV.ISAModules <- function(biclusters, eset, order, filename, norm, cutoff,
     if ( missing(filename) ) {
         con <- file(file.choose(TRUE), open="w")
     } else {
+        if ( filename == "" ) {
+            stop("indicate filename or omit argument to choose it interactively.", call.=FALSE)
+        }
         con <- file(filename, open="w", blocking = TRUE)
     }
     
@@ -378,6 +381,9 @@ ExportEV.list <- function(biclusters, eset, order, filename, norm, cutoff, descr
     if ( missing(filename) ) {
         con <- file(file.choose(TRUE), open="w")
     } else {
+        if ( filename == "" ) {
+            stop("indicate filename or omit argument to choose it interactively.", call.=FALSE)
+        }
         con <- file(filename, open="w", blocking = TRUE)
     }
     

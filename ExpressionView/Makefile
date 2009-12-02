@@ -40,8 +40,8 @@ bin/ExpressionView.swf: alivepdf $(EXPRESSIONVIEWFILES)
 			-use-network=false ExpressionView.mxml \
 			-target-player=10 \
 			-debug=false \
-			-define+=CONFIG::air,false
-	@ mv src/$(@F) $(@)
+			-define+=CONFIG::air,false \
+			-output ../$(@)
 
 debug: bin-debug/ExpressionView.swf
 
@@ -53,8 +53,8 @@ bin-debug/ExpressionView.swf: alivepdf $(EXPRESSIONVIEWFILES)
 			-use-network=false ExpressionView.mxml \
 			-target-player=10 \
 			-define+=CONFIG::air,false \
-			-debug=true
-	@ mv src/$(@F) $(@)
+			-debug=true \
+			-output ../$(@)
 
 air: key air/ExpressionView.air
 

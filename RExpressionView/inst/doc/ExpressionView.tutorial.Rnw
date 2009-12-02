@@ -178,13 +178,13 @@ The \Rfunction{ExportEV} function allows the user to combine the available data 
 ExportEV(modules, ALL, optimalorder, filename="file.evf")
 @
 The function gathers the data contained in the \Rclass{ExpressionSet} \variable{ALL}, orders it according to the optimal arrangement 
-\variable{optimalorder} and adds the biclusters defined in \variable{modules}. The output is an uncompressed XML file that can be opened with any text viewer. We have chosen to use the extension \variable{.evf} (for ExpressionView file) for the data files. This extension is associated with the stand-alone version of the viewer, so that one can simply double-click on such a file to launch the program and load the data. The file association is the reason why we do not use the \variable{.xml} extension. A description of the XML layout can be found on the  href{http://www2.unil.ch/cbg/index.php?title=ExpressionView}{website}. Before exporting the data, the 
+\variable{optimalorder} and adds the biclusters defined in \variable{modules}. The output is an uncompressed XML file that can be opened with any text viewer. We have chosen to use the extension \variable{.evf} (for ExpressionView file) for the data files. This extension is associated with the stand-alone version of the viewer, so that one can simply double-click on such a file to launch the program and load the data. The file association is the reason why we do not use the \variable{.xml} extension. A description of the XML layout can be found on the \href{http://www2.unil.ch/cbg/index.php?title=ExpressionView}{website}. Before exporting the data, the 
 \Rfunction{ExportEV} function automatically calculates GO~\cite{ashburner00} and KEGG~\cite{kanehisa04} enrichments for the given biclusters.
 
 \section{Visualize}
 The ExpressionView Flash applet can be launched from the R environment:
 <<export, eval=FALSE>>=
-OpenEV()
+LaunchEV()
 @
 Video tutorials describing how to use the applet can be found on the ExpressionView \\
 \href{http://www2.unil.ch/cbg/index.php?title=ExpressionView}{website}. The screenshot shown in Fig.~\ref{fig:screenshot} 
@@ -199,15 +199,15 @@ and the description below illustrate the main features of the applet:
 \begin{description}
 	\item[a] Opens an ExpressionView data file. Note that before opening a new data file, you should restart the applet, i.e., refresh your browser window.
 	\item[b] Exports the current view to a pdf file. The file also includes the title (o) of the gene expression data.
-	\item[c] Exports the data of the currently viewed module(=bicluster) to a CSV file, that can be opened as a spreadsheet.
+	\item[c] Exports the data of the currently viewed module (=bicluster) to a CSV file, that can be opened as a spreadsheet.
 	\item[d] In inspect mode, you can use the mouse to explore the gene expression data. The information about the data under the mouse pointer is shown in the Info Panel (t).
-	\item[e, f] Zoom and pan modes allow you to restrict the view to a particular part of the gene expression data. They behave like the functions used in graphic programs.
+	\item[e, f] Zoom and pan modes allow you to restrict the view to a particular part of the gene expression data.
 	\item[e] In zoom mode, you can also use keyboard shortcuts: {\bf a} to auto-zoom onto the modules and {\bf e} to see the whole data. In addition to the simple zoom-in feature, you can also use the mouse to select the rectangular area you want to have a closer look at.
 	\item[f] Pan mode.
 	\item[g, h, i, j] Module highlighting and viewing. It is in general impossible to present mutually overlapping biclusters as single rectangles. They are made up of a collection of rectangles. The ordering algorithm used in the R package realigns the gene expression matrix in a way that maximizes the total area of the largest rectangle in every bicluster. The outlines of these parts are drawn in a slightly brighter color than the background, making them easily recognizable.
 	\item[g, h] Modules are highlighted as the user moves the moves over the gene expression data. The two check boxes allow you to choose between highlighting all the parts of a module (Filling) or alternatively only the largest rectangle (Outline). You can also turn it off completely. For data sets with many modules, it can be helpful to restrict highlighting to Outline.
 	\item[i, j] Similar to the highlighting, these two check boxes allow you to show either all the parts of the modules (Filling) or only the largest rectangles (Outline). By shift-clicking one of the check-boxes you can switch between showing only the modules or only the gene expression data.
-	\item[k] Sets the visibility of the modules layer. Moving the slider to the left fades out the gene expression data, focusing on the Biclusters, while towards the opposite direction, the gene expression data moves to the foreground.
+	\item[k] Sets the visibility of the modules layer. Moving the slider to the left fades out the gene expression data, thus focusing on the Biclusters, while towards the opposite direction, the gene expression data moves to the foreground.
 	\item[l] Realigns the windows at their initial positions.
 	\item[m] Puts the program in fullscreen mode. Note that due to security reasons, it is impossible to enter text in this mode. On Mac OS X, a bug in Flash player prevents you from exporting data in fullscreen mode.
 	\item[n] Opens the ExpressionView website, from where you can download sample files and tutorials.
@@ -226,6 +226,65 @@ and the description below illustrate the main features of the applet:
 	\item[x] Searches the tables for a given expression and restricts the view to the matching entries. The search function uses Perl-style {\bf regular expressions}. By default, the search functions is applied to the whole table. To restrict it to a particular column, shift-click the corresponding column header.
 	\item[z] Select a column header to sort the entries according to that column. Shift-click to restrict the search function to that column.
 \end{description}
+
+\section{Using ExpressionView with non-gene expression data}
+While ExpressionView is designed to work with gene expression data available in the form of a \Rpackage{Bioconductor} \Rclass{ExpressionSet}, it can also be used to visualize other data. Let us for instance use in-silico data generated by the \Rpackage{isa} package with dimensions 50 $\times$ 500 containing 10 overlapping modules:
+<<in-silico>>=
+library(ExpressionView)
+# generate in-silico data with dimensions m x n containing M overlapping modules
+# and add some noise
+m <- 50
+n <- 500
+M <- 10
+data <- isa.in.silico(num.rows=m, num.cols=n, num.fact=M, noise=0.1, overlap.row=5)[[1]]
+modules <- isa(data)
+@
+
+The \Rfunction{ExportEV} uses the named list provided by the \variable{description} variable to label the data. First, let us annotate the rows and columns of the data set
+<<data set annotation>>=
+v <- vector("character"); for ( i in 1:dim(data)[1] ) { v[i] <- paste("row ", i, sep="") }; rownames(data) <- v
+v <- vector("character"); for ( i in 1:dim(data)[2] ) { v[i] <- paste("column ", i, sep="") }; colnames(data) <- v
+@
+
+Next, we assign the meta data associated with the rows of the data matrix. In this example we use 5 tags labelled ''row tag``:
+<<rowdata annotation>>=
+rowdata <- matrix(nrow=dim(data)[1], ncol=5)
+rownames(rowdata) <- rownames(data)
+v <- vector("character"); for ( i in 1:dim(rowdata)[2] ) { v[i] <- paste("row tag ", i, sep="") }; colnames(rowdata) <- v
+for ( i in 1:dim(rowdata)[1] ) { for ( j in 1:dim(rowdata)[2] ) { rowdata[i,j] <- paste("row description (", i, ", ", j, ")", sep="") }}
+@
+And similarly for the columns, using 10 "column tags``:
+<<coldata annotation>>=
+coldata <- matrix(nrow=dim(data)[2], ncol=10)
+rownames(coldata) <- colnames(data)
+v <- vector("character"); for ( i in 1:dim(coldata)[2] ) { v[i] <- paste("column tag ", i, sep="") }; colnames(coldata) <- v
+for ( i in 1:dim(coldata)[1] ) { for ( j in 1:dim(coldata)[2] ) { coldata[i,j] <- paste("column description (", i, ", ", j, ")", sep="") }}
+@
+
+To finish  the description, we add some general information and merge it with the above tables to get a single named list:
+<<in-silico data annotation>>=
+description <- list(
+experiment=list(
+	title="Title", 
+	xaxislabel="x-Axis Label",
+	yaxislabel="y-Axis Label",
+	name="Author", 
+	lab="Address", 
+	abstract="Abstract", 
+	url="URL", 
+	annotation="Annotation", 
+	organism="Organism"),
+coldata=coldata,
+rowdata=rowdata
+)
+@
+When dealing with gene expression data, the \variable{xaxislabel} is equal to ''genes`` and the  \variable{yaxislabel} is ''samples``. Finally, we export the data set to an ExpressionView file:
+<<in-silico data export, eval=FALSE>>=
+ExportEV(modules, data, filename="file.evf", description=description)
+@
+
+Simply load this file with the Flash applet and check where the various labels appear.
+
 
 \section{Session information}
 
