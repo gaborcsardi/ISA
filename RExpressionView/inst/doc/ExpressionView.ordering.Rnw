@@ -123,7 +123,7 @@ More than 90\% of the calculation time is spent to recalculate the length of the
 thus has a direct impact on the overall performance of the algorithm. Since the different clusters can be treated independently, it is
 straightforward to parallelize the calculation, maybe even on the graphic chip.
 
-\bibliographystyle{unsrt}
-\bibliography{ExpressionView}
+%\bibliographystyle{unsrt}
+%\bibliography{ExpressionView}
 
 \end{document}

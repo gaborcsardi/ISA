@@ -27,12 +27,11 @@ doc: $(EXPRESSIONVIEWFILES)
 			-external-library-path libs \
 			-define+=CONFIG::air,false \
 
-release: bin-release/ExpressionView.swf
+release: bin/ExpressionView.swf
 
 bin/ExpressionView.swf: alivepdf $(EXPRESSIONVIEWFILES)
 	@ echo compile release build
-	@ rm -rf bin
-	@ mkdir bin
+	@ mkdir -p bin
 	@ cd src && \
 	mxmlc -compiler.library-path+=../libs/AlivePDF.swc \
 			-use-network=false ExpressionView.mxml \
@@ -45,14 +44,13 @@ debug: bin-debug/ExpressionView.swf
 
 bin-debug/ExpressionView.swf: alivepdf $(EXPRESSIONVIEWFILES)
 	@ echo compile debug build
-	@ rm -rf bin-debug
-	@ mkdir bin-debug
+	@ mkdir -p bin-debug
 	@ cd src && \
 	mxmlc -compiler.library-path+=../libs/AlivePDF.swc \
 			-use-network=false ExpressionView.mxml \
 			-target-player=10 \
-			-debug=true \ 
-			-define+=CONFIG::air,false
+			-define+=CONFIG::air,false \
+			-debug=true
 	@ mv src/$(@F) $(@)
 
 air: key air/ExpressionView.air
