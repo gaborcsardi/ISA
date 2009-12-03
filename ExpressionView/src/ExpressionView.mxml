@@ -33,7 +33,6 @@
 	
 	<mx:Script>
 		<![CDATA[
-			import flash.text.engine.EastAsianJustifier;
 			import mx.containers.Canvas;
 			import ch.unil.cbg.ExpressionView.view.*;
 			import ch.unil.cbg.ExpressionView.events.*;
@@ -123,6 +122,7 @@
 				if ( Application.application.parameters.filename ) { 
 					filename = Application.application.parameters.filename;
 				}
+				trace(filename)
 				if ( filename != "" ) {
 					statusBar.visible = true;
 					var request:URLRequest = new URLRequest(filename);
