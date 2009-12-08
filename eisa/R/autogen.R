@@ -361,8 +361,8 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
     }
     
     ## Create HTML
-    foo <- html.df(df, link=link, display=c("s", "e", "g", "g", "d", extra.display),
-                   digits=c(NA, 3, 4, 4, 4, rep(NA, length(extra.display))))
+    foo <- html.df(df, link=link, display=c("s", "s", "e", "g", "g", "d", extra.display),
+                   digits=c(NA, NA, 3, 4, 4, 4, rep(NA, length(extra.display))))
     foo <- foo[4:(length(foo)-1)]
     foo <- color.table(foo)
     
