@@ -42,12 +42,12 @@ data sets, because it reduces the complexity of the data: instead of
 tens of thousands of individual genes, one can focus on a handful of
 biclusters, in which the genes behave similarly.
 
-The Iterative Signature Algorithm (ISA)~\cite{isa} is a biclustering
-method, that can efficiently find potentially overlapping biclusters
-(modules, according to the ISA terminology) in a matrix. The ISA is
-implemented in the \Rpackage{eisa} package~\cite{eisapackage} it uses
-standard BioConductor classes and includes a number of visualization
-tools as well.
+The Iterative Signature Algorithm (ISA)~\cite{sa,isa,isamod} is a
+biclustering method, that can efficiently find potentially overlapping
+biclusters (modules, according to the ISA terminology) in a
+matrix. The ISA is implemented in the \Rpackage{eisa} package. This
+package uses standard BioConductor classes and includes a number of
+visualization tools as well.
 
 The \Rpackage{biclust} R package~\cite{biclust} is a general
 biclustering package, it contains several biclustering methods, and
@@ -73,7 +73,7 @@ data(ALL)
 
 Next, we select a subset of the genes in the data set. We do this to speed 
 up the computation for our simple examples. We select the genes that are 
-annotated to involved in immune system processes, according to the Gene
+annotated to be involved in immune system processes, according to the Gene
 Ontology database.
 
 <<filter>>=
@@ -111,7 +111,7 @@ Bc
 Now we will convert the \Rclass{Biclust} object to an \Rclass{ISAModules} 
 object, that is used in the \Rpackage{eisa} package. To help
 some \Rpackage{eisa} functions, we add the name of the annotation package to 
-the parameters stored in the \Rclass{Biclust} object, this is always adwised.
+the parameters stored in the \Rclass{Biclust} object, this is always advised.
 The procedure makes use of the probe and sample names that are kept and stored 
 in the \Rclass{Biclust} object, this information will be used later, e.g. for 
 the enrichment analysis. The conversion itself can be performed with
@@ -122,17 +122,21 @@ modules <- as(Bc, "ISAModules")
 modules
 @
 
+\subsection{Enrichment analysis}
+
 Now we are able apply the usual \Rclass{ISAModules} methods to 
 the biclusters. See more about these functions in the documentation of the 
 \Rpackage{eisa} package. 
 
-Doing some enrichment analysis is easy:
+Performing enrichment analysis is easy:
 <<biclust enrichment>>=
 library(KEGG.db)
 KEGG <- ISAKEGG(modules)
 sigCategories(KEGG)[[2]]
 unlist(mget(sigCategories(KEGG)[[2]], KEGGPATHID2NAME))
 @ 
+
+\subsection{Heatmaps}
 
 The \Rfunction{ISA2heatmap} function creates a heatmap for a module. Let us
 annotate the heatmap with the leukemia sample type, white means B-cell, black 
@@ -151,12 +155,14 @@ ISA2heatmap(modules, 2, ALL.filtered,
 @
 \caption{Heatmap of the second module, found with the Plaid Model
   biclustering algorithm. The black squares denote the T-cell samples;
-  all samples in the module belong to T-cell samples.}
+  all samples in the module are from T-cell leukemia patients.}
 \label{fig:heatmap}
 \end{figure}
 
 It turns out, that all samples in the second bicluster belong to
 patients with T-cell leukemia.
+
+\subsection{Profile plots}
 
 Profile plots visualize the mean expression levels, both for the
 genes/samples in the module and in the background (i.e. the background
@@ -175,6 +181,8 @@ profilePlot(modules, 2, ALL, plot="both")
   lines show the same for the samples/genes not in the module.}
 \label{fig:profile}
 \end{figure}
+
+\subsection{Gene Ontology tree plots}
 
 The \Rfunction{gograph} and \Rfunction{gographPlot} functions 
 create a plot of the part of the Gene Ontology tree that contains 
@@ -201,6 +209,8 @@ gographPlot(gog)
 \label{fig:gotree}
 \end{figure}
 
+\subsection{HTML summary of the biclusters}
+
 The \Rfunction{ISAHTML} function creates a HTML overview of all modules.
 <<html>>=
 CHR <- ISACHR(modules)
@@ -211,6 +221,8 @@ if (interactive()) {
   browseURL(URLencode(paste("file://", htmldir, "/index.html", sep="")))
 }
 @ 
+
+\subsection{Group-mean plots}
 
 The \Rfunction{ISAmnplot} funtion plots group means of expression
 levels againts each other, for all genes in the module. Here we plot
@@ -246,11 +258,13 @@ ALLModules
 @ 
 
 The conversion from \Rclass{ISAModules} to \Rclass{Biclust} can be done
-the usual way:
+the usual way, using the \Rfunction{as} function:
 <<isa to biclust>>=
 BcMods <- as(ALLModules, "Biclust")
 BcMods
 @
+
+\subsection{Coherence of biclusters}
 
 The usual methods of the \Rclass{Biclust} class can be applied to 
 \texttt{BcMods} now. E.g. we can calculate the coherence of the 
@@ -276,7 +290,13 @@ rob <- ISARobustness(ALL, ALLModules)
 Let's create a pairs-plot to visualize the relationship of these measures
 for our data set, the result is in Fig.~\ref{fig:coherence}.
 <<pairs,eval=FALSE>>=
-pairs( cbind(cV, aV, mV, sV, rob) )
+panel.low <- function(x, y) {
+  usr <- par("usr")
+  m <- c((usr[2]+usr[1])/2, (usr[4]+usr[3])/2)
+  text(m[1], m[2], adj=c(1/2,1/2), cex=1.5,
+       paste(sep="\n", "Correlation:", round(cor(x,y),2)))
+}
+pairs( cbind(cV, aV, mV, sV, rob), lower.panel=panel.low )
 @
 \begin{figure}
 \centering
