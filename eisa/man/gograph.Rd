@@ -22,11 +22,11 @@ gographPlot (graph, coords = FALSE, \dots)
   \item{coords}{Logical scalar, whether to return the coordinates of the
     vertices on the plot.}
   \item{\dots}{Additional arguments. These are passed to
-    \code{igraph.plot}.}
+    \code{plot.igraph}.}
 }
 \details{
   A GO plot can be created in two steps. \code{gograph} creates an
-  \code{igraph} graph object can contains all the information about the
+  \code{igraph} graph object that contains all the information about the
   plot; \code{gographPlot} creates the actual plot.
 
   The two steps are needed, because \code{gograph} calculates the

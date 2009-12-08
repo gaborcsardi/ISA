@@ -63,7 +63,7 @@ profilePlot (modules, module, eset, plot = c("samples", "features",
 }
 \details{
   \code{plot="both"} uses the \code{mfrow} graphical parameter to create
-  the two subplots. This does not work properly if you already hae
+  the two subplots. This does not work properly if you already have
   subplots.
 }
 \value{

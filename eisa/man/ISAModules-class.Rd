@@ -88,7 +88,7 @@
 }
 \arguments{
   \item{x,modules}{An \code{ISAModules} object.}
-  \item{mods}{An optional numeric index vector for the modules. If given
+  \item{mods}{An optional numeric index vector for the modules. If given,
     the information is only returned only for the specified modules.}
   \item{binary}{Logical scalar. Whether to binarize the feature or
     sample scores.} 
@@ -241,7 +241,7 @@
   \code{getFeatureMatrix} returns feature scores for the specified
   modules (all modules by default) in a matrix form. The number of rows
   is the number of features and the number of columns is the number of
-  features requested. It can optionally binarize the values.
+  modules requested. It can optionally binarize the values.
 
   \code{getSampleMatrix} is similar to \code{getFeatureMatrix}, but for
   sample scores.
@@ -275,8 +275,8 @@
   \code{annotation} and \code{getOrganism} return a character vector of length one.
   \code{pData} returns a data frame.
 
-  \code{seedData} returns a data frame, see more above.
-  \code{runData} returns a named list, see more above.
+  \code{seedData} returns a data frame, see more below.
+  \code{runData} returns a named list, see more below.
   \code{featureThreshold} and \code{sampleThreshold} return a numeric
   vector.
 

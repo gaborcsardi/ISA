@@ -36,7 +36,7 @@ ISAGO (modules, ann = annotation(modules), features = featureNames(modules),
   sub-terms, that can have even more specific sub-sub-terms, and so on.
 
   The Gene Ontology database has three big sub-graphs, the root nodes
-  (the most general terms) of these they are the direct children of the
+  (the most general terms) of these are the direct children of the
   root term of the whole ontology: biological process, cellular
   component, molecular function. They are usually referred to as
   ontologies.

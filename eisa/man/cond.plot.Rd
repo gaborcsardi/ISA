@@ -53,14 +53,14 @@ condPlot (modules, number, eset, col = "white", all = TRUE, sep = NULL,
   These plots are useful if you want to show that a given transcription
   module separates the samples into two (or more) groups.
   You can assign different colors to the samples, based on some external
-  information, e.g. case and control samples can be colored separately.
+  information, e.g. case and control samples can be colored differently.
   
   In most cases the scores are between minus one and one, but this is
   not necessarily true.
 
   It is possible to assign scores to samples that are not part of the
   module, but this requires performing one (more precisely half) ISA
-  iteration step. Currently that function always performs this extra
+  iteration step. Currently the function always performs this extra
   step, even if the out-of-module samples are not plotted. Because the
   sample scores in a module are only approximately constant during ISA
   iteration, it might be possible that the plotted scores are slightly

@@ -1,7 +1,7 @@
 \name{mnplot}
 \alias{mnplot}
 \alias{ISAmnplot}
-\title{Plot group means against each other for an ISA module}
+\title{Plot group means against each other, for an ISA module}
 \description{Plot mean expression values for two sets of samples,
   against each other.}
 \usage{

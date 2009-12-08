@@ -26,7 +26,11 @@
   }
   The \code{Parameters} slot of the \code{Biclust} object is used as the
   run data of the \code{ISAModules} object. The seed data of the new
-  object will be an empty data frame.
+  object will be an empty data frame. We suggest that the used adds the
+  name of the appropriate annotation package to the \code{Biclust}
+  object, before converting it to an \code{ISAModules} object. See an
+  example on how to do this below.
+  
 }
 \author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
 \references{

@@ -34,10 +34,10 @@ expPlotColbar (epo)
   \code{expPlotCreate} creates an object that contains all data for
   performing the image plot and returns it. The reason for not plotting
   it directly is, that the size of the plot is usually different in
-  different in different cases, and the opening of the graphics device
+  different cases, and the opening of the graphics device
   is delayed until \code{expPlotCreate} returns.
 
-  In the returned objects, the \code{weight} and \code{height} entries
+  In the returned object, the \code{weight} and \code{height} entries
   give the optimal size of the image, in pixels.
 
   \code{expPlot} creates the expression plot.

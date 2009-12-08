@@ -39,7 +39,7 @@ overlapPlot (graph, xsize = 400, ysize = 400, vertex.size = 20,
 
   \code{overlapPlot} takes such a graph and plots it.
 
-  \code{overlap} can use various algorithm, depending on the
+  \code{overlap} can use various algorithms, depending on the
   \code{algorithm} argument. If it is \sQuote{\code{mds}}, then
   multi-dimensional scaling is used, by calling the
   \code{isaMDS} function in the \code{MASS} package.

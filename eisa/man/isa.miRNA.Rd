@@ -50,7 +50,7 @@ ISAmiRNA (modules, ann = annotation(modules), features = featureNames(modules),
   In order to use this function, TargetScan annotation packages are
   needed. These are currently available for Homo Sapiens and Mus
   Musculus and they can be downloaded from
-  \url{http://www2.unil.ch/cbg/index.php?title=Building_BioConductor_Annotation_Packages}.
+  \url{http://www.unil.ch/cbg/index.php?title=Software}.
 }
 \value{A \code{\link{miRNAListHyperGResult}} object.}
 \author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }

@@ -11,7 +11,7 @@ ISAIterate(data, feature.seeds, sample.seeds, thr.feat,
 }
 \arguments{
   \item{data}{An \code{ExpressionSet} or \code{ISAExpressionSet}
-    object. If \code{ExpressionSet} object is supplied, then it is
+    object. If an \code{ExpressionSet} object is supplied, then it is
     normalised by calling \code{\link{ISANormalize}} on it.}
   \item{feature.seeds}{A matrix of feature seeds. The number of rows
     should match the number of features in the \code{ExpressionSet},
@@ -25,7 +25,7 @@ ISAIterate(data, feature.seeds, sample.seeds, thr.feat,
     for the features. Higher values indicate a more stringent threshold and
     the result biclusters will contain less features on average. The
     threshold is measured by the number of standard deviations from the
-    mean, over the values of the feature vector. If it is a vector then it
+    mean, over the values of the feature vector. If it is a vector, then it
     must contain an entry for each seed.}
   \item{thr.samp}{Numeric scalar or vector giving the threshold parameter
     for the columns. The analogue of \code{thr.feat}.}

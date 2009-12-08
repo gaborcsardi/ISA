@@ -130,7 +130,7 @@
   \item{file}{A file name, or a connection object. The result is written
     here. If it is \code{""}, then the result is written to the standard
     output. If it is \code{NULL}, then the result is not written
-    anywhere. (But it is always returned, invisibly, see below.}
+    anywhere. (But it is always returned, invisibly, see below.)}
   \item{append}{Logical scalar, whether to append the HTML code to the
     given file, or remove its previous contents if it already exists.}
   \item{label}{An HTML label (\code{<A LABEL="">} tag) to add.}
@@ -148,7 +148,7 @@
   \code{HyperGResult}, as defined in the \code{Category} package.
 
   More precisely, \code{ListHyperGResult} is an abstract class, it is
-  not possible to instantiate objects from it. Its extensions should be
+  not possible to instantiate objects from it. Its extensions are be
   used instead:
   \code{GOListHyperGResult}, \code{KEGGListHyperGResult},
   \code{CHRListHyperGResult} and \code{miRNAListHyperGResult}.  
@@ -169,7 +169,7 @@
   sets, in a list.
   
   \code{expectedCounts} returns the number of genes that are expected to
-  be annotated wit hthe given term, just by chance. This is calculated
+  be annotated with the given term, just by chance. This is calculated
   for all input gene sets, and returned as a list.
   
   \code{oddsRatios} returns the odds ratios for each term tested, for
@@ -221,7 +221,7 @@
   implemented, please see the \code{GOstats} package for a working
   implementation.
   
-  \code{ontology} returns a chracter vector of length one, the name of
+  \code{ontology} returns a character vector of length one, the name of
   the ontology for the GO test.
 }
 \value{

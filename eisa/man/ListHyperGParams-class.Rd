@@ -93,7 +93,7 @@
   \code{ListHyperGParams} objects.
 
   \code{makeValidParams} validates \code{ListHyperGParams} object, in
-  particular, it removed duplicate genes, both from the gene universe
+  particular, it removes duplicate genes, both from the gene universe
   and the specified gene sets; and it also makes sure that all genes in
   the gene sets are included in the universe.
 

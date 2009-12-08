@@ -37,6 +37,9 @@ ISAFilterRobust(data, isaresult, \dots)
 \value{
   \code{ISARobustness} returns a numeric vector, the robustness scores
   of the biclusters.
+
+  \code{ISAFilterRobust} returns the filtered \code{ISAModules}
+  instance.
 }
 \author{
   Gabor Csardi \email{Gabor.Csardi@unil.ch}
