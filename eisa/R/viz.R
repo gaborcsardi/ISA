@@ -784,8 +784,8 @@ profilePlot <- function(modules, module, eset,
       lines(data[,i], col=col.mod, type=type.mod, ...)
     }
     if (mean) {
-      if (background) { lines(rowMeans(data[,yy]), col=meancol, type=type) }
-      lines(rowMeans(data[,nyy]), col=meancol.mod, type=type.mod)
+      if (background) { lines(rowMeans(data[,yy]), col=meancol.mod, type=type.mod) }
+      lines(rowMeans(data[,nyy]), col=meancol, type=type)
     }
   }
 
