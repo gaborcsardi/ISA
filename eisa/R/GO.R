@@ -146,7 +146,7 @@ setMethod("htmlReport", signature(r="GOListHyperGResult"),
               summ[[i]]$Term <- sapply(mget(rownames(summ[[i]]), GOTERM), Term)
             }
             res <- lapply(summ, html.df, label=label, digits=digits,
-                          display=c("s", "g", "g", "g", "g", "g", "s"))
+                          display=c("s", "g", "g", "g", "g", "g", "g", "s"))
             if (!is.null(file)) {
               do.call("cat", c(res, list(file=file, sep="\n\n", append=append)))
               invisible(res)

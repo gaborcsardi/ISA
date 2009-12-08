@@ -18,13 +18,13 @@ fix.xtable <- function(str) {
 
 html.df <- function(df, link=NA, label=NULL, digits=NULL, display=NULL) {
   if (nrow(df)==0) return("")
-  if ("drive" %in% colnames(df)) { df <- df[,colnames(df) != "drive"] }
+  if ("drive" %in% colnames(df)) {
+    df <- df[,colnames(df) != "drive"]
+  }
   df <- cbind(Id=rownames(df), df)
   if (length(link)!=1 || !is.na(link)) {
     df$Id <- paste(sep="", '<a href="', link, '">', df$Id, '</a>')
   }
-  if (!is.null(digits)) { digits <- c(NA, digits) }
-  if (!is.null(display)) { display <- c("s", display) }
   xt <- xtable(df, label=label, digits=digits, display=display)
   tc <- textConnection("outp", open="w", local=TRUE)
   print(xt, type="html", file=tc, include.rownames=FALSE)

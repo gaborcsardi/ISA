@@ -59,7 +59,7 @@ setMethod("htmlReport", signature(r="KEGGListHyperGResult"),
               summ[[i]]$Pathway <- unlist(mget(rownames(summ[[i]]), KEGGPATHID2NAME))
             }
             res <- lapply(summ, html.df, label=label, digits=digits,
-                          display=c("s", "g", "g", "g", "g", "g", "s"))
+                          display=c("s", "g", "g", "g", "g", "g", "g", "s"))
             if (!is.null(file)) {
               do.call("cat", c(res, list(file=file, sep="\n\n", append=append)))
               invisible(res)

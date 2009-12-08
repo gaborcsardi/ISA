@@ -88,7 +88,7 @@ setMethod("htmlReport", signature(r="ListHyperGResult"),
             library(xtable)
             summ <- do.call("summary", c(list(r), summary.args))
             res <- lapply(summ, html.df, label=label, digits=digits,
-                          display=c("s", "g", "g", "g", "g", "g"))
+                          display=c("s", "g", "g", "g", "g", "g", "g"))
             if (!is.null(file)) {
               do.call("cat", c(res, list(file=file, sep="\n\n", append=append)))
               invisible(res)
