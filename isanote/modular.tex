@@ -27,7 +27,7 @@
 
 \begin{abstract}
 \section{Summary:}
-Large sets of data, like expression profile from many samples, require
+Large sets of data, like expression profiles from many samples, require
 analytic tools to reduce their complexity. Classical (bi-)clustering
 algorithms typically attribute elements (genes, arrays) to disjoint groups
 (``clusters''). Yet, in some cases overlapping cluster assignments would suit
@@ -35,16 +35,16 @@ the biological reality much better.
 
 The Iterative Signature Algorithm (ISA) was designed to overcome this and
 other limitations of standard clustering algorithms. It aims to reduce the
-complexity of very large sets of data by decomposing it into so-called
+complexity of a very large set of data by decomposing it into so-called
 ``modules''. In the context of gene expression data these modules consist of
 subsets of genes that exhibit a coherent expression profile only over a
 subset of microarray experiments. Genes and arrays may be attributed to
 multiple modules and the level of required coherence can be varied resulting
 in different ``resolutions'' of the modular mapping. Since the ISA does not
 rely on the computation of correlation matrices (like many other tools), it
-is extremely fast even for very large datsets.
+is extremely fast even for very large datasets.
 
-In this short note, we introduce two BioConductor, \cite{BioC}, software
+In this short note, we introduce two BioConductor \citep{BioC}, software
 packages written in GNU~R: The~\Rpackage{isa2} includes a highly optimized
 implementation of the ISA and~\Rpackage{eisa} provides a convenient interface
 to run the ISA and visualize its output.
@@ -60,9 +60,9 @@ The ISA homepage is at \href{http://www.unil.ch/cbg/homepage/software.html}%
 % How the ISA works
 The ISA can be applied to identify coherent substructures (i.e. modules)
 from any rectangular matrix of data. To be specific we consider here the
-case of transcriptomics data corresponding to a selection of gene-expression
+case of transcriptomics data corresponding to a set of gene-expression
 profiles from a collection of samples. The method has been described in
-detail in Refs~\cite{isamod,isa}. Here we only give a brief summary.
+detail in Refs~\citep{isamod,isa}. Here we only give a brief summary.
 
 The ISA identifies modules by an iterative procedure. The algorithm starts
 from an input seed (corresponding to some set of genes or samples) which is
@@ -102,7 +102,7 @@ detail the R packages that implement the ISA and visualize its output
   Subfigures \subfig{A}, \subfig{B}, \subfig{C} and \subfig{D} were
 generated
   using the acute lymphoblastic leukemia data set, see
-  \cite{chiaretti04} and the \Rpackage{ALL} R package.
+  \citep{chiaretti04} and the \Rpackage{ALL} R package.
   \subfig{(A)} A condition plot for a simple bicluster. Each sample is
   represented as a bar, its height is its score in the bicluster.
   Samples above the red (none in this case) and samples
@@ -136,7 +136,8 @@ many aspects of transcriptional regulation one often combines several
 microarray experiments into a single dataset. In such a case it is important
 to properly normalize such data and reduce the bias due to constituent
 datasets. Several methods address this challenge,
-see e.g.~\cite{johnson07} for an algorithm that has a GNU R implementation.
+see e.g.~\citep{johnson07} for an algorithm that has a GNU R
+implementation. 
 % (S: Do we have a standard flag to call their software?)
 
 % Filtering
@@ -164,12 +165,12 @@ seeds, based on the application.
 
 % The ISA iteration.
 \emph{The ISA iteration.}
-This step is essentially performing the ISA and finding the biclusters
-from the starting seeds.
+This step is the core of the ISA and finds biclusters from the
+starting seeds.
 
 % Merging the modules.
 \emph{Merging the modules.}
-It is possible that more seeds converge to the same, or very similar
+It is possible that several seeds converge to the same, or very similar
 biclusters. This step eliminates such duplicates.
 
 % The robustness measure and filtering the modules.
@@ -195,13 +196,13 @@ The ISA and accompanying visualization tools are implemented in two R
 packages. The \Rpackage{isa2} package contains the implementation of
 the basic ISA itself; this package can be used to analyze any tabular
 data. The \Rpackage{eisa} package builds on \Rpackage{isa2}. It adds
-support to standard BioConductor gene expression data structures; and
-contains gene expression specific visualization tools, see some of
-these in Fig.~\ref{fig:workflow}.
+support to standard BioConductor data structures; and
+contains gene expression specific visualization tools (see 
+Fig.~\ref{fig:workflow} for examples).
 
 Both the \Rpackage{isa2} and \Rpackage{eisa} packages support two
 workflows. The \emph{simple workflow} involves a single R function
-call and runs all ISA steps (1-3 on Fig.~\ref{fig:workflow}.) with
+call and runs all ISA steps (1-3 in Fig.~\ref{fig:workflow}.) with
 their default parameters.
 
 The \emph{detailed workflow} means running every step of the modular
@@ -214,16 +215,16 @@ ISA, please see the ISA homepage for more information.
 % \subsubsection{Visualization}
 
 The \Rpackage{eisa} package implements a set of visualization
-techniques for biclusters, some of these are specific to ISA, others
-are not. Please see Fig.~\ref{fig:workflow} for some of these.
+techniques for biclusters, one of which is specific to ISA (see
+Fig.~\ref{fig:workflow} for examples). 
 
-The \Rpackage{ExpressionView} R package, discussed in detail in
-another application note, implements an interactive tool
-for visualizing ISA (or other) overlapping biclusters.
+% The \Rpackage{ExpressionView} R package, discussed in detail in
+% another application note, implements an interactive tool
+% for visualizing ISA (or other) overlapping biclusters.
 
 % \subsubsection{Connection to other software}
 
-The \Rpackage{biclust} package, \cite{biclust}, implements a number of
+The \Rpackage{biclust} package, \citep{biclust}, implements a number of
 biclustering algorithms in a unified framework. The \Rpackage{eisa}
 package include tools to convert between \Rpackage{biclust} and ISA
 biclusters. This allows the cross-talk of the functions in the two
@@ -236,7 +237,9 @@ ISA homepage.
 \section*{Acknowledgement}
 
 \paragraph{Funding\textcolon} The authors are greatful to the Swiss
-Institute of Bioinformatics for support.
+Institute of Bioinformatics, the Swiss National Science Foundation
+(3100AO-116323/1), and the European Framework Project 6 (through
+the EuroDia and AnEuploidy projects).
 \paragraph{Conflict of interest\textcolon} None declared.
 
 \bibliographystyle{natbib}
