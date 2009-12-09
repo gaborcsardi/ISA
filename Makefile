@@ -1,5 +1,6 @@
 
 VERSION=0.2.1
+EISAVERSION=0.2.2
 
 all: isa2 eisa
 
@@ -34,12 +35,12 @@ isa2_$(VERSION)-nv.tar.gz: $(ISA2FILES)
 EISAFILES = eisa/DESCRIPTION eisa/NAMESPACE eisa/R/*.R eisa/man/*.Rd \
 	eisa/inst/CITATION eisa/data/*.rda
 
-eisa-final: eisa_$(VERSION).tar.gz
-eisa: eisa_$(VERSION)-nv.tar.gz
+eisa-final: eisa_$(EISAVERSION).tar.gz
+eisa: eisa_$(EISAVERSION)-nv.tar.gz
 
-eisa_$(VERSION).tar.gz: $(EISAFILES)
+eisa_$(EISAVERSION).tar.gz: $(EISAFILES)
 	R_LIBS=~/.R/library R CMD build eisa
-eisa_$(VERSION)-nv.tar.gz: $(EISAFILES)
+eisa_$(EISAVERSION)-nv.tar.gz: $(EISAFILES)
 	R_LIBS=~/.R/library R CMD build --no-vignettes eisa
 
 # ExpressionView
@@ -86,7 +87,7 @@ vignettes/ExpressionView_tutorial.tex: $(REVFILES) vignettes/ExpressionView_tuto
 	R CMD build --no-vignettes eisa
 	R CMD build --no-vignettes RExpressionView
 	R CMD INSTALL -l /tmp/ isa2_$(VERSION).tar.gz
-	R CMD INSTALL -l /tmp/ eisa_$(VERSION).tar.gz
+	R CMD INSTALL -l /tmp/ eisa_$(EISAVERSION).tar.gz
 	R CMD INSTALL -l /tmp/ ExpressionView_$(VERSION).tar.gz
 	cd vignettes && R_LIBS=/tmp/ R CMD Sweave ExpressionView_tutorial.Rnw || rm ExpressionView_tutorial.tex
 
@@ -208,10 +209,10 @@ homepage/manuals/isa2.pdf: isa2_$(VERSION).tar.gz
 	rm -f isa2.pdf && R CMD Rd2dvi --pdf --no-preview isa2 && \
 	mv isa2.pdf homepage/manuals/
 
-homepage/manuals/eisa/.stamp: eisa_$(VERSION).tar.gz
-	scripts/manual.sh eisa $(VERSION)
+homepage/manuals/eisa/.stamp: eisa_$(EISAVERSION).tar.gz
+	scripts/manual.sh eisa $(EISAVERSION)
 
-homepage/manuals/eisa.pdf: eisa_$(VERSION).tar.gz
+homepage/manuals/eisa.pdf: eisa_$(EISAVERSION).tar.gz
 	rm -f eisa.pdf && R CMD Rd2dvi --pdf --no-preview eisa && \
 	mv eisa.pdf homepage/manuals/
 
