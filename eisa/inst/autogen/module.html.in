@@ -35,8 +35,6 @@
 </ul>
 <ul class="menu">
 <li><a href="#expr">Expression data</a></li>
-<li><a href="#over">Overlap plot</a></li>
-<!-- <li><a href="#closeup">Closeup</a></li> -->
 </ul><ul class="menu">
 <li><a href="#GOtreeBP">The BP GO tree</a></li>
 <li><a href="#GOtreeCC">The CC GO tree</a></li>
@@ -47,7 +45,6 @@
 <li><a href="#GOMF">GO MF enrichment</a></li>
 <li><a href="#KEGG">KEGG enrichment</a></li> 
 <li><a href="#miRNA">miRNA enrichment</a></li>
-<li><a href="#DBD">DBD transcription factor enrichment</a></li>
 <li><a href="#CHR">Chromosome enrichment</a></li>
 </ul><ul class="menu">
 <li><a href="#genes">Genes</a></li>
@@ -142,75 +139,6 @@ deviation one for every gene separately across all conditions
 <p class="note"><img src="expcolbar-<!--no-->.png" alt="color bar"/><br/>
 Under-expression is coded with <span style="color:green;">green</span>, 
 over-expression with <span style="color:red;">red</span> color.</p>
-</div>
-
-<div style="clear:both;"/>
-<h2 id="over"><span class="hideshow">
-<span id="section.13.1" style="position:absolute;top:0;right:0;display:block;">
-<a href="#" onclick="togglestuff2('help.13'); return false;">Help</a> |
-<a href="#" onclick="togglestuff('section.13'); return false;">Hide</a> |
-<a href="#">Top</a>
-</span>
-<span id="section.13.2" style="position:absolute;top:0;right:0;display:none;">
-<a href="#" onclick="togglestuff2('help.13'); return false;">Help</a> |
-<a href="#" onclick="togglestuff('section.13'); return false;">Show</a> |
-<a href="#">Top</a>
-</span>
-</span>
-Overlap plot</h2>
-
-<div id="help.13" style="background:#eaeaea;display:none;visibility:hidden;width:100%;">
-<div style="width:800px;margin:10px 10px 10px 10px;">
-<h3>HELP</h3>
-<p>
-  The overlap plot shows all modules at the same gene and condition
-  thresholds and their relationship. If there is significant
-  correlation (or anti-correlation) between two modules' gene scores,
-  then they are placed close to each other. If the correlation exceeds
-  the 0.3 limit, then and edge is drawn between the two
-  modules. Green edges denote correlation, red anti-correlation. The
-  edge widths also code the correlation.
-</p>
-
-<p>
-  The overlap table shows how many genes and conditions the selected
-  module has in common with the other modules (at the same gene and
-  condition thresholds). The first column is the id of the module,
-  <b>Genes</b> is the number of genes, <b>Conds.</b> the number of
-  conditions in the module. <b>Common Genes</b> is the number of genes
-  common in the given and the selected module, the next column
-  (<b>%</b>) gives the percentage of the genes (also) included in the
-  selected module, and <b>Cor.</b> is the correlation between the two
-  modules' gene score vectors. The last three columns give the same
-  information for conditions.
-</p>
-
-<p>
-  Move the mouse cursor over the modules on the graph to show the
-  overlap tables of other modules, clicking on the modules takes you
-  to their module page.
-</p>
-
-<p class="note">
-&mdash; Click on the <i>Help</i> button again to close this help window.
-</p>
-</div>
-<div style="clear:both;height:2px;background:url(images/headerbg.png) repeat-x;"></div>
-</div>
-
-<div id="section.13" style="display:block;">
-
-<div style="float:left;">
-<dl class="map" id="mapover">
-<!-- overlaptext -->
-<!-- /overlaptext -->
-</dl>
-</div>
-
-<div style="float:left;">
-<p></p><p></p>
-<!-- overlaptable -->
-<!-- /overlaptable -->
 </div>
 
 <div style="clear:both;"></div>
@@ -696,59 +624,6 @@ Clicking on the miRNA names takes you to the TargetScan web site.
 <table border="0">
 <!-- tablemiRNA -->
 <!-- /tablemiRNA -->
-</table>
-</div>
-
-<h2 id="DBD"><span class="hideshow">
-<span id="section.15.1" style="position:absolute;top:0;right:0;">
-<a href="#" onclick="togglestuff2('help.15'); return false;">Help</a> |
-<a href="#" onclick="togglestuff('section.15'); return false;">Hide</a> |
-<a href="#">Top</a>
-</span>
-<span id="section.15.2" style="position:absolute;top:0;right:0;display:none;">
-<a href="#" onclick="togglestuff2('help.15'); return false;">Help</a> |
-<a href="#" onclick="togglestuff('section.15'); return false;">Show</a> |
-<a href="#">Top</a>
-</span>
-</span>
-DBD transcription factor test for over-representation</h2>
-
-<div id="help.15" style="background:#eaeaea;display:none;visibility:hidden;width:100%;">
-<div style="width:800px;margin:10px 10px 10px 10px;">
-<h3>HELP</h3>
-<p>
-List of all enriched transcription regulators, at the 0.05
-p-value level.
-</p>
-
-<p>
-The columns: 
-<ul><li><b>ECount</b> is the expected count of genes in the
-module regulated by the given (general) transcription factor,
-just by chance. </li>
-<li><b>Count</b>
-is the number of genes in the module regulated by the given TF.</li>
-<li><b>Size</b> is the total number of genes (in our universe)
-regulated with the given TF.</li>
-</ul>
-</p>
-
-<p>
-The transcription regulation data was taken from the <a
-href="http://www.transcriptionfactor.org/">DBD</a> database.
-</p>
-
-<p class="note">
-&mdash; Click on the <i>Help</i> button again to close this help window.
-</p>
-</div>
-<div style="clear:both;height:2px;background:url(images/headerbg.png) repeat-x;"></div>
-</div>
-
-<div id="section.15">
-<table border="0">
-<!-- tableDBD -->
-<!-- /tableDBD -->
 </table>
 </div>
 
