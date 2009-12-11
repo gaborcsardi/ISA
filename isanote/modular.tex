@@ -90,38 +90,27 @@ detail the R packages that implement the ISA and visualize its output
 \begin{figure*}
 \centering
 \includegraphics[width=\textwidth]{isa2workflow3}
-\caption{Work flow of a typical modular analysis study, with the
-  \Rpackage{eisa} package (left); and four bicluster visualization
-  techniques (right). The input of the \Rpackage{eisa} pipeline is a
+\caption{\subfig{(A)} Work flow of a typical modular analysis study, with the
+  \Rpackage{eisa} package. The input of the \Rpackage{eisa} pipeline is a
   BioConductor \Rclass{ExpressionSet} object. This is normalized to
-  $Z$-scores (1); the ISA iterations are initiated using ``smart'' or
-  random seeds (2); and the biclusters are then merged and filtered
-  based on the robustness measure (3). The \Rpackage{eisa} package
-  contains tools to perform many GO, KEGG, etc. enrichment calculations
-  quickly (4), and several bicluster visualization tools (5).
-  Subfigures \subfig{A}, \subfig{B}, \subfig{C} and \subfig{D} were
-generated
+  $Z$-scores (1); the ISA iterations are performed (2); and the
+  biclusters are then merged and filtered based on the robustness
+  measure (3). The \Rpackage{eisa} package contains tools to perform
+  many GO, KEGG, etc. enrichment calculations quickly (4), and several
+  bicluster visualization tools (5).
+  Subfigures \subfig{B} and \subfig{C} were generated
   using the acute lymphoblastic leukemia data set, see
   \citep{chiaretti04} and the \Rpackage{ALL} R package.
-  \subfig{(A)} A condition plot for a simple bicluster. Each sample is
-  represented as a bar, its height is its score in the bicluster.
-  Samples above the red (none in this case) and samples
-  below the green line are part of the biclusters. The coloring
-  indicates cases and controls.
-  \subfig{(B)} A module tree. Each rectangle is a bicluster; see the
+  \subfig{(B)} Heatmap for a single module, showing correlated
+  expression for the genes and samples. The red lines are the gene and
+  sample scores.
+  \subfig{(C)} A module tree. Each rectangle is a bicluster; see the
   definition of the edges in the text. The modules are colored
   according to their Gene Ontology enrichment $p$-values, the codes of
   the enriched GO categories are shown in the top-left corner of the
   rectangles. The top-right corner shows the number of genes and
   conditions in the bicluster. The gene thresholds used for finding
   the modules is shown on the horizontal axes.
-  \subfig{(C)} Heatmap for a single module, showing correlated
-  expression for the genes and samples. The red lines are the gene and
-  sample scores.
-  \subfig{(D)} Profile plot, for a single module. On the top plot the
-  expression of all samples is plotted, the samples of the module
-  with black. The red and green lines show the mean of the two
-  groups. The bottom plot is the same for the genes of the module.
 }
 \label{fig:workflow}
 \end{figure*}
