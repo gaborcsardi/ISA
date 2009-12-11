@@ -47,11 +47,12 @@ is extremely fast even for very large datasets.
 In this short note, we introduce two BioConductor \citep{BioC}, software
 packages written in GNU~R: The~\Rpackage{isa2} includes a highly optimized
 implementation of the ISA and~\Rpackage{eisa} provides a convenient interface
-to run the ISA and visualize its output.
+to run the ISA, visualize its output and puts the biclusters into
+biological context.
 
 \section{Availability:}
-The ISA homepage is at \href{http://www.unil.ch/cbg/homepage/software.html}%
-{\url{http://www.unil.ch/cbg/homepage/software.html}}
+\href{http://www.unil.ch/cbg/ISA}%
+{\url{http://www.unil.ch/cbg/ISA}}
 \section{Contact:} \href{Sven.Bergmann@unil.ch}{Sven.Bergmann@unil.ch}
 \end{abstract}
 
@@ -68,16 +69,11 @@ The ISA identifies modules by an iterative procedure. The algorithm starts
 from an input seed (corresponding to some set of genes or samples) which is
 refined at each iteration by adding and/or removing genes and/or samples
 until the process converges to a stable set, which is referred to as a
-transcription module. This iterative procedure is typically performed to a
-large number of seeds. In the unsupervised approach these seeds are chosen
-randomly to sample uniformly the immense search space. We also implemented a
-semi-supervised method, to which we refer as ``smart seeding'', where the
-seeds a biased to start with certain sets of genes or samples for which
-there is prior knowledge.
+transcription module. 
 
-The output of ISA is a collection of potentially overlapping modules. Each
-gene and each sample is attributed a score that reflects the strength of the
-association with the module.
+The output of ISA is a collection of potentially overlapping
+modules. In every module, each gene and each sample is attributed a
+score that reflects the strength of the association with the module.
 
 In the following we first outline how our software tool is commonly used for a
 modular analysis (Section~\ref{sec:methods}) and then we describe in more
@@ -91,13 +87,7 @@ detail the R packages that implement the ISA and visualize its output
 \centering
 \includegraphics[width=\textwidth]{isa2workflow3}
 \caption{\subfig{(A)} Work flow of a typical modular analysis study, with the
-  \Rpackage{eisa} package. The input of the \Rpackage{eisa} pipeline is a
-  BioConductor \Rclass{ExpressionSet} object. This is normalized to
-  $Z$-scores (1); the ISA iterations are performed (2); and the
-  biclusters are then merged and filtered based on the robustness
-  measure (3). The \Rpackage{eisa} package contains tools to perform
-  many GO, KEGG, etc. enrichment calculations quickly (4), and several
-  bicluster visualization tools (5).
+  \Rpackage{eisa} package. See the text for details.
   Subfigures \subfig{B} and \subfig{C} were generated
   using the acute lymphoblastic leukemia data set, see
   \citep{chiaretti04} and the \Rpackage{ALL} R package.
@@ -122,9 +112,9 @@ steps:
 \emph{Batch correction.}
 To study the global organization of a transcription program including
 many aspects of transcriptional regulation one often combines several
-microarray experiments into a single dataset. In such a case it is important
-to properly normalize such data and reduce the bias due to constituent
-datasets. Several methods address this challenge,
+microarray experiments into a single dataset. In such a case
+additional data normalization is vital to reduce the bias due to
+constituent datasets. Several methods address this challenge,
 see e.g.~\citep{johnson07} for an algorithm that has a GNU R
 implementation. 
 % (S: Do we have a standard flag to call their software?)
@@ -138,9 +128,9 @@ removing them before running the ISA iteration.
 % (S: Describe how this is done, and if it requires setting a threshold!) 
 
 % Normalization.
-\emph{ISA normalization.}
-In each iteration of the ISA weighted sums of expression levels over either
-genes or samples are computed. Since different genes
+\emph{ISA normalization.} (Step 1 on Fig.~\ref{fig:workflow}.)
+In each iteration of the ISA thresholded weighted sums of expression
+levels over either genes or samples are computed. Since different genes
 typically show different levels of base
 expression and variance, it is important to standardize expression
 levels to $Z$-scores. The ISA uses two sets of $Z$-scores, one
@@ -148,22 +138,22 @@ calculated for each gene across all samples, the other for each sample
 across all genes.
 
 % Random and smart seeding.
-\emph{Random and smart seeding.}
-As mentioned previously, ISA can be performed with random or smart
+\emph{Random and smart seeding, ISA iteration} (Step 2.)
+The ISA iteration is typically performed to a
+large number of seeds. In the unsupervised approach these seeds are chosen
+randomly to sample uniformly the immense search space. We also implemented a
+semi-supervised method, to which we refer as ``smart seeding'', where the
+seeds a biased to start with certain sets of genes or samples based on
+prior knowledge.As mentioned previously, ISA can be performed with random or smart
 seeds, based on the application.
 
-% The ISA iteration.
-\emph{The ISA iteration.}
-This step is the core of the ISA and finds biclusters from the
-starting seeds.
-
 % Merging the modules.
-\emph{Merging the modules.}
+\emph{Merging the modules.} (Step 3.)
 It is possible that several seeds converge to the same, or very similar
 biclusters. This step eliminates such duplicates.
 
 % The robustness measure and filtering the modules.
-\emph{Robustness of biclusters.}
+\emph{Robustness of biclusters.} (Step 3.)
 To access the significance of a bicluster, we designed a robustness
 measure, that can be used to filter out spurious modules. This is done
 based on performing ISA on the scrambled input data.
