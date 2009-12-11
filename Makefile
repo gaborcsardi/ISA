@@ -165,21 +165,20 @@ eisa/inst/doc/EISA_tutorial.pdf: eisa/inst/doc/EISA_tutorial.tex
 eisa/inst/doc/EISA_tutorial.tex: eisa/inst/doc/EISA_tutorial.Rnw
 	cd eisa/inst/doc/ && R CMD Sweave EISA_tutorial.Rnw
 
-homepage/EISA_module_trees.html: eisa/inst/doc/EISA_module_trees.tex
-	cp vignettes/style.cfg eisa/inst/doc/
-	cd eisa/inst/doc/ && pdflatex EISA_module_trees.tex && \
+homepage/EISA_module_trees.html: vignettes/EISA_module_trees.tex
+	cd vignettes && pdflatex EISA_module_trees.tex && \
 		bibtex EISA_module_trees && pdflatex EISA_module_trees
-	cd eisa/inst/doc && $(SWEAVE2HTML) EISA_module_trees $(SWEAVE2HTMLOPTIONS)
-	cat eisa/inst/doc/EISA_module_trees.html | $(REMOVEHTML) | $(REWRITEIMG) >homepage/EISA_module_trees.html
-	cp eisa/inst/doc/EISA_module_trees.css homepage/
-	cp eisa/inst/doc/EISA_module_trees*.png homepage/
-	cp eisa/inst/doc/*.png homepage/
-homepage/EISA_module_trees.pdf: eisa/inst/doc/EISA_module_trees.pdf
+	cd vignettes && $(SWEAVE2HTML) EISA_module_trees $(SWEAVE2HTMLOPTIONS)
+	cat vignettes/EISA_module_trees.html | $(REMOVEHTML) | $(REWRITEIMG) >homepage/EISA_module_trees.html
+	cp vignettes/EISA_module_trees.css homepage/
+	cp vignettes/EISA_module_trees*.png homepage/
+	cp vignettes/*.png homepage/
+homepage/EISA_module_trees.pdf: vignettes/EISA_module_trees.pdf
 	cp $< $@
-eisa/inst/doc/EISA_module_trees.pdf: eisa/inst/doc/EISA_module_trees.tex
-	cd eisa/inst/doc/ && pdflatex EISA_module_trees.tex
-eisa/inst/doc/EISA_module_trees.tex: eisa/inst/doc/EISA_module_trees.Rnw
-	cd eisa/inst/doc/ && R CMD Sweave EISA_module_trees.Rnw
+vignettes/EISA_module_trees.pdf: vignettes/EISA_module_trees.tex
+	cd vignettes/ && pdflatex EISA_module_trees.tex
+vignettes/EISA_module_trees.tex: vignettes/EISA_module_trees.Rnw
+	cd vignettes/ && R CMD Sweave EISA_module_trees.Rnw
 
 homepage/EISA_biclust.html: eisa/inst/doc/EISA_biclust.tex
 	cp vignettes/style.cfg eisa/inst/doc/
