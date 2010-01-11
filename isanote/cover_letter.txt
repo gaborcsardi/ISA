@@ -1,0 +1,63 @@
+Dear Prof Bateman, Prof Valencia,
+
+please find attached our manuscript for 
+an application note, entitled 'Modular analysis
+of gene expression data with R'.
+
+The software introduced by the paper is an 
+implementation of the Iterative Signature Algorithm 
+(ISA), a biclustering method that finds transcription
+modules in gene expression data. (Bi-)clustering 
+is an approach to reduce the complexity of large
+data sets and currently ISA is one of the state
+of the art algorithms. See e.g. Prelic et al. 
+(2006) [1] and Richards et al. (2008) [2] for 
+independent evaluations of the ISA.
+
+So far the ISA lacked an extensively 
+documented, efficient, open-source implementation. 
+We think that our software facilitates data 
+analysis and makes ISA modular analysis a quick 
+routine procedure. As our implementation is 
+built on R and BioConductor, it fits smoothly
+into existing analysis pipelines, and works for 
+any organism supported by BioConductor. Manuals 
+and tutorials are included both in the software 
+package itself and at the ISA homepage [3].
+
+Sincerely Yours,
+Gabor Csardi
+
+Contact details
+---------------
+
+Gabor Csardi <Gabor.Csardi@unil.ch>
+Zoltan Kutalik <Zoltan.Kutalik@unil.ch>
+Sven Bergmann <Sven.Bergmann@unil.ch>
+
+Rue de Bugnon 27 - DGM 328 
+CH-1005 Lausanne 
+Switzerland
+
+Tel.: ++41-21-692-5452
+FAX: ++41-21-692-5455
+
+References
+----------
+
+[1] Amela Prelic, Stefan Bleuler, 
+    Philip Zimmermann, Anja Wille, 
+    Peter Bühlmann, Wilhelm Gruissem, 
+    Lars Hennig, Lothar Thiele
+    and Eckart Zitzler: A systematic comparison 
+    and evaluation of biclustering methods for 
+    gene expression data, Bioinformatics 2006
+    22(9):1122-1129
+
+[2] Alexander L Richards, Peter Holmans, 
+    Michael C O'Donovan, Michael J Owen and 
+    Lesley Jones: A comparison of four clustering
+    methods for brain expression microarray data, 
+    BMC Bioinformatics 2008, 9:490
+
+[3] http://www.unil.ch/cbg/ISA
