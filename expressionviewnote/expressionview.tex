@@ -54,12 +54,13 @@ The ExpressionView package contains two independent parts: An ordering algorithm
 For users who prefer to install the viewer as a standalone program, we also provide a platform independent Adobe AIR version that can be downloaded from the \href{http://www2.unil.ch/cbg/index.php?title=ExpressionView}{website}.
 
 \subsection{Gene expression data and biclusters}
-ExpressionView is designed to work with gene expression data in the form of a Bioconductor ExpressionSet. This class provides a user-friendly way to access the actual gene expression matrix and its associated metadata. There is a variety of biclustering algorithms described in the literature~\citep{madeira04,prelic06}, several of which have been implemented as R packages. ExpressionView can treat results obtained by the iterative signature algorithm (ISA)~\citep{bergmann03,csardi09} and the methods available in the Biclust package~\citep{kaiser08}. Since the structure of biclustering results is independent of the algorithm, an extension to other methods is straightforward.
+ExpressionView is designed to work with gene expression data in the form of a Bioconductor ExpressionSet. This class provides a user-friendly way to access the actual gene expression matrix and its associated metadata. There is a variety of biclustering algorithms described in the literature~\citep{madeira04,prelic06}, several of which have been implemented as R packages. ExpressionView can treat results obtained by the iterative signature algorithm (ISA)~\citep{bergmann03}%,csardi09
+and the methods available in the Biclust package~\citep{kaiser08}. Since the structure of biclustering results is independent of the algorithm, an extension to other methods is straightforward.
 
 \subsection{Order}
 To present the tens of possibly overlapping biclusters in a visually appealing form, it is necessary to reorder the rows and columns of the gene expression matrix in such a way that biclusters form contiguous rectangles. Since for more than two mutually overlapping biclusters, it is in general impossible to find such an arrangement, one has to make concessions. In contrast to \cite{grothaus06}, who proposed to repeat rows and columns as necessary to achieve this goal, we prefer to optimise the arrangement within the original data by maximising the area of the largest contiguous biclusters. 
 
-Since this reordering is an interesting problem on its own, which to the best of our knowledge has not been studied in the literature, we briefly outline our strategy here. Noting that the rows and the columns can be ordered separately, the problem reduces to finding the optimal arrangement of a set of $n$ elements that are part of at least one of $m$ clusters. The quality of the order is defined as the sum over the maximal number of neighbouring elements in every cluster and the tasks thus consists in maximizing this quantity by changing the order of the elements. Starting from an initial configuration determined by similarity, this is achieved by either shifting well aligned subsequences of a given cluster, herby enlarging the longest contiguous part, or permuting the individual elements of a given subcluster. 
+Since this reordering is an interesting problem on its own, which to the best of our knowledge has not been studied in the literature, we briefly outline our strategy here. Noting that the rows and the columns can be ordered separately, the problem reduces to finding the optimal arrangement of a set of $n$ elements that are part of at least one of $m$ clusters. The quality of the order is defined as the sum over the maximal number of neighbouring elements in every cluster and the tasks thus consists in maximizing this quantity by changing the order of the elements. Starting from an initial configuration determined by similarity, this is achieved by either shifting well aligned subsequences of a given cluster, hereby enlarging the longest contiguous part, or permuting the individual elements of a given subcluster. 
 
 To determine the efficiency of this method, we have studied a large number of perfectly orderable, but initially scrambled, test cases. We find that in almost every situation, the proposed algorithm finds an order that recovers more than 99\% of the score of the optimal solution and in most cases, it actually recovers the correct alignment. For random samples, which are more representative for actual gene expression data than orderable situations, execution time increases polynomially with the number of clusters $m$ as ${\mathcal O}(m^\alpha)$, where $\alpha \in [1.6, 2]$, almost independent of the number of elements $n$. For a given number of clusters, we find ${\mathcal O}(n^\alpha)$, with $\alpha \in [2.5, 2.7]$.
 
@@ -72,7 +73,10 @@ The core application of this package is the Flash applet that allows the user to
 
 %\section*{Acknowledgement}
 
-\paragraph{Funding\textcolon} This work was supported by ...
+\paragraph{Funding\textcolon} The authors are grateful to the Swiss
+Institute of Bioinformatics, the Swiss National Science Foundation
+(3100AO-116323/1), and the European Framework Project 6 (through
+the EuroDia and AnEuploidy projects).
 
 \paragraph{Conflict of interest\textcolon} none declared.
 
@@ -88,10 +92,10 @@ Bergmann,S., Ihmels,J. and Barkai,N. (2003)
 Iterative signature algorithm for the analysis of large-scale gene expression data.
 \href{http://dx.doi.org/10.1103/PhysRevE.67.031902 }{\emph{Physical Review E}, {\bf 67}, 031902.}
 
-\bibitem[Cs{\'a}rdi et~al.(2009)]{csardi09}
-Cs{\'a}rdi,G., Kutalik,Z. and Bergmann,S. (2009)
-Modular analysis of gene expression data with R.
-\href{http://dx.doi.org/}{\emph{Bioinformatics}, ...}
+%\bibitem[Cs{\'a}rdi et~al.(2009)]{csardi09}
+%Cs{\'a}rdi,G., Kutalik,Z. and Bergmann,S. (2009)
+%Modular analysis of gene expression data with R.
+%\href{http://dx.doi.org/}{\emph{Bioinformatics}, ...}
 
 \bibitem[Gentleman et~al.(2004)]{gentleman04}
 Gentleman,R.C., \emph{et al.} (2004)
