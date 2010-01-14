@@ -3,6 +3,7 @@
 \usepackage{color}
 \newcommand{\cred}{\color{red}}
 
+\usepackage{amstext}
 \usepackage{url}
 % \usepackage[colorlinks,citecolor=blue,linkcolor=red,urlcolor=blue]{hyperref}
 \newcommand{\thefirstpage}{1} \newcommand{\thelastpage}{1}
@@ -21,8 +22,7 @@ Lachapelle, Zolt\'an Kutalik, and Sven Bergmann]{Andreas
   L\"uscher$^{1\dagger}$, G\'abor Cs\'ardi$^{1,2\dagger}$, Aitana Morton de
   Lachapelle$^{1,2\dagger}$, Zolt\'an Kutalik$^{1,2\dagger}$, 
   Bastian Peter$^{1,2}$
-  and Sven Bergmann$^{1,2}$\footnote{to whom correspondence should be
-    addressed}}  
+  and Sven Bergmann$^{1,2}$}
 \address{
   $^{1}$Swiss Institute of Bioinformatics, Lausanne, Switzerland\\
   $^{2}$Department of Medical Genetics, University of Lausanne,
@@ -37,7 +37,6 @@ Lachapelle, Zolt\'an Kutalik, and Sven Bergmann]{Andreas
 \maketitle
 
 \begin{abstract}
-
 \section{Summary:}
 ExpressionView is an R package that provides an interactive graphical
 environment to explore transcription modules identified in gene expression
@@ -45,7 +44,7 @@ data. A sophisticated ordering algorithm is used to present the
 modules with the expression in a visually appealing layout that provides an intuitive
 summary of the results. From this overview, the user can select
 individual modules and access all the biologically relevant metadata
-associated with it.
+associated with them.
 
 \section{Availability:} 
 %\href{http://www.unil.ch/cbg/ExpressionView}{R 
@@ -60,14 +59,13 @@ Screenshots, tutorials and sample data sets can be found on the
 ExpressionView \href{http://www.unil.ch/cbg/ExpressionView}{website}. 
 \end{abstract}
 
-\vspace*{-10pt}
+\vspace*{-7pt}
 \section{Introduction}
 Biclustering is an unsupervised data analysis method which is
 frequently used to explore microarray data. Biclustering algorithms
 identify co-expressed groups of
 genes and conditions (samples) where this co-expression occurs from
-collections of expression profiles. We refer to such groups (or
-biclusters) as modules. While
+collections of expression profiles. We refer to such groups as modules. While 
 there is a multitude of biclustering software available~(see in
 \cite{madeira04,ihmels04}), packages with intuitive interfaces that
 allow for an interactive exploration of the results are
@@ -77,11 +75,12 @@ life scientists without consolidated programming
 experience. Implemented as an R package, the user can apply all the
 powerful microarray analysis tools provided by the
 Bioconductor~\citep{gentleman04} project before exporting the data to
-a platform independent Adobe Flash applet. This stand-alone applet
-provides and integrated, intuitive and interactive visualization of
+a platform independent Adobe Flash applet. This applet
+provides an integrated, intuitive and interactive visualization of
 the modules together with the underlying gene expression data and
 additional information on the genes and conditions.
 
+\vspace*{-7pt}
 \section{Package design and workflow}
 The ExpressionView package contains two independent parts: An ordering
 algorithm implemented in C++ and an Adobe Flash applet written in
@@ -105,9 +104,9 @@ different steps in more detail.
   applet.}\label{fig:workflow} 
 \end{figure*}
 For users who prefer to install the viewer as a standalone program, we
-also provide a platform independent Adobe AIR version that can be
-downloaded from the
+also provide an Adobe AIR version that can be downloaded from the
 \href{http://www.unil.ch/cbg/ExpressionView}{website}. 
+
 
 \subsection{Gene expression data and modules}
 ExpressionView is designed to work with gene expression data in the
@@ -116,12 +115,12 @@ user-friendly way to access the actual gene expression matrix and its
 associated metadata. There is a variety of biclustering algorithms
 described in the literature~\citep{madeira04,prelic06}, several of
 which have been implemented as R packages. ExpressionView can treat
-results obtained by the Iterative Signature Algorithm
-(ISA)~\citep{bergmann03} (see \citep{csardi09} for its R
-implementation) and any of the methods available in the Biclust
-package~\citep{kaiser08}. Since the structure of biclustering results
-is independent of the algorithm, an extension to other methods is
-straightforward. 
+results obtained by the Iterative Signature
+Algorithm~\citep{bergmann03,csardi09} and any of the methods available
+in the Biclust package~\citep{kaiser08}. Since the structure of
+biclustering results is independent of the algorithm, an extension to
+other methods is straightforward. 
+
 
 \subsection{Reordering genes and conditions}
 To present the collection of possibly overlapping modules in a visually
@@ -133,7 +132,7 @@ arrangement for more than two mutually overlapping modules, we propose
 here an approximate solution that optimizes the arrangement within the
 original data by maximising the total area of the largest contiguous
 module subsets. (An alternative would be to repeat rows and columns as
-necessary~\cite{grothaus06}, but for many modules this will results in
+necessary~\citep{grothaus06}, but for many modules this will results in
 a very large expression matrix.) 
 
 This optimization task is an interesting problem on its own, which to
@@ -144,9 +143,9 @@ other, so the same optimization method can be applied sequentially,
 say first to rows and then to columns. For a given order of the
 elements (either genes or conditions) we compute for each module the
 size of the largest contiguous sequence of elements (i.e. the maximal
-number of neighboring elements $N^{max}_i$). Then as a measure of the
+number of neighboring elements $N^\text{max}_i$). Then as a measure of the
 quality $Q$ of the order we sum this quantity over all modules
-($Q=\sum_i N^{max}_i$). The optimization procedure for $Q$ starts from
+($Q=\sum_i N^\text{max}_i$). The optimization procedure for $Q$ starts from
 some initial order. Two operations are then applied to this order: (1)
 Permutations that exchange two elements within a module and (2) shifts
 of a sequence of elements within a module to a different position. We
@@ -166,6 +165,7 @@ with the number of clusters $m$ as ${\mathcal O}(m^\alpha)$, where
 $\alpha \in [1.6, 2]$, almost independent of the number of elements
 $n$. For a given number of clusters, we find ${\mathcal O}(n^\alpha)$,
 with $\alpha \in [2.5, 2.7]$. 
+
 
 \subsection{Export}
 Once the optimal order is determined, the program rearranges the gene
@@ -190,15 +190,16 @@ interface is divided in two parts: On the left-hand side, the user
 finds the gene expression data in the common heat map form, on top of
 which the modules are overlaid. On the right-hand side, the metadata
 associated with the gene expression data and the results of the
-enrichment calculations, GO (Gene Ontology)~\citep{ashburner00} and
-KEGG (Kyoto Encyclopedia of Genes and Genomes)~\citep{kanehisa04}, are
-shown. Wherever possible, these elements are linked to the
-corresponding databases. The interface essentially behaves as an image
-viewer, allowing the user to zoom and pan around the expression data,
-getting instant feedback on the selected item. The currently selected
-region can be exported to a PDF file, helpful to prepare figures for
-presentations or articles, or a simple text file.
+enrichment calculations, GO~\citep{ashburner00} and
+KEGG~\citep{kanehisa04}, are shown. Wherever possible, these elements
+are linked to the corresponding databases. The interface essentially
+behaves as an image viewer, allowing the user to zoom and pan around
+the expression data, getting instant feedback on the selected
+item. The currently selected region can be exported to a PDF file,
+helpful to prepare figures for presentations or articles, or a simple
+text file.
 
+\vspace*{-7pt}
 \section*{Acknowledgement}
 
 \paragraph{Funding\textcolon} The authors are grateful to the Swiss
@@ -208,68 +209,8 @@ the EuroDia and AnEuploidy projects).
 
 \paragraph{Conflict of interest\textcolon} none declared.
 
-\begin{thebibliography}{6}
-
-\bibitem[Ashburner et~al.(2000)]{ashburner00}
-Ashburner,~M. \emph{et al.} (2000)
-Gene Ontology: tool for the unification of biology.
-\href{http://dx.doi.org/10.1038/75556}{\emph{Nature Genetics}, {\bf 25}, 25--29.}
-
-\bibitem[Bergmann et~al.(2003)]{bergmann03}
-Bergmann,~S., Ihmels,~J. and Barkai,~N. (2003)
-Iterative signature algorithm for the analysis of large-scale gene expression data.
-\href{http://dx.doi.org/10.1103/PhysRevE.67.031902 }{\emph{Physical Review E}, {\bf 67}, 031902.}
-
-%\bibitem[Cs{\'a}rdi et~al.(2009)]{csardi09}
-%Cs{\'a}rdi,G., Kutalik,Z. and Bergmann,S. (2009)
-%Modular analysis of gene expression data with R.
-%\href{http://dx.doi.org/}{\emph{Bioinformatics}, ...}
-
-\bibitem[Cs{\'a}rdi(2009)]{csardi09}
-G\'abor Cs\'ardi (2009)
-isa2: The Iterative Signature Algorithm. 
-{R package version 0.2.}
-
-\bibitem[Gentleman et~al.(2004)]{gentleman04}
-Gentleman,~R.C., \emph{et al.} (2004)
-Bioconductor: open software development for computational biology and bioinformatics.
-\href{http://dx.doi.org/10.1186/gb-2004-5-10-r80}{\emph{Genome Biology}, {\bf 5}, R80.}
-
-\bibitem[Grothaus et~al.(2006)]{grothaus06}
-Grothaus,~G., Mufti,~A., and Murali,~TM. (2006)
-Automatic layout and visualization of biclusters.
-\href{http://dx.doi.org/10.1186/1748-7188-1-15}{\emph{Algorithms for Molecular Biology}, {\bf 1}, 15.}
-
-\bibitem[Ihmels and Bergmann(2004)]{ihmels04}
-Ihmels JH and Bergmann S. Challenges and prospects in the analysis
-of large-scale gene expression data. (2004)
-{\emph{Brief Bioinform} \bf{5} 313--327.}
-
-\bibitem[Kaiser and Leisch(2008)]{kaiser08}
-Kaiser,~S. and Leisch,~F. (2008)
-A toolbox for bicluster analysis in R.
-\href{http://epub.ub.uni-muenchen.de/3293/}{Technical Report 028, Department of Statistics, University of Munich}.
-
-\bibitem[Kanehisa et~al.(2004)]{kanehisa04}
-Kanehisa,~M. \emph{et al.} (2004)
-The KEGG resource for deciphering the genome.
-\href{http://dx.doi.org/10.1093/nar/gkh063}{\emph{Nucleic Acids Res.}, {\bf 32} (Database special issue), D277.}
-
-\bibitem[Madeira and Oliveira(2004)]{madeira04}
-Madeira,~S.C. and Oliveira,~A.L. (2004)
-Biclustering algorithms for biological data analysis: A survey.
-\href{http://dx.doi.org/10.1109/TCBB.2004.2}{\emph{IEEE/ACM Transactions on Computational Biology and Bioinformatics}, {\bf 1}, 24--45.}
-
-\bibitem[Prelic et~al.(2006)]{prelic06}
-Prelic,~A., \emph{et~al.} 
-A systematic comparison and evaluation of biclustering methods for gene expression data 
-\href{http://dx.doi.org/10.1093/bioinformatics/bt1060}{\emph{Bioinformatics}, {\bf 22}(9), 1122--1129.}
-
-\bibitem[Santamar\'ia et~al.(2008)]{santamaria08}
-Santamar\'ia,~R., Ther\'on,~R. and Quintales,~L. (2008)
-BicOverlapper: A tool for bicluster visualization. 
-\href{http://dx.doi.org/10.1093/bioinformatics/btn076}{\emph{Bioinformatics}, {\bf 24}, 1212--1213.}
-
-\end{thebibliography}
+\vspace*{-7pt}
+\bibliographystyle{natbib}
+\bibliography{expressionview}
 
 \end{document}
