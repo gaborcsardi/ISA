@@ -1,0 +1,66 @@
+Dear Prof Bateman, Prof Valencia,
+
+please find attached our manuscript for
+an application note, entitled 'ExpressionView 
+-- an interactive viewer for modules identified 
+in gene expression data'.
+
+The software discussed in this paper is an
+interactive visualization tool for overlapping 
+biclusters. Biclustering is an approach to 
+reduce the complexity of gene expression data 
+from many samples by finding genes with 
+similar expression profiles, over a subset of 
+the samples. ExpressionView works with the 
+output of many biclustering algorithm and 
+works especially well with the Iterative
+Signature Algorithm (ISA) [1,2].
+
+As our implementation is built on R and 
+BioConductor, it fits smoothly into existing 
+analysis pipelines, and works for any organism 
+supported by BioConductor. Manuals and tutorials 
+are included both in the software package itself 
+and online [3].
+
+We believe that ExpressionView fills a gap, 
+and provides a solution to a challenging 
+visualization problem. 
+
+Sincerely Yours,
+Gabor Csardi
+
+Contact details
+---------------
+
+Andreas Lüscher <andreas.luescher@a3.epfl.ch>
+Gabor Csardi <Gabor.Csardi@unil.ch>
+Aitana Morton de Lachapelle 
+   <Aitana.MortonDeLachapelle@unil.ch>
+Zoltan Kutalik <Zoltan.Kutalik@unil.ch>
+Bastian Peter <Bastian.Peter@unil.ch>
+Sven Bergmann <Sven.Bergmann@unil.ch>
+
+Rue de Bugnon 27 - DGM 328 
+CH-1005 Lausanne 
+Switzerland
+
+Tel.: ++41-21-692-5452
+FAX: ++41-21-692-5455
+
+References
+----------
+
+[1] Ihmels J, Friedlander G, Bergmann S, 
+    Sarig O, Ziv Y, and Barkai N. 
+    Revealing modular organization in the 
+    yeast transcriptional network. 
+    Nat Genet 2002 Aug; 31(4) 370-7 
+
+[2] Bergmann S, Ihmels J, and Barkai N. 
+    Iterative signature algorithm for the analysis 
+    of large-scale gene expression data. 
+    Phys Rev E Stat Nonlin Soft Matter Phys 
+    2003 Mar; 67(3 Pt 1) 031902. 
+
+[3] http://www.unil.ch/cbg/ExpressionView
