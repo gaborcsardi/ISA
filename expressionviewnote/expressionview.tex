@@ -15,7 +15,7 @@
 
 \firstpage{1}
 \application{}
-\title[ExpressionView]{ExpressionView - an interactive viewer for
+\title[ExpressionView]{ExpressionView -- an interactive viewer for
   modules identified in gene expression data}
 \author[Andreas L\"uscher, G\'abor Cs\'ardi, Aitana Morton de
 Lachapelle, Zolt\'an Kutalik, and Sven Bergmann]{Andreas
@@ -62,9 +62,9 @@ ExpressionView \href{http://www.unil.ch/cbg/ExpressionView}{website}.
 \vspace*{-7pt}
 \section{Introduction}
 Biclustering is an unsupervised data analysis method which is
-frequently used to explore microarray data. Biclustering algorithms
-process collections of expression profiles to identify co-expressed groups of
-genes and conditions (samples) for which this co-expression occurs. 
+frequently used to explore microarray data. 
+Biclustering algorithms process collections of expression profiles to
+identify groups of genes co-expressed under some conditions (samples).
 We refer to such groups as modules. While
 there is a multitude of biclustering software available (for a reviews 
 and comparisons see~\cite{madeira04,ihmels04,prelic06}), packages with 
@@ -74,7 +74,7 @@ gap, and facilitate the collaboration between bioinformaticians and
 life scientists without consolidated programming
 experience. Implemented as an R package, the user can apply all the
 powerful microarray analysis tools provided by the
-Bioconductor~\citep{gentleman04} project before exporting the data to
+Bioconductor project~\citep{gentleman04} before exporting the data to
 a platform independent Adobe Flash applet. This applet
 provides an integrated, intuitive and interactive visualization of
 the modules together with the underlying gene expression data and
@@ -125,7 +125,7 @@ columns (genes) of the gene expression matrix in such a way that biclusters form
 rectangles. Since it is in general impossible to find such an
 arrangement for more than two mutually overlapping modules, we propose
 here an approximate solution that optimizes the arrangement within the
-original data by maximising the total area of the largest contiguous
+original data, by maximising the total area of the largest contiguous
 module subsets. (An alternative would be to repeat rows and columns as
 necessary~\citep{grothaus06}, but for many modules this results in
 a very large expression matrix.)
@@ -142,10 +142,10 @@ number of neighboring elements $N^\text{max}_i$). Then, as a measure of the
 quality ($Q$) of the order we sum this quantity over all modules
 ($Q=\sum_i N^\text{max}_i$). To optimize $Q$, an initial sequence is calculated using
 hierarchical clustering. Two operations are then applied to this: (1)
-Permutations that exchange two elements within a module and (2) shifts
+permutations that exchange two elements within a module and (2) shifts
 of a sequence of multiple elements of the same module to a different position. We
 use a greedy iterative scheme that performs these operations at
-randomly selected positions and keeps the new sequence if it improves
+all possible positions and keeps the best new sequence if it improves
 $Q$. The algorithm stops if after a given number of operations no
 significant improvement of $Q$ is achieved.
 
