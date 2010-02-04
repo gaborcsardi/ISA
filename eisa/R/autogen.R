@@ -646,8 +646,9 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
     }
   }
 
-  score <- round(getSampleMatrix(modules, mods=m), 2)
+  score <- getSampleMatrix(modules, mods=m)
   seq <- which(score != 0)
+  score <- round(score, 2)
   ord <- order(getSampleScores(modules, mods=m)[[1]], decreasing=TRUE)
   pd <- pData(modules)[seq,,drop=FALSE][ ord,,drop=FALSE]
   pd <- pd[, cond.to.include,drop=FALSE]
@@ -664,6 +665,7 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   
   # mark under- and over-expression
   under <- score[seq][ord] < 0
+  
   if (any(under)) {
     foo[under] <- gsub('<tr>', '<tr class="under">', foo[under])
   }

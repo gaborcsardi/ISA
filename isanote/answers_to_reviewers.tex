@@ -1,0 +1,225 @@
+\documentclass[a4paper]{article}
+\usepackage{url}
+
+\title{Modular analysis of gene expression data with R\\
+  Answers to reviewers}
+\author{G\'abor Cs\'ardi, Zolt\'an Kutalik and Sven Bergmann}
+
+\begin{document}
+
+\maketitle
+
+\section{Reviewer 1}
+
+\begin{quote}
+Comments to the Author
+
+This Application Note presents a software package that implements the
+Iterative Signature Algorithm and provides a convenient visualization
+of it’s results. The method is useful and the software may be of help
+to interested users. 
+\end{quote}
+
+\begin{quote}
+I have two problems with the Note in its present form.
+The first may be due to my misunderstanding of the method. My
+understanding was that some threshold Tg is applied on the genes and
+another one, Tc, on the conditions. The aim is to reach a bicluster (a
+set of conditions C and a set of genes G) such that G contains only
+genes with expression above Tg for all the conditions of C, and
+conditions are included in C only if the expression of all genes of G
+exceeds Tc (one can replace a lower threshold with an upper one). The
+heatmap of the Figure implies that my understanding was incorrect –
+the conditions satisfy a double threshold (expressions are either
+above or below some thresholds) and the genes have expressions above a
+Tg in some conditions or below some other Tg’ in other conditions. 
+I urge the authors to define what specifies or defines a bicluster –
+do it briefly and sacrifice a few lines from elsewhere. 
+\end{quote}
+
+\begin{quote}
+My second concern is minor – the abstract implies that the ISA is
+special in allowing overlapping cluster assignments. This is incorrect
+– there are other biclustering methods that do this. If I am not
+mistaken, all three original biclustering methods that came out in
+2000 (Cheng, Getz and Califano) allow this. 
+\end{quote}
+
+\section{Reviewer 2}
+
+\begin{quote}
+Comments to the Author
+
+Summary
+
+This manuscript describes two software packages for GNU R, for
+discovering biclusters (here called transcription modules. see [1] for
+a survey) in a given gene expression matrix based on the Iterative
+Signature Algorithm (ISA) [2]. The first package, called isa2,
+contains the implementation of the basic ISA, and can be used to
+analyze any tabular data. The second package, called eisa, is built on
+isa2. It adds support to standard BioConductor [3] data structures,
+and contains gene expression specific tools for visualization of
+biclusters. Both packages support execution of ISA with default
+parameters, and also execution of ISA step by step with user-specified
+parameters. The steps of ISA are normalization, iteration, filtering
+of modules and enrichment calculation. In the current note, the
+authors present both packages, and describe how to install and run
+them step by step, using the acute lymphoblastic leukemia data set
+(ALL) [4] as an example. 
+\end{quote}
+
+\begin{quote}
+Overall evaluation
+
+The manuscript and its accompanying tutorials are well written and
+give an adequate theoretical background to ISA. The tutorials include
+many detailed and visualized examples that make learning the package
+quite easy for an R user. However, the following major points should
+be taken into consideration: 
+\end{quote}
+
+\begin{quote}
+1.      The manuscript and the website lack explanations about how the
+authors implemented ISA and how they used the advantages of R. The
+authors emphasize that the packages are highly optimized and run
+extremely fast even for very large datasets.  Therefore, the
+accompanying material should contain a summary describing how this
+efficiency was achieved. In addition, a graph showing execution time
+as a function of dataset size should be given. 
+\end{quote}
+
+\begin{quote}
+2.      The tutorials give examples of execution on a single rather
+old dataset (ALL) which is quite small in comparison to datasets of
+recent years. Here the authors should give results for ISA execution
+on more up-to-date datasets, and on heterogeneous datasets containing
+profiles from multiple studies. 
+\end{quote}
+
+\begin{quote}
+To summarize, the software is well motivated and enables users of the
+R environment to utilize ISA. I suggest accepting the manuscript
+conditional on solving the issues mentioned in this report. 
+\end{quote}
+
+\begin{quote}
+Additional important remarks:
+
+1.      The manuscript should contain references to additional
+biclustering implementations, in R or in other environments, so that
+the user could choose the one that best fits his needs in terms of
+input/output, species, etc. Examples are SAMBA (via the Expander
+software) [5,6] and BicAt [7]. 
+\end{quote}
+
+\begin{quote}
+2.      The sample score plots example given in the EISA tutorial
+(\url{http://www2.unil.ch/cbg/index.php?title=EISA\_tutorial}, section 6.5)
+is not sufficiently clear. What are the scores represented by the
+horizontal lines and how can one calculate them? Moreover, how can one
+separate B-cell and T-cell leukemia samples using this plot? 
+\end{quote}
+
+\begin{quote}
+3.      It is not quite clear what is the difference between the ISA
+implementation included in the isa2 package and the ISA implementation
+included in the eisa package. 
+\end{quote}
+
+\begin{quote}
+4.      It should be clarified who are the potential users for the ISA
+implementation for R environment. Assuming these are mainly
+biologists, bioinformaticians and biostatisticians (and not only
+programmers), more technical details of how to work with the packages
+should be given. The following points are important examples: 
+a.      Since the ISA implementation in eisa package imports data from
+another package (e.g. hgu95av2.db), a tutorial for how to create such
+a .db package from a given expression data text file should be given
+(or referred to). 
+\end{quote}
+
+\begin{quote}
+b.      Since both ISA packages use various data structures, a short
+explanation of how to construct and use them should be given (or
+references to such explanation), and also how to export data from
+these structures to external files. 
+\end{quote}
+
+\begin{quote}
+Minor remarks:
+
+1.      The authors describe methods that perform enrichment tests for
+the gene sets corresponding to the ISA modules against various
+databases. In particular, they perform enrichment analysis against GO
+database, KEGG pathway database, chromosomes and the TargetScan [8]
+database. One may also want to investigate the correspondence of
+biclusters and protein-protein interaction networks (which have been
+derived from other types of data than gene expression data), e.g. the
+DIP database [9]. An example for such analysis can be found in [10]. 
+\end{quote}
+
+\begin{quote}
+2.      The heatmap image of a transcription module obtained by any
+one of the two methods presented in the tutorial should include a
+color legend. 
+\end{quote}
+
+\begin{quote}
+3.      Since ISA function accepts an ExpressionSet, one must obtain
+annotations for its expression data file in order to run ISA function
+on it. Annotations should not be a prerequisite for running ISA. 
+\end{quote}
+
+\begin{quote}
+4.      In section 10.8 it is mentioned that two significant modules
+were found using random seeds and two significant (separating) modules
+were found using smart seeds. However, in figure 7 it is noted that
+only one module found using smart seeds. At the end of the section it
+is mistakenly written "As it turns out, one modules found". 
+\end{quote}
+
+\begin{quote}
+References:
+[1] A. Tanay, R. Sharan, and R. Shamir. Biclustering algorithms: A
+survey. In E. by Srinivas Aluru, editor, In Handbook of Computational
+Molecular Biology. Chapman \& Hall/CRC, Computer and Information
+Science Series, 2005. 
+
+[2] Bergmann, S., Ihmels, J., and Barkai, N. (2003). Iterative
+signature algorithm for the analysis of large-scale gene expression
+data. Phys Rev E Nonlin Soft Matter Phys, page 031902.
+
+[3] Gentleman, R. C., Carey, V. J., Bates, D. M., et
+al. (2004). Bioconductor: Open software development for computational
+biology and bioinformatics. Genome Biology, 5, R80. 
+
+[4] Chiaretti, S., Li, X., Gentleman, R., Vitale, A., Vignetti, M.,
+Mandelli, F., Ritz, J., and Foa, R. (2004). Gene expression profile of
+adult t-cell acute lymphocytic leukemia identifies distinct subsets of
+patients with different response to therapy and survival. Blood,
+103(7).
+
+[5] R. Sharan, A. Maron-Katz, N. Arbili, and R. Shamir.EXPANDER:
+EXPression ANalyzer and DisplayER, 2002.Software package, Tel-Aviv
+University, \url{http://www.cs.tau.ac.il/~rshamir/expander/expander.html}.
+
+[6] A. Tanay, R. Sharan, M. Kupiec, and R. Shamir. Revealing
+modularity and organization in the yeast molecular network by
+integrated analysis of highly heterogeneous genomewide data. Proc Natl
+Acad Sci U S A., 101(9):2981–6, 2004. 
+
+[7] Barkow, S., et al. (2006) BicAT: a biclustering analysis
+toolbox. Bioinformatics, 22, 1282–1283 
+
+[8] Targetscan [\url{http://www.targetscan.org/}]
+
+[9] Salwinski, L., et al. (2004) The Database of Interacting Proteins:
+2004 update. Nucleic Acids Res, . 32, D449–D451
+
+[10] Prelic,A. et al. (2006) A systematic comparison and evaluation of
+biclustering methods for gene expression data. Bioinformatics, 22,
+1122–1129. 
+\end{quote}
+
+\end{document}

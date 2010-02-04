@@ -138,7 +138,7 @@ gograph <- function(table, colbar.length=30, label.cex=1, GOGRAPHS=NULL,
   ## nonzero is here to ignore an igraph bug in the
   ## Reingold-Tilford implementation, sometime two vertices
   ## are put at the very same coordinates
-  nonzero <- function(x) x[ x != 0 ]
+  nonzero <- function(x) x[ abs(x) > 1e-12 ]
   nodes.y <- tapply(l[,2], l[,1], function(x) {
     if (length(x)==1) Inf else min(nonzero(diff(sort(x)))) })
   nodes.y <- min(nodes.y)
