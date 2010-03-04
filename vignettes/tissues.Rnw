@@ -1,0 +1,276 @@
+% \VignetteIndexEntry{Tissue specific expression with ISA}
+\documentclass{article}
+\usepackage{ragged2e}
+\usepackage{url}
+\usepackage{fancyvrb}
+\usepackage{longtable}
+\usepackage{rotating}
+
+\newenvironment{narrow}[2]{%
+  \begin{list}{}{%
+  \setlength{\topsep}{0pt}%
+  \setlength{\leftmargin}{#1}%
+  \setlength{\rightmargin}{#2}%
+  \setlength{\listparindent}{\parindent}%
+  \setlength{\itemindent}{\parindent}%
+  \setlength{\parsep}{\parskip}}%
+\item[]}{\end{list}}
+
+\newcommand{\Rfunction}[1]{\texttt{#1()}}
+\newcommand{\Rpackage}[1]{\texttt{#1}}
+\newcommand{\Rclass}[1]{\texttt{#1}}
+\newcommand{\Rargument}[1]{\textsl{#1}}
+\newcommand{\filename}[1]{\texttt{#1}}
+\newcommand{\variable}[1]{\texttt{#1}}
+
+\SweaveOpts{cache=TRUE}
+\SweaveOpts{prefix.string=plot}
+
+\setlength{\parindent}{2em}
+
+\begin{document}
+
+\title{Tissue specific expression with the Iterative Signature Algorithm}
+\author{G\'abor Cs\'ardi}
+\maketitle
+
+\tableofcontents
+
+\RaggedRight
+
+<<set width,echo=FALSE,print=FALSE>>=
+options(width=60)
+options(continue=" ")
+X11.options(type="xlib")
+@ 
+
+\section{Introduction}
+
+<<load packages>>=
+library(GEOquery)
+library(eisa)
+library(affy)
+library(gcrma)
+library(GO.db)
+library(KEGG.db)
+library(xtable)
+@ 
+
+\section{Loading the data set}
+
+<<download files if needed>>=
+GEO <- "GSE9954"
+if (!file.exists(GEO)) {
+  rawfiles <- getGEOSuppFiles(GEO)
+  tarfile <- grep("\\.tar$", rownames(rawfiles), value=TRUE)
+  untar(tarfile, exdir=GEO)
+} else {
+  tarfile <- list.files("GSE9954", pattern="\\.tar$", full.names=TRUE)
+}
+@ 
+
+<<read in the CEL files>>=
+ABfile <- paste(GEO, sep="/", "AB.Rdata")
+if (!file.exists(ABfile)) {
+  celfiles <- list.files(GEO, pattern="\\.CEL.gz", full.names=TRUE)
+  AB <- ReadAffy(filenames=celfiles)
+  save(AB, file=ABfile)
+}
+@
+
+<<PA calls>>=
+PAfile <- paste(GEO, sep="/", "PA.Rdata")
+if (!file.exists(PAfile)) {
+  load(ABfile)
+  PA <- mas5calls(AB)
+  save(PA, file=PAfile)
+} else {
+  load(PAfile)
+}
+@ 
+
+<<normalize>>=
+EXPfile <- paste(GEO, sep="/", "EXP.Rdata")
+if (!file.exists(EXPfile)) {
+  tissueEXP <- gcrma(AB, fast=FALSE)
+  save(tissueEXP, file=EXPfile)
+} else {
+  load(EXPfile)
+}
+@ 
+
+<<filter based on the PA calls>>=
+keep <- rowSums(exprs(PA) == "P") >= 3
+EXP <- tissueEXP[keep,]
+@
+
+<<load the required annotation package>>=
+library(paste(annotation(EXP), sep=".", "db"), character.only=TRUE)
+@
+
+<<add sample annotation,results=hide>>=
+if (is.null(EXP$tissue)) {
+  annot <- getGEOfile(GEO, amount="quick")
+  annotSample <- function(x) {
+    x <- sub(".CEL.gz", "", x, fixed=TRUE)
+    f <- getGEOfile(x, amount="quick")
+    l <- readLines(f)
+    s <- grep("Sample_source_name", l, value=TRUE)[1]
+    strsplit(s, " = ")[[1]][2]
+  }
+  tissues <- sapply(sampleNames(EXP), annotSample)
+  tissueEXP$tissue <- sub("Mouse ", "", tissues, fixed=TRUE)
+  EXP$tissue <- tissueEXP$tissue
+
+  save(tissueEXP, file=EXPfile)
+}
+@ 
+
+\section{Running the ISA}
+
+<<ISA>>=
+NEXP <- ISANormalize(EXP)
+modulesfile <- paste(GEO, sep="/", "modules.Rdata")
+if (!file.exists(modulesfile)) {
+  modules <- ISA(EXP, flist=NA, thr.gene=3, thr.cond=c(1,2), no.seeds=1000)
+  save(modules, file=modulesfile)
+} else {
+  load(modulesfile)
+}
+@ 
+
+\section{Finding tissue-specific modules}
+
+There are various methods for testing the tissue-selectivity of genes,
+see e.g. \cite{vandeun09}. The approach we are taking here, however,
+is completely unsupervised. 
+
+<<cond plot parameters>>=
+sep <- c(which(!duplicated(NEXP$tissue))[-1]-1, ncol(NEXP))
+names(sep) <- NEXP$tissue[!duplicated(NEXP$tissue)]
+colbar <- rainbow(length(sep))
+col <- colbar[as.factor(NEXP$tissue)]
+@ 
+
+<<condplot,eval=FALSE>>=
+condPlot(modules, length(modules), NEXP, sep=sep, col=col)
+@ 
+
+\begin{figure}
+\centering
+<<condplot2,fig=TRUE,width=8,height=6,echo=FALSE>>=
+<<condplot>>
+@ 
+\caption{}
+\label{fig:condplot}
+\end{figure}
+
+<<function to decide tissue specificity>>=
+tspec <- function(mod) {
+ t <- EXP$tissue[getSamples(modules, mod)[[1]]]
+  unique(t)
+}
+spec <- sapply(1:length(modules), tspec)
+@ 
+
+Tissue specific plot for four tissues.
+<<condplot3,eval=FALSE>>=
+to.plot <- which(sapply(spec, length)==1)[1:4]
+layout(rbind(1:2,3:4))
+for (p in to.plot) {
+  condPlot(modules, p, NEXP, sep=sep, col=col)
+  title(main="", sub=spec[[p]])
+}
+@ 
+
+\begin{figure}
+\begin{narrow}{-1cm}{-1cm}
+\setkeys{Gin}{width=\linewidth}
+<<condplot4,fig=TRUE,width=12,height=9,echo=FALSE>>=
+<<condplot3>>
+@ 
+\caption{}
+\label{fig:condplot2}
+\end{narrow}
+\end{figure}
+
+<<enrichment calculation>>=
+enrichFile <- paste(GEO, sep="/", "enrichment.Rdata")
+if (!file.exists(enrichFile)) {
+  GO <- ISAGO(modules)
+  KEGG <- ISAKEGG(modules)
+  save(GO, KEGG, file=enrichFile)
+} else {
+  load(enrichFile)
+}
+@ 
+
+<<function to query GO terms>>=
+goterm <- function(x) {
+  gt <- sapply(mget(na.omit(x), GOTERM), Term)
+  res <- character(length(x))
+  res[!is.na(x)] <- gt
+  res[is.na(x)] <- NA
+  res
+}
+keggpath <- function(x) {
+  kp <- unlist(mget(na.omit(x), KEGGPATHID2NAME))
+  res <- character(length(x))
+  res[!is.na(x)] <- kp
+  res[is.na(x)] <- NA
+  res
+}
+@
+
+<<first function>>=
+first <- function(x) if (length(x) >= 1) x[[1]] else NA
+@ 
+
+<<create GO and KEGG tables>>=
+topgo <- sapply(seq_len(length(modules)), function(x) {
+  p <- c(BP=summary(GO$BP, p=1)[[x]][1,]$Pvalue,
+         CC=summary(GO$CC, p=1)[[x]][1,]$Pvalue,
+         MF=summary(GO$MF, p=1)[[x]][1,]$Pvalue)
+  mc <- names(which.min(p))
+  paste(goterm(sigCategories(GO[[mc]])[[x]][1]), 
+        sep=", p=", format(min(p), digits=3))
+})
+  
+keggterms <- keggpath(sapply(sigCategories(KEGG), first))
+keggp <- sapply(summary(KEGG), function(x) x$Pvalue[1])
+
+specc <- sapply(spec, paste, collapse=", ")
+eTable <- data.frame(Tissue=specc, GO=topgo, 
+     KEGG=paste(keggterms, sep=", ", format(keggp, digits=3)))
+@ 
+
+
+<<print the table,eval=FALSE>>=
+caption <- paste("The most significantly enriched GO categories",
+                 "and KEGG pathways for the transctription modules.")
+if (nrow(eTable)>30) { eTable2 <- eTable[1:30,] }
+print(xtable(eTable2, caption=caption,
+             align=c("r@{\\hspace{1em}}", 
+	             "p{4.5cm}", "p{7.5cm}", "p{7.5cm}")), 
+      floating.environment="sidewaystable", 
+      tabular.environment="tabular")
+@ 
+
+\small\hspace*{-1cm}%
+<<really print it,results=tex,echo=FALSE,cache=FALSE>>=
+<<print the table>>
+@
+
+\section{Session information}
+
+The version number of R and packages loaded for generating this
+vignette were:
+
+<<sessioninfo,results=tex,echo=FALSE>>=
+toLatex(sessionInfo())
+@ 
+
+\bibliographystyle{apalike}
+\bibliography{tissues}
+
+\end{document}

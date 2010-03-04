@@ -117,6 +117,7 @@ vignettes: homepage/ISA_tutorial.html homepage/ISA_tutorial.pdf \
 	homepage/EISA_tutorial.html homepage/EISA_tutorial.pdf \
 	homepage/EISA_module_trees.html homepage/EISA_module_trees.pdf \
 	homepage/EISA_biclust.html homepage/EISA_biclust.pdf \
+	homepage/tissues.html homepage/tissues.pdf \
 	vignettes/style.cfg
 
 homepage/ISA_tutorial.html: isa2/inst/doc/ISA_tutorial.tex
@@ -179,6 +180,21 @@ vignettes/EISA_module_trees.pdf: vignettes/EISA_module_trees.tex
 	cd vignettes/ && pdflatex EISA_module_trees.tex
 vignettes/EISA_module_trees.tex: vignettes/EISA_module_trees.Rnw
 	cd vignettes/ && R CMD Sweave EISA_module_trees.Rnw
+
+homepage/tissues.html: vignettes/tissues.tex
+	cd vignettes && pdflatex tissues.tex && \
+		bibtex tissues && pdflatex tissues
+	cd vignettes && $(SWEAVE2HTML) tissues $(SWEAVE2HTMLOPTIONS)
+	cat vignettes/tissues.html | $(REMOVEHTML) | $(REWRITEIMG) >homepage/tissues.html
+	cp vignettes/tissues.css homepage/
+	cp vignettes/tissues*.png homepage/
+	cp vignettes/*.png homepage/
+homepage/tissues.pdf: vignettes/tissues.pdf
+	cp $< $@
+vignettes/tissues.pdf: vignettes/tissues.tex
+	cd vignettes/ && pdflatex tissues.tex
+vignettes/tissues.tex: vignettes/tissues.Rnw
+	cd vignettes/ && R CMD Sweave tissues.Rnw
 
 homepage/EISA_biclust.html: eisa/inst/doc/EISA_biclust.tex
 	cp vignettes/style.cfg eisa/inst/doc/
