@@ -26,17 +26,16 @@
 \SweaveOpts{cache=TRUE}
 \SweaveOpts{prefix.string=plot}
 
-\setlength{\parindent}{2em}
-
 \begin{document}
 
-\title{Tissue specific expression with the Iterative Signature Algorithm}
+\title{Tissue specific expression with the\\ Iterative Signature Algorithm}
 \author{G\'abor Cs\'ardi}
 \maketitle
 
 \tableofcontents
 
 \RaggedRight
+\setlength{\parindent}{2em}
 
 <<set width,echo=FALSE,print=FALSE>>=
 options(width=60)
@@ -46,6 +45,33 @@ X11.options(type="xlib")
 
 \section{Introduction}
 
+The Iterative Signature Algorithm (ISA) is a biclustering method. It
+finds genes that are up- and/or downregulated consistently in a subset
+of samples, in gene expression data. (Although, it can be also applied
+to other tabular data sets.) Please see \cite{bergmann03} for the
+details about the ISA, and also the other tutorials at the ISA
+homepage, \url{http://www.unil.ch/cbg/ISA}.
+
+In this tutorial we show an example application of the ISA, for which
+we use a publicly available data set, a panel of murine
+tissues. You are expected to understand the basics of R and ISA
+for this tutorial; please see the introductory ISA tutorials
+otherwise.
+
+We use a number of R packages for this tutorial, all of them are
+available from the standard BioConductor or CRAN repositories. We will
+use the \Rpackage{GEOquery} package \cite{davis07} to download the raw
+data files for the tissue-panel experiment. The Rpackage{eisa} package
+loads the implementation of the ISA. The \Rpackage{affy} package
+\cite{gautier04} is used to read in the CEL files and calculate the
+MAS5 Present/Absent calls; the \Rpackage{gcrma} package contains the
+implementation of the GCRMA gene expression normalization method
+\cite{wu03}. \Rpackage{GO.db} contains the Gene Ontology database
+\cite{go00}, \Rpackage{KEGG.db} the KEGG Pathway database
+\cite{kanehisa00}. The \Rpackage{xtable} package is used to 
+create a nicely formatted table.
+
+Let's load all these packages first.
 <<load packages>>=
 library(GEOquery)
 library(eisa)
@@ -58,17 +84,36 @@ library(xtable)
 
 \section{Loading the data set}
 
-<<download files if needed>>=
+First we define the data set that we want to use. This is a murine
+tissue panel for 22 tissues, 3-5 samples each, 70 samples
+altogether. The different tissues were dissected from 10-12 week old
+C57Bl6 mice for RNA extraction and hybridization on Affymetrix
+microarrays. This is the ID of the experiment in the Gene Expression
+Omnibus (GEO) \cite{barret09}:
+<<the id of the data set>>=
 GEO <- "GSE9954"
+@ 
+
+To spare time and bandwidth, we download the data only once and store
+it in the local disk, this facilitates running this tutorial more than
+once. The \Rfunction{getGEOSuppFile} function from the
+\Rpackage{GEOquery} package creates a directory in the current working
+directory, names it according to the GEO id of the experiment and
+stores the raw files there. Then, the \Rfunction{untar} function
+unpacks the downloaded archive. If this directory already exists, then
+we have nothing to download or unpack.
+<<download files if needed>>=
 if (!file.exists(GEO)) {
   rawfiles <- getGEOSuppFiles(GEO)
   tarfile <- grep("\\.tar$", rownames(rawfiles), value=TRUE)
   untar(tarfile, exdir=GEO)
-} else {
-  tarfile <- list.files("GSE9954", pattern="\\.tar$", full.names=TRUE)
 }
-@ 
+@
 
+Next, we read in the downloaded and unpacked CEL files and store the
+data in an \Rclass{AffyBatch} object. Because this is a quite lengthty
+process, we perform it only once and store the results in a file. We
+don't have to do anything if this file already exists.
 <<read in the CEL files>>=
 ABfile <- paste(GEO, sep="/", "AB.Rdata")
 if (!file.exists(ABfile)) {
@@ -78,6 +123,12 @@ if (!file.exists(ABfile)) {
 }
 @
 
+To get rid of the probesets that do not match a gene that is expressed
+in any of the tissues, we calculate the MAS5 Present/Absent
+calls. These are based on the perfect match and mismatch probes on the
+array and provide a way to access the probes that are present in a
+tissue. We save the results in a file. If the file already exists,
+then no calculation is needed, and we just load it.
 <<PA calls>>=
 PAfile <- paste(GEO, sep="/", "PA.Rdata")
 if (!file.exists(PAfile)) {
@@ -89,6 +140,13 @@ if (!file.exists(PAfile)) {
 }
 @ 
 
+GCRMA normalization \cite{wu03} is the next step of the analysis. This
+results the background corrected, log2 transformed expression
+values. Running GCRMA takes a relatively long time, so we save these
+results in a file, as well. If the file is already present, we just
+load it. \variable{EXP} is an \Rclass{ExpressionSet} object here, it
+contains all the expression data, and may contain experiment meta-data
+as well.
 <<normalize>>=
 EXPfile <- paste(GEO, sep="/", "EXP.Rdata")
 if (!file.exists(EXPfile)) {
@@ -99,15 +157,38 @@ if (!file.exists(EXPfile)) {
 }
 @ 
 
+Next, we do the filtering, based on the previously calculated
+detection calls. We keep only probesets that were called `Present' in
+at least three samples.
 <<filter based on the PA calls>>=
 keep <- rowSums(exprs(PA) == "P") >= 3
 EXP <- tissueEXP[keep,]
 @
 
+Next we load the annotation package of the array that was used in the
+experiment. BioConductor provides annotation packages for all the
+standard (and many non-standard) arrays. These packages include
+mappings from the array probe ids to Entrez (and other) gene ids, and
+also mappings to databases. The \Rfunction{annotation} function gives
+the name of the annotation package. If you don't have the required
+annotation package installed, then please install it, the same way as
+you install normal BioConductor packages.
 <<load the required annotation package>>=
-library(paste(annotation(EXP), sep=".", "db"), character.only=TRUE)
+annotation(EXP)
+annpackage <- paste(annotation(EXP), sep=".", "db")
+library(annpackage, character.only=TRUE)
 @
 
+Unfortunately, the files downloaded from GEO do not contain any meta
+data. We, however, need the tissue information for each sample, so we
+have to download these separately. First we create a function
+(\Rfunction{annotSample}) that takes a sample name and downloads its
+corresponding meta data from GEO. We only use the ``sample source''
+(=tissue) information from the meta data.
+
+We put the tissue labels into the \Rclass{ExpressionSet} object, and
+save the new version. If these labels are already present in the
+\Rclass{ExpressionSet}, then we do't have to do anything.
 <<add sample annotation,results=hide>>=
 if (is.null(EXP$tissue)) {
   annot <- getGEOfile(GEO, amount="quick")
@@ -128,23 +209,94 @@ if (is.null(EXP$tissue)) {
 
 \section{Running the ISA}
 
+We are ready to run the ISA on the data. First we calculate the ISA
+normalized expression matrix, see the documentation of the
+\Rfunction{ISANormalize} function for details. (It is possible to use
+the un-normalized expression matrix in any of following examples, but
+pre-calculating it saves some time later.)
+
+We run the ISA with two threshold combinations. The gene threshold is
+fixed at 3. (Meaning that the genes of a module must be at least 3
+standard deviations away from the (weighted) mean expression in the
+samples of the module.) The condition threshold is set to 1 and 2. We
+expect to get smaller modules (in terms of samples) for the stricter
+threshold. As before, we save the modules in a file, to save a couple
+of minutes. 
 <<ISA>>=
 NEXP <- ISANormalize(EXP)
 modulesfile <- paste(GEO, sep="/", "modules.Rdata")
 if (!file.exists(modulesfile)) {
+  set.seed(123)
   modules <- ISA(EXP, flist=NA, thr.gene=3, thr.cond=c(1,2), no.seeds=1000)
   save(modules, file=modulesfile)
 } else {
   load(modulesfile)
 }
 @ 
+Note, that we set the seed of the random number generator here with
+the \Rfunction{set.seed} function, to get the same results every time
+we run the code of this tutorial. This is not needed for regular
+analysis. Also note, that even if the random seed is the same, you
+might still get different results (=modules), depending on your R
+version.
 
-\section{Finding tissue-specific modules}
+Let's quickly check the modules, found by ISA.
+<<check modules>>=
+length(modules)
+getNoFeatures(modules)
+getNoSamples(modules)
+@
+We have \Sexpr{length(modules)} altogether. The largest one contains
+\Sexpr{max(getNoFeatures(modules))} genes, the smallest one has
+\Sexpr{min(getNoFeatures(modules))} genes. As for the samples, most
+modules contain three samples only, these should correspond to a
+single tissue, we will check this in a minute. Some modules have more
+than three samples, these probably contain genes that have high (or
+low) expression in multiple tissues.
 
-There are various methods for testing the tissue-selectivity of genes,
-see e.g. \cite{vandeun09}. The approach we are taking here, however,
-is completely unsupervised. 
+\section{Finding tissue selective modules}
 
+Tissue selectivity of a gene means that the gene has a higher
+expression in one tissue, than in other tissues; even if it is
+expressed in a range of tissues. There are various
+methods for testing the tissue selectivity of genes, see
+e.g. \cite{vandeun09} for a method that is well principled and
+efficient in finding such genes. 
+
+The approach we are taking here with ISA is a bit different. 
+We do not ask the question of tissue-selectivity directly, but use an
+unsupervised method to group genes together that are up- and
+downregulated together, in some samples. These genes and samples form
+transcription modules. If it turns out that the samples of a module
+correspond to a given tissue, then a module of tissue-selective genes
+was found. It is also very well possible that the ISA finds modules
+that are selective for two or three (or four, etc) tissues; the genes
+of these modules are harder to find via direct testing, one would have
+to test for all pairs, triples, etc. of tissues to find them.
+
+<<pick a module,echo=FALSE,print=FALSE,results=hide>>=
+## We choose a module that has opposite sample scores and 
+## at least two tissues.
+mymod <- which(sapply(getSampleScores(modules), function(x) {
+    length(unique(sign(x)))==2
+  }) &
+  sapply(getSamples(modules), function(x) {
+    length(unique(EXP$tissue[x]))>=2
+  })
+)
+if (length(mymod)==0) mymod <- length(modules) else mymod <- mymod[1]
+@
+
+Condition plots are good for finding tissue selective modules. A
+condition plot is a barplot of sample scores, potentially also
+containing (non-zero) scores for the samples that are not included in
+the module. Let's create a condition plot for a transcription module,
+module \Sexpr{mymod}. 
+
+First, we define some parameters that make the plot look better. We
+group the samples according to tissues and also assign different
+colors to the tissues. Please see the documentation of the
+\Rfunction{condPlot} function for details about these parameters.
 <<cond plot parameters>>=
 sep <- c(which(!duplicated(NEXP$tissue))[-1]-1, ncol(NEXP))
 names(sep) <- NEXP$tissue[!duplicated(NEXP$tissue)]
@@ -152,34 +304,63 @@ colbar <- rainbow(length(sep))
 col <- colbar[as.factor(NEXP$tissue)]
 @ 
 
+We are ready to create the plot, see the results in
+Fig.~\ref{fig:condplot}.
 <<condplot,eval=FALSE>>=
-condPlot(modules, length(modules), NEXP, sep=sep, col=col)
+condPlot(modules, mymod, NEXP, sep=sep, col=col)
 @ 
 
+This module contains samples from
+\Sexpr{length(unique(tissues[getSamples(modules, mymod)[[1]]]))}
+tissues: \Sexpr{paste(unique(EXP$tissue[getSamples(modules, mymod)[[1]]]), collapse=", ")}. 
 \begin{figure}
 \centering
 <<condplot2,fig=TRUE,width=8,height=6,echo=FALSE>>=
 <<condplot>>
 @ 
-\caption{}
+\caption{Condition plot for module \Sexpr{mymod}. This module has
+\Sexpr{getNoFeatures(modules, mymod)} genes and
+\Sexpr{getNoSamples(modules, mymod)} samples. The samples belong to
+two tissues: adipose tissue and ES cells. (ES cells were considered as
+a separate tissue in the experiment.) Out of the
+\Sexpr{getNoFeatures(modules, mymod)} genes of the module,
+\Sexpr{sum(getFeatureScores(modules, mymod)[[1]] > 0)} are 
+upregulated in the ES cell samples and down-regulated in the adipose
+tissue samples. The rest of the genes, 
+\Sexpr{sum(getFeatureScores(modules, mymod)[[1]] < 0)}, have opposite
+regulation.}
 \label{fig:condplot}
 \end{figure}
 
+Now we look for tissue selective modules. In order to consider a
+module tissue selective, we require that the non-zero sample scores
+of a tissue have the same signs; i.e. the genes of the module are
+regulated the same in all samples of the tissue. We also mark
+oppositely regulated tissues with a `d' in parentheses.
 <<function to decide tissue specificity>>=
 tspec <- function(mod) {
- t <- EXP$tissue[getSamples(modules, mod)[[1]]]
+  t <- EXP$tissue[getSamples(modules, mod)[[1]]]
+  s <- getSampleScores(modules, mod)[[1]]
+  t[ s<0 ] <- paste(t[s<0], sep=" ", "(d)")
   unique(t)
 }
-spec <- sapply(1:length(modules), tspec)
-@ 
+spec <- sapply(seq_len(length(modules)), tspec)
+specc <- sapply(spec, paste, collapse=", ")
+specc
+@
+\Sexpr{sum(sapply(spec, length)==1)} modules contain a single tissue
+only, \Sexpr{sum(sapply(spec, length)==2)} contain exactly two
+tissues, regulated either the same way, or
+oppositely. \Sexpr{sum(sapply(spec, length)>=3)} contain three or more
+tissues.
 
-Tissue specific plot for four tissues.
+As another example, we create a plot for four modules that are
+specific for a single tissue.
 <<condplot3,eval=FALSE>>=
 to.plot <- which(sapply(spec, length)==1)[1:4]
 layout(rbind(1:2,3:4))
 for (p in to.plot) {
   condPlot(modules, p, NEXP, sep=sep, col=col)
-  title(main="", sub=spec[[p]])
 }
 @ 
 
@@ -189,11 +370,20 @@ for (p in to.plot) {
 <<condplot4,fig=TRUE,width=12,height=9,echo=FALSE>>=
 <<condplot3>>
 @ 
-\caption{}
+\caption{Condition plots for four modules that are specific for a
+single tissue, modules: \Sexpr{paste(to.plot, collapse=", ")} (from
+top to bottom and left to right). They are specific to
+\Sexpr{paste(sub(" (d)", "", specc[to.plot], fixed=TRUE), collapse=", ")}, 
+respectively.}
 \label{fig:condplot2}
 \end{narrow}
 \end{figure}
 
+It is easy to perform enrichment calculations to check whether the
+tissue selective genes are actually on a common pathway. As usual, we
+save the results to a file. Note, that the \Rfunction{ISAGO} and
+\Rfunction{ISAKEGG} functions also perform multiple testing
+correction.
 <<enrichment calculation>>=
 enrichFile <- paste(GEO, sep="/", "enrichment.Rdata")
 if (!file.exists(enrichFile)) {
@@ -203,8 +393,18 @@ if (!file.exists(enrichFile)) {
 } else {
   load(enrichFile)
 }
+GO
+KEGG
 @ 
 
+Most of the modules are enriched with some Gene Ontology term and/or
+KEGG pathway. Let's create a good-looking table that lists the tissues
+associated with a module, together with the enriched GO terms and KEGG
+pathways.
+
+First we define two functions that translate GO and KEGG ids to
+category and pathway names. These functions also handle \verb+NA+
+values.
 <<function to query GO terms>>=
 goterm <- function(x) {
   gt <- sapply(mget(na.omit(x), GOTERM), Term)
@@ -222,36 +422,61 @@ keggpath <- function(x) {
 }
 @
 
+The \Rfunction{first} function takes a list of vectors and returns the
+first element of each vector, we will use this later, to query the
+most significantly enriched terms.
 <<first function>>=
 first <- function(x) if (length(x) >= 1) x[[1]] else NA
 @ 
 
-<<create GO and KEGG tables>>=
+We are ready to create the list of the most significantly enriched GO
+terms, for each module. We use the \Rfunction{summary} function to
+create a table for the enrichment and take the best $p$-value for each
+ontology. We choose the ontology with the best $p$-value
+then. Finally, we also query the id of the best enrichment, using the
+\Rfunction{sigCategories} function and use the \Rfunction{goterm}
+function that we just defined to translate it to a category name.
+<<create GO>>=
 topgo <- sapply(seq_len(length(modules)), function(x) {
   p <- c(BP=summary(GO$BP, p=1)[[x]][1,]$Pvalue,
          CC=summary(GO$CC, p=1)[[x]][1,]$Pvalue,
          MF=summary(GO$MF, p=1)[[x]][1,]$Pvalue)
   mc <- names(which.min(p))
-  paste(goterm(sigCategories(GO[[mc]])[[x]][1]), 
+  paste(goterm(sigCategories(GO[[mc]], p=1)[[x]][1]), 
         sep=", p=", format(min(p), digits=3))
 })
-  
-keggterms <- keggpath(sapply(sigCategories(KEGG), first))
-keggp <- sapply(summary(KEGG), function(x) x$Pvalue[1])
+@
 
-specc <- sapply(spec, paste, collapse=", ")
-eTable <- data.frame(Tissue=specc, GO=topgo, 
-     KEGG=paste(keggterms, sep=", ", format(keggp, digits=3)))
+We do a similar thing for KEGG now. This is simpler, as we don't have
+multiple ontologies here, all we need is the name and $p$-value of the
+most significant enrichment.
+<<create KEGG>>=
+keggterms <- keggpath(sapply(sigCategories(KEGG, p=1), first))
+keggp <- sapply(summary(KEGG), function(x) x$Pvalue[1])
 @ 
 
+Everything is set for creating the table. It has three columns, the
+name(s) of the tissue(s), the Gene Ontology enrichment and the KEGG
+enrichment.
+<<put together table>>=
+eTable <- data.frame(Tissue=specc, GO=topgo, 
+     KEGG=paste(keggterms, sep=", p=", format(keggp, digits=3)))
+@ 
 
+We use the \Rpackage{xtable} package to create a nice printed version
+of the table. Because GO category names tend to be long, we typeset
+the table in landscape mode. In order to make it fit into this
+document, we only include the first 20 modules.
 <<print the table,eval=FALSE>>=
 caption <- paste("The most significantly enriched GO categories",
-                 "and KEGG pathways for the transctription modules.")
-if (nrow(eTable)>30) { eTable2 <- eTable[1:30,] }
+                 "and KEGG pathways for the (first 20)",
+                 "transctription modules.",
+                 "Oppositely regulated tissues are marged with `d'.")
+if (nrow(eTable)>20) { eTable2 <- eTable[1:20,] }
 print(xtable(eTable2, caption=caption,
              align=c("r@{\\hspace{1em}}", 
-	             "p{4.5cm}", "p{7.5cm}", "p{7.5cm}")), 
+	             "p{4.5cm}@{\\hspace{1em}}", 
+		     "p{7.5cm}@{\\hspace{1em}}", "p{7.5cm}")), 
       floating.environment="sidewaystable", 
       tabular.environment="tabular")
 @ 
