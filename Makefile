@@ -118,6 +118,7 @@ vignettes: homepage/ISA_tutorial.html homepage/ISA_tutorial.pdf \
 	homepage/EISA_module_trees.html homepage/EISA_module_trees.pdf \
 	homepage/EISA_biclust.html homepage/EISA_biclust.pdf \
 	homepage/tissues.html homepage/tissues.pdf \
+	homepage/ISA_internals.html homepage/ISA_internals.pdf \
 	vignettes/style.cfg
 
 homepage/ISA_tutorial.html: isa2/inst/doc/ISA_tutorial.tex
@@ -165,6 +166,21 @@ eisa/inst/doc/EISA_tutorial.pdf: eisa/inst/doc/EISA_tutorial.tex
 	cd eisa/inst/doc/ && pdflatex EISA_tutorial.tex
 eisa/inst/doc/EISA_tutorial.tex: eisa/inst/doc/EISA_tutorial.Rnw
 	cd eisa/inst/doc/ && R CMD Sweave EISA_tutorial.Rnw
+
+homepage/ISA_internals.html: isa2/inst/doc/ISA_internals.tex
+	cp vignettes/style.cfg isa2/inst/doc/
+	cd isa2/inst/doc/ && pdflatex ISA_internals.tex
+	cd isa2/inst/doc && $(SWEAVE2HTML) ISA_internals $(SWEAVE2HTMLOPTIONS)
+	cat isa2/inst/doc/ISA_internals.html | $(REMOVEHTML) | $(REWRITEIMG) >homepage/ISA_internals.html
+	cp isa2/inst/doc/ISA_internals.css homepage/
+	cp isa2/inst/doc/ISA_internals*.png homepage/
+#	cp isa2/inst/doc/*.png homepage/
+homepage/ISA_internals.pdf: isa2/inst/doc/ISA_internals.pdf
+	cp $< $@
+isa2/inst/doc/ISA_internals.pdf: isa2/inst/doc/ISA_internals.tex
+	cd isa2/inst/doc/ && pdflatex ISA_internals.tex
+isa2/inst/doc/ISA_internals.tex: isa2/inst/doc/ISA_internals.Rnw
+	cd isa2/inst/doc/ && R CMD Sweave ISA_internals.Rnw
 
 homepage/EISA_module_trees.html: vignettes/EISA_module_trees.tex
 	cd vignettes && pdflatex EISA_module_trees.tex && \
