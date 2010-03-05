@@ -11,10 +11,15 @@
   or KEGG pathways.
 }
 \usage{
+ISAEnrichment (modules, categories, ann = annotation(modules),
+    features = featureNames(modules), hgCutoff = 0.05,
+    correction = TRUE, correction.method = "holm")
 }
 \arguments{
   \item{modules}{An \code{ISAModules} object, a set of ISA modules.}
-  \item{categories}{}
+  \item{categories}{A named list of gene categories. The names of the
+    entries are used as category names. Each entry of the list must be a
+    character vector containing Entrez gene ids.}
   \item{ann}{Character scalar. The annotation package to be used. By
     default it is taken from the \code{modules} argument.}
   \item{features}{Character vector. The names of the features. By
@@ -31,8 +36,24 @@
     \code{\link[stats]{p.adjust}} function for details on these. }
 }
 \details{
+  This function performs enrichment analysis, based on user defined gene
+  labels. It is useful if one want to test ISA modules against
+  databases, other than GO and KEGG.
+  
+  The hypergeometric test, a version Fisher's exact test, takes a gene
+  label and a gene set (in our case coming from an ISA module) and asks
+  whether the number of genes in the set labelled by the label is
+  significantly more (or less) than what one would expect by chance.
+  
+  \code{ISAEnrichment} performs the hypergeometric test for every
+  module, for all user supplied gene labels. The mapping from the probe
+  ids on the array to Entrez Ids is done using the appropriate chip
+  annotation package.
+
+  \code{ISAEnrichment} currently cannot test for under-representation.
 }
 \value{
+  A \code{\link{GeneralListHyperGResult}} object.
 }
 \author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
 \references{

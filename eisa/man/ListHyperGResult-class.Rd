@@ -6,18 +6,21 @@
 \alias{GOListHyperGResult}
 \alias{KEGGListHyperGResult}
 \alias{miRNAListHyperGResult}
+\alias{GeneralListHyperGResult}
 
 \alias{ListHyperGResult-class}
 \alias{CHRListHyperGResult-class}
 \alias{GOListHyperGResult-class}
 \alias{KEGGListHyperGResult-class}
 \alias{miRNAListHyperGResult-class}
+\alias{GeneralListHyperGResult-class}
 
 \alias{condGeneIdUniverse,ListHyperGResult-method}
 \alias{condGeneIdUniverse,CHRListHyperGResult-method}
 \alias{condGeneIdUniverse,KEGGListHyperGResult-method}
 \alias{condGeneIdUniverse,GOListHyperGResult-method}
 \alias{condGeneIdUniverse,miRNAListHyperGResult-method}
+\alias{condGeneIdUniverse,GeneralListHyperGResult-method}
 
 \alias{conditional,GOListHyperGResult-method}
 
@@ -26,42 +29,49 @@
 \alias{expectedCounts,KEGGListHyperGResult-method}
 \alias{expectedCounts,GOListHyperGResult-method}
 \alias{expectedCounts,miRNAListHyperGResult-method}
+\alias{expectedCounts,GeneralListHyperGResult-method}
 
 \alias{geneCounts,ListHyperGResult-method}
 \alias{geneCounts,CHRListHyperGResult-method}
 \alias{geneCounts,KEGGListHyperGResult-method}
 \alias{geneCounts,GOListHyperGResult-method}
 \alias{geneCounts,miRNAListHyperGResult-method}
+\alias{geneCounts,GeneralListHyperGResult-method}
 
 \alias{geneIdsByCategory,ListHyperGResult-method}
 \alias{geneIdsByCategory,CHRListHyperGResult-method}
 \alias{geneIdsByCategory,KEGGListHyperGResult-method}
 \alias{geneIdsByCategory,GOListHyperGResult-method}
 \alias{geneIdsByCategory,miRNAListHyperGResult-method}
+\alias{geneIdsByCategory,GeneralListHyperGResult-method}
 
 \alias{geneIdUniverse,ListHyperGResult-method}
 \alias{geneIdUniverse,CHRListHyperGResult-method}
 \alias{geneIdUniverse,KEGGListHyperGResult-method}
 \alias{geneIdUniverse,GOListHyperGResult-method}
 \alias{geneIdUniverse,miRNAListHyperGResult-method}
+\alias{geneIdUniverse,GeneralListHyperGResult-method}
 
 \alias{geneMappedCount,ListHyperGResult-method}
 \alias{geneMappedCount,CHRListHyperGResult-method}
 \alias{geneMappedCount,KEGGListHyperGResult-method}
 \alias{geneMappedCount,GOListHyperGResult-method}
 \alias{geneMappedCount,miRNAListHyperGResult-method}
+\alias{geneMappedCount,GeneralListHyperGResult-method}
 
 \alias{htmlReport,ListHyperGResult-method}
 \alias{htmlReport,CHRListHyperGResult-method}
 \alias{htmlReport,KEGGListHyperGResult-method}
 \alias{htmlReport,GOListHyperGResult-method}
 \alias{htmlReport,miRNAListHyperGResult-method}
+\alias{htmlReport,GeneralListHyperGResult-method}
 
 \alias{oddsRatios,ListHyperGResult-method}
 \alias{oddsRatios,CHRListHyperGResult-method}
 \alias{oddsRatios,KEGGListHyperGResult-method}
 \alias{oddsRatios,GOListHyperGResult-method}
 \alias{oddsRatios,miRNAListHyperGResult-method}
+\alias{oddsRatios,GeneralListHyperGResult-method}
 
 \alias{ontology,GOListHyperGResult-method}
 
@@ -70,32 +80,37 @@
 \alias{pvalues,KEGGListHyperGResult-method}
 \alias{pvalues,GOListHyperGResult-method}
 \alias{pvalues,miRNAListHyperGResult-method}
+\alias{pvalues,GeneralListHyperGResult-method}
 
 \alias{sigCategories,ListHyperGResult-method}
 \alias{sigCategories,CHRListHyperGResult-method}
 \alias{sigCategories,KEGGListHyperGResult-method}
 \alias{sigCategories,GOListHyperGResult-method}
 \alias{sigCategories,miRNAListHyperGResult-method}
+\alias{sigCategories,GeneralListHyperGResult-method}
 
 \alias{summary,ListHyperGResult-method}
 \alias{summary,CHRListHyperGResult-method}
 \alias{summary,KEGGListHyperGResult-method}
 \alias{summary,GOListHyperGResult-method}
 \alias{summary,miRNAListHyperGResult-method}
+\alias{summary,GeneralListHyperGResult-method}
 
 \alias{universeCounts,ListHyperGResult-method}
 \alias{universeCounts,CHRListHyperGResult-method}
 \alias{universeCounts,KEGGListHyperGResult-method}
 \alias{universeCounts,GOListHyperGResult-method}
 \alias{universeCounts,miRNAListHyperGResult-method}
+\alias{universeCounts,GeneralListHyperGResult-method}
 
 \alias{universeMappedCount,ListHyperGResult-method}
 \alias{universeMappedCount,CHRListHyperGResult-method}
 \alias{universeMappedCount,KEGGListHyperGResult-method}
 \alias{universeMappedCount,GOListHyperGResult-method}
 \alias{universeMappedCount,miRNAListHyperGResult-method}
+\alias{universeMappedCount,GeneralListHyperGResult-method}
 
-\title{Classes for quick GO/KEGG/CHR/miRNA target enrichment
+\title{Classes for quick GO/KEGG/CHR/miRNA target or other enrichment
   calculation for multiple gene sets}
 \description{
   These classes extend the \code{HyperGResult}
@@ -250,7 +265,7 @@
 \author{ Gabor Csardi \email{Gabor.Csardi@gmail.com} }
 \seealso{Functions for enrichment calculation of ISA modules:
   \code{\link{ISAGO}}, \code{\link{ISAKEGG}}, \code{\link{ISACHR}},
-  \code{\link{ISAmiRNA}}.
+  \code{\link{ISAmiRNA}}, \code{\link{ISAEnrichment}}.
   
   Perhaps see also the vignette in the \code{GOstats} package.
 }
