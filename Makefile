@@ -167,21 +167,6 @@ eisa/inst/doc/EISA_tutorial.pdf: eisa/inst/doc/EISA_tutorial.tex
 eisa/inst/doc/EISA_tutorial.tex: eisa/inst/doc/EISA_tutorial.Rnw
 	cd eisa/inst/doc/ && R CMD Sweave EISA_tutorial.Rnw
 
-homepage/ISA_internals.html: isa2/inst/doc/ISA_internals.tex
-	cp vignettes/style.cfg isa2/inst/doc/
-	cd isa2/inst/doc/ && pdflatex ISA_internals.tex
-	cd isa2/inst/doc && $(SWEAVE2HTML) ISA_internals $(SWEAVE2HTMLOPTIONS)
-	cat isa2/inst/doc/ISA_internals.html | $(REMOVEHTML) | $(REWRITEIMG) >homepage/ISA_internals.html
-	cp isa2/inst/doc/ISA_internals.css homepage/
-	cp isa2/inst/doc/ISA_internals*.png homepage/
-#	cp isa2/inst/doc/*.png homepage/
-homepage/ISA_internals.pdf: isa2/inst/doc/ISA_internals.pdf
-	cp $< $@
-isa2/inst/doc/ISA_internals.pdf: isa2/inst/doc/ISA_internals.tex
-	cd isa2/inst/doc/ && pdflatex ISA_internals.tex
-isa2/inst/doc/ISA_internals.tex: isa2/inst/doc/ISA_internals.Rnw
-	cd isa2/inst/doc/ && R CMD Sweave ISA_internals.Rnw
-
 homepage/EISA_module_trees.html: vignettes/EISA_module_trees.tex
 	cd vignettes && pdflatex EISA_module_trees.tex && \
 		bibtex EISA_module_trees && pdflatex EISA_module_trees
@@ -211,6 +196,21 @@ vignettes/tissues.pdf: vignettes/tissues.tex
 	cd vignettes/ && pdflatex tissues.tex
 vignettes/tissues.tex: vignettes/tissues.Rnw
 	cd vignettes/ && R CMD Sweave tissues.Rnw
+
+homepage/ISA_internals.html: vignettes/ISA_internals.tex
+	cd vignettes && pdflatex ISA_internals.tex && \
+		bibtex ISA_internals && pdflatex ISA_internals
+	cd vignettes && $(SWEAVE2HTML) ISA_internals $(SWEAVE2HTMLOPTIONS)
+	cat vignettes/ISA_internals.html | $(REMOVEHTML) | $(REWRITEIMG) >homepage/ISA_internals.html
+	cp vignettes/ISA_internals.css homepage/
+#	cp vignettes/ISA_internals*.png homepage/
+#	cp vignettes/*.png homepage/
+homepage/ISA_internals.pdf: vignettes/ISA_internals.pdf
+	cp $< $@
+vignettes/ISA_internals.pdf: vignettes/ISA_internals.tex
+	cd vignettes/ && pdflatex ISA_internals.tex
+vignettes/ISA_internals.tex: vignettes/ISA_internals.Rnw
+	cd vignettes/ && R CMD Sweave ISA_internals.Rnw
 
 homepage/EISA_biclust.html: eisa/inst/doc/EISA_biclust.tex
 	cp vignettes/style.cfg eisa/inst/doc/

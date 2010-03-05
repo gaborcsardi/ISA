@@ -1,0 +1,125 @@
+% \VignetteIndexEntry{ISA internals}
+\documentclass{article}
+\usepackage{ragged2e}
+\usepackage{url}
+
+\newcommand{\Rfunction}[1]{\texttt{#1()}}
+\newcommand{\Rpackage}[1]{\texttt{#1}}
+\newcommand{\Rclass}[1]{\texttt{#1}}
+\newcommand{\Rargument}[1]{\textsl{#1}}
+\newcommand{\filename}[1]{\texttt{#1}}
+\newcommand{\variable}[1]{\texttt{#1}}
+
+\SweaveOpts{cache=TRUE}
+\SweaveOpts{prefix.string=plot}
+
+\begin{document}
+
+\title{ISA internals}
+\author{G\'abor Cs\'ardi}
+\maketitle
+
+\tableofcontents
+
+\RaggedRight
+\setlength{\parindent}{2em}
+
+<<set width,echo=FALSE,print=FALSE>>=
+options(width=60)
+options(continue=" ")
+@ 
+
+\section{Introduction}
+
+The Iterative Signature Algorithm (ISA) is a biclustering method, it
+finds consistent blocks (modules, biclusters) in tabular data,
+e.g. gene expression measurements across a number of samples. Please
+see the introductory tutorials at the ISA homepage,
+\url{http://www.unil.ch/cbg/ISA}, and also \cite{bergmann03} for
+details.
+
+In this document we specifically deal with the implementation of the
+ISA in the \Rpackage{isa2} and \Rpackage{eisa} R packages. 
+
+\section{Why two packages?}
+
+We implemented the ISA in two R packages, \Rpackage{isa2} and
+\Rpackage{eisa}. ISA is a very general algorithm, that can be used for
+any tabular data to find correlated blocks. Examples for such tabular
+data are gene expression \cite{ihmels04}, response of different cell
+lines to a number of drugs \cite{kutalik08}, and possibly for
+non-biological data as well, as a general classifier algorithm.
+
+It is also true, however, that the ISA is frequently used for gene
+expression analysis. 
+
+It is thus a straightforward idea to provide two different user
+interfaces to the ISA. One interface, provided by \Rpackage{isa2}
+package, is very general, the input of the ISA functions is a numeric
+matrix, and the output is two matrices, defining the ISA modules. The
+\Rpackage{isa2} package can be used for the modular analysis of
+tabular data from any source. 
+
+The \Rpackage{eisa} package (`e' stands for expression) provides a
+second interface, for people that specifically deal with gene
+expression data. This package builds on the infrastructure created by
+the BioConductor project \cite{BioC}. The input the \Rpackage{eisa}
+functions is an \Rclass{ExpressionSet} object, the standard
+BioConductor data structure for storing gene expression
+data. BioConductor provides functions to create such an
+\Rclass{ExpressionSet} object from raw data and to download data from
+public repositories, such as the Gene Expression Omnibus
+\cite{davis07,barret09}. The output of the \Rpackage{eisa} functions
+is an object that contains, the ISA modules, the annotation of the
+genes and samples in the data set and possibly also further meta
+data. The \Rpackage{eisa} package provides functions for calculating
+enrichment statistics against various databases for the ISA modules.
+The \Rpackage{eisa} package uses already existing BioConductor
+annotation packages, so it works for any organism that is supported by
+BioConductor.
+
+Having two ISA packages, however, does not mean having two
+implementations of the ISA. The \Rpackage{eisa} package is fully built
+on top of the services of the \Rpackage{isa2} package, only the latter
+one contains the implementation of the ISA iteration. 
+
+The two packages allow ease of installation and use: users dealing
+with gene expression data install the \Rpackage{eisa} package, and
+this automatically installs the \Rpackage{isa2} package as well. Users
+analyzing other data install the \Rpackage{isa2} package only, this
+does not need any BioConductor packages.
+
+The \Rpackage{isa2} package is part of the standard R package
+repository (CRAN), the \Rpackage{eisa} package has been accepted as an
+official BioConductor package and is included in BioConductor from the
+2.6 release in April, 2010.
+
+\section{Speeding up the ISA iteration}
+
+ISA is an unsupervised, iterative, randomized algorithm. It starts
+with randomly generated seed vectors and then iteratively refines this
+vector, until it converges to a fixed point.
+
+
+
+\section{Running time analysis}
+
+\subsection{Number of genes and samples}
+
+\subsection{Number of seeds}
+
+\section{Parallel version of the ISA}
+
+\section{Session information}
+
+The version number of R and packages loaded for generating this
+vignette were:
+
+<<sessioninfo,results=tex,echo=FALSE>>=
+toLatex(sessionInfo())
+@ 
+
+\bibliographystyle{apalike}
+\bibliography{tissues}
+
+\end{document}
