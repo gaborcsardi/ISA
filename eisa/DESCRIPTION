@@ -20,4 +20,5 @@ biocViews: Classification, Visualization, Microarray, GeneExpression
 Collate: AllClasses.R AllGenerics.R ISAExpressionSet-methods.R
 	 ISAModules-methods.R enrichment.R CHR.R GO.R KEGG.R miRNA.R 
 	 autil.R autogen.R biclust.R eisa.R viz.R zzz.R
+         generalenrichment.R 
 Packaged: Mon Jul 28 09:19:47 2008; csardi

@@ -27,6 +27,11 @@ setClass("KEGGListHyperGParams",
          contains="ListHyperGParams",
          prototype=prototype(categoryName=c("KEGG", "List")))
 
+setClass("GeneralListHyperGParams",
+         representation=representation(categories="list"),
+         contains="ListHyperGParams",
+         prototype=prototype(categoryName=c("General", "List")))
+
 setClass("miRNAListHyperGParams",
          contains="ListHyperGParams",
          prototype=prototype(categoryName=c("miRNA", "List")))
@@ -58,6 +63,10 @@ setClass("ListHyperGResult",
 setClass("KEGGListHyperGResult",
          contains="ListHyperGResult",
          prototype=prototype(testname="KEGG"))
+
+setClass("GeneralListHyperGResult",
+         contains="ListHyperGResult",
+         prototype=prototype(testname="General"))
 
 setClass("miRNAListHyperGResult",
          contains="ListHyperGResult",
