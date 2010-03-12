@@ -63,8 +63,8 @@ We implemented the ISA in two R packages, \Rpackage{isa2} and
 \Rpackage{eisa}. ISA is a very general algorithm, that can be used for
 any tabular data to find correlated blocks. Examples for such tabular
 data are gene expression \cite{ihmels04}, response of different cell
-lines to a number of drugs \cite{kutalik08}, and possibly for
-non-biological data as well, as a general classifier algorithm.
+lines to a number of drugs \cite{kutalik08}. It can also be used as a
+general classifier, for biological or other data.
 
 It is also true, however, that the ISA is frequently used for gene
 expression analysis. 
@@ -74,25 +74,25 @@ interfaces to the ISA. One interface, provided by \Rpackage{isa2}
 package, is very general, the input of the ISA functions is a numeric
 matrix, and the output is two matrices, defining the ISA modules. The
 \Rpackage{isa2} package can be used for the modular analysis of
-tabular data from any source. 
+tabular data of any kind, from any source. 
 
-The \Rpackage{eisa} package (`e' stands for expression) provides a
-second interface, for people that specifically deal with gene
-expression data. This package builds on the infrastructure created by
-the BioConductor project \cite{BioC}. The input the \Rpackage{eisa}
-functions is an \Rclass{ExpressionSet} object, the standard
-BioConductor data structure for storing gene expression
+The \Rpackage{eisa} package (the leading `e' stands for expression)
+provides a second interface, for people that specifically deal with
+gene expression data. This package builds on the infrastructure
+created by the BioConductor project \cite{BioC}. The input of the
+\Rpackage{eisa} functions is an \Rclass{ExpressionSet} object, the
+standard BioConductor data structure for storing gene expression
 data. BioConductor provides functions to create such an
 \Rclass{ExpressionSet} object from raw data and to download data from
 public repositories, such as the Gene Expression Omnibus
 \cite{davis07,barret09}. The output of the \Rpackage{eisa} functions
-is an object that contains, the ISA modules, the annotation of the
-genes and samples in the data set and possibly also further meta
-data. The \Rpackage{eisa} package provides functions for calculating
-enrichment statistics against various databases for the ISA modules.
-The \Rpackage{eisa} package uses already existing BioConductor
-annotation packages, so it works for any organism that is supported by
-BioConductor.
+is an object that contains the ISA modules, the annotation of the
+genes and samples in the data set and possibly also further
+experimental meta data. The \Rpackage{eisa} package provides functions
+for calculating enrichment statistics against various databases for
+the ISA modules. The \Rpackage{eisa} package uses already existing
+BioConductor annotation packages, so it works for any organism that is
+supported by BioConductor.
 
 Having two ISA packages, however, does not mean two
 implementations of the ISA. The \Rpackage{eisa} package is fully built
@@ -108,7 +108,7 @@ does not need any BioConductor packages.
 The \Rpackage{isa2} package is part of the standard R package
 repository (CRAN), the \Rpackage{eisa} package has been accepted as an
 official BioConductor package and is included in BioConductor from the
-2.6 release in April, 2010.
+2.6 release, due in April, 2010.
 
 \section{Speeding up the ISA iteration}
 
@@ -124,16 +124,16 @@ column-wise, repectively. One step of the ISA iteration involves
 (1) multiplying $E_r$ by $r_n$ and then (2) thresholding
 the result to keep elements that are further away from its mean than a
 prescribed value, $\Theta_c$. This gives $c_{n+1}$. Next, (3) $E_c$ is
-multiplied by $c_n$ and the result is thresholded with
+multiplied by $c_n$ and (4) the result is thresholded with
 $\Theta_r$. This gives $r_{n+1}$. 
 
 The iteration is finished if $r_{n+1}$ is close to $r_n$ and $c_{n+1}$
 is close to $c_n$.
 
 Considerable speedup can be achived, if the ISA iteration is performed
-in batches od seed vectors, instead of handling them
+in batches of seed vectors, instead of handling them
 individually. The reason for this is the availability of the highly
-optimized linear algebra libraries that perform a matrix-matrix
+optimized linear algebra libraries that perform matrix-matrix
 multiplication much faster than all the corresponding matrix-vector
 multiplications individually. The seed vectors can be merged into a
 seed matrix, even if the ISA thresholds are different for the
@@ -142,7 +142,7 @@ support this.
 
 We considered using sparse matrices during the ISA iteration, because
 the matrix of seed vectors is sparse, but according to our
-experiments, using sparse matrices are only marginally faster, and
+measurements, sparse matrices are only marginally faster, and
 only in some cases. The reason for this is, that the product of the
 two matrices is always dense, and gets sparse only after the
 thresholding; the dense-sparse matrix multiplication, plus the
@@ -157,6 +157,9 @@ matrix needs to be iterated for many steps.
 
 \section{Running time analysis}
 
+In this section we show an experimental running time analysis for our
+ISA implementation.
+
 \subsection{The hardware and software}
 
 The code in the following sections were run under
@@ -170,6 +173,19 @@ The code in the following sections were run under
 
 \subsection{Getting the data}
 
+We use subsets of the same data set for the test, this is a public
+data set that is publicly available in the Gene Expression Omnibus (GEO)
+repository, its id is \Sexpr{"GSE18858"}. Note, that for the analysis
+of gene expression data, the \Rpackage{eisa} package is a better
+choice. It makes sense, however, if this tutorial can be run without
+any BioConductor packages, so we will use the \Rpackage{eisa}
+package.
+
+The non-normalized data set of the experiment is available as numeric
+matrix. To spare time and bandwidth, we only download it once, even if
+the code of this tutorial is run multiple times. We store the data
+file in the current local directory. If the file is already there,
+then there is nothing to do.
 <<download data matrix>>=
 GEO <- "GSE18858"
 GEOfile <- paste(sep="", GEO, "_series_matrix.txt.gz")
@@ -180,22 +196,34 @@ if (!file.exists(GEOfile)) {
 }
 @
 
+Next, we are read in the data. Lines that are part of the file header
+start with an exclamation mark in GEO files, so skip them by setting
+the \verb+comment.char+ argument of \Rfunction{read.table}. The table
+has a header, the first lines are the sample names; it also has the
+probeset names in the first column, we use these as row names.
 <<read in the data,cache=TRUE>>=
 data <- read.table(gzfile(GEOfile), comment.char="!", header=TRUE,
                    row.names=1)
 data <- as.matrix(data)
 @
 
+Let's check the size of the data matrix.
 <<dimensions>>=
 dim(data)
 @ 
+It has \Sexpr{nrow(data)} rows (=probesets) and \Sexpr{ncol(data)} columns. 
 
+We load the \Rpackage{isa2} package, to perform the ISA. No BioConductor 
+packages are needed.
 <<load the isa2 package>>=
 library(isa2)
 @ 
 
 \subsection{Measuring running time}
 
+We define a simple function first, that runs the various steps of the ISA
+toolchain and measures the running time of each step. We use the 
+\Rfunction{system.time} function for this. The results are returned in table.
 <<create a function that measures ISA running time>>=
 mesISA <- function(E, thr.row, thr.col, no.seeds) {
   t1 <- system.time({
@@ -217,17 +245,35 @@ mesISA <- function(E, thr.row, thr.col, no.seeds) {
 }
 @
 
+We quickly test this function, on a small subset of out data, with 
+1000 rows and 30 columns, chosen randomly.
 <<test the masurement function>>=
 mydata <- data[ sample(nrow(data), 1000), sample(ncol(data), 30)]
 mesISA(mydata, 3, 3, 100)
-@ 
+@
+The table has one column for each step of the ISA toolchain:
+normalization, seed generation, performing the ISA iteration, merging
+the modules, and there is a column for the total time of these
+operations as well. The first row shows the processor time used by
+process itself, the second row the time spent in system calls. In the
+following we will use the total of both of them to measure the
+speed of the implementation.
 
 \subsection{Number of rows and columns}
 
+First, we increase the number of rows in the data matrix gradually,
+and measure the running time of ISA. We do this for variuos (row)
+thresholds, to see if the trend is threshold-dependent. The column 
+threshold will be fixed now.
 <<running time in the function of rows set up things>>=
 row.thresholds <- seq(1,3,by=0.5)
 col.thresholds <- 2
+@ 
 
+We create a function, \Rfunction{do.row.thr}, that runs the ISA 
+for fixed threshold parameters, and different number of rows in the 
+data matrix. The function also does replications, 5 by default.
+<<running time in the function of rows set up things 2>>=
 no.rows <- seq(5000, min(40000, nrow(data)), by=5000)
 do.row.thr <- function(thr, rep=5) {
   res <- lapply(no.rows, function(x) {
@@ -240,10 +286,16 @@ do.row.thr <- function(thr, rep=5) {
 }
 @ 
 
+We are ready to do the running time measurement now; separately for each row 
+threshold parameter. This takes about three hours to run, on the platform 
+mentioned above.
 <<calculate by rows,eval=FALSE>>=
 by.rows <- lapply(row.thresholds, do.row.thr)
 @
 
+Next, we define a function to plot the results, with error bars. Error bars 
+are not supported by the builtin R plotting functions, so we put them together 
+from line segments.
 <<function to plot with error bars>>=
 myplot <- function(x, y, sd, xlim=range(x), 
                    ylim=c(min(y-sd),max(y+sd)), xlab="", ylab="", ...) {
@@ -258,15 +310,19 @@ myplot <- function(x, y, sd, xlim=range(x),
 }
 @ 
 
+The following two functions calculate the mean and standard deviation of the 
+running times in the result lists, we will use them later.
 <<function to extract mean and sd>>=
 get.mean <- function(xx) {
-  sapply(xx, function(x) mean(sapply(x, function(y) y[1,5])))
+  sapply(xx, function(x) mean(sapply(x, function(y) sum(y[1:2,5]))))
 }
 get.sd <- function(xx) {
-  sapply(xx, function(x) sd(sapply(x, function(y) y[1,5])))
+  sapply(xx, function(x) sd(sapply(x, function(y) sum(y[1:2,5]))))
 }
 @ 
 
+We are ready to create the plot, the results can be seen in 
+Fig.~\ref{fig:by-rows}.
 <<create the plot,eval=FALSE>>=
 layout(rbind(1:2,3:4,5:6))
 for (i in 1:length(row.thresholds)) {
@@ -288,33 +344,54 @@ for (i in 1:length(row.thresholds)) {
 <<by-rows-plot,fig=TRUE,echo=FALSE,width=7,height=7>>=
 <<create the plot>>
 @ 
-\caption{}
+\caption{Running time of the ISA, in the function of the number of rows
+  in the input matrix, for various row thresholds. Crealy, the running time
+  increases linearly with the number of rows, for all row threshold. It is 
+  also true, that for higher thresholds the running times tend to be smaller, 
+  this is because in these cases more seeds converge quickly to the null
+  vector, and these don't need to be iterated further. Each data point 
+  is the mean of five runs.
+}
 \label{fig:by-rows}
 \end{figure}
 
+In the following, we perform a similar analysis for the number of columns
+in the input matrix. ISA is a symmetric algorithm, rows are treated the same 
+way as columns. The reason for discussing them separately here, is that 
+gene expression matrices have usually much more rows than columns and this 
+difference might affect the running time.
 
+For these runs, the row threshold is fixed and the column threshold changes
+from 1 to 3.
 <<change number of columns set up things>>=
 row.thresholds2 <- 2
 col.thresholds2 <- seq(1,3,by=0.5)
+@ 
 
+We create a function to perform the all the runs for a given column
+threshold, with replications.
+<<change number of columns set up things>>=
 no.cols <- seq(30, ncol(data), by=30)
 do.col.thr <- function(thr, rep=5) {
   res <- lapply(no.cols, function(x) {
-    cat(".")
     lapply(1:rep, function(xxx) {
       mydata <- data[, sample(ncol(data), x)]
       mesISA(mydata, row.thresholds2, thr, 100)
     })
   })
-  cat("\n")
   res
 }
 @
 
+We are ready to do the measurements. On the above mentioned hardware 
+configuration, this takes about 4 hours to run, depending on the load
+of the system.
 <<calculate by cols,eval=FALSE>>= 
 by.cols <- lapply(col.thresholds2, do.col.thr)
 @ 
 
+The mean running times are plotted, the results are shown in 
+Fig.~\ref{fig:by-cols}. 
 <<make by cols plot,eval=FALSE>>=
 layout(rbind(1:2,3:4,5:6))
 for (i in 1:length(col.thresholds2)) {
@@ -336,35 +413,51 @@ for (i in 1:length(col.thresholds2)) {
 <<by-cols-plot,fig=TRUE,echo=FALSE,width=7,height=7>>=
 <<make by cols plot>>
 @ 
-\caption{}
+\caption{Running times, in the function of the number of columns in the 
+  input matrix, for various column thresholds. Interestingly, the running time
+  can be considered as independent of the number of columns. This is simply 
+  because the row seed matrix is one order of magnitude larger than the 
+  column seed matrix, and the former dominates the running time. Each data 
+  point is the mean of five runs.}
 \label{fig:by-cols}
 \end{figure}
 
 \subsection{Number of seeds}
 
-<<no seeds function>>=
+Finally, we also check the running time in the function of the number
+of stating seeds.
+
+We define three threshold configurations to test. The first has intermediate 
+thresholds for both the rows and the columns, the second has a low threshold
+for the rows and a high threshold for the columns, the third is the opposite of 
+the second.
+<<no seeds parameters>>=
 thr.comb <- list( c(2,2), c(1,3), c(3,1) )
 no.seeds <- seq(50, 400, by=50)
+@ 
 
+The following function does all the runs for a given threshold combination.
+The size of the data matrix is fixed here, 20000 times 100.
+<<no seeds function>>=
 do.no.seeds <- function(thr, rep=5) {
   nr <- min(20000, nrow(data))
   nc <- min(100, ncol(data))
   res <- lapply(no.seeds, function(x) {
-    cat(".")
     lapply(1:rep, function(xxx) {
       mydata <- data[sample(nrow(data), nr), sample(ncol(data), nc)]
       mesISA(mydata, thr[1], thr[2], x)
     })
   })
-  cat("\n")
   res
 }
 @ 
 
+We are ready to do the measurement now.
 <<calculate no needs,eval=FALSE>>=
 by.no.seeds <- lapply(thr.comb, do.no.seeds)
 @ 
 
+Fianally, we craete the figure, see Fig.~\ref{fig:no-seeds}.
 <<plot by no seeds,eval=FALSE>>=
 layout(rbind(1:2,3:4))
 for (i in 1:length(thr.comb)) {
@@ -387,9 +480,22 @@ for (i in 1:length(thr.comb)) {
 <<by-seeds-plot,fig=TRUE,echo=FALSE,width=7,height=5>>=
 <<plot by no seeds>>
 @ 
-\caption{}
+\caption{The running time, in the function of the number of starting seeds, 
+  for various row and column combinations. Each point is the average of 
+  five ISA runs. The running time is increasing linearly with the number 
+  of seeds.
+}
 \label{fig:no-seeds}
 \end{figure}
+
+\section{Running ISA in parallel}
+
+It is trivial to run an ISA analysis in parallel, on a multi-processor 
+machine, or a computer cluster: one just runs different
+threshold-combinations and/or different seeds on the different 
+processors. The achived speedup is close to linear, since the
+ISA iteration step dominates in the toolchain. Please see more about
+this on the ISA homepage at \url{http://www.unil.ch/cbg/ISA}.
 
 \section{Session information}
 
