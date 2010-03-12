@@ -203,7 +203,7 @@ homepage/ISA_internals.html: vignettes/ISA_internals.tex
 	cd vignettes && $(SWEAVE2HTML) ISA_internals $(SWEAVE2HTMLOPTIONS)
 	cat vignettes/ISA_internals.html | $(REMOVEHTML) | $(REWRITEIMG) >homepage/ISA_internals.html
 	cp vignettes/ISA_internals.css homepage/
-#	cp vignettes/ISA_internals*.png homepage/
+	cp vignettes/ISA_internals*.png homepage/
 #	cp vignettes/*.png homepage/
 homepage/ISA_internals.pdf: vignettes/ISA_internals.pdf
 	cp $< $@

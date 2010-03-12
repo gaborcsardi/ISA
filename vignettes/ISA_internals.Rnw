@@ -10,7 +10,6 @@
 \newcommand{\filename}[1]{\texttt{#1}}
 \newcommand{\variable}[1]{\texttt{#1}}
 
-\SweaveOpts{cache=TRUE}
 \SweaveOpts{prefix.string=plot}
 
 \begin{document}
@@ -27,7 +26,24 @@
 <<set width,echo=FALSE,print=FALSE>>=
 options(width=60)
 options(continue=" ")
+.getmaxmem <- function() {
+  ml <- system("free", intern=TRUE)[2]
+  m <- sub(" .*$", "", sub("^[^1-9]*", "", ml))
+  format(as.numeric(m) / 1024 / 1024, digits=4)
+}
+.getnoproc <- function() {
+  pc <- system("cat /proc/cpuinfo | grep processor | tail -1", intern=TRUE)
+  as.numeric(sub("^[^1-9]*", "", pc)) + 1
+}
+.getproctype <- function() {
+  mn <- system("cat /proc/cpuinfo | grep 'model name' | head -1", intern=TRUE)
+  sub("^.*:[ ]*", "", gsub("[\t ]+", " ", mn))
+}
 @ 
+
+<<load saved data,echo=FALSE,print=FALSE>>=
+load("ISA_internals.Rdata")
+@
 
 \section{Introduction}
 
@@ -78,7 +94,7 @@ The \Rpackage{eisa} package uses already existing BioConductor
 annotation packages, so it works for any organism that is supported by
 BioConductor.
 
-Having two ISA packages, however, does not mean having two
+Having two ISA packages, however, does not mean two
 implementations of the ISA. The \Rpackage{eisa} package is fully built
 on top of the services of the \Rpackage{isa2} package, only the latter
 one contains the implementation of the ISA iteration. 
@@ -97,18 +113,283 @@ official BioConductor package and is included in BioConductor from the
 \section{Speeding up the ISA iteration}
 
 ISA is an unsupervised, iterative, randomized algorithm. It starts
-with randomly generated seed vectors and then iteratively refines this
-vector, until it converges to a fixed point.
+with a seed vector. $r_0$. This vector is an initial guess for the
+rows of the input matrix that form a single module. This guess is then
+refined, by iterating itself and another vector, $c_i$, that defines
+the columns of the module.
 
+During the iteration, the ISA uses two matrices, $E_r$ and $E_c$,
+derived from the input matrix, by standardizing it row-wise and
+column-wise, repectively. One step of the ISA iteration involves
+(1) multiplying $E_r$ by $r_n$ and then (2) thresholding
+the result to keep elements that are further away from its mean than a
+prescribed value, $\Theta_c$. This gives $c_{n+1}$. Next, (3) $E_c$ is
+multiplied by $c_n$ and the result is thresholded with
+$\Theta_r$. This gives $r_{n+1}$. 
 
+The iteration is finished if $r_{n+1}$ is close to $r_n$ and $c_{n+1}$
+is close to $c_n$.
+
+Considerable speedup can be achived, if the ISA iteration is performed
+in batches od seed vectors, instead of handling them
+individually. The reason for this is the availability of the highly
+optimized linear algebra libraries that perform a matrix-matrix
+multiplication much faster than all the corresponding matrix-vector
+multiplications individually. The seed vectors can be merged into a
+seed matrix, even if the ISA thresholds are different for the
+different seeds, the \Rpackage{isa2} and \Rpackage{eisa} packages
+support this. 
+
+We considered using sparse matrices during the ISA iteration, because
+the matrix of seed vectors is sparse, but according to our
+experiments, using sparse matrices are only marginally faster, and
+only in some cases. The reason for this is, that the product of the
+two matrices is always dense, and gets sparse only after the
+thresholding; the dense-sparse matrix multiplication, plus the
+conversion to a sparse matrix again, takes about the same time as the
+dense-dense matrix multiplication.
+
+Different input seeds converge in different number of steps, many
+seeds tend to converge quickly, and very few seeds need a lot of
+steps. Because of this, it is essential to remove the seeds that have
+already converged, from the seed matrix, so that only a smaller seed
+matrix needs to be iterated for many steps.
 
 \section{Running time analysis}
 
-\subsection{Number of genes and samples}
+\subsection{The hardware and software}
+
+The code in the following sections were run under
+\Sexpr{Sys.info()["sysname"]} operating system, release 
+'\verb+\Sexpr{Sys.info()["release"]}+', version 
+`\verb+\Sexpr{Sys.info()["version"]}+', on a 
+`\verb+\Sexpr{Sys.info()["machine"]}+' machine with 
+\Sexpr{.getnoproc()} processors of type 
+`\verb+\Sexpr{.getproctype()}+' and 
+\Sexpr{.getmaxmem()} GiB memory.
+
+\subsection{Getting the data}
+
+<<download data matrix>>=
+GEO <- "GSE18858"
+GEOfile <- paste(sep="", GEO, "_series_matrix.txt.gz")
+GEOurl <- paste(sep="", "ftp://ftp.ncbi.nih.gov/pub/geo/DATA/SeriesMatrix/", 
+                GEO, "/", GEOfile) 
+if (!file.exists(GEOfile)) {
+  download.file(GEOurl, GEOfile)
+}
+@
+
+<<read in the data,cache=TRUE>>=
+data <- read.table(gzfile(GEOfile), comment.char="!", header=TRUE,
+                   row.names=1)
+data <- as.matrix(data)
+@
+
+<<dimensions>>=
+dim(data)
+@ 
+
+<<load the isa2 package>>=
+library(isa2)
+@ 
+
+\subsection{Measuring running time}
+
+<<create a function that measures ISA running time>>=
+mesISA <- function(E, thr.row, thr.col, no.seeds) {
+  t1 <- system.time({
+    NE <- isa.normalize(E)
+  })
+  t2 <- system.time({
+    seeds <- generate.seeds(length=nrow(E), count=no.seeds)
+  })
+  t3 <- system.time({
+    mods <- isa.iterate(NE, row.seeds=seeds, 
+                        thr.row=thr.row, thr.col=thr.col)
+  })
+  t4 <- system.time({
+    mods2 <- isa.unique(NE, mods)
+  })
+  cbind(normalization=t1, seeds.generation=t2, 
+        isa.iteration=t3, module.merge=t4, 
+        full=t1+t2+t3+t4)
+}
+@
+
+<<test the masurement function>>=
+mydata <- data[ sample(nrow(data), 1000), sample(ncol(data), 30)]
+mesISA(mydata, 3, 3, 100)
+@ 
+
+\subsection{Number of rows and columns}
+
+<<running time in the function of rows set up things>>=
+row.thresholds <- seq(1,3,by=0.5)
+col.thresholds <- 2
+
+no.rows <- seq(5000, min(40000, nrow(data)), by=5000)
+do.row.thr <- function(thr, rep=5) {
+  res <- lapply(no.rows, function(x) {
+    lapply(1:rep, function(xxx) {
+      mydata <- data[sample(nrow(data), x),]
+      mesISA(mydata, thr, col.thresholds, 100)
+    })    
+  })
+  res
+}
+@ 
+
+<<calculate by rows,eval=FALSE>>=
+by.rows <- lapply(row.thresholds, do.row.thr)
+@
+
+<<function to plot with error bars>>=
+myplot <- function(x, y, sd, xlim=range(x), 
+                   ylim=c(min(y-sd),max(y+sd)), xlab="", ylab="", ...) {
+  plot(NA, type="n", xlim=xlim, ylim=ylim, xlab=xlab, ylab=ylab)
+  xmin <- par("usr")[1] 
+  xr <- par("usr")[2]-xmin
+  bw <- xr/200
+  segments(x,y-sd,x,y+sd)
+  segments(x-bw,y-sd,x+bw,y-sd)
+  segments(x-bw,y+sd,x+bw,y+sd)
+  points(x, y, ...)
+}
+@ 
+
+<<function to extract mean and sd>>=
+get.mean <- function(xx) {
+  sapply(xx, function(x) mean(sapply(x, function(y) y[1,5])))
+}
+get.sd <- function(xx) {
+  sapply(xx, function(x) sd(sapply(x, function(y) y[1,5])))
+}
+@ 
+
+<<create the plot,eval=FALSE>>=
+layout(rbind(1:2,3:4,5:6))
+for (i in 1:length(row.thresholds)) {
+  par(mar=c(5,4,1,1)+0.1)
+  y <- get.mean(by.rows[[i]])
+  s <- get.sd(by.rows[[i]])
+  myplot(no.rows, y, s,
+         type="b", pch=20, xlab="# of rows", ylab="running time [s]")
+  rt <- row.thresholds[i]
+  text(min(no.rows), max(y+s),
+       substitute(Theta[r]==rt, list(rt=rt)),
+       adj=c(0,1), cex=1.3)
+}
+@ 
+
+\begin{figure}
+\centering
+\setkeys{Gin}{width=\linewidth}
+<<by-rows-plot,fig=TRUE,echo=FALSE,width=7,height=7>>=
+<<create the plot>>
+@ 
+\caption{}
+\label{fig:by-rows}
+\end{figure}
+
+
+<<change number of columns set up things>>=
+row.thresholds2 <- 2
+col.thresholds2 <- seq(1,3,by=0.5)
+
+no.cols <- seq(30, ncol(data), by=30)
+do.col.thr <- function(thr, rep=5) {
+  res <- lapply(no.cols, function(x) {
+    cat(".")
+    lapply(1:rep, function(xxx) {
+      mydata <- data[, sample(ncol(data), x)]
+      mesISA(mydata, row.thresholds2, thr, 100)
+    })
+  })
+  cat("\n")
+  res
+}
+@
+
+<<calculate by cols,eval=FALSE>>= 
+by.cols <- lapply(col.thresholds2, do.col.thr)
+@ 
+
+<<make by cols plot,eval=FALSE>>=
+layout(rbind(1:2,3:4,5:6))
+for (i in 1:length(col.thresholds2)) {
+  par(mar=c(5,4,1,1)+0.1)
+  y <- get.mean(by.cols[[i]])
+  s <- get.sd(by.cols[[i]])
+  myplot(no.cols, y, s,
+         type="b", pch=20, xlab="# of cols", ylab="running time [s]")
+  rt <- col.thresholds2[i]
+  text(min(no.cols), max(y+s),
+       substitute(Theta[c]==rt, list(rt=rt)),
+       adj=c(0,1), cex=1.3)
+}
+@ 
+
+\begin{figure}
+\centering
+\setkeys{Gin}{width=\linewidth}
+<<by-cols-plot,fig=TRUE,echo=FALSE,width=7,height=7>>=
+<<make by cols plot>>
+@ 
+\caption{}
+\label{fig:by-cols}
+\end{figure}
 
 \subsection{Number of seeds}
 
-\section{Parallel version of the ISA}
+<<no seeds function>>=
+thr.comb <- list( c(2,2), c(1,3), c(3,1) )
+no.seeds <- seq(50, 400, by=50)
+
+do.no.seeds <- function(thr, rep=5) {
+  nr <- min(20000, nrow(data))
+  nc <- min(100, ncol(data))
+  res <- lapply(no.seeds, function(x) {
+    cat(".")
+    lapply(1:rep, function(xxx) {
+      mydata <- data[sample(nrow(data), nr), sample(ncol(data), nc)]
+      mesISA(mydata, thr[1], thr[2], x)
+    })
+  })
+  cat("\n")
+  res
+}
+@ 
+
+<<calculate no needs,eval=FALSE>>=
+by.no.seeds <- lapply(thr.comb, do.no.seeds)
+@ 
+
+<<plot by no seeds,eval=FALSE>>=
+layout(rbind(1:2,3:4))
+for (i in 1:length(thr.comb)) {
+  par(mar=c(5,4,1,1)+0.1)
+  y <- get.mean(by.no.seeds[[i]])
+  s <- get.sd(by.no.seeds[[i]])
+  myplot(no.seeds, y, s,
+         type="b", pch=20, xlab="# of seeds", ylab="running time [s]")
+  th <- thr.comb[[i]]
+  text(min(no.seeds), max(y+s),
+       substitute(paste(Theta[r]==r1, ",  ", Theta[c]==r2), 
+                  list(r1=th[1], r2=th[2])),
+       adj=c(0,1), cex=1.3)
+}
+@ 
+
+\begin{figure}
+\centering
+\setkeys{Gin}{width=\linewidth}
+<<by-seeds-plot,fig=TRUE,echo=FALSE,width=7,height=5>>=
+<<plot by no seeds>>
+@ 
+\caption{}
+\label{fig:no-seeds}
+\end{figure}
 
 \section{Session information}
 
