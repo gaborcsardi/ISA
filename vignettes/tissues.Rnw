@@ -1,4 +1,4 @@
-% \VignetteIndexEntry{Tissue specific expression with ISA}
+% \VignetteIndexEntry{Tissue selective expression with ISA}
 \documentclass{article}
 \usepackage{ragged2e}
 \usepackage{url}
@@ -28,7 +28,7 @@
 
 \begin{document}
 
-\title{Tissue specific expression with the\\ Iterative Signature Algorithm}
+\title{Tissue selective expression with the\\ Iterative Signature Algorithm}
 \author{G\'abor Cs\'ardi}
 \maketitle
 
@@ -337,7 +337,7 @@ module tissue selective, we require that the non-zero sample scores
 of a tissue have the same signs; i.e. the genes of the module are
 regulated the same in all samples of the tissue. We also mark
 oppositely regulated tissues with a `d' in parentheses.
-<<function to decide tissue specificity>>=
+<<function to decide tissue selectivity>>=
 tspec <- function(mod) {
   t <- EXP$tissue[getSamples(modules, mod)[[1]]]
   s <- getSampleScores(modules, mod)[[1]]
@@ -355,7 +355,7 @@ oppositely. \Sexpr{sum(sapply(spec, length)>=3)} contain three or more
 tissues.
 
 As another example, we create a plot for four modules that are
-specific for a single tissue.
+selective for a single tissue.
 <<condplot3,eval=FALSE>>=
 to.plot <- which(sapply(spec, length)==1)[1:4]
 layout(rbind(1:2,3:4))
@@ -370,9 +370,9 @@ for (p in to.plot) {
 <<condplot4,fig=TRUE,width=12,height=9,echo=FALSE>>=
 <<condplot3>>
 @ 
-\caption{Condition plots for four modules that are specific for a
+\caption{Condition plots for four modules that are selective for a
 single tissue, modules: \Sexpr{paste(to.plot, collapse=", ")} (from
-top to bottom and left to right). They are specific to
+top to bottom and left to right). They are selective to
 \Sexpr{paste(sub(" (d)", "", specc[to.plot], fixed=TRUE), collapse=", ")}, 
 respectively.}
 \label{fig:condplot2}
