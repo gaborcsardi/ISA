@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<actionScriptProperties mainApplicationPath="ExpressionView.mxml" version="3">
-  <compiler additionalCompilerArguments="-locale en_US -use-network=false -define+=CONFIG::air,false" copyDependentFiles="true" enableModuleDebug="true" generateAccessible="false" htmlExpressInstall="true" htmlGenerate="true" htmlHistoryManagement="false" htmlPlayerVersion="10.0.0" htmlPlayerVersionCheck="true" outputFolderPath="bin-debug" sourceFolderPath="src" strict="true" useApolloConfig="false" verifyDigests="true" warn="true">
+<actionScriptProperties mainApplicationPath="ExpressionView.mxml" projectUUID="3efcdf9f-8560-427a-872c-35a55a7dff7d" version="6">
+  <compiler additionalCompilerArguments="-locale en_US -use-network=false -define+=CONFIG::air,false" autoRSLOrdering="false" copyDependentFiles="false" flex3CompatMode="false" flexSDK="Flex 3.4" generateAccessible="false" htmlExpressInstall="true" htmlGenerate="true" htmlHistoryManagement="false" htmlPlayerVersionCheck="true" includeNetmonSwc="false" outputFolderPath="bin-debug" sourceFolderPath="src" strict="true" targetPlayerVersion="10.0.0" useApolloConfig="false" useDebugRSLSwfs="true" verifyDigests="true" warn="true">
     <compilerSourcePath/>
     <libraryPath defaultLinkType="1">
       <libraryPathEntry kind="4" path=""/>
@@ -13,4 +13,13 @@
   </applications>
   <modules/>
   <buildCSSFiles/>
+  <publishSource>
+    <sourcePathIncludes/>
+    <sourceExcludes>
+      <exclude path="air"/>
+      <exclude path="bin"/>
+      <exclude path="doc"/>
+      <exclude path="libs"/>
+    </sourceExcludes>
+  </publishSource>
 </actionScriptProperties>

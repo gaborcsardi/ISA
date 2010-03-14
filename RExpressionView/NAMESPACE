@@ -1,8 +1,9 @@
 exportMethods("OrderEV")
 exportMethods("ExportEV")
-
-importFrom(AnnotationDbi, summary)
-
 export(LaunchEV)
-
 useDynLib(ExpressionView)
+
+import(AnnotationDbi, methods, isa2, eisa, GO.db, KEGG.db)
+
+#importFrom(AnnotationDbi, summary)
+
