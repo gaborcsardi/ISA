@@ -14,17 +14,27 @@
 //     You should have received a copy of the GNU General Public License
 //     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <Rdefines.h>
+#include "Rdefines.h"
+#include "R_ext/Rdynload.h"
+
+#include <vector>
+#include "orderclusters.h"
 
 extern "C" {
 	SEXP orderClusters(SEXP, SEXP, SEXP, SEXP);
 }
 
-#include <vector>
-#include "orderclusters.h"
+// register functions
+R_CallMethodDef callMethods[] = {
+    { "orderClusters", (DL_FUNC)&orderClusters, 4 },
+    { NULL, NULL, 0 }
+};
 
-using namespace std;
+void R_init_pretty_matrix(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, callMethods, NULL, NULL);
+}
 
+// ordering function
 SEXP orderClusters(SEXP _data, SEXP _order, SEXP _maxtime, SEXP _debug) {
 
 	int nrows = INTEGER(GET_DIM(_data))[0];

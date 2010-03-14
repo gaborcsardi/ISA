@@ -16,6 +16,8 @@
  
      You should have received a copy of the GNU General Public License
      along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+     This code compiles fine with Flex SDK 3.4.1, SDK 4 is not yet supported.
 -->
 
 <mx:Application
@@ -27,25 +29,19 @@
 	scriptTimeLimit = "60" 
 	horizontalScrollPolicy="off" 
 	verticalScrollPolicy="off" 
-	applicationComplete="applicationCompleteHandler()" 
-	viewSourceURL="srcview/index.html"
-	backgroundColor="#d5e5f5" >
+	applicationComplete="applicationCompleteHandler()"
+	backgroundColor="#d5e5f5" 
+	viewSourceURL="srcview/index.html">
 	
 	<mx:Script>
 		<![CDATA[
-			import mx.containers.Canvas;
-			import ch.unil.cbg.ExpressionView.view.*;
 			import ch.unil.cbg.ExpressionView.events.*;
 			import ch.unil.cbg.ExpressionView.model.*;
 			import ch.unil.cbg.ExpressionView.styles.*;
+			import ch.unil.cbg.ExpressionView.view.*;
 			
-			import mx.events.ResizeEvent;
 			import mx.controls.Alert;
 			
-			import flash.display.StageAlign;
-			import flash.display.StageScaleMode;
-			import flash.system.Capabilities;
-
 			CONFIG::air {
 				import flash.events.InvokeEvent;
 				import flash.desktop.NativeApplication;
@@ -71,7 +67,7 @@
 			}
 			
 			private function applicationCompleteHandler(): void {
-
+								
 				if ( !menuBar ) {
 					menuBar = new MenuBar;
 					menuBar.setStyle("borderStyle", "solid");
@@ -122,7 +118,7 @@
 				if ( Application.application.parameters.filename ) { 
 					filename = Application.application.parameters.filename;
 				}
-				trace(filename)
+
 				if ( filename != "" ) {
 					statusBar.visible = true;
 					var request:URLRequest = new URLRequest(filename);
@@ -130,7 +126,8 @@
 					loader.dataFormat = URLLoaderDataFormat.BINARY;
 					loader.addEventListener(ProgressEvent.PROGRESS, fileLoadProgressHandler);
 					loader.addEventListener(Event.COMPLETE, fileLoadCompleteHandler);
-					loader.load(request);
+					loader.addEventListener(IOErrorEvent.IO_ERROR, fileLoadErrorHandler);
+					loader.load(request);					
 				}
 							
 			}
@@ -145,6 +142,13 @@
 				loader.removeEventListener(ProgressEvent.PROGRESS, fileLoadProgressHandler);
         		dispatchEvent(new UpdateStatusBarEvent("")); 					
 				loader.removeEventListener(Event.COMPLETE, fileLoadCompleteHandler);	
+			}
+			
+			private function fileLoadErrorHandler(event:IOErrorEvent):void {
+				Alert.show("Unable to load file.", 'Error', mx.controls.Alert.OK);
+				loader.removeEventListener(ProgressEvent.PROGRESS, fileLoadProgressHandler);
+				loader.removeEventListener(Event.COMPLETE, fileLoadCompleteHandler);
+				loader.removeEventListener(IOErrorEvent.IO_ERROR, fileLoadErrorHandler);
 			}
 			
 			CONFIG::air {

@@ -1,6 +1,6 @@
 <application xmlns="http://ns.adobe.com/air/application/1.5">
 	<id>ch.unil.cbg.ExpressionView</id>
-	<version>0.2.1</version>
+	<version>0.2.3</version>
 	<filename>ExpressionView</filename>
 	<name>ExpressionView</name>
 	<description>ExpressionView is an interactive environment to explore biclusters identified in gene expression data.</description>

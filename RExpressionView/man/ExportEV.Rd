@@ -33,6 +33,7 @@ If the data is available in the form of a \code{\link[Biobase]{ExpressionSet}}, 
 
 ## Load the package and the ALL data
 library(ExpressionView)
+library(eisa)
 library(ALL)
 library(hgu95av2.db)
 data(ALL)

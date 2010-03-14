@@ -1,8 +1,13 @@
 exportMethods("OrderEV")
 exportMethods("ExportEV")
+export(LaunchEV)
+useDynLib(ExpressionView)
+
+#import(AnnotationDbi, methods, isa2, eisa, GO.db, KEGG.db)
 
 importFrom(AnnotationDbi, summary)
+importFrom(isa2, isa.normalize)
+importFrom(eisa, ISA, ISAGO, ISAKEGG)
+importFrom(GO.db, GOTERM)
+importFrom(KEGG.db, KEGGPATHID2NAME)
 
-export(LaunchEV)
-
-useDynLib(ExpressionView)

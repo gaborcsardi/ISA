@@ -34,6 +34,7 @@ OrderEV performs a brute-force ordering of the biclusters, treating the rows and
 ## scramble the initially ordered arrangement
 ## identify the bicluster with the Iterative Signature Algorithm (ISA)
 ## and order the results with the OrderEV function
+library(isa2)
 data.in.silico <- isa.in.silico(noise=0.1)[[1]]
 data.in.silico <- data.in.silico[sample(c(1:dim(data.in.silico)[1])),sample(c(1:dim(data.in.silico)[2]))]
 isa.results <- isa(data.in.silico)

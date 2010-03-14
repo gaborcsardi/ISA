@@ -221,7 +221,7 @@ void Clusters::complexify() {
 			neworder.push_back(*slotp);
 		}
 	}
-	if ( redundantslots.size() > nSlots ) {
+	if ( (int) redundantslots.size() > nSlots ) {
 		for ( set<int>::iterator slotp = redundantslots[nSlots].begin(); slotp != redundantslots[nSlots].end(); slotp++ ) {
 			neworder.push_back(*slotp);
 		}
@@ -474,8 +474,6 @@ void Clusters::shift(int slot1, int slot2, int dslot) {
 // finds the best position of slots between the first and the second argument
 int Clusters::findbestposition(int start, int end) {
 
-	int result = 0;
-	
 	int length = end - start + 1;
 
 	double bestfitness = getfullfitness();
@@ -624,7 +622,7 @@ int Clusters::exchange(int cluster, int what) {
 				swapslots.push_back(make_pair(slot,order[slot]));
 				modifiedslotstemp.insert(slot);
 			}
-		} while ( swapslots.size() < nslots );
+		} while ( (int) swapslots.size() < nslots );
 
 		if ( debug > 2 ) {
 			print("\t\t\texchange: ");

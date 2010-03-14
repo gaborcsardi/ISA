@@ -18,11 +18,11 @@ libs/AlivePDF.swc: $(ALIVEPDFFILES)
 	@ cd src/
 	compc -source-path src -include-classes $(ALIVEPDFCLASSES) -output $@
 	
-
+# explicitely use asdoc from sdk 4
 doc: $(EXPRESSIONVIEWFILES)
 	@ rm -rf doc
 	@ mkdir doc
-	@ asdoc -target-player 10 \
+	@ "/Applications/Adobe Flash Builder Beta 2/sdks/4.0.0/bin/asdoc" -target-player 10 \
 			-source-path src \
 			-exclude-classes $(ALIVEPDFCLASSES) \
 			-output doc \
@@ -60,8 +60,10 @@ air: key air/ExpressionView.air
 
 air/ExpressionView.air: air/ExpressionView.swf air/ExpressionView.xml air/ExpressionView.pfx
 	@ echo package air application
+	@ rm -rf air/srcview
+	@ cp -rf bin/srcview air
 	@ cd air && \
-	adt -package -storepass ExpressionView -storetype pkcs12 -keystore ExpressionView.pfx ExpressionView.air ExpressionView.xml ExpressionView.swf icons/
+	adt -package -storepass ExpressionView -storetype pkcs12 -keystore ExpressionView.pfx ExpressionView.air ExpressionView.xml ExpressionView.swf icons/ srcview/
 
 air/ExpressionView.swf: alivepdf $(EXPRESSIONVIEWFILES)
 	@ echo compile ExpressionView for air
