@@ -411,50 +411,50 @@ before running the module detection, but \Rfunction{ISA2heatmap} plots
 the raw values by default, optionally scaled. 
 If you want to plot the normalized values, then you need supply the
 \Rargument{norm} argument to \Rfunction{ISA2heatmap}, see the manual
-for details. The result is in Fig.~\ref{fig:heatmap}.
-<<heatmap,results=hide,include=FALSE,eval=FALSE>>=
-ISA2heatmap(modules, 1, ALL, norm="sample", scale="none")
+for details. 
+<<heatmap,results=hide,eval=FALSE>>=
+ISA2heatmap(modules, 1, ALL, norm="sample", scale="none", 
+            col=heat.colors(12))
+@
+
+We also create a color bar.
+<<heatmap-cb,results=hide,eval=FALSE>>=
+sc <- function(x, ab) {
+  x <- x-min(x)
+  r <- range(x) 
+  x <- x/(r[2]-r[1])
+  x * (ab[2]-ab[1]) + ab[1]
+}
+cb <- sc(1:12, range(exprs(ALL)[getFeatureNames(modules, 1)[[1]],
+                                      getSampleNames(modules, 2)[[1]] ]))
+par(mar=c(3,4,5,2)+0.1)
+image(rbind(cb), axes=FALSE)
+axis(2, at=sc(1:12, 0:1), cb, label=format(cb, digits=2))
+@ 
+
+The result is in Fig.~\ref{fig:heatmap}.
+
+<<save heatmap files,echo=FALSE,print=FALSE,results=hide>>=
+png("plot-heatmap.png", 400, 400)
+<<heatmap>>
+dev.off()
+png("plot-heatmap-colorbar.png", 100, 400)
+<<heatmap-cb>>
+dev.off()
 @ 
 
 \begin{figure}
 \centering
-<<heatmap-real,fig=TRUE,echo=FALSE,results=hide>>=
-<<heatmap>>
-@
+\includegraphics[width=0.8\textwidth]{plot-heatmap.png}%
+\includegraphics[width=0.2\textwidth]{plot-heatmap-colorbar.png}
 \caption{Heatmap of the first ISA module, plotted via the
-\Rfunction{ISA2heatmap} function. The expression values are
-sample-wised normalized.}
+\Rfunction{ISA2heatmap} function.}
 \label{fig:heatmap}
 \end{figure}
 
 \Rfunction{ISA2heatmap} simply calls the \Rfunction{heatmap} function,
 and passes additional arguments to it. See the manual of
 \Rfunction{heatmap} for details.
-
-You can also use the \Rpackage{biclust} package to create image
-plots, by calling the \Rfunction{drawHeatmap} function. The result is
-in Fig.~\ref{fig:drawHeatmap}.
-<<heatmap biclust pre,echo=FALSE,results=hide>>=
-if (require(Cairo)) {
-  CairoPNG("plot-heatmap.png", 400, 400 )  
-} else {
-  png("plot-heatmap.png", 400, 400 )
-}
-@ 
-<<heatmap>>=
-drawHeatmap(exprs(ALL[featureNames(modules),]), Bc, number=1) 
-@
-<<heatmap post,echo=FALSE,results=hide>>=
-dev.off() 
-@ 
-\begin{figure}
-  \centering
-  \includegraphics[width=0.7\textwidth]{plot-heatmap.png}
-  \caption{Heatmap of the first transcription module, plotted with the
-  \Rfunction{drawHeatmap} function from the \Rpackage{biclust}
-  package.}
-  \label{fig:drawHeatmap}
-\end{figure}
 
 \subsection{Profile plots}
 
@@ -672,7 +672,7 @@ The previously mentioned visualization techniques focus on a single
 module at at time. The \Rpackage{ExpressionView} package visualizes a
 set of possibly overlapping biclusters together.
 
-The \Rpackage{ExpressionView} package~\cite{ev} tries to reorder the
+The \Rpackage{ExpressionView} package tries to reorder the
 rows and columns of the expression matrix in such a way that the
 genes/samples that appear together in a module, are placed right
 beside/above each other. The package directly supports the
