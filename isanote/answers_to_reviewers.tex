@@ -191,14 +191,13 @@ horizontal lines and how can one calculate them? Moreover, how can one
 separate B-cell and T-cell leukemia samples using this plot? 
 \end{quote}
 
-The reviewer is right, that the module plotted in section 6.5 cannot
-be used to separate B-cell and T-cell samples, unfortunately the wrong
-module was plotted. We corrected this.
-
 We have also explained sample score plots better in the tutorial. 
 Please note, that the tutorials do not aim to explain all details 
 about the ISA functions; the reference manual, that is included in the
 package, is the place for that.
+
+The module plotted in section 6.5 indeed cannot be used to separate
+B-cell and T-cell samples, we point this out in the text.
 
 \begin{quote}
 3.      It is not quite clear what is the difference between the ISA
@@ -278,7 +277,9 @@ one of the two methods presented in the tutorial should include a
 color legend. 
 \end{quote}
 
-We have added the color legends.
+We have added the color legend to the first heatmap. We removed the 
+second heatmap from the tutorial entirely, as adding a heatmap to 
+it would be too cumbersome for the user.
 
 \begin{quote}
 3.      Since ISA function accepts an ExpressionSet, one must obtain
