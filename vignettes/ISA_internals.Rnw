@@ -69,10 +69,10 @@ general classifier, for biological or other data.
 It is also true, however, that the ISA is frequently used for gene
 expression analysis. 
 
-It is thus a straightforward idea to provide two different user
+Thus, we decided to provide two different user
 interfaces to the ISA. One interface, provided by \Rpackage{isa2}
-package, is very general, the input of the ISA functions is a numeric
-matrix, and the output is two matrices, defining the ISA modules. The
+package, is very general, the input of the \Rpackage{isa2} functions is a numeric
+matrix, and the output contains two matrices, defining the ISA modules. The
 \Rpackage{isa2} package can be used for the modular analysis of
 tabular data of any kind, from any source. 
 
@@ -85,7 +85,8 @@ standard BioConductor data structure for storing gene expression
 data. BioConductor provides functions to create such an
 \Rclass{ExpressionSet} object from raw data and to download data from
 public repositories, such as the Gene Expression Omnibus
-\cite{davis07,barret09}. The output of the \Rpackage{eisa} functions
+\cite{davis07,barret09} and transform it into an
+\Rclass{ExpressionSet}. The output of the \Rpackage{eisa} functions 
 is an object that contains the ISA modules, the annotation of the
 genes and samples in the data set and possibly also further
 experimental meta data. The \Rpackage{eisa} package provides functions
@@ -120,12 +121,12 @@ the columns of the module.
 
 During the iteration, the ISA uses two matrices, $E_r$ and $E_c$,
 derived from the input matrix, by standardizing it row-wise and
-column-wise, repectively. One step of the ISA iteration involves
+column-wise, respectively. One step of the ISA iteration involves
 (1) multiplying $E_r$ by $r_n$ and then (2) thresholding
 the result to keep elements that are further away from its mean than a
-prescribed value, $\Theta_c$. This gives $c_{n+1}$. Next, (3) $E_c$ is
-multiplied by $c_n$ and (4) the result is thresholded with
-$\Theta_r$. This gives $r_{n+1}$. 
+prescribed value, $\Theta_c$, in standard deviation units. This gives
+$c_{n+1}$. Next, (3) $E_c$ is multiplied by $c_{n+1}$ and (4) the result
+is thresholded with $\Theta_r$. This gives $r_{n+1}$. 
 
 The iteration is finished if $r_{n+1}$ is close to $r_n$ and $c_{n+1}$
 is close to $c_n$.
@@ -136,9 +137,9 @@ individually. The reason for this is the availability of the highly
 optimized linear algebra libraries that perform matrix-matrix
 multiplication much faster than all the corresponding matrix-vector
 multiplications individually. The seed vectors can be merged into a
-seed matrix, even if the ISA thresholds are different for the
-different seeds, the \Rpackage{isa2} and \Rpackage{eisa} packages
-support this. 
+seed matrix. This can be done, even if the ISA thresholds are
+different for the different seeds, the \Rpackage{isa2} and
+\Rpackage{eisa} packages support this. 
 
 We considered using sparse matrices during the ISA iteration, because
 the matrix of seed vectors is sparse, but according to our
@@ -149,11 +150,14 @@ thresholding; the dense-sparse matrix multiplication, plus the
 conversion to a sparse matrix again, takes about the same time as the
 dense-dense matrix multiplication.
 
-Different input seeds converge in different number of steps, many
-seeds tend to converge quickly, and very few seeds need a lot of
-steps. Because of this, it is essential to remove the seeds that have
-already converged, from the seed matrix, so that only a smaller seed
-matrix needs to be iterated for many steps.
+Different input seeds converge in different number of steps, in
+parctice many seeds tend to converge quickly, and very few seeds need
+a lot of steps. Because of this, it is essential to remove the seeds
+that have already converged, from the seed matrix, so that only a
+smaller seed matrix needs to be iterated for many steps.
+
+As loops are typically slow in R, we implemented the thresholding
+operations in C.
 
 \section{Running time analysis}
 
@@ -165,27 +169,27 @@ ISA implementation.
 The code in the following sections were run under
 \Sexpr{Sys.info()["sysname"]} operating system, release 
 '\verb+\Sexpr{Sys.info()["release"]}+', version 
-`\verb+\Sexpr{Sys.info()["version"]}+', on a 
+`\verb+\Sexpr{Sys.info()["version"]}+', on an
 `\verb+\Sexpr{Sys.info()["machine"]}+' machine with 
 \Sexpr{.getnoproc()} processors of type 
-`\verb+\Sexpr{.getproctype()}+' and 
+`\texttt{\Sexpr{.getproctype()}}' and 
 \Sexpr{.getmaxmem()} GiB memory.
 
 \subsection{Getting the data}
 
-We use subsets of the same data set for the test, this is a public
+We use subsets of the same data set for the test, this is a
 data set that is publicly available in the Gene Expression Omnibus (GEO)
 repository, its id is \Sexpr{"GSE18858"}. Note, that for the analysis
 of gene expression data, the \Rpackage{eisa} package is a better
 choice. It makes sense, however, if this tutorial can be run without
-any BioConductor packages, so we will use the \Rpackage{eisa}
+any BioConductor packages, so we will use the \Rpackage{isa2}
 package.
 
-The non-normalized data set of the experiment is available as numeric
-matrix. To spare time and bandwidth, we only download it once, even if
-the code of this tutorial is run multiple times. We store the data
-file in the current local directory. If the file is already there,
-then there is nothing to do.
+The non-normalized data set of the experiment is available from GEO as
+a numeric matrix. To spare time and bandwidth, we only download it
+once, even if the code of this tutorial is run multiple times. We
+store the data file in the current local directory. If the file is
+already there, then there is nothing to do.
 <<download data matrix>>=
 GEO <- "GSE18858"
 GEOfile <- paste(sep="", GEO, "_series_matrix.txt.gz")
@@ -197,7 +201,7 @@ if (!file.exists(GEOfile)) {
 @
 
 Next, we are read in the data. Lines that are part of the file header
-start with an exclamation mark in GEO files, so skip them by setting
+start with an exclamation mark in GEO files, so we skip them by setting
 the \verb+comment.char+ argument of \Rfunction{read.table}. The table
 has a header, the first lines are the sample names; it also has the
 probeset names in the first column, we use these as row names.
@@ -245,7 +249,7 @@ mesISA <- function(E, thr.row, thr.col, no.seeds) {
 }
 @
 
-We quickly test this function, on a small subset of out data, with 
+We quickly test this function, on a small subset of our data, with 
 1000 rows and 30 columns, chosen randomly.
 <<test the masurement function>>=
 mydata <- data[ sample(nrow(data), 1000), sample(ncol(data), 30)]
@@ -321,7 +325,8 @@ get.sd <- function(xx) {
 }
 @ 
 
-We are ready to create the plot, the results can be seen in 
+We are ready to create a plot, the running times in the function of
+the number of rows in the input matrix. The results can be seen in
 Fig.~\ref{fig:by-rows}.
 <<create the plot,eval=FALSE>>=
 layout(rbind(1:2,3:4,5:6))
@@ -345,8 +350,8 @@ for (i in 1:length(row.thresholds)) {
 <<create the plot>>
 @ 
 \caption{Running time of the ISA, in the function of the number of rows
-  in the input matrix, for various row thresholds. Crealy, the running time
-  increases linearly with the number of rows, for all row threshold. It is 
+  in the input matrix, for various row thresholds. Crearly, the running time
+  increases linearly with the number of rows, for all row thresholds. It is 
   also true, that for higher thresholds the running times tend to be smaller, 
   this is because in these cases more seeds converge quickly to the null
   vector, and these don't need to be iterated further. Each data point 
@@ -368,8 +373,8 @@ row.thresholds2 <- 2
 col.thresholds2 <- seq(1,3,by=0.5)
 @ 
 
-We create a function to perform the all the runs for a given column
-threshold, with replications.
+We create a function to perform all the runs for a given column
+threshold, with replications five by default.
 <<change number of columns set up things>>=
 no.cols <- seq(30, ncol(data), by=30)
 do.col.thr <- function(thr, rep=5) {
@@ -416,7 +421,7 @@ for (i in 1:length(col.thresholds2)) {
 \caption{Running times, in the function of the number of columns in the 
   input matrix, for various column thresholds. Interestingly, the running time
   can be considered as independent of the number of columns. This is simply 
-  because the row seed matrix is one order of magnitude larger than the 
+  because the row seed matrix is two orders of magnitude larger than the 
   column seed matrix, and the former dominates the running time. Each data 
   point is the mean of five runs.}
 \label{fig:by-cols}
@@ -425,7 +430,7 @@ for (i in 1:length(col.thresholds2)) {
 \subsection{Number of seeds}
 
 Finally, we also check the running time in the function of the number
-of stating seeds.
+of starting seeds.
 
 We define three threshold configurations to test. The first has intermediate 
 thresholds for both the rows and the columns, the second has a low threshold
@@ -457,7 +462,7 @@ We are ready to do the measurement now.
 by.no.seeds <- lapply(thr.comb, do.no.seeds)
 @ 
 
-Fianally, we craete the figure, see Fig.~\ref{fig:no-seeds}.
+The results are plotted in Fig.~\ref{fig:no-seeds}.
 <<plot by no seeds,eval=FALSE>>=
 layout(rbind(1:2,3:4))
 for (i in 1:length(thr.comb)) {
@@ -481,7 +486,7 @@ for (i in 1:length(thr.comb)) {
 <<plot by no seeds>>
 @ 
 \caption{The running time, in the function of the number of starting seeds, 
-  for various row and column combinations. Each point is the average of 
+  for various row and column threshold combinations. Each point is the average of 
   five ISA runs. The running time is increasing linearly with the number 
   of seeds.
 }
