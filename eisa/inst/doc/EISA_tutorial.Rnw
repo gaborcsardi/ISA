@@ -586,12 +586,15 @@ condPlot(modules, 2, ALL, col=col)
 <<condplot-real,fig=TRUE,width=10,height=4,echo=FALSE,results=hide>>=
 <<condplot>>
 @
-\caption{Condition plot for the ALL data and the second module. Every
-  sample is represented as a bar, and its ISA score is plotted. The
-  scores are also printed at the top or bottom of the bars. The scores
-  corresponding to the ISA thresholds are represented as horizontal
-  lines. The dashed line is the mean of the condition scores. B-cell
-  samples are dark green, T-cell samples are orange.
+\caption{Condition (or sample score) plot for the ALL data and the
+  second module. Every sample is represented as a bar, and its ISA
+  score is plotted. The scores are also printed at the top or bottom
+  of the bars. The scores corresponding to the ISA thresholds are
+  represented as horizontal lines. The dashed line is the mean of the
+  condition scores. B-cell samples are dark green, T-cell samples are
+  orange. The green and red horizontal lines show the sample
+  thresholds. Samples above the red line, and samples below the green
+  line are included in the module.
 }
 \label{fig:condplot}
 \end{figure}

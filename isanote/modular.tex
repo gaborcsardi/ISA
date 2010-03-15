@@ -28,27 +28,22 @@
 \begin{abstract}
 \section{Summary:}
 Large sets of data, like expression profiles from many samples, require
-analytic tools to reduce their complexity. Classical (bi-)clustering
-algorithms typically attribute elements (genes, arrays) to disjoint groups
-(``clusters''). Yet, in some cases overlapping cluster assignments would suit
-the biological reality much better.
-
-The Iterative Signature Algorithm (ISA) was designed to overcome this and
-other limitations of standard clustering algorithms. It aims to reduce the
-complexity of a very large set of data by decomposing it into so-called
+analytic tools to reduce their complexity. The Iterative Signature
+Algorithm (ISA) is a biclustering algorithm. 
+It was designed to decompose a large set of data into so-called
 ``modules''. In the context of gene expression data these modules consist of
 subsets of genes that exhibit a coherent expression profile only over a
 subset of microarray experiments. Genes and arrays may be attributed to
 multiple modules and the level of required coherence can be varied resulting
-in different ``resolutions'' of the modular mapping. Since the ISA does not
-rely on the computation of correlation matrices (like many other tools), it
-is extremely fast even for very large datasets.
+in different ``resolutions'' of the modular mapping. 
 
-In this short note, we introduce two BioConductor \citep{BioC}, software
-packages written in GNU~R: The~\Rpackage{isa2} package includes a highly optimized
-implementation of the ISA and the~\Rpackage{eisa} package provides a convenient interface
+In this short note, we introduce two BioConductor \citep{BioC} software
+packages written in GNU~R: The~\Rpackage{isa2} package includes an optimized
+implementation of the ISA and the~\Rpackage{eisa} package provides a
+convenient interface 
 to run the ISA, visualize its output and put the biclusters into
-biological context.
+biological context. Potential users for these packages are all R and
+BioConductor users dealing with tabular (e.g. gene expression) data.
 
 \section{Availability:}
 \href{http://www.unil.ch/cbg/ISA}%
@@ -56,6 +51,7 @@ biological context.
 \section{Contact:} \href{Sven.Bergmann@unil.ch}{Sven.Bergmann@unil.ch}
 \end{abstract}
 
+\vspace{-1cm}
 \section{Introduction}
 
 % How the ISA works
@@ -72,20 +68,25 @@ until the process converges to a stable set, which is referred to as a
 transcription module.
 
 The output of ISA is a collection of potentially overlapping
-modules. In every module, each gene and each sample is attributed a
-score that reflects the strength of the association with the module.
+modules. Every module contains genes, that are up- and/or
+down-regulated together, exactly in the samples of the module.
+In every module, each gene and each sample is attributed a
+score between minus one and one, that reflects the strength of the
+association with the module. Moreover, if the scores of two genes of a
+module have the same sign, then they are correlated (in the samples of
+the module), opposite signs mean anti-correlation. If two sample
+scores have the same sign, then these samples are correlated (along
+the genes of the module), opposite signs signal anti-correlation.
 
-In the following we first outline how our software tool is commonly used for a
-modular analysis (Section~\ref{sec:methods}) and then we describe in more
-detail the R packages that implement the ISA and visualize its output
-(Section~\ref{sec:implementation}).
+For other biclustering algorithms, please see
+\citet{cheng00,getz00,califano00,sharan02,tanay04,barkow06}.
 
 \section{Methods}%
 \label{sec:methods}
 
 \begin{figure*}
 \centering
-\includegraphics[width=\textwidth]{isa2workflow3}
+\includegraphics[width=0.8\textwidth]{isa2workflow3}
 \caption{\subfig{(A)} Work flow of a typical modular analysis with the
   \Rpackage{eisa} package. See text for details.
   Subfigures \subfig{B} and \subfig{C} were generated
@@ -185,9 +186,6 @@ In the \emph{detailed workflow} every step of the modular analysis
 is executed separately, possibly with non-default parameters. This allows
 the users to tailor the ISA according their needs.
 
-For users that prefer Matlab over R, we created a Matlab package for
-ISA, please see the ISA homepage for more information.
-
 % \subsubsection{Visualization}
 
 The \Rpackage{eisa} package implements a set of visualization
@@ -199,10 +197,10 @@ package include tools to convert between \Rpackage{biclust} and ISA
 biclusters. This allows the cross-talk of the functions in the two
 packages.
 
-Additional information about the ISA, the \Rpackage{isa2} and
-\Rpackage{eisa} packages and several tutorials are available on the
-ISA homepage.
+Additional information and a Matlab implementation of ISA are
+available on the ISA homepage. 
 
+\vspace*{-0.4cm}
 \section*{Acknowledgement}
 
 \paragraph{Funding\textcolon} The authors are grateful to the Swiss
