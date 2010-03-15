@@ -1,10 +1,13 @@
 \documentclass[a4paper]{article}
 \usepackage{url}
 \usepackage{natbib}
+\usepackage{color}
 
 \newcommand{\Rpackage}[1]{`\texttt{#1}'}
 \newcommand{\Rfunction}[1]{`\texttt{#1}'}
 \newcommand{\Rclass}[1]{\textsl{#1}}
+
+\newenvironment{myquote}{\begin{quote}\color{blue}}{\end{quote}}
 
 \setlength{\parskip}{12pt}
 \setlength{\parindent}{0pt}
@@ -19,20 +22,20 @@
 
 First of all, we want to thank the reviewers for their thorough work
 and useful suggestions. In the following, the reviewers' comments are
-indented as a block.
+typeset in blue, and indented as a block.
 
-\section{Reviewer 1}
+\section*{Reviewer 1}
 
-\begin{quote}
+\begin{myquote}
 Comments to the Author
 
 This Application Note presents a software package that implements the
 Iterative Signature Algorithm and provides a convenient visualization
 of it’s results. The method is useful and the software may be of help
 to interested users. 
-\end{quote}
+\end{myquote}
 
-\begin{quote}
+\begin{myquote}
 I have two problems with the Note in its present form.
 The first may be due to my misunderstanding of the method. My
 understanding was that some threshold Tg is applied on the genes and
@@ -47,7 +50,7 @@ above or below some thresholds) and the genes have expressions above a
 Tg in some conditions or below some other Tg’ in other conditions. 
 I urge the authors to define what specifies or defines a bicluster –
 do it briefly and sacrifice a few lines from elsewhere. 
-\end{quote}
+\end{myquote}
 
 Indeed, by default the software uses a double threshold. This can be
 changed, as explained in the reference manual of the ISA functions,
@@ -79,20 +82,20 @@ The tutorial on the ISA homepage explains the ISA iteration in detail:
   (a) significantly higher (``up''); (b) lower (``down'') than the
   mean; or (c) both (``updown'').}
 
-\begin{quote}
+\begin{myquote}
 My second concern is minor – the abstract implies that the ISA is
 special in allowing overlapping cluster assignments. This is incorrect
 – there are other biclustering methods that do this. If I am not
 mistaken, all three original biclustering methods that came out in
 2000 (Cheng, Getz and Califano) allow this. 
-\end{quote}
+\end{myquote}
 
 We have removed the emphasis on the overlapping biclusters of the
 ISA and added references to these methods.
 
-\section{Reviewer 2}
+\section*{Reviewer 2}
 
-\begin{quote}
+\begin{myquote}
 Comments to the Author
 
 Summary
@@ -112,9 +115,9 @@ of modules and enrichment calculation. In the current note, the
 authors present both packages, and describe how to install and run
 them step by step, using the acute lymphoblastic leukemia data set
 (ALL) \citep{chiaretti04} as an example. 
-\end{quote}
+\end{myquote}
 
-\begin{quote}
+\begin{myquote}
 Overall evaluation
 
 The manuscript and its accompanying tutorials are well written and
@@ -122,9 +125,9 @@ give an adequate theoretical background to ISA. The tutorials include
 many detailed and visualized examples that make learning the package
 quite easy for an R user. However, the following major points should
 be taken into consideration: 
-\end{quote}
+\end{myquote}
 
-\begin{quote}
+\begin{myquote}
 1.      The manuscript and the website lack explanations about how the
 authors implemented ISA and how they used the advantages of R. The
 authors emphasize that the packages are highly optimized and run
@@ -132,20 +135,20 @@ extremely fast even for very large datasets.  Therefore, the
 accompanying material should contain a summary describing how this
 efficiency was achieved. In addition, a graph showing execution time
 as a function of dataset size should be given. 
-\end{quote}
+\end{myquote}
 
 We have added a new document to the ISA homepage at
 \url{http://www.unil/ch/cbg/ISA}, titled `ISA internals'. This
 document contains the details of our implementations, and also
 execution time analysis.
 
-\begin{quote}
+\begin{myquote}
 2.      The tutorials give examples of execution on a single rather
 old dataset (ALL) which is quite small in comparison to datasets of
 recent years. Here the authors should give results for ISA execution
 on more up-to-date datasets, and on heterogeneous datasets containing
 profiles from multiple studies. 
-\end{quote}
+\end{myquote}
 
 We believe that the tutorials are best if they can be run on an
 average desktop computer, interactively, without spending much
@@ -165,13 +168,13 @@ Of course, the ISA can be used for much larger data sets (see
 e.g. \cite{bergmann04}), but then the analysis takes at least hours
 instead of minutes.
 
-\begin{quote}
+\begin{myquote}
 To summarize, the software is well motivated and enables users of the
 R environment to utilize ISA. I suggest accepting the manuscript
 conditional on solving the issues mentioned in this report. 
-\end{quote}
+\end{myquote}
 
-\begin{quote}
+\begin{myquote}
 Additional important remarks:
 
 1.      The manuscript should contain references to additional
@@ -179,19 +182,19 @@ biclustering implementations, in R or in other environments, so that
 the user could choose the one that best fits his needs in terms of
 input/output, species, etc. Examples are SAMBA (via the Expander
 software) \citep{sharan02,tanay04} and BicAt \citep{barkow06}. 
-\end{quote}
+\end{myquote}
 
 We have added these references.
 
-\begin{quote}
+\begin{myquote}
 2.      The sample score plots example given in the EISA tutorial
 (\url{http://www2.unil.ch/cbg/index.php?title=EISA\_tutorial}, section 6.5)
 is not sufficiently clear. What are the scores represented by the
 horizontal lines and how can one calculate them? Moreover, how can one
 separate B-cell and T-cell leukemia samples using this plot? 
-\end{quote}
+\end{myquote}
 
-We have also explained sample score plots better in the tutorial. 
+We have explained sample score plots better in the tutorial. 
 Please note, that the tutorials do not aim to explain all details 
 about the ISA functions; the reference manual, that is included in the
 package, is the place for that.
@@ -199,22 +202,36 @@ package, is the place for that.
 The module plotted in section 6.5 indeed cannot be used to separate
 B-cell and T-cell samples, we point this out in the text.
 
-\begin{quote}
+\begin{myquote}
 3.      It is not quite clear what is the difference between the ISA
 implementation included in the isa2 package and the ISA implementation
 included in the eisa package. 
-\end{quote}
+\end{myquote}
 
 We have explained the difference between the two packages in the newly
-added `ISA internals' document, section `Why two packages?'.
+added `ISA internals' document, section `Why two packages?'. 
 
-\begin{quote}
+In brief, the \Rpackage{isa2} package implements the ISA iteration and
+provides and interface to people dealing with data, that is not gene
+expression. The \Rpackage{eisa} package provides an interface that
+uses the standard BioConductor data structures. It does not
+reimplement the ISA iteration, but simply calls the implementation in
+the \Rpackage{isa2} package.
+
+The two packages allow ease of installation and use: users dealing
+with gene expression data install the \Rpackage{eisa} package, and
+this automatically installs the \Rpackage{isa2} package as well. Users
+analyzing other data install the \Rpackage{isa2} package only, this
+does not need any BioConductor packages.
+
+
+\begin{myquote}
 4.      It should be clarified who are the potential users for the ISA
 implementation for R environment. Assuming these are mainly
 biologists, bioinformaticians and biostatisticians (and not only
 programmers), more technical details of how to work with the packages
 should be given.
-\end{quote}
+\end{myquote}
 
 We have added the following to the abstract:
 \textsl{
@@ -222,13 +239,13 @@ Potential users for these packages are all R and
 BioConductor users dealing with tabular (e.g. gene expression) data.
 }
 
-\begin{quote}
+\begin{myquote}
 The following points are important examples: 
 a.      Since the ISA implementation in eisa package imports data from
 another package (e.g. hgu95av2.db), a tutorial for how to create such
 a .db package from a given expression data text file should be given
 (or referred to). 
-\end{quote}
+\end{myquote}
 
 Users analyzing gene expression data almost never need to build
 these annotation packages, they are included in BioConductor, for all
@@ -237,22 +254,22 @@ packages by hand; but even in this case, they are not required, the
 user can create ExpressionSet objects that do not contain chip
 annotation, or use the \Rpackage{isa2} package.
 
-\begin{quote}
+\begin{myquote}
 b.      Since both ISA packages use various data structures, a short
 explanation of how to construct and use them should be given (or
 references to such explanation), and also how to export data from
 these structures to external files. 
-\end{quote}
+\end{myquote}
 
 For the \Rpackage{isa2} package, this is included in the reference
 manual. For the \Rpackage{eisa} package, the \Rclass{ISAModules} class
-is an opaque data type, the representation of it might change in the
+is an opaque data type, i.e. the representation of it might change in the
 future, and the user should not rely on its current
 definition. Instead, various functions are provided that deal with
 these kind of objects, they are documented on the manual page of the
 \Rclass{ISAModules} class, in the reference manual.
 
-\begin{quote}
+\begin{myquote}
 Minor remarks:
 
 1.      The authors describe methods that perform enrichment tests for
@@ -264,28 +281,28 @@ biclusters and protein-protein interaction networks (which have been
 derived from other types of data than gene expression data), e.g. the
 DIP database \citep{salwinski04}. An example for such analysis can be
 found in \citet{prelic06}.
-\end{quote}
+\end{myquote}
 
 We have added new classes and functions to perform enrichment analysis
-on the ISA modules, against any gene label or database that the user
+on the ISA modules, against any gene labels or database that the user
 provides. These functions are explained in the manual page of the
 \Rfunction{ISAEnrichment} function.
 
-\begin{quote}
+\begin{myquote}
 2.      The heatmap image of a transcription module obtained by any
 one of the two methods presented in the tutorial should include a
 color legend. 
-\end{quote}
+\end{myquote}
 
 We have added the color legend to the first heatmap. We removed the 
 second heatmap from the tutorial entirely, as adding a heatmap to 
 it would be too cumbersome for the user.
 
-\begin{quote}
+\begin{myquote}
 3.      Since ISA function accepts an ExpressionSet, one must obtain
 annotations for its expression data file in order to run ISA function
 on it. Annotations should not be a prerequisite for running ISA. 
-\end{quote}
+\end{myquote}
 
 Annotations are not required to run ISA. First, the purpose of the
 \Rpackage{isa2} package is to run ISA on any tabular data set,
@@ -293,13 +310,13 @@ biological or not. As an alternative, the user can construct an
 \Rclass{ExpressionSet} object without annotation, and this can be used
 with the function of the \Rpackage{eisa} package.
 
-\begin{quote}
+\begin{myquote}
 4.      In section 10.8 it is mentioned that two significant modules
 were found using random seeds and two significant (separating) modules
 were found using smart seeds. However, in figure 7 it is noted that
 only one module found using smart seeds. At the end of the section it
 is mistakenly written "As it turns out, one modules found". 
-\end{quote}
+\end{myquote}
 
 We have corrected this.
 
