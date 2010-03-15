@@ -690,16 +690,15 @@ typically a sparse 0/1 vector of length $m$. The non-zero elements in
 the seed vector define a set of genes in $E$. Then the transposed of
 $E$, $E'$ is multiplied by $r_0$ and the result is thresholded.
 
-The thresholding is an important step of the ISA, without thresholding
-ISA would be equivalent to a (not too effective) numerical singular
-value decomposition (SVD) algorithm. Currently thresholding is done by
-calculating the mean and standard deviation of the vector and keeping
-only elements that are further than a given number of standard
-deviations from the mean. Based on the \Rargument{direction} parameter,
-this means keeping values that are significantly higher than the
-mean (``\emph{up}''), or keeping the ones that are significantly lower
-than the mean (``\emph{down}''); or keeping both
-(``\emph{updown}'').
+The thresholding is an important step of the ISA, without
+thresholding ISA would be equivalent to a (not too effective)
+numerical singular value decomposition (SVD) algorithm. Currently
+thresholding is done by calculating the mean and standard deviation
+of the vector and keeping only elements that are further than a
+given number of standard deviations from the mean. Using the
+``direction'' parameter, one can keep values that are
+(a) significantly higher (``up''); (b) lower (``down'') than the
+mean; or (c) both (``updown'').
 
 The thresholded vector $c_0$ is the (sample)
 \emph{signature} of $r_0$. Then the (gene) signature of

@@ -42,7 +42,7 @@ packages written in GNU~R: The~\Rpackage{isa2} package includes an optimized
 implementation of the ISA and the~\Rpackage{eisa} package provides a
 convenient interface 
 to run the ISA, visualize its output and put the biclusters into
-biological context. Potential users for these packages are all R and
+biological context. Potential users of these packages are all R and
 BioConductor users dealing with tabular (e.g. gene expression) data.
 
 \section{Availability:}
@@ -69,14 +69,15 @@ transcription module.
 
 The output of ISA is a collection of potentially overlapping
 modules. Every module contains genes, that are up- and/or
-down-regulated together, exactly in the samples of the module.
+down-regulated, in samples that belong to the module.
 In every module, each gene and each sample is attributed a
 score between minus one and one, that reflects the strength of the
 association with the module. Moreover, if the scores of two genes of a
-module have the same sign, then they are correlated (in the samples of
-the module), opposite signs mean anti-correlation. If two sample
-scores have the same sign, then these samples are correlated (along
-the genes of the module), opposite signs signal anti-correlation.
+module have the same sign, then they are correlated (across the
+samples of the module), opposite signs mean
+anti-correlation. Similarly, if two sample
+scores have the same sign, then these samples are correlated (across
+the genes of the module), opposite signs indicate anti-correlation.
 
 For other biclustering algorithms, please see
 \citet{cheng00,getz00,califano00,sharan02,tanay04,barkow06}.

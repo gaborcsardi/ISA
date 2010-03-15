@@ -58,26 +58,26 @@ To  clarify things better, we have added the following to the main
 text:
 \textsl{The output of ISA is a collection of potentially overlapping
 modules. Every module contains genes, that are up- and/or
-down-regulated together, exactly in the samples of the module.
+down-regulated, in samples that belong to the module.
 In every module, each gene and each sample is attributed a
 score between minus one and one, that reflects the strength of the
 association with the module. Moreover, if the scores of two genes of a
-module have the same sign, then they are correlated (in the samples of
-the module), opposite signs mean anti-correlation. If two sample
-scores have the same sign, then these samples are correlated (along
-the genes of the module), opposite signs signal anti-correlation.}
+module have the same sign, then they are correlated (across the
+samples of the module), opposite signs mean
+anti-correlation. Similarly, if two sample
+scores have the same sign, then these samples are correlated (across
+the genes of the module), opposite signs indicate anti-correlation.}
 
 The tutorial on the ISA homepage explains the ISA iteration in detail:
 \textsl{The thresholding is an important step of the ISA, without
-  thresholding ISA would be equivalent to a (not too eﬀective)
+  thresholding ISA would be equivalent to a (not too effective)
   numerical singular value decomposition (SVD) algorithm. Currently
   thresholding is done by calculating the mean and standard deviation
   of the vector and keeping only elements that are further than a
-  given number of standard deviations from the mean. Based on the
-  direction parameter, this means keeping values that are signiﬁcantly
-  higher than the mean (``up''), or keeping the ones that are
-  signiﬁcantly lower than the mean (``down''); or keeping both
-  (``updown'').} 
+  given number of standard deviations from the mean. Using the
+  ``direction'' parameter, one can keep values that are
+  (a) significantly higher (``up''); (b) lower (``down'') than the
+  mean; or (c) both (``updown'').}
 
 \begin{quote}
 My second concern is minor – the abstract implies that the ISA is
