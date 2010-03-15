@@ -68,8 +68,8 @@ until the process converges to a stable set, which is referred to as a
 transcription module.
 
 The output of ISA is a collection of potentially overlapping
-modules. Every module contains genes, that are up- and/or
-down-regulated, in samples that belong to the module.
+modules. Every module contains genes, that are over- and/or
+under-expressed, in samples that belong to the module.
 In every module, each gene and each sample is attributed a
 score between minus one and one, that reflects the strength of the
 association with the module. Moreover, if the scores of two genes of a
@@ -79,8 +79,9 @@ anti-correlation. Similarly, if two sample
 scores have the same sign, then these samples are correlated (across
 the genes of the module), opposite signs indicate anti-correlation.
 
-For other biclustering algorithms, please see
-\citet{cheng00,getz00,califano00,sharan02,tanay04,barkow06}.
+For other biclustering algorithms, please see e.g.
+\citet{cheng00,getz00,califano00,sharan02,tanay04,barkow06} and
+\citet{ihmels04} for a review.
 
 \section{Methods}%
 \label{sec:methods}
@@ -96,8 +97,9 @@ For other biclustering algorithms, please see
   \subfig{(B)} Heatmap for a single module, showing coherent
   expression of the genes across the samples. The red lines are the gene and
   sample scores.
-  \subfig{(C)} Module tree. Each rectangle is a module; see the
-  definition of the edges in the text. Modules are colored
+  \subfig{(C)} Module tree. Each rectangle is a module; its numeric id
+  is shown on top of it. See the definition of the edges in the
+  text. Modules are colored 
   according to their Gene Ontology enrichment $p$-values, the codes of
   the enriched GO categories are shown in the top-left corner of the
   rectangles. The top-right corner shows the number of genes and
@@ -116,7 +118,7 @@ To study the global organization of a transcription program including
 many aspects of transcriptional regulation one often combines several
 microarray experiments into a single dataset. In such a case
 additional data normalization is crucial to reduce the bias due to
-constituent datasets. Several methods address this challenge,
+the constituent datasets. Several methods address this challenge,
 see e.g.~\citep{johnson07} for an algorithm that has a GNU R
 implementation.
 
@@ -124,12 +126,12 @@ implementation.
 \emph{Gene filtering.}
 Genes that have very low expression levels in all samples, carry little if
 any information and may reflect ineffective array probes, etc. Since these
-genes are likely to contribute only noise to the
+genes are likely to contribute mostly noise to the
 analysis~\citep{hackstadt09}, we suggest removing them before running
 the module identification of the ISA.
 
 % Normalization.
-\emph{ISA normalization.} (Step 1 on Fig.~\ref{fig:workflow}.)
+\emph{ISA normalization.} (Step 1 in Fig.~\ref{fig:workflow}.)
 In each iteration the ISA computes thresholded weighted sums of expression
 levels over either genes or samples. Since different genes 
 typically show different levels of base
