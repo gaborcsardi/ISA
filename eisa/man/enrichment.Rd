@@ -69,6 +69,7 @@ ISAEnrichment (modules, categories, ann = annotation(modules),
 }
 \examples{
 data(ALLModulesSmall)
+library(hgu95av2.db)
 entrez <- unique(unlist(mget(featureNames(ALLModulesSmall), hgu95av2ENTREZID)))
 categories <- lapply(letters, function(x) sample(entrez, 100))
 names(categories) <- letters
