@@ -1,6 +1,6 @@
 Package: eisa
-Version: 0.99.2
-Date: Mar 31, 2010
+Version: 0.99.3
+Date: Apr 6, 2010
 Title: Expression data analysis via the Iterative Signature Algorithm
 Author: Gabor Csardi <Gabor.Csardi@unil.ch>
 Maintainer: Gabor Csardi <Gabor.Csardi@unil.ch>
