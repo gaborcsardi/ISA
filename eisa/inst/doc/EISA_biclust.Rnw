@@ -217,6 +217,8 @@ CHR <- ISACHR(modules)
 htmldir <- tempdir()
 ISAHTML(eset=ALL.filtered, modules=modules, target.dir=htmldir, 
         GO=GO, KEGG=KEGG, CHR=CHR, condPlot=FALSE)
+@
+<<html-show,eval=FALSE>>=
 if (interactive()) {
   browseURL(URLencode(paste("file://", htmldir, "/index.html", sep="")))
 }
