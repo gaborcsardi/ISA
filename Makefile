@@ -104,7 +104,8 @@ vignettes/ISA_internals.pdf: vignettes/ISA_internals.tex
 	cd vignettes && pdflatex ISA_internals && bibtex ISA_internals && \
 		pdflatex ISA_internals && pdflatex ISA_internals
 
-vignettes/ISA_internals.tex: vignettes/ISA_internals.Rnw eisa isa2
+vignettes/ISA_internals.tex: vignettes/ISA_internals.Rnw \
+		eisa_$(EISAVERSION)-nv.tar.gz isa2_$(ISAVERSION)-nv.tar.gz
 	$(R) CMD INSTALL isa2_$(ISAVERSION)-nv.tar.gz
 	$(R) CMD INSTALL eisa_$(EISAVERSION)-nv.tar.gz
 	cd vignettes && $(R) CMD Sweave ISA_internals.Rnw || \
@@ -120,7 +121,8 @@ vignettes/tissues.pdf: vignettes/tissues.tex
 	cd vignettes && pdflatex tissues && bibtex tissues && \
 		pdflatex tissues && pdflatex tissues
 
-vignettes/tissues.tex: vignettes/tissues.Rnw eisa isa2
+vignettes/tissues.tex: vignettes/tissues.Rnw \
+		eisa_$(EISAVERSION)-nv.tar.gz isa2_$(ISAVERSION)-nv.tar.gz
 	$(R) CMD INSTALL isa2_$(ISAVERSION)-nv.tar.gz
 	$(R) CMD INSTALL eisa_$(EISAVERSION)-nv.tar.gz
 	cd vignettes && $(R) CMD Sweave tissues.Rnw || rm tissues.tex
@@ -135,7 +137,8 @@ vignettes/EISA_module_trees.pdf: vignettes/EISA_module_trees.tex
 	cd vignettes && pdflatex EISA_module_trees && bibtex EISA_module_trees\
 		&& pdflatex EISA_module_trees && pdflatex EISA_module_trees
 
-vignettes/EISA_module_trees.tex: vignettes/EISA_module_trees.Rnw eisa isa2
+vignettes/EISA_module_trees.tex: vignettes/EISA_module_trees.Rnw \
+		eisa_$(EISAVERSION)-nv.tar.gz isa2_$(ISAVERSION)-nv.tar.gz
 	$(R) CMD INSTALL isa2_$(ISAVERSION)-nv.tar.gz
 	$(R) CMD INSTALL eisa_$(EISAVERSION)-nv.tar.gz
 	cd vignettes && $(R) CMD Sweave EISA_module_trees.Rnw
