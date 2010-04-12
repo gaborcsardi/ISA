@@ -1,6 +1,6 @@
 Package: ExpressionView
-Version: 0.2.6
-Date: Mar 31, 2010
+Version: 0.99.0
+Date: Apr 12, 2010
 Title: Visualize biclusters identified in gene expression data
 Author: Andreas Luscher <andreas.luescher@a3.epfl.ch>
 Maintainer: Gabor Csardi <Gabor.Csardi@unil.ch>
