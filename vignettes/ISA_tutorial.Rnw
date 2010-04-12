@@ -28,7 +28,7 @@
 ## Some options for R
 options(width=60)
 options(continue=" ")
-if (require(Cairo)) { png <- CairoPNG }
+try(X11.options(type="xlib"), silent=TRUE)
 @ 
 
 \section{For the impatient}

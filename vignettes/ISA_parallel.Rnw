@@ -24,6 +24,7 @@
 <<Roptions,echo=FALSE,results=hide>>=
 options(width=60)
 options(continue=" ")
+try(X11.options(type="xlib"), silent=TRUE)
 @ 
 
 \section{Running ISA in parallel}
