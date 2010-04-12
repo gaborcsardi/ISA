@@ -17,18 +17,18 @@ alivepdf: libs/AlivePDF.swc
 libs/AlivePDF.swc: $(ALIVEPDFFILES)
 	@ cd src/
 	compc -source-path src -include-classes $(ALIVEPDFCLASSES) -output $@
-	
+
 # explicitely use asdoc from sdk 4
 doc: $(EXPRESSIONVIEWFILES)
 	@ rm -rf doc
 	@ mkdir doc
-	@ "/Applications/Adobe Flash Builder Beta 2/sdks/4.0.0/bin/asdoc" -target-player 10 \
+	@ asdoc -target-player 10 \
 			-source-path src \
 			-exclude-classes $(ALIVEPDFCLASSES) \
 			-output doc \
 			-doc-sources src \
 			-external-library-path libs \
-			-define+=CONFIG::air,false \
+			-define+=CONFIG::air,false
 
 release: bin/ExpressionView.swf
 
@@ -82,7 +82,7 @@ air/ExpressionView.pfx:
 	@ echo generate key
 	@ cd air && \
 	adt -certificate -cn ExpressionView -o "Swiss Institute of Bioinformatics" -ou "Computational Biology Group" -c CH 1024-RSA ExpressionView.pfx ExpressionView
-	
+
 clean: 
 	@ echo clean doc
 	@ rm -rf doc
