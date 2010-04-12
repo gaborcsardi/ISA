@@ -28,6 +28,7 @@
 <<set width,echo=FALSE,print=FALSE>>=
 options(width=60)
 options(continue=" ")
+try(X11.options(type="xlib"), silent=TRUE)
 @ 
 
 \section{Introduction}
@@ -464,11 +465,7 @@ contains a line plot for every single gene (or sample) and the genes
 that belong to the module have a different color, see
 Fig.~\ref{fig:parallel}.
 <<parallel.pre,echo=FALSE,results=hide>>=
-if (require(Cairo)) {
-  CairoPNG("plot-parallel.png", 400, 400 )
-} else {
-  png("plot-parallel.png", 400, 400 )
-}
+png("plot-parallel.png", 400, 400 )
 @ 
 <<parallel>>=
 profilePlot(modules, 2, ALL, plot="both")

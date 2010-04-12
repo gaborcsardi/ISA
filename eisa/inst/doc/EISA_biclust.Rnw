@@ -28,6 +28,7 @@
 <<set width,echo=FALSE,print=FALSE>>=
 options(width=60)
 options(continue=" ")
+try(X11.options(type="xlib"), silent=TRUE)
 @ 
 
 \section{Introduction}
