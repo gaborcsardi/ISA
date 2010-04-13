@@ -14,7 +14,7 @@ Description: The Iterative Signature Algorithm (ISA) is a biclustering
   algorithms.
 Depends: methods, isa2, Biobase, AnnotationDbi, Category, genefilter, DBI
 Suggests: igraph (>= 0.5.2), Matrix, GOstats,
-	  Cairo, GO.db, KEGG.db, biclust, MASS, xtable, ALL, hgu95av2.db
+	  GO.db, KEGG.db, biclust, MASS, xtable, ALL, hgu95av2.db
 License: GPL (>= 2)
 biocViews: Classification, Visualization, Microarray, GeneExpression
 Collate: AllClasses.R AllGenerics.R ISAExpressionSet-methods.R

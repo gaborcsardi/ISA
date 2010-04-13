@@ -203,7 +203,6 @@ ISAHTMLModules <- function(eset, modules, which=seq_len(length(modules)),
   library(KEGG.db)
   library(igraph)
   library(xtable)
-  if (require(Cairo)) { png <- CairoPNG }
 
   chip <- annotation(modules)
   library(paste(sep="", chip, ".db"),  character.only=TRUE)
