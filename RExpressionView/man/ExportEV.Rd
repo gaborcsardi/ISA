@@ -20,7 +20,16 @@
 \item{filename}{The filename of the output file. If not specified, the file is selected via the user interface.}
 \item{norm}{The normalization of the gene expression data. The \code{\link[isa2]{isa.normalize}} function can normalize (zero mean and unit variance) the data with respect to the genes or the samples. The default value is c("feature", "sample", "raw") or alternatively c("x", "y", "raw").}
 \item{cutoff}{The cutoff for the coloring is a value between 0 and 1. It represents the fraction of data points taken into account for the density plots. The default value is 0.95, i.e., the extrema of the coloring are chosen in such a way that 95\% of the data points can be represented.}
-\item{description}{A named list containing an alternative description of the data. By default, the metadata is extracted from eset.}
+\item{description}{A named list containing an alternative description of
+  the data. By default, the metadata is extracted from eset.}
+\item{GO}{A list of three \code{GOListHyperGResult} objects, containing
+  the enrichment calculation results for the three Gene Ontology
+  ontologies, for all modules, as returned by the \code{ISAGO} function
+  in the \code{eisa} package.} 
+\item{KEGG}{A \code{GOListHyperGResult} object, that contains the
+  of the enrichment calculation results for all modules, against the
+  KEGG pathway database, as returned by the \code{ISAKEGG} function in
+  the \code{eisa} package.} 
 }
 \details{
 If the data is available in the form of a \code{\link[Biobase]{ExpressionSet}}, the \code{ExportEV} function automatically uses the metadata associated with the gene expression data. If the underlying data does not contain any annotations, you can provide them manually, by defining various items in the description list, see the second example below.}

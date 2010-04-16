@@ -27,7 +27,9 @@ if (require(eisa)) {
     )
 }
 
-ExportEV.ISAModules <- function(biclusters, eset, order, filename, norm, cutoff, description) {
+ExportEV.ISAModules <- function(biclusters, eset, order, filename, norm, cutoff,
+                                description, GO=ISAGO(biclusters),
+                                KEGG=ISAKEGG(biclusters)) {
 
     if ( missing(order) ) {
         order <- OrderEV(biclusters)
@@ -81,10 +83,7 @@ ExportEV.ISAModules <- function(biclusters, eset, order, filename, norm, cutoff,
     writeLines("\t</summary>", con)
 
     go.table <- toTable(GOTERM)
-    gos <- ISAGO(biclusters)
-
     kegg.table <- toTable(KEGGPATHID2NAME)
-    keggs <- ISAKEGG(biclusters)
 
     ## get gene info
     ann <- annotation(eset)
@@ -279,7 +278,7 @@ ExportEV.ISAModules <- function(biclusters, eset, order, filename, norm, cutoff,
             writeLines("\t\t\t<gos>", con)
             k <- 1
             for ( i in 1:3 ) {
-                s <- summary(gos[[i]])[[module]]
+                s <- summary(GO[[i]])[[module]]
                 if ( dim(s)[1] > 0 ) {
                     temp <- match(rownames(s), go.table[,1])
                     
@@ -305,7 +304,7 @@ ExportEV.ISAModules <- function(biclusters, eset, order, filename, norm, cutoff,
             writeLines("", con)
 
             writeLines("\t\t\t<keggs>", con)
-            s <- summary(keggs)[[module]]
+            s <- summary(KEGG)[[module]]
             if ( dim(s)[1] > 0 ) {
                 temp <- match(rownames(s), kegg.table[,1])
                 for ( j in 1:dim(s)[1] ) {
