@@ -1,0 +1,133 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <xsd:annotation>
+    <xsd:documentation xml:lang="en">
+     ExpressionView file format schema. ExpressionView is a tool 
+     to visualize modules (biclusters) in gene expression data. 
+     Please see http://www.unil.ch/cbg for details.
+     Copyright 2010 UNIL DGM Computational Biology Group
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:element name="summary" type="SummaryType" />
+  <xsd:element name="experimentdata" type="ExperimentDataType" />
+  <xsd:element name="genes" type="GenesType" />
+  <xsd:element name="samples" type="SamplesType" />
+  <xsd:element name="modules" type="ModulesType" />
+  <xsd:element name="data" type="xsd:string" />
+  
+  <xsd:complexType name="SummaryType">
+    <xsd:sequence>
+      <xsd:element name="description" minOccurs="0" type="xsd:string" />
+      <xsd:element name="version" type="xsd:string" />
+      <xsd:element name="nmodules" type="xsd:string" />
+      <xsd:element name="ngenes" type="xsd:string" />
+      <xsd:element name="nsamples" type="xsd:string" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="ExperimentDataType">
+    <xsd:sequence>
+      <xsd:element name="title" minOccurs="0" type="xsd:string" />
+      <xsd:element name="name" minOccurs="0" type="xsd:string" />
+      <xsd:element name="lab" minOccurs="0" type="xsd:string" />
+      <xsd:element name="abstract" minOccurs="0" type="xsd:string" />
+      <xsd:element name="url" minOccurs="0" type="xsd:string" />
+      <xsd:element name="annotation" minOccurs="0" type="xsd:string" />
+      <xsd:element name="organism" minOccurs="0" type="xsd:string" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="GenesType">
+    <xsd:sequence>
+      <xsd:element name="genetags" type="GeneTagsType" />
+      <xsd:element name="gene" maxOccurs="unbounded" type="GeneType" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="GeneTagsType">
+    <xsd:sequence>
+      <xsd:element name="id" type="xsd:string" />
+      <xsd:element name="score" type="xsd:string" />
+      <xsd:element name="name" type="xsd:string" />
+      <xsd:element name="symbol" type="xsd:string" />
+      <xsd:element name="entrezid" type="xsd:string" />
+    </xsd:sequence>
+  </xsd:complexType>
+  
+  <xsd:complexType name="GeneType">
+    <xsd:sequence>
+      <xsd:element name="score" type="xsd:string" />
+      <xsd:element name="name" type="xsd:string" />
+      <xsd:element name="symbol" type="xsd:string" />
+      <xsd:element name="entrezid" type="xsd:string" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="SamplesType">
+    <xsd:sequence>
+      <xsd:element name="sampletags" type="SampleTagsType" />
+      <xsd:element name="sample" maxOccurs="unbounded" type="SampleType" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="SampleTagsType">
+    <xsd:sequence>
+      <xsd:element name="id" type="xsd:string" />
+      <xsd:element name="score" type="xsd:string" />
+      <xsd:element name="name" type="xsd:string" />
+      <xsd:element name="diagnosis" type="xsd:string" />
+      <xsd:element name="sex" type="xsd:string" />
+      <xsd:element name="age" type="xsd:string" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="SampleType">
+    <xsd:sequence>
+      <xsd:element name="id" type="xsd:string" />
+      <xsd:element name="score" type="xsd:string" />
+      <xsd:element name="name" type="xsd:string" />
+      <xsd:element name="diagnosis" type="xsd:string" />
+      <xsd:element name="sex" type="xsd:string" />
+      <xsd:element name="age" type="xsd:string" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="ModulesType">
+    <xsd:sequence>
+      <xsd:element name="moduletags" type="ModuleTagsType" />
+      <xsd:element name="gotags" minOccurs="0" type="GoTagsType" />
+      <xsd:element name="keggtags" minOccurs="0" type="KeggTagsType" />
+      <xsd:element name="module" maxOccurs="unbounded" type="ModuleType" />
+    </xsd:sequence>      
+  </xsd:complexType>
+
+  <xsd:complexType name="ModuleTagsType">
+    <xsd:sequence>
+      <xsd:element name="id" type="xsd:string" />
+      <xsd:element name="name" type="xsd:string" />
+      <xsd:element name="iterations" type="xsd:string" />
+      <xsd:element name="oscillation" type="xsd:string" />
+      <xsd:element name="thr_row" type="xsd:string" />
+      <xsd:element name="thr_col" type="xsd:string" />
+      <xsd:element name="freq" type="xsd:string" />
+      <xsd:element name="rob" type="xsd:string" />
+      <xsd:element name="rob_limit" type="xsd:string" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="ModuleType">
+    <xsd:sequence>
+      <xsd:element name="id" type="xsd:string" />
+      <xsd:element name="name" type="xsd:string" />
+      <xsd:element name="iterations" type="xsd:string" />
+      <xsd:element name="oscillation" type="xsd:string" />
+      <xsd:element name="thr_row" type="xsd:string" />
+      <xsd:element name="thr_col" type="xsd:string" />
+      <xsd:element name="freq" type="xsd:string" />
+      <xsd:element name="rob" type="xsd:string" />
+      <xsd:element name="rob_limit" type="xsd:string" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+</xsd:schema>
