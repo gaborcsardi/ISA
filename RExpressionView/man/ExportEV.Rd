@@ -9,12 +9,16 @@
 \concept{biclustering, gene expression data, interactive}
 \description{Exports the biclusters identified in  gene expression data with all the relevant biological data to an XML file that can be read by the ExpressionView Flash applet.}
 \usage{
-\S4method{ExportEV}{ISAModules}(biclusters, eset, order, filename, norm,
-         cutoff, description, GO, KEGG, ...)
+\S4method{ExportEV}{ISAModules}(biclusters, eset,
+         order=OrderEV(biclusters), filename=file.choose(),
+         norm=c("sample", "feature", "raw", "x", "y"), cutoff=0.95,
+         description=NULL, GO, KEGG, ...)
 \S4method{ExportEV}{Biclust}(biclusters, eset, order, filename, norm,
          cutoff, description, ...) 
-\S4method{ExportEV}{list}(biclusters, eset, order, filename, norm,
-         cutoff, description, ...) 
+\S4method{ExportEV}{list}(biclusters, eset, order=OrderEV(biclusters),
+         filename=file.choose(),
+         norm=c("sample", "feature", "raw", "x", "y"),
+         cutoff=0.95, description=NULL, ...) 
 }
 \arguments{
 \item{biclusters}{An \code{\link[eisa]{ISAModules}} object, a \code{\link[biclust]{Biclust}} object, or a named list.}

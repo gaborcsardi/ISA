@@ -1,72 +1,42 @@
 ########################################################################
 ## export Biclust
 
+ExportEV.Biclust <- function(biclusters, eset,
+                             order=OrderEV(biclusters),
+                             filename=file.choose(),
+                             norm=c("sample", "feature", "raw", "x",
+                             "y"), cutoff=0.95, 
+                             description=NULL, ...) { 
+  eisamodules <- as(biclusters, "ISAModules")
+  eisamodules@rundata$annotation <- annotation(eset)
+  eisamodules@rundata$prenormalize <- FALSE
+  ExportEV(eisamodules, eset, order, filename, norm, cutoff, description, ...)
+}
 
 if (require(biclust)) {
-     setMethod("ExportEV", signature(biclusters="Biclust"), 
-         function(biclusters, eset, order, filename, norm, cutoff, description, ...) 
-         ExportEV.Biclust(biclusters, eset, order, filename, norm, cutoff, description, ...)
-     )
+  setMethod("ExportEV", signature(biclusters="Biclust"), ExportEV.Biclust)
 }
-
-ExportEV.Biclust <- function(biclusters, eset, order, filename, norm, cutoff, description, ...) {
-    eisamodules <- as(biclusters, "ISAModules")
-    eisamodules@rundata$annotation <- annotation(eset)
-    eisamodules@rundata$prenormalize <- FALSE
-    ExportEV(eisamodules, eset, order, filename, norm, cutoff, description, ...)
-}
-
 
 ########################################################################
 ## export EISA
-
-if (require(eisa)) {
-    setMethod("ExportEV", signature(biclusters="ISAModules"), 
-        function(biclusters, eset, order, filename, norm, cutoff, description, ...) 
-        ExportEV.ISAModules(biclusters, eset, order, filename, norm, cutoff, description, ...)
-    )
-}
 
 mytoString <- function(x) {
   paste(x, collapse=" ")
 }
 
-ExportEV.ISAModules <- function(biclusters, eset, order, filename, norm, cutoff,
-                                description, ...) {
+ExportEV.ISAModules <- function(biclusters, eset,
+                                order=OrderEV(biclusters),
+                                filename=file.choose(),
+                                norm=c("sample", "feature", "raw",
+                                "x", "y"),
+                                cutoff=0.95, 
+                                description=NULL,
+                                GO=ISAGO(biclusters),
+                                KEGG=ISAKEGG(biclusters), ...) {
+  
+    norm <- match.arg(norm)
 
-    if ( missing(order) ) {
-        order <- OrderEV(biclusters)
-    }
-
-    if ( missing(filename) ) {
-        con <- file(file.choose(TRUE), open="w")
-    } else {
-        if ( filename == "" ) {
-            stop("indicate filename or omit argument to choose it interactively.", call.=FALSE)
-        }
-        con <- file(filename, open="w", blocking = TRUE)
-    }
-    
-    if ( missing(norm) ) {
-        ## x, y, raw
-        norm <- "y"
-    }
-    
-    if ( missing(cutoff) ) {
-        cutoff <- 0.95
-    }
-
-    args <- list(...)
-    if ("GO" %in% names(args)) {
-      GO <- args$GO
-    } else {
-      GO <- ISAGO(biclusters)
-    }
-    if ("KEGG" %in% names(args)) {
-      KEGG <- args$KEGG
-    } else {
-      KEGG <- ISAKEGG(biclusters)
-    }
+    con <- file(filename, open="w", blocking=TRUE)
     
     ## in case biclusters were converted to ISAModules
     if ( is.null(biclusters@rundata$annotation) ) {
@@ -377,43 +347,22 @@ ExportEV.ISAModules <- function(biclusters, eset, order, filename, norm, cutoff,
 
 }
 
+if (require(eisa)) {
+    setMethod("ExportEV", signature(biclusters="ISAModules"), ExportEV.ISAModules)
+}
 
 ########################################################################
 ## export list
 
-setMethod("ExportEV", signature(biclusters="list"), 
-    function(biclusters, eset, order, filename, norm, cutoff, description, ...) 
-    ExportEV.list(biclusters, eset, order, filename, norm, cutoff, description, ...)
-)
+ExportEV.list <- function(biclusters, eset, order=OrderEV(biclusters),
+                          filename=file.choose(),
+                          norm=c("sample", "feature", "raw", "x", "y"), cutoff=0.95,
+                          description=NULL, ...) {
 
-ExportEV.list <- function(biclusters, eset, order, filename, norm, cutoff, description, ...) {
+    norm <- match.arg(norm)
 
-    if ( missing(order) ) {
-        order <- OrderEV(biclusters)
-    }
-
-    if ( missing(filename) ) {
-        con <- file(file.choose(TRUE), open="w")
-    } else {
-        if ( filename == "" ) {
-            stop("indicate filename or omit argument to choose it interactively.", call.=FALSE)
-        }
-        con <- file(filename, open="w", blocking = TRUE)
-    }
-    
-    if ( missing(norm) ) {
-        ## x, y, raw
-        norm <- "y"
-    }
-    
-    if ( missing(cutoff) ) {
-        cutoff <- 0.95
-    }
-    
-    if ( missing(description) ) {
-        description <- NULL
-    }
-
+    con <- file(filename, open="w", blocking=TRUE)    
+  
     data <- eset
 
     geneMaps <- order$cols
@@ -672,6 +621,7 @@ ExportEV.list <- function(biclusters, eset, order, filename, norm, cutoff, descr
 
 }
 
+setMethod("ExportEV", signature(biclusters="list"), ExportEV.list)
 
 normalize <- function(data, cutoff) {
 

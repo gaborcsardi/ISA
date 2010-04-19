@@ -1,13 +1,6 @@
 ########################################################################
 ## order EISA
 
-if (require(eisa)) {
-    setMethod("OrderEV", signature(biclusters="ISAModules"), 
-        function(biclusters, initialorder, maxtime, debuglevel) 
-        OrderEV.ISAModules(biclusters, initialorder, maxtime, debuglevel)
-    )
-}
-
 OrderEV.ISAModules <- function(biclusters, initialorder, maxtime, debuglevel) {
 
     if ( !missing(initialorder) ) {
@@ -20,32 +13,26 @@ OrderEV.ISAModules <- function(biclusters, initialorder, maxtime, debuglevel) {
     res
 }
 
+if (require(eisa)) {
+    setMethod("OrderEV", signature(biclusters="ISAModules"), OrderEV.ISAModules)
+}
 
 ########################################################################
 ## order biclust 
-
-if (require(biclust)) {
-    setMethod("OrderEV", signature(biclusters="Biclust"), 
-        function(biclusters, initialorder, maxtime, debuglevel) 
-        OrderEV.Biclust(biclusters, initialorder, maxtime, debuglevel)
-    )
-}
 
 OrderEV.Biclust <- function(biclusters, initialorder, maxtime, debuglevel) {
     eisamodules <- as(biclusters, "ISAModules")
     OrderEV(eisamodules, initialorder, maxtime, debuglevel)
 }
 
+if (require(biclust)) {
+    setMethod("OrderEV", signature(biclusters="Biclust"), OrderEV.Biclust)
+}
+
+
 
 ########################################################################
 ## order ISA
-
-if (require(isa2)) {
-    setMethod("OrderEV", signature(biclusters="list"), 
-        function(biclusters, initialorder, maxtime, debuglevel)
-        OrderEV.list(biclusters, initialorder, maxtime, debuglevel)
-    )
-}
 
 OrderEV.list <- function(biclusters, initialorder, maxtime, debuglevel) {
     
@@ -217,3 +204,5 @@ OrderEV.list <- function(biclusters, initialorder, maxtime, debuglevel) {
     return(res)
 
 }
+
+setMethod("OrderEV", signature(biclusters="list"), OrderEV.list)
