@@ -27,6 +27,10 @@ if (require(eisa)) {
     )
 }
 
+mytoString <- function(x) {
+  paste(x, collapse=" ")
+}
+
 ExportEV.ISAModules <- function(biclusters, eset, order, filename, norm, cutoff,
                                 description, GO=ISAGO(biclusters),
                                 KEGG=ISAKEGG(biclusters)) {
@@ -251,10 +255,10 @@ ExportEV.ISAModules <- function(biclusters, eset, order, filename, norm, cutoff,
             }
 
             genesp <- match(as.vector(which(biclusters@genes[,module]!=0)),geneMaps[[1]])[geneMaps[[module+1]]]
-            writeLines(paste("\t\t\t<containedgenes>", toString(genesp), "</containedgenes>", sep=""), con)
+            writeLines(paste("\t\t\t<containedgenes>", mytoString(genesp), "</containedgenes>", sep=""), con)
             scores <- as.array(as.real(genes[genesp]))
             scores <- apply(scores, 1, formatter)
-            writeLines(paste("\t\t\t<genescores>", toString(scores), "</genescores>", sep=""), con)
+            writeLines(paste("\t\t\t<genescores>", mytoString(scores), "</genescores>", sep=""), con)
 
             intersectingbiclusterssamples = list();
             samples <- biclusters@conditions[,module][sampleMaps[[1]]]
@@ -265,13 +269,13 @@ ExportEV.ISAModules <- function(biclusters, eset, order, filename, norm, cutoff,
             }
 
             samplesp <- match(as.vector(which(biclusters@conditions[,module]!=0)),sampleMaps[[1]])[sampleMaps[[module+1]]]
-            writeLines(paste("\t\t\t<containedsamples>", toString(samplesp), "</containedsamples>", sep=""), con)
+            writeLines(paste("\t\t\t<containedsamples>", mytoString(samplesp), "</containedsamples>", sep=""), con)
             scores <- as.array(as.real(samples[samplesp]))
             scores <- apply(scores, 1, formatter)
-            writeLines(paste("\t\t\t<samplescores>", toString(scores), "</samplescores>", sep=""), con)
+            writeLines(paste("\t\t\t<samplescores>", mytoString(scores), "</samplescores>", sep=""), con)
 
             intersectingbiclusters <- intersect(unique(intersectingbiclustersgenes), unique(intersectingbiclusterssamples))
-            writeLines(paste("\t\t\t<intersectingmodules>", toString(intersectingbiclusters), "</intersectingmodules>", sep=""), con)
+            writeLines(paste("\t\t\t<intersectingmodules>", mytoString(intersectingbiclusters), "</intersectingmodules>", sep=""), con)
 
             writeLines("", con)
 
@@ -591,10 +595,10 @@ ExportEV.list <- function(biclusters, eset, order, filename, norm, cutoff, descr
                 }
 
                 genesp <- match(as.vector(which(biclusters$columns[,module]!=0)),geneMaps[[1]])[geneMaps[[module+1]]]
-                writeLines(paste("\t\t\t<containedgenes>", toString(genesp), "</containedgenes>", sep=""), con)
+                writeLines(paste("\t\t\t<containedgenes>", mytoString(genesp), "</containedgenes>", sep=""), con)
                 scores <- as.array(as.real(genes[genesp]))
                 scores <- apply(scores, 1, formatter)
-                writeLines(paste("\t\t\t<genescores>", toString(scores), "</genescores>", sep=""), con)
+                writeLines(paste("\t\t\t<genescores>", mytoString(scores), "</genescores>", sep=""), con)
 
                 intersectingbiclusterssamples = list();
                 samples <- biclusters$rows[,module][sampleMaps[[1]]]
@@ -605,13 +609,13 @@ ExportEV.list <- function(biclusters, eset, order, filename, norm, cutoff, descr
                 }
 
                 samplesp <- match(as.vector(which(biclusters$rows[,module]!=0)),sampleMaps[[1]])[sampleMaps[[module+1]]]
-                writeLines(paste("\t\t\t<containedsamples>", toString(samplesp), "</containedsamples>", sep=""), con)
+                writeLines(paste("\t\t\t<containedsamples>", mytoString(samplesp), "</containedsamples>", sep=""), con)
                 scores <- as.array(as.real(samples[samplesp]))
                 scores <- apply(scores, 1, formatter)
-                writeLines(paste("\t\t\t<samplescores>", toString(scores), "</samplescores>", sep=""), con)
+                writeLines(paste("\t\t\t<samplescores>", mytoString(scores), "</samplescores>", sep=""), con)
 
                 intersectingbiclusters <- intersect(unique(intersectingbiclustersgenes), unique(intersectingbiclusterssamples))
-                writeLines(paste("\t\t\t<intersectingmodules>", toString(intersectingbiclusters), "</intersectingmodules>", sep=""), con)
+                writeLines(paste("\t\t\t<intersectingmodules>", mytoString(intersectingbiclusters), "</intersectingmodules>", sep=""), con)
 
                 writeLines("", con)
 
