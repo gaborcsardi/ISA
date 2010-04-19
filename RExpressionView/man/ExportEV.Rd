@@ -9,9 +9,12 @@
 \concept{biclustering, gene expression data, interactive}
 \description{Exports the biclusters identified in  gene expression data with all the relevant biological data to an XML file that can be read by the ExpressionView Flash applet.}
 \usage{
-\S4method{ExportEV}{ISAModules}(biclusters, eset, order, filename, norm, cutoff, description)
-\S4method{ExportEV}{Biclust}(biclusters, eset, order, filename, norm, cutoff, description)
-\S4method{ExportEV}{list}(biclusters, eset, order, filename, norm, cutoff, description)
+\S4method{ExportEV}{ISAModules}(biclusters, eset, order, filename, norm,
+         cutoff, description, GO, KEGG, ...)
+\S4method{ExportEV}{Biclust}(biclusters, eset, order, filename, norm,
+         cutoff, description, ...) 
+\S4method{ExportEV}{list}(biclusters, eset, order, filename, norm,
+         cutoff, description, ...) 
 }
 \arguments{
 \item{biclusters}{An \code{\link[eisa]{ISAModules}} object, a \code{\link[biclust]{Biclust}} object, or a named list.}
@@ -29,7 +32,8 @@
 \item{KEGG}{A \code{GOListHyperGResult} object, that contains the
   of the enrichment calculation results for all modules, against the
   KEGG pathway database, as returned by the \code{ISAKEGG} function in
-  the \code{eisa} package.} 
+  the \code{eisa} package.}
+\item{\dots}{Additional arguments, nothing currently.}
 }
 \details{
 If the data is available in the form of a \code{\link[Biobase]{ExpressionSet}}, the \code{ExportEV} function automatically uses the metadata associated with the gene expression data. If the underlying data does not contain any annotations, you can provide them manually, by defining various items in the description list, see the second example below.}
