@@ -67,4 +67,4 @@ isa.results <- isa(data.in.silico)
 optimalorder <- OrderEV(isa.results)
 str(optimalorder)
 }
-\keyword{order, ExpressionView, bicluster, order, isa}
+\keyword{cluster}

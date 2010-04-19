@@ -24,4 +24,4 @@ LaunchEV()
 ## Launch the ExpressionView applet
 \dontrun{LaunchEV()}
 }
-\keyword{launch, open, ExpressionView, bicluster, order, isa}
+\keyword{cluster}

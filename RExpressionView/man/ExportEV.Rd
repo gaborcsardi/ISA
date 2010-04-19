@@ -165,4 +165,4 @@ optimalorder <- OrderEV(modules)
 ExportEV(modules, data, optimalorder, filename="file.evf",
          description=description) 
 }
-\keyword{export, ExpressionView, bicluster, order, isa}
+\keyword{cluster}
