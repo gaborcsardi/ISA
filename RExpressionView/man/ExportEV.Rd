@@ -6,7 +6,6 @@
 \alias{ExportEV,Biclust-method}
 \alias{ExportEV,list-method}
 \title{Export an ExpressionView file}
-\concept{biclustering, gene expression data, interactive}
 \description{Exports the biclusters identified in  gene expression data
   with all the relevant biological data to an XML file that can be read
   by the ExpressionView Flash applet.} 

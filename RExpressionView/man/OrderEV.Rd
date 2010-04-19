@@ -7,7 +7,6 @@
 \alias{OrderEV,list-method}
 \title{Find the optimal arrangement of biclusters for visualization in
   ExpressionView}
-\concept{biclustering, gene expression data, interactive}
 \description{Finds the optimal arrangement of possibly overlapping
   biclusters that maximizes the areas of the largest contiguous parts of
   the biclusters. The reordering is necessary to obtain a visually

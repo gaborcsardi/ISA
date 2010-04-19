@@ -2,7 +2,6 @@
 \name{LaunchEV}
 \alias{LaunchEV}
 \title{Launch the ExpressionView Flash applet}
-\concept{biclustering, gene expression data, interactive}
 \description{Launches the ExpressionView Flash applet that comes with
   the R package.}
 \usage{

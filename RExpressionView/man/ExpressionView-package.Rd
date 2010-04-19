@@ -2,7 +2,6 @@
 \encoding{UTF-8}
 \name{ExpressionView-package}
 \alias{ExpressionView-package}
-\concept{biclustering, gene expression data, interactive}
 \title{The ExpressionView package}
 \description{A package designed to interactively explore biclusters
   identified in gene expression data.
