@@ -14,6 +14,8 @@
 
 %\SweaveOpts{prefix.string=graphics/plot}
 
+\setlength{\parindent}{2em}
+
 \begin{document}
 
 \title{ExpressionView}
@@ -33,13 +35,13 @@ options(continue=" ")
 Clustering genes according to their expression profiles is an important task 
 in analyzing microarray data. In this tutorial, we explain how to use ExpressionView, 
 an R package designed to interactively explore biclusters identified in gene 
-expression data in conjunction with the Iterative Signature Algorithm (ISA)~\cite{bergmann03} 
+expression data, in conjunction with the Iterative Signature Algorithm (ISA)~\cite{bergmann03} 
 and the biclustering methods available in the \Rpackage{Biclust} package~\cite{kaiser08}.
 
 \section{Loading the gene expression data}
 The \Rpackage{ExpressionView} package requires the gene expression data to be available in the
-form of a \Rpackage{Bioconductor} \Rclass{ExpressionSet}. In this tutorial we will use the 
-\Rpackage{Bioconductor} sample data from a 
+form of a BioConductor \Rclass{ExpressionSet}. In this tutorial we will use the 
+BioConductor sample data from a 
 clinical trial in acute lymphoblastic leukemia provided by the \Rpackage{ALL} package.
 <<load the data>>=
 library(ALL)
@@ -51,8 +53,8 @@ The data set contains \Sexpr{ncol(ALL)} samples and \Sexpr{nrow(ALL)} features.
 \section{Find biclusters}
 There are many biclustering algorithms described in the literature~\cite{madeira04}.
 All of them aim to reduce the complexity of the gene expression data by identifying 
-suitable groups of genes and conditions that are co-regulated. In what follows we
-show how to use two of the freely available biclustering methods.
+suitable groups of genes and conditions that are co-expressed. In this tutorial
+show how to use \Rpackage{ExpressionView} with some of the available biclustering algorithms.
 
 \subsection{Iterative Signature Algorithm (ISA)}
 The ISA~\cite{bergmann03} for gene expression data is implemented in the \Rpackage{eisa} package:
@@ -84,11 +86,9 @@ Typing its name returns a brief summary of the results:
 modules
 @
 
-The ISA biclustering is not binary, every gene (and
-similarly, every sample or condition) has a score between -1 and 1; the further the
-score is from zero, the stronger the association between the gene
-(or sample) and the module. If two features both have scores with the
-same sign, they are correlated, otherwise, they are anti-correlated.
+This object can be directly used with the functions of the
+\Rpackage{ExpressionView} package. See Section~\ref{sec:ordering} for
+details.
 
 \subsection{Algorithms of the \Rpackage{Biclust} package}
 The \Rpackage{biclust} package implements several biclustering
@@ -100,19 +100,14 @@ library(biclust)
 biclusters <- biclust(exprs(ALL), BCPlaid(), fit.model=~m+a+b, verbose=FALSE)
 @
 
-The standard R function \Rfunction{as} 
-can be used to convert \Rclass{ISAModules} to \Rclass{Biclust} objects. This
-requires the binarization of the modules, i.e., the ISA scores are
-lost since they are converted to zeros and ones:
-<<biclust>>=
-as(modules, "Biclust")
-@
-
-The conversion also works in the other direction. Starting from a \Rclass{Biclust} object, just use
+\Rclass{Biclust} objects can be directly used with the
+\Rpackage{ExpressionView} functions. Alternatively, they can be
+converted to \Rclass{ISAModules} objects, using the standard
+\Rfunction{as} R function:
 <<isa>>=
 as(biclusters, "ISAModules")
 @
-to get an \Rclass{ISAModules} object.
+results an \Rclass{ISAModules} object.
 
 \subsection{External clustering programs}
 Since the structure of biclustering results is independent of the applied method, it is straightforward to
@@ -131,17 +126,20 @@ new("ISAModules",
 genes=modules.genes, conditions=modules.conditions,rundata=data.frame(),seeddata=data.frame())
 @
 
-\section{Order}
+\section{Order}%
+\label{sec:ordering}
 To present the tens of possibly overlapping biclusters in a visually appealing form, 
-it is necessary to regroup the rows and columns of the gene expression matrix in 
+it is necessary to reorder the rows and columns of the gene expression matrix in 
 such a way that biclusters form contiguous rectangles. Since for more than two 
 mutually overlapping biclusters, it is in general impossible to find such an arrangement,
- one has to make concessions. In contrast to~\cite{grothaus06}, who proposed to repeat 
- rows and columns as necessary to achieve this goal, we prefer to optimize the 
+ one has to make concessions. In contrast methods that propose to repeat 
+ rows and columns as necessary to achieve this goal~\cite{grothaus06}, we prefer to optimize the 
  arrangement within the original data by maximizing the area of the largest contiguous biclusters. 
 
 The \Rfunction{OrderEV} function implemented in the \Rpackage{ExpressionView} package
-determines the optimal order of the gene expression matrix for a given set of biclusters:
+determines the optimal order of the gene expression matrix for a given
+set of biclusters. It can be called with \Rclass{ISAModules} or
+\Rclass{Biclust} objects as the first argument:
 <<expressionview, results=HIDE>>=
 library(ExpressionView)
 optimalorder <- OrderEV(modules)
@@ -155,14 +153,15 @@ The mapping of the genes and the samples contained in bicluster \variable{i} can
 optimalorder$genes[i+1]
 optimalorder$samples[i+1]
 @
-Here, \variable{i=0}, returns the map of the complete data set. By default, the \Rfunction{OrderEV}
+The first elements of the lists contain the optimal ordering of the
+complete matrix. By default, the \Rfunction{OrderEV} function
 runs for roughly one minute, this might not be sufficient to find an appropriate order for data 
 containing many overlapping biclusters. The status of the ordering is stored in 
 <<status ordering>>=
 optimalorder$status
 @
 If the status is set to \variable{1}, the algorithm has found the optimal solution. A \variable{0} indicates that the
-the calculation could not be terminated within the given timeframe. The \Rfunction{OrderEV} 
+the calculation could not be terminated within the given timeframe. The \Rfunction{OrderEV} function
 accepts two additional parameters to circumvent the problem of partial alignment:
 One can start the ordering from a given initial configuration, i.e., the result of a previous arrangement
 by defining the \Rargument{initialorder} argument
@@ -178,7 +177,7 @@ The \Rfunction{ExportEV} function allows the user to combine the available data 
 ExportEV(modules, ALL, optimalorder, filename="file.evf")
 @
 The function gathers the data contained in the \Rclass{ExpressionSet} \variable{ALL}, orders it according to the optimal arrangement 
-\variable{optimalorder} and adds the biclusters defined in \variable{modules}. The output is an uncompressed XML file that can be opened with any text viewer. We have chosen to use the extension \variable{.evf} (for ExpressionView file) for the data files. This extension is associated with the stand-alone version of the viewer, so that one can simply double-click on such a file to launch the program and load the data. The file association is the reason why we do not use the \variable{.xml} extension. A description of the XML layout can be found on the \href{http://www2.unil.ch/cbg/index.php?title=ExpressionView}{website}. Before exporting the data, the 
+\variable{optimalorder} and adds the biclusters defined in \variable{modules}. The output is an uncompressed XML file that can be opened with any text viewer. We have chosen to use the extension \variable{.evf} (for ExpressionView file) for the data files. This extension is associated with the stand-alone version of the viewer, so that one can simply double-click on such a file to launch the program and load the data. The file association is the reason why we do not use the \variable{.xml} extension. A description of the XML layout can be found on the \Rpackage{ExpressionView} website at \url{http://www.unil.ch/cbg/ExpressionView}. Before exporting the data, the
 \Rfunction{ExportEV} function automatically calculates GO~\cite{ashburner00} and KEGG~\cite{kanehisa04} enrichments for the given biclusters.
 
 \section{Visualize}
@@ -242,23 +241,25 @@ modules <- isa(data)
 
 The \Rfunction{ExportEV} uses the named list provided by the \variable{description} variable to label the data. First, let us annotate the rows and columns of the data set
 <<data set annotation>>=
-v <- vector("character"); for ( i in 1:dim(data)[1] ) { v[i] <- paste("row ", i, sep="") }; rownames(data) <- v
-v <- vector("character"); for ( i in 1:dim(data)[2] ) { v[i] <- paste("column ", i, sep="") }; colnames(data) <- v
+rownames(data) <- paste("row", seq_len(nrow(data)))
+colnames(data) <- paste("column", seq_len(ncol(data)))
 @
 
 Next, we assign the meta data associated with the rows of the data matrix. In this example we use 5 tags labelled ''row tag``:
 <<rowdata annotation>>=
-rowdata <- matrix(nrow=dim(data)[1], ncol=5)
+rowdata <- outer(1:nrow(data), 1:5, function(x, y) {
+  paste("row description (", x, ", ", y, ")", sep="")
+})             
 rownames(rowdata) <- rownames(data)
-v <- vector("character"); for ( i in 1:dim(rowdata)[2] ) { v[i] <- paste("row tag ", i, sep="") }; colnames(rowdata) <- v
-for ( i in 1:dim(rowdata)[1] ) { for ( j in 1:dim(rowdata)[2] ) { rowdata[i,j] <- paste("row description (", i, ", ", j, ")", sep="") }}
+colnames(rowdata) <- paste("row tag", seq_len(ncol(rowdata)))
 @
-And similarly for the columns, using 10 "column tags``:
+And similarly for the columns, using 10 ``column tags'':
 <<coldata annotation>>=
-coldata <- matrix(nrow=dim(data)[2], ncol=10)
+coldata <- outer(1:ncol(data), 1:10, function(x, y) {
+  paste("column description (", x, ", ", y, ")", sep="")
+})
 rownames(coldata) <- colnames(data)
-v <- vector("character"); for ( i in 1:dim(coldata)[2] ) { v[i] <- paste("column tag ", i, sep="") }; colnames(coldata) <- v
-for ( i in 1:dim(coldata)[1] ) { for ( j in 1:dim(coldata)[2] ) { coldata[i,j] <- paste("column description (", i, ", ", j, ")", sep="") }}
+colnames(coldata) <- paste("column tag", seq_len(ncol(coldata)))
 @
 
 To finish  the description, we add some general information and merge it with the above tables to get a single named list:

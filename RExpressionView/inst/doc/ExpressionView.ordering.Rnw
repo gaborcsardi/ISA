@@ -16,6 +16,8 @@
 
 \SweaveOpts{cache=TRUE}
 
+\setlength{\parindent}{2em}
+
 \begin{document}
 
 \title{Ordering algorithm used in ExpressionView}
@@ -41,7 +43,7 @@ that maximizes the areas of the largest contiguous parts of the biclusters.
 
 \section{Problem}
 The problem can be formulated very generally:
-Given a matrix in which each element is part of at least one bicluster, arrange the rows and columns
+given a matrix in which each element is part of at least one bicluster, arrange the rows and columns
 in such a way that the biclusters are easily recognizable on a two-dimensional plot.
 Since biclusters are rectangular, rows and columns can be ordered separately.
 The problem thus reduces to finding the optimal arrangement of a set of $n$ elements 
@@ -63,7 +65,7 @@ in every cluster, as illustrated in Fig.~\ref{fig:ordering}.
 
 \section{Optimizing the order}
 Optimizing the order thus consists in maximizing $Q$ by changing the order of the slots.
-To achieve this goal we use a brute-force approach that 
+To achieve this goal we use a greedy approach that 
 \begin{itemize}
 	\item{shifts parts of a given cluster to better positions and}
 	\item{permutes elements contained in a given cluster.}
@@ -75,21 +77,34 @@ The ordering is done in four steps:
 \begin{enumerate}
 	\item{\code{simplify}: Reduces the dimensions of the problem by excluding duplicate rows. The multiplicity of each slot is taken into account when calculating the score $Q$.}
 	\item{\code{prearrange}: Tries to find a good starting point for the optimization by creating a new order, starting from the first row and adding the consecutive rows one after the other, placing them at the optimal position. For smaller samples, the fitness function is used, while for larger samples only the similarity (scalar product) between rows is taken into account.}
-	\item{\code{arrange}: Uses the brute-force approach to further increase the alignment score.}
+	\item{\code{arrange}: Uses the greedy approach to further increase the alignment score.}
 	\item{\code{complexify}: Reinstates the original dimensions of the problem by inserting the omitted rows at the newly found position.}
 \end{enumerate}
 
 If the user specifies a time limit, the algorithm stops the alignment after the elapsed interval and returns the best alignment. Otherwise, it continues until it can no longer improve the alignment score. 
 
-The ordering iterates over the clusters and first calls the function \code{reposition}, taking \code{cluster} as argument. It goes through all the rows contained in a given cluster and tries to shift them to a better position. A contiguous group of rows can be repositioned at once or split up in subgroups. Empirically, it turned out that the alignment is fastest by starting the repositioning with a single row, increasing the length of the group only if no better position could be found. The opposite approach can be used by replacing the \emph{start forward} section on line 545 by the \emph{start backwards} code on line 556. 
+The ordering iterates over the clusters and first tries to shift the
+rows of them to a better position. A contiguous group of rows can be
+repositioned at once or split up in subgroups. Empirically, it turned
+out that the alignment is fastest by starting the repositioning with a
+single row, increasing the length of the group only if no better
+position could be found. 
 
-After repositioning, the main loop calls the exchange function, taking \code{cluster} and \code{what} as argument. It exchanges rows contained (\code{what = 1}) / not contained (\code{what = 0}) in a given cluster. It randomly picks \code{maxslots} number of rows (currently six), generates all possible permutations, calculates the corresponding alignment scores, and retains the best order. This realignment is repeated \code{maxiter} times, so that on average every slot is part of one optimization.
+After repositioning, the algorithm tries to exchanges rows
+contained or not contained in a given cluster. It randomly picks
+a number of rows (up to six right now) and generates all their
+possible permutations, calculates the corresponding alignment scores,
+and retains the best order. This realignment is repeated
+a number of times, so that on average every slot is part of one
+optimization.
 
-The loop over clusters calls the \code{reposition} function first for all the rows not contained in a given cluster and afterwards for the remaining ones. The main loop is repeated until the maximal computation time is reached or no improved alignment could be found anymore.
+These two steps are repeated until the maximal computation time is
+reached or no improved alignment could be found anymore.
 
-The \code{C++} program can also be compiled to a standalone executable by defining \code{-DSTANDALONE}
-to exclude R-specific functions. You can also define \code{-DTIMING} to measure the time spent in the function
-that calculates $Q$ (\code{getfitness}).
+The \code{C++} program can also be compiled to a standalone executable
+by defining \code{-DSTANDALONE} to exclude R-specific functions. You
+can also define \code{-DTIMING} to measure the time spent in the
+function that calculates $Q$ (\code{getfitness}).
 
 \section{Calculation time}
 To get an idea of the complexity of the algorithm, we determined the scaling of the calculation time 
@@ -129,9 +144,12 @@ the number of clusters constant, the complexity of the problem stays roughly the
 equal to those already contained in the data.
 
 \section{Possible improvements}
-More than 90\% of the calculation time is spent to recalculate the length of the longest contiguous subclusters. Optimizing the \code{getfitness} routine
-thus has a direct impact on the overall performance of the algorithm. Since the different clusters can be treated independently, it is
-straightforward to parallelize the calculation, maybe even on the graphic chip.
+More than 90\% of the calculation time is spent to recalculate the
+length of the longest contiguous subclusters. Optimizing this
+algorithm thus has a direct impact on the overall performance of the
+algorithm. Since the different clusters can be treated independently,
+it is straightforward to parallelize the calculation, maybe even on
+the graphic chip.
 
 %\bibliographystyle{unsrt}
 %\bibliography{ExpressionView}
