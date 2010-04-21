@@ -18,10 +18,12 @@ ExpressionView
 cd 0.2-main
 make ExpressionView-final
 cp ExpressionView*.tar.gz ..
+cd ..
 tar xzf ExpressionView*.tar.gz
 diff -ruN -x .svn -x .bzr ExpressionView-svn ExpressionView > /tmp/EV-patch
 cd ExpressionView-svn
 patch -p1 < /tmp/EV-patch
 <add new files to SVN>
 <delete deleted files from SVN>
+<check binary files that differ>
 svn commit --username g.csardi
