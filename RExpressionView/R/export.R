@@ -21,8 +21,11 @@ if (require(biclust)) {
 ## export EISA
 
 mytoString <- function(x) {
-  paste(x, collapse=", ")
+  paste(x, collapse=" ")
 }
+
+allowed <- c("iterations", "oscillation", "thr.row", "thr.col",
+             "freq", "rob", "rob.limit")
 
 ExportEV.ISAModules <- function(biclusters, eset,
                                 order=OrderEV(biclusters),
@@ -33,6 +36,11 @@ ExportEV.ISAModules <- function(biclusters, eset,
                                 description=NULL,
                                 GO=ISAGO(biclusters),
                                 KEGG=ISAKEGG(biclusters), ...) {
+
+    require(AnnotationDbi)              # toTable
+    require(GO.db)
+    require(KEGG.db)
+    require(affy)                       # featureNames
   
     norm <- match.arg(norm)
 
@@ -60,7 +68,7 @@ ExportEV.ISAModules <- function(biclusters, eset,
     writeLines("<evf>", con)
     writeLines("\t<summary>", con)
     writeLines("\t\t<description>ExpressionView data file</description>", con)
-    writeLines("\t\t<version>1.0</version>", con)
+    writeLines("\t\t<version>1.1</version>", con)
     writeLines("\t\t<dataorigin>eisa</dataorigin>", con)
     writeLines(paste("\t\t<nmodules>", nBiclusters, "</nmodules>", sep=""), con)
     writeLines(paste("\t\t<ngenes>", nGenes, "</ngenes>", sep=""), con)
@@ -97,7 +105,6 @@ ExportEV.ISAModules <- function(biclusters, eset,
 
         writeLines("\t\t<genetags>", con)
             writeLines("\t\t\t<id>#</id>", con)
-            writeLines("\t\t\t<score>Score</score>", con)
             writeLines("\t\t\t<name>Name</name>", con)
             writeLines("\t\t\t<symbol>Symbol</symbol>", con)
             writeLines("\t\t\t<entrezid>EntrezID</entrezid>", con)
@@ -109,7 +116,6 @@ ExportEV.ISAModules <- function(biclusters, eset,
         for ( gene in 1:nGenes ) {
             writeLines("\t\t<gene>", con)
                 writeLines(paste("\t\t\t<id>", gene, "</id>", sep=""), con)
-                writeLines("\t\t\t<score/>", con)
                 writeLines(paste("\t\t\t<name>", Genes[gene], "</name>", sep=""), con)
                 writeLines(paste("\t\t\t<symbol>", symbol.table[genemap[gene],2], "</symbol>", sep=""), con)
                 writeLines(paste("\t\t\t<entrezid>", entrez.table[genemap[gene],2], "</entrezid>", sep=""), con)
@@ -124,7 +130,6 @@ ExportEV.ISAModules <- function(biclusters, eset,
 
         writeLines("\t\t<sampletags>", con)
             writeLines("\t\t\t<id>#</id>", con)
-            writeLines("\t\t\t<score>Score</score>", con)
             writeLines("\t\t\t<name>Name</name>", con)
     
             temp <- rownames(phenoData(eset)@varMetadata)
@@ -133,7 +138,7 @@ ExportEV.ISAModules <- function(biclusters, eset,
             tempp <- phenoData(eset)@varMetadata[[1]]
             if ( length(temp) >= 2 ) {    
                 for ( i in 2:length(temp) ) {
-                    writeLines(paste("\t\t\t<", temp[i], ">", tempp[i], "</", temp[i], ">", sep=""), con)
+                    writeLines(paste('\t\t\t<x name="', temp[i], '">', tempp[i], "</x>", sep=""), con)
                 }
             }
         writeLines("\t\t</sampletags>", con)
@@ -144,12 +149,11 @@ ExportEV.ISAModules <- function(biclusters, eset,
             
             writeLines("\t\t<sample>", con)
                 writeLines(paste("\t\t\t<id>", sample, "</id>", sep=""), con)
-                writeLines("\t\t\t<score/>", con)
                 writeLines(paste("\t\t\t<name>", Samples[sample], "</name>", sep=""), con)
                 if ( dim(eset@phenoData@data)[2] != 0 ) {
                     tempp <- eset@phenoData@data[sampleMaps[[1]][sample],]
                     for ( i in 2:length(temp) ) {
-                        writeLines(paste("\t\t\t<", temp[i], ">", tempp[i], "</", temp[i], ">", sep=""), con)
+                        writeLines(paste('\t\t\t<x name="', temp[i], '">', tempp[i], "</x>", sep=""), con)
                     }
                 }
                 
@@ -161,18 +165,26 @@ ExportEV.ISAModules <- function(biclusters, eset,
 
     ## modules
     writeLines("\t<modules>", con)
-
+    
         writeLines("\t\t<moduletags>", con)
             writeLines("\t\t\t<id>#</id>", con)
             writeLines("\t\t\t<name>Name</name>", con)
 
             if ( dim(biclusters@seeddata)[1] > 0 ) {
                 temp <- colnames(biclusters@seeddata)
+                temp2 <- setdiff(temp, allowed)
+                temp <- intersect(temp, allowed)
                 ## replace unallowed characters by underscores
                 tempp <- gsub("[^[:alnum:]]", "_", temp)
                 if ( length(temp) >= 1 ) {    
-                    for ( i in 1:length(temp) ) {
+                    for ( i in seq_len(length(temp))) {
                         writeLines(paste("\t\t\t<", tempp[i], ">", temp[i], "</", tempp[i], ">", sep=""), con)
+                    }
+                }
+                tempp <- gsub("[^[:alnum:]]", "_", temp2)
+                if ( length(temp2) >= 1) {
+                    for ( i in seq_len(length(temp2)) ) {
+                        writeLines(paste('\t\t\t<x name="', tempp[i], '">', temp2[i], "</x>", sep=""), con)
                     }
                 }
             }
@@ -213,16 +225,26 @@ ExportEV.ISAModules <- function(biclusters, eset,
             writeLines(paste("\t\t\t<name>module ", module, "</name>", sep=""), con)
             if ( dim(biclusters@seeddata)[1] > 0 ) {
                 temp <- colnames(biclusters@seeddata)
+                temp2 <- setdiff(temp, allowed)
+                temp <- intersect(temp, allowed)
                 ## replace unallowed characters by underscores
                 temp <- gsub("[^[:alnum:]]", "_", temp)
                 if ( length(temp) != 0 ) {
                     tempp <- biclusters@seeddata[module,]
-                    for ( i in 1:length(temp) ) {
+                    for ( i in seq_len(length(temp)) ) {
                         value <- tempp[i]
                         if ( temp[i] == "rob" || temp[i] == "rob_limit" ) {
                             value <- formatter(as.numeric(value))
                         }
                         writeLines(paste("\t\t\t<", temp[i], ">", value, "</", temp[i], ">", sep=""), con)
+                    }
+                }
+                temp2 <- gsub("[^[:alnum:]]", "_", temp2)
+                if ( length(temp2) != 0 ) {
+                    temp2p <- biclusters@seeddata[module,]
+                    for ( i in seq_len(length(temp2)) ) {
+                        value <- temp2p[i]
+                        writeLines(paste('\t\t\t<x name="', temp2[i], '">', value, "</x>", sep=""), con)
                     }
                 }
             }
@@ -393,7 +415,7 @@ ExportEV.list <- function(biclusters, eset, order=OrderEV(biclusters),
     writeLines("<evf>", con)
     writeLines("\t<summary>", con)
     writeLines("\t\t<description>ExpressionView data file</description>", con)
-    writeLines("\t\t<version>1.0</version>", con)
+    writeLines("\t\t<version>1.1</version>", con)
     writeLines("\t\t<dataorigin>non-eisa</dataorigin>", con)
     writeLines(paste("\t\t<xaxislabel>", experimentdata$xaxislabel, "</xaxislabel>", sep=""), con)
     writeLines(paste("\t\t<yaxislabel>", experimentdata$yaxislabel, "</yaxislabel>", sep=""), con)
@@ -422,7 +444,6 @@ ExportEV.list <- function(biclusters, eset, order=OrderEV(biclusters),
 
         writeLines("\t\t<genetags>", con)
             writeLines("\t\t\t<id>#</id>", con)
-            writeLines("\t\t\t<score>Score</score>", con)
             writeLines("\t\t\t<name>Name</name>", con)
 
             if ( !is.null(geneLabels) ) {
@@ -430,8 +451,8 @@ ExportEV.list <- function(biclusters, eset, order=OrderEV(biclusters),
                 ## replace unallowed characters by underscores
                 tempp <- gsub("[^[:alnum:]]", "_", temp)
                 if ( length(temp) >= 1 ) {    
-                    for ( i in 1:length(temp) ) {
-                        writeLines(paste("\t\t\t<", tempp[i], ">", temp[i], "</", tempp[i], ">", sep=""), con)
+                    for ( i in seq_len(length(temp)) ) {
+                        writeLines(paste('\t\t\t<x name="', tempp[i], '">', temp[i], "</x>", sep=""), con)
                     }
                 }
             }
@@ -440,18 +461,25 @@ ExportEV.list <- function(biclusters, eset, order=OrderEV(biclusters),
 
         writeLines("", con)
 
+        geneallowed <- c("symbol", "entrez")
         for ( gene in 1:nGenes ) {
             writeLines("\t\t<gene>", con)
                 writeLines(paste("\t\t\t<id>", gene, "</id>", sep=""), con)
-                writeLines("\t\t\t<score/>", con)
                 writeLines(paste("\t\t\t<name>", Genes[gene], "</name>", sep=""), con)
 
                 if ( !is.null(geneLabels) ) {
                     ## replace unallowed characters by underscores
-                    temp <- gsub("[^[:alnum:]]", "_", geneLabels)
-                    tempp <- geneLabelsData[gene, ]
-                    for ( i in 1:length(temp) ) {
+                    temp2 <- setdiff(geneLabels, geneallowed)
+                    temp <- intersect(geneLabels, geneallowed)
+                    tempp <- geneLabelsData[gene, temp]
+                    temp <- gsub("[^[:alnum:]]", "_", temp)
+                    for ( i in seq_len(length(temp)) ) {
                         writeLines(paste("\t\t\t<", temp[i], ">", xmlconf(tempp[i]), "</", temp[i], ">", sep=""), con)
+                    }
+                    tempp <- geneLabelsData[gene, temp2]
+                    temp2 <- gsub("[^[:alnum:]]", "_", temp2)
+                    for ( i in seq_len(length(temp2))) {
+                        writeLines(paste('\t\t\t<x name="', temp2[i], '">', xmlconf(tempp[i]), "</x>", sep=""), con)
                     }
                 }
 
@@ -465,7 +493,6 @@ ExportEV.list <- function(biclusters, eset, order=OrderEV(biclusters),
 
         writeLines("\t\t<sampletags>", con)
             writeLines("\t\t\t<id>#</id>", con)
-            writeLines("\t\t\t<score>Score</score>", con)
             writeLines("\t\t\t<name>Name</name>", con)
 
             if ( !is.null(sampleLabels) ) {
@@ -473,8 +500,8 @@ ExportEV.list <- function(biclusters, eset, order=OrderEV(biclusters),
                 ## replace unallowed characters by underscores
                 tempp <- gsub("[^[:alnum:]]", "_", temp)
                 if ( length(temp) >= 1 ) {    
-                    for ( i in 1:length(temp) ) {
-                        writeLines(paste("\t\t\t<", tempp[i], ">", temp[i], "</", tempp[i], ">", sep=""), con)
+                    for ( i in seq_len(length(temp)) ) {
+                        writeLines(paste('\t\t\t<x name="', tempp[i], '">', temp[i], "</x>", sep=""), con)
                     }
                 }
             }
@@ -487,15 +514,14 @@ ExportEV.list <- function(biclusters, eset, order=OrderEV(biclusters),
             
             writeLines("\t\t<sample>", con)
                 writeLines(paste("\t\t\t<id>", sample, "</id>", sep=""), con)
-                writeLines("\t\t\t<score/>", con)
                 writeLines(paste("\t\t\t<name>", Samples[sample], "</name>", sep=""), con)
 
                 if ( !is.null(sampleLabels) ) {
                     ## replace unallowed characters by underscores
                     temp <- gsub("[^[:alnum:]]", "_", sampleLabels)
                     tempp <- sampleLabelsData[sample, ]
-                    for ( i in 1:length(temp) ) {
-                        writeLines(paste("\t\t\t<", temp[i], ">", xmlconf(tempp[i]), "</", temp[i], ">", sep=""), con)
+                    for ( i in seq_len(length(temp)) ) {
+                        writeLines(paste('\t\t\t<x name="', temp[i], '">', xmlconf(tempp[i]), "</x>", sep=""), con)
                     }
                 }
 
@@ -515,11 +541,19 @@ ExportEV.list <- function(biclusters, eset, order=OrderEV(biclusters),
 
             if ( dim(biclusters$seeddata)[1] > 0 ) {
                 temp <- colnames(biclusters$seeddata)
+                temp2 <- setdiff(temp, allowed)
+                temp <- intersect(temp, allowed)
                 ## replace unallowed characters by underscores
                 tempp <- gsub("[^[:alnum:]]", "_", temp)
                 if ( length(temp) >= 1 ) {    
-                    for ( i in 1:length(temp) ) {
+                    for ( i in seq_len(length(temp)) ) {
                         writeLines(paste("\t\t\t<", tempp[i], ">", temp[i], "</", tempp[i], ">", sep=""), con)
+                    }
+                }
+                temp2p <- gsub("[^[:alnum:]]", "_", temp2)
+                if ( length(temp2) >= 1 ) {    
+                    for ( i in seq_len(length(temp2)) ) {
+                        writeLines(paste('\t\t\t<x name="', temp2p[i], '">', temp2[i], "</x>", sep=""), con)
                     }
                 }
             }
@@ -532,16 +566,29 @@ ExportEV.list <- function(biclusters, eset, order=OrderEV(biclusters),
                 writeLines(paste("\t\t\t<name>module ", module, "</name>", sep=""), con)
                 if ( dim(biclusters$seeddata)[1] > 0 ) {
                     temp <- colnames(biclusters$seeddata)
+                    temp2 <- setdiff(temp, allowed)
+                    temp <- intersect(temp, allowed)
                     ## replace unallowed characters by underscores
                     temp <- gsub("[^[:alnum:]]", "_", temp)
                     if ( length(temp) != 0 ) {
                         tempp <- biclusters$seeddata[module,]
-                        for ( i in 1:length(temp) ) {
+                        for ( i in seq_len(length(temp)) ) {
                             value <- tempp[i]
                             if ( temp[i] == "rob" || temp[i] == "rob_limit" ) {
                                 value <- formatter(as.numeric(value))
                             }
                             writeLines(paste("\t\t\t<", temp[i], ">", value, "</", temp[i], ">", sep=""), con)
+                        }
+                    }
+                    temp2 <- gsub("[^[:alnum:]]", "_", temp2)
+                    if ( length(temp2) != 0 ) {
+                        temp2p <- biclusters$seeddata[module,]
+                        for ( i in seq_len(length(temp2)) ) {
+                            value <- temp2p[i]
+                            if ( temp2[i] == "rob" || temp2[i] == "rob_limit" ) {
+                                value <- formatter(as.numeric(value))
+                            }
+                            writeLines(paste("\t\t\t<", temp2[i], ">", value, "</", temp2[i], ">", sep=""), con)
                         }
                     }
                 }

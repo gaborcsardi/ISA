@@ -2,10 +2,10 @@
 
   <xsd:annotation>
     <xsd:documentation xml:lang="en">
-     ExpressionView file format schema. ExpressionView is a tool 
-     to visualize modules (biclusters) in gene expression data. 
-     Please see http://www.unil.ch/cbg for details.
-     Copyright 2010 UNIL DGM Computational Biology Group
+     ExpressionView file format schema, version 1.1.
+     ExpressionView is a tool to visualize modules (biclusters) in
+     gene expression data. Please see http://www.unil.ch/cbg for
+     details. Copyright 2010 UNIL DGM Computational Biology Group
     </xsd:documentation>
   </xsd:annotation>
 
@@ -23,6 +23,9 @@
       <xsd:element name="nmodules" type="xsd:nonNegativeInteger" />
       <xsd:element name="ngenes" type="xsd:positiveInteger" />
       <xsd:element name="nsamples" type="xsd:positiveInteger" />
+      <xsd:element name="xaxislabel" type="xsd:string" />
+      <xsd:element name="yaxislabel" type="xsd:string" />
+      <xsd:element name="dataorigin" minOccurs="0" type="xsd:string" />
     </xsd:sequence>
   </xsd:complexType>
 
@@ -56,7 +59,6 @@
   <xsd:complexType name="GeneTagsType">
     <xsd:sequence>
       <xsd:element name="id" type="xsd:string" />
-      <xsd:element name="score" type="xsd:string" />
       <xsd:element name="name" minOccurs="0" type="xsd:string" />
       <xsd:element name="symbol" minOccurs="0" type="xsd:string" />
       <xsd:element name="entrez" minOccurs="0" type="xsd:string" />
@@ -68,7 +70,6 @@
   <xsd:complexType name="GeneType">
     <xsd:sequence>
       <xsd:element name="id" type="xsd:string" />
-      <xsd:element name="score" type="xsd:string" />
       <xsd:element name="name" minOccurs="0" type="xsd:string" />
       <xsd:element name="symbol" minOccurs="0" type="xsd:string" />
       <xsd:element name="entrezid" minOccurs="0" type="xsd:string" />
@@ -87,7 +88,6 @@
   <xsd:complexType name="SampleTagsType">
     <xsd:sequence>
       <xsd:element name="id" type="xsd:string" />
-      <xsd:element name="score" type="xsd:string" />
       <xsd:element name="name" minOccurs="0" type="xsd:string" />
       <xsd:element name="x" minOccurs="0" maxOccurs="unbounded"
 		   type="ExtraType" />
@@ -97,7 +97,6 @@
   <xsd:complexType name="SampleType">
     <xsd:sequence>
       <xsd:element name="id" type="xsd:string" />
-      <xsd:element name="score" type="xsd:string" />
       <xsd:element name="name" minOccurs="0" type="xsd:string" />
       <xsd:element name="x" minOccurs="0" maxOccurs="unbounded"
 		   type="ExtraType" />

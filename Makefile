@@ -171,7 +171,7 @@ ExpressionView/libs/AlivePDF.swc: $(ALIVEPDFFILES)
 RExpressionView/inst/ExpressionView.swf: $(EVFILES) ExpressionView/libs/AlivePDF.swc
 	cd ExpressionView/src && \
 	mxmlc -compiler.library-path+=../libs/AlivePDF.swc \
-			-use-network=false ExpressionView.mxml \
+			-use-network=true ExpressionView.mxml \
 			-target-player=10 \
 			-debug=false \
 			-define+=CONFIG::air,false \

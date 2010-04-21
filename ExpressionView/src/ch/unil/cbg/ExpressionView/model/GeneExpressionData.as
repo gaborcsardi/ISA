@@ -39,6 +39,8 @@ package ch.unil.cbg.ExpressionView.model {
 
 		public var nGenes:int;
 		public var nSamples:int;
+
+		private var separator:String;
 		
 		public var XMLData:XML;
 		// true if data is derived from gene expression matrix
@@ -109,10 +111,27 @@ package ch.unil.cbg.ExpressionView.model {
 		}
 
 
-		public function initialize(data:XML): void  {		
+		public function initialize(data:XML): void {		
 
 			XMLData = data;
 			//XML.ignoreWhitespace = true;
+
+			// Check version and dispatch
+			var version:String = XMLData.summary.version;
+			
+			if (version == "1.0") {
+			  initialize_1_0();
+			} else if (version == "1.1") {
+			  initialize_1_1();
+                        } else {
+                          // TODO: error, we try to parse anyway
+                          initialize_1_1();
+                        }
+		}
+		
+		private function initialize_1_0(): void {
+
+		        separator = ", ";
 
 			// read summary
 			nModules = int(XMLData.summary.nmodules);
@@ -134,7 +153,7 @@ package ch.unil.cbg.ExpressionView.model {
 			label = XMLData.summary.yaxislabel;
 			if ( label != "" ) {
 				yAxisLabel = label;
-			}
+			}			
 
 			// read expression matrix
 			var decoder:Base64Decoder = new Base64Decoder();
@@ -275,6 +294,199 @@ package ch.unil.cbg.ExpressionView.model {
 			
 		}
 
+		private function recode(list:XMLListCollection): XMLListCollection {
+		  for (var i:int = 0; i<list.length; i++) {
+		    for (var j:int = 0; j<list[i].children().length(); j++) {
+                      var name:String = list[i].children()[j].name();
+                      if (name == "x") {
+//		        Alert.show(name + list[i].children()[j].@name, "Warning", mx.controls.Alert.OK);
+                        list[i].children()[j].setName(list[i].children()[j].@name);
+                      }
+                    }
+		  }
+		  return list;
+		}
+
+		private function initialize_1_1(): void {
+
+		        separator = " ";
+
+			// read summary
+			nModules = int(XMLData.summary.nmodules);
+			nGenes = int(XMLData.summary.ngenes);
+			nSamples = int(XMLData.summary.nsamples);
+			
+			dataOrigin = ( XMLData.summary.dataorigin == "non-eisa" ) ? false : true;
+			if ( !dataOrigin ) {
+				var alert:String = "Data is not derived from a BioConductor ExpressSet. ";
+				alert += "Since ExpressionView is designed to explore gene expression data, ";
+				alert += "you might encounter unexpected behavior." 
+				Alert.show(alert , 'Warning', mx.controls.Alert.OK)
+			}
+			
+			var label:String = XMLData.summary.xaxislabel;
+			if ( label != "" ) {
+				xAxisLabel = label;
+			}
+			label = XMLData.summary.yaxislabel;
+			if ( label != "" ) {
+				yAxisLabel = label;
+			}			
+
+			// read expression matrix
+			var decoder:Base64Decoder = new Base64Decoder();
+			decoder.decode(XMLData.data);
+			Data = decoder.toByteArray();
+						
+			Modules = recode(new XMLListCollection(XMLData.modules.module));
+			ModularData = new Vector.<GeneExpressionModule>(nModules+1, true);
+			ModulesColors = new Vector.<Array>(nModules+1, true);
+			for ( var module:int = 0; module <= nModules; ++module ) {
+				ModularData[module] = new GeneExpressionModule();
+				ModulesColors[module]  = [hsv2rgb(module / nModules * 360, 100, 60), hsv2rgb(module / nModules * 360, 100, 100)];
+			}
+
+			// read labels
+			var tags:XML = XML(XMLData.genes.genetags);
+			var size:int = tags.children().length();
+			geneLabels = new Vector.<Array>(size, true);
+ 			for ( var tag:int = 0; tag < size; ++tag ) {
+			      	var mytag:Object = tags.children()[tag];
+ 				var temp:String = mytag.name()
+				if (temp != "x") {
+				  geneLabels[tag] = [temp, tags.child(temp)];
+ 				} else {
+				  geneLabels[tag] = [mytag.@name, mytag.children()[0]];
+                                }
+			}
+			tags = new XML(XMLData.samples.sampletags);
+			size = tags.children().length();
+			sampleLabels = new Vector.<Array>(size, true);
+ 			for ( tag = 0; tag < size; ++tag ) {
+			        mytag = tags.children()[tag];
+ 				temp = mytag.name();
+				if (temp != "x") {				  
+				  sampleLabels[tag] = [temp, tags.child(temp)];
+				} else {
+				  sampleLabels[tag] = [mytag.@name, mytag.children()[0]];
+ 				}
+			}
+			tags = new XML(XMLData.modules.moduletags);
+			size = tags.children().length();
+			moduleLabels = new Vector.<Array>(size, true);
+ 			for ( tag = 0; tag < size; ++tag ) {
+			        mytag = tags.children()[tag];
+ 				temp = mytag.name();
+				if (temp != "x") {
+				  moduleLabels[tag] = [temp, tags.child(temp)];
+ 				} else {
+				  moduleLabels[tag] = [mytag.@name, mytag.children()[0]];
+				}
+			}
+			goLabels = new Vector.<Array>;
+			if ( XMLData.modules.child("gotags").length() > 0 ) {
+				tags = new XML(XMLData.modules.gotags);
+				size = tags.children().length();
+				goLabels = new Vector.<Array>(size, true);
+	 			for ( tag = 0; tag < size; ++tag ) {
+ 					temp = tags.children()[tag].name();
+					goLabels[tag] = [temp, tags.child(temp)];
+				}
+			}
+			keggLabels = new Vector.<Array>;
+			if ( XMLData.modules.child("keggtags").length() > 0 ) {
+				tags = new XML(XMLData.modules.keggtags);
+				size = tags.children().length();
+				keggLabels = new Vector.<Array>(size, true);
+ 				for ( tag = 0; tag < size; ++tag ) {
+ 					temp = tags.children()[tag].name();
+					keggLabels[tag] = [temp, tags.child(temp)];
+				}
+			}
+
+			ModulesLookupGOs = new Vector.<Array>(nModules+1, true);
+			ModulesLookupGOsP = new Vector.<Array>(nModules+1, true);
+			gos = new XMLListCollection();
+			var tempsort:Array = [];
+			for ( module = 1; module <= nModules; ++module ) {
+				var length:int = XMLData.modules.module[module-1].gos.go.length();
+				ModulesLookupGOs[module] = new Array(length+1);
+				ModulesLookupGOsP[module] = new Array(length);
+				for ( var i:int = 0; i < length; ++i ) {
+					tempsort.push(new Object());
+					var item:XML = new XML(XMLData.modules.module[module-1].gos.go[i]);
+					tempsort[tempsort.length-1].pvalue = item.pvalue;
+					tempsort[tempsort.length-1].module = module;
+					tempsort[tempsort.length-1].slot = i+1;
+					item.id = gos.length + 1; 
+					gos.addItem(item);
+				}
+			}
+			ModulesLookupGOs[0] = [];
+			for ( i = 0; i < gos.length; ++i ) {
+				module = tempsort[i].module;
+				ModulesLookupGOs[module][tempsort[i].slot] = i+1;
+				ModulesLookupGOsP[module][i.toString()] = tempsort[i].slot - 1; 
+				ModulesLookupGOs[0].push(module);
+			} 
+			
+			ModulesLookupKEGGs = new Vector.<Array>(nModules+1, true);
+			ModulesLookupKEGGsP = new Vector.<Array>(nModules+1, true);
+			keggs = new XMLListCollection();
+			tempsort = [];
+			for ( module = 1; module <= nModules; ++module ) {
+				length = XMLData.modules.module[module-1].keggs.kegg.length();
+				ModulesLookupKEGGs[module] = new Array(length+1);
+				ModulesLookupKEGGsP[module] = new Array(length);
+				for ( i = 0; i < length; ++i ) {
+					tempsort.push(new Object());
+					item = new XML(XMLData.modules.module[module-1].keggs.kegg[i]);
+					tempsort[tempsort.length-1].pvalue = item.pvalue;
+					tempsort[tempsort.length-1].module = module;
+					tempsort[tempsort.length-1].slot = i+1;
+					item.id = keggs.length + 1; 
+					keggs.addItem(item);
+				}
+			}
+			ModulesLookupKEGGs[0] = [];
+			for ( i = 0; i < keggs.length; ++i ) {
+				module = tempsort[i].module;
+				ModulesLookupKEGGs[module][tempsort[i].slot] = i+1;
+				ModulesLookupKEGGsP[module][i.toString()] = tempsort[i].slot - 1;
+				ModulesLookupKEGGs[0].push(module);
+			}
+
+			// set modularData[0]
+			ModularData[0].nGenes = nGenes;
+			ModularData[0].Genes = recode(new XMLListCollection(XMLData.genes.gene));
+			ModularData[0].nSamples = nSamples;
+			ModularData[0].Samples = recode(new XMLListCollection(XMLData.samples.sample));
+			ModularData[0].GO = new XMLListCollection(gos.source);
+			ModularData[0].KEGG = new XMLListCollection(keggs.source);
+
+			ModulesLookup = new Vector.<Array>(nGenes * nSamples, true);
+			for ( i = 0; i < ModulesLookup.length; ++i ) { ModulesLookup[i] = []; }
+			
+			ModulesLookupGenes = new Vector.<Array>(nGenes+1, true);
+			for ( i = 0; i < ModulesLookupGenes.length; ++i ) { ModulesLookupGenes[i] = []; }
+
+			ModulesLookupSamples = new Vector.<Array>(nSamples+1, true);
+			for ( i = 0; i < ModulesLookupSamples.length; ++i ) { ModulesLookupSamples[i] = []; }
+
+			ModulesLookupModules = new Vector.<Array>(nModules+1, true);
+			for ( i = 0; i < ModulesLookupModules.length; ++i ) { ModulesLookupModules[i] = []; }
+
+			GenesLookup = new Vector.<Array>(nModules+1, true);
+			GenesLookupP = new Vector.<Array>(nModules+1, true);
+			SamplesLookup = new Vector.<Array>(nModules+1, true);
+			SamplesLookupP = new Vector.<Array>(nModules+1, true);			
+			ModularData[0].ModulesRectangles = new Vector.<Array>(nModules+1, true);
+			ModularData[0].ModulesOutlines = new Vector.<int>(nModules+1, true);
+
+			setTimeout(treatModules, 10, 1);
+			
+		}
+
 		public function getModule(module:int): GeneExpressionModule {
 			if ( nModules > 0 && module >= 0 && module <= nModules ) {
 				if ( ModularData[module].nGenes == 0 ) {
@@ -308,7 +520,7 @@ package ch.unil.cbg.ExpressionView.model {
 						
 			newmodule.nGenes = ngenes;
 			var string:String = Modules.source[module-1].genescores.toString();
-		   	var scores:Array = string.split(", ");
+		   	var scores:Array = string.split(separator);
 			for ( var gene:int = 0; gene < genes.length; ++gene ) {
 				var item:XML = new XML(global.Genes[genes[gene]-1]);
 				item.id = gene + 1;
@@ -317,7 +529,7 @@ package ch.unil.cbg.ExpressionView.model {
 			}
 			newmodule.nSamples = nsamples;
 			string = Modules.source[module-1].samplescores.toString();
-		   	scores = string.split(", ");
+		   	scores = string.split(separator);
 			for ( var sample:int = 0; sample < samples.length; ++sample ) {
 				item = new XML(global.Samples[samples[sample]-1]);
 				item.id = sample + 1;
@@ -468,7 +680,7 @@ package ch.unil.cbg.ExpressionView.model {
 				}
 
 	        	var string:String = Modules.source[module-1].containedgenes.toString();
-		   		var genes:Array = string.split(", ");
+		   		var genes:Array = string.split(separator);
 				GenesLookup[module] = [];
 				GenesLookupP[module] = [];
 				for ( var genep:int = 0; genep < genes.length; ++genep ) {
@@ -481,7 +693,7 @@ package ch.unil.cbg.ExpressionView.model {
 		   		genes.sort(Array.NUMERIC);
 
 				string = Modules.source[module-1].containedsamples.toString();
-				var samples:Array = string.split(", ");
+				var samples:Array = string.split(separator);
 				SamplesLookup[module] = [];
 				SamplesLookupP[module] = [];
 				for ( var samplep:int = 0; samplep < samples.length; ++samplep ) {
@@ -494,7 +706,7 @@ package ch.unil.cbg.ExpressionView.model {
 				samples.sort(Array.NUMERIC);
 				
 				string = Modules.source[module-1].intersectingmodules.toString();
-				var modules:Array = string.split(", ");
+				var modules:Array = string.split(separator);
 				modules.sort(Array.NUMERIC);
 				
 				// determine rectangles				
@@ -548,10 +760,10 @@ package ch.unil.cbg.ExpressionView.model {
 					for ( samplep = 0; samplep < SamplesLookup[module].length; ++samplep ) {
 						sample = SamplesLookup[module][samplep];
 						var k:int = (gene-1) * nSamples + sample - 1;
-						if ( ModulesLookup[k] == null ) { 
+						if ( ModulesLookup[k] == null ) {
 							ModulesLookup[k] = [module]; 
 						} else {
-							ModulesLookup[k].push(module);							
+							ModulesLookup[k].push(module);
 						}
 					}
 				}
