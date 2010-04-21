@@ -308,7 +308,7 @@ package ch.unil.cbg.ExpressionView.model {
 						
 			newmodule.nGenes = ngenes;
 			var string:String = Modules.source[module-1].genescores.toString();
-		   	var scores:Array = string.split(" ");
+		   	var scores:Array = string.split(", ");
 			for ( var gene:int = 0; gene < genes.length; ++gene ) {
 				var item:XML = new XML(global.Genes[genes[gene]-1]);
 				item.id = gene + 1;
@@ -317,7 +317,7 @@ package ch.unil.cbg.ExpressionView.model {
 			}
 			newmodule.nSamples = nsamples;
 			string = Modules.source[module-1].samplescores.toString();
-		   	scores = string.split(" ");
+		   	scores = string.split(", ");
 			for ( var sample:int = 0; sample < samples.length; ++sample ) {
 				item = new XML(global.Samples[samples[sample]-1]);
 				item.id = sample + 1;
@@ -468,7 +468,7 @@ package ch.unil.cbg.ExpressionView.model {
 				}
 
 	        	var string:String = Modules.source[module-1].containedgenes.toString();
-		   		var genes:Array = string.split(" ");
+		   		var genes:Array = string.split(", ");
 				GenesLookup[module] = [];
 				GenesLookupP[module] = [];
 				for ( var genep:int = 0; genep < genes.length; ++genep ) {
@@ -481,7 +481,7 @@ package ch.unil.cbg.ExpressionView.model {
 		   		genes.sort(Array.NUMERIC);
 
 				string = Modules.source[module-1].containedsamples.toString();
-				var samples:Array = string.split(" ");
+				var samples:Array = string.split(", ");
 				SamplesLookup[module] = [];
 				SamplesLookupP[module] = [];
 				for ( var samplep:int = 0; samplep < samples.length; ++samplep ) {
@@ -494,7 +494,7 @@ package ch.unil.cbg.ExpressionView.model {
 				samples.sort(Array.NUMERIC);
 				
 				string = Modules.source[module-1].intersectingmodules.toString();
-				var modules:Array = string.split(" ");
+				var modules:Array = string.split(", ");
 				modules.sort(Array.NUMERIC);
 				
 				// determine rectangles				

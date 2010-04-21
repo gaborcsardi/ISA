@@ -21,7 +21,7 @@ if (require(biclust)) {
 ## export EISA
 
 mytoString <- function(x) {
-  paste(x, collapse=" ")
+  paste(x, collapse=", ")
 }
 
 ExportEV.ISAModules <- function(biclusters, eset,
