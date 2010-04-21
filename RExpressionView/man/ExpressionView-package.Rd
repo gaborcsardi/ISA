@@ -34,13 +34,13 @@
       The Flash applet is started by the \code{\link{LaunchEV}}
       command. Video tutorials describing the various features of the
   applet can be found on the ExpressionView website
-  (\url{http://www2.unil.ch/cbg/index.php?title=ExpressionView}).
+  (\url{http://www.unil.ch/cbg/ExpressionView}).
     }
   }
-  A tutorial can be found at \url{../doc/ExpressionView.tutorial.pdf}
+  A tutorial can be found in the accompanying vignette of the package.
 }
 \section{Biclustering with non-gene expression data}{
-  Both, the ISA (see \code{\link[eisa]{ISA}}) and the biclustering methods
+  Both, the \code{\link[eisa]{ISA}} and the biclustering methods
   implemented in the \code{\link[biclust]{biclust}} package can treat any
   two-dimensional data, i.e., not necessarily originating from gene
   expression profiling. While the ExpressionView package is optimized for
