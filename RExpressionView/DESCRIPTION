@@ -11,7 +11,7 @@ Description: ExpressionView visualizes possibly overlapping biclusters
 	Flex and runs in a flash-enabled web browser.
 Depends: caTools, bitops
 Imports: methods, isa2, eisa, GO.db, KEGG.db, AnnotationDbi
-Suggests: ALL, hgu95av2.db, biclust
+Suggests: ALL, hgu95av2.db, biclust, GO.db, KEGG.db, AnnotationDbi, affy
 biocViews: Classification, Visualization, Microarray, GeneExpression
 Collate: AllGenerics.R export.R launch.R order.R zzz.R
 License: GPL (>= 2)
