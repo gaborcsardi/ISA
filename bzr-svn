@@ -1,0 +1,27 @@
+
+From our bzr to BioC svn:
+=========================
+
+eisa
+----
+
+diff -ruN -x .svn -x .bzr eisa-svn/ 0.2-main-svn/eisa/ > /tmp/eisa-patch
+cd eisa-svn
+patch -p1 < /tmp/eisa-patch 
+<add new files to SVN>
+<delete deleted files from SVN>
+svn commit --username g.csardi
+
+ExpressionView
+--------------
+
+cd 0.2-main
+make ExpressionView-final
+cp ExpressionView*.tar.gz ..
+tar xzf ExpressionView*.tar.gz
+diff -ruN -x .svn -x .bzr ExpressionView-svn ExpressionView > /tmp/EV-patch
+cd ExpressionView-svn
+patch -p1 < /tmp/EV-patch
+<add new files to SVN>
+<delete deleted files from SVN>
+svn commit --username g.csardi
