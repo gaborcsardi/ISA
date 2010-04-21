@@ -32,56 +32,67 @@ options(continue=" ")
 @ 
 
 \section{Introduction}
-Clustering genes according to their expression profiles is an important task 
-in analyzing microarray data. In this tutorial, we explain how to use ExpressionView, 
-an R package designed to interactively explore biclusters identified in gene 
-expression data, in conjunction with the Iterative Signature Algorithm (ISA)~\cite{bergmann03} 
-and the biclustering methods available in the \Rpackage{Biclust} package~\cite{kaiser08}.
+Clustering genes according to their expression profiles is an
+important task in analyzing microarray data. In this tutorial, we
+explain how to use ExpressionView, an R package designed to
+interactively explore biclusters identified in gene expression data,
+in conjunction with the Iterative Signature Algorithm
+(ISA)~\cite{bergmann03} and the biclustering methods available in the
+\Rpackage{Biclust} package~\cite{kaiser08}.
 
 \section{Loading the gene expression data}
-The \Rpackage{ExpressionView} package requires the gene expression data to be available in the
-form of a BioConductor \Rclass{ExpressionSet}. In this tutorial we will use the 
-BioConductor sample data from a 
-clinical trial in acute lymphoblastic leukemia provided by the \Rpackage{ALL} package.
+The \Rpackage{ExpressionView} package requires the gene expression
+data to be available in the form of a BioConductor
+\Rclass{ExpressionSet}. In this tutorial we will use the BioConductor
+sample data from a clinical trial in acute lymphoblastic leukemia
+provided by the \Rpackage{ALL} package.
 <<load the data>>=
 library(ALL)
 library(hgu95av2.db)
 data(ALL)
 @
-The data set contains \Sexpr{ncol(ALL)} samples and \Sexpr{nrow(ALL)} features.
+The data set contains \Sexpr{ncol(ALL)} samples and \Sexpr{nrow(ALL)}
+features.
 
 \section{Find biclusters}
-There are many biclustering algorithms described in the literature~\cite{madeira04}.
-All of them aim to reduce the complexity of the gene expression data by identifying 
-suitable groups of genes and conditions that are co-expressed. In this tutorial
-show how to use \Rpackage{ExpressionView} with some of the available biclustering algorithms.
+There are many biclustering algorithms described in the
+literature~\cite{madeira04}. All of them aim to reduce the complexity
+of the gene expression data by identifying suitable groups of genes
+and conditions that are co-expressed. In this tutorial show how to use
+\Rpackage{ExpressionView} with some of the available biclustering
+algorithms.
 
 \subsection{Iterative Signature Algorithm (ISA)}
-The ISA~\cite{bergmann03} for gene expression data is implemented in the \Rpackage{eisa} package:
+The ISA~\cite{bergmann03} for gene expression data is implemented in
+the \Rpackage{eisa} package:
 <<load the packages>>=
 library(eisa)
 @
 
-To run the ISA for the given data set, simply call the \Rfunction{ISA} function on the
+To run the ISA for the given data set, simply call the \Rfunction{ISA}
+function on the
 \Rclass{ExpressionSet} object:
 <<ISA, eval=FALSE>>=
 set.seed(5) # initialize random number generator to get always the same results
 modules <- ISA(ALL)
 @ 
-Depending on your computing resources, this should take roughly two minutes. If you do not
-want to wait that long, you can shorten the calculation by selecting the thresholds for genes and
-conditions:
+Depending on your computing resources, this should take roughly two
+minutes. If you do not want to wait that long, you can shorten the
+calculation by selecting the thresholds for genes and conditions:
 <<fast ISA, cache=FALSE>>=
 threshold.genes <- 2.7 
 threshold.conditions <- 1.4 
 set.seed(5)
 modules <- ISA(ALL, thr.gene=threshold.genes, thr.cond=threshold.conditions)
 @
-If you leave the thresholds undefined, as in the first example, the ISA runs with the 
-default values, i.e., \variable{thr.gene=c(2,2.5,3,3.5,4)} and \variable{thr.cond=c(1,1.5,2,2.5,3)}.
-In both cases, the random number generator is initialized manually using \Rfunction{set.seed(5)}, 
-to give reproducible results. The \Rfunction{isa} function returns an \Rclass{ISAModules} object. 
-Typing its name returns a brief summary of the results:
+If you leave the thresholds undefined, as in the first example, the
+ISA runs with the default values, i.e.,
+\variable{thr.gene=c(2,2.5,3,3.5,4)} and
+\variable{thr.cond=c(1,1.5,2,2.5,3)}. In both cases, the random number
+generator is initialized manually using \Rfunction{set.seed(5)}, to
+give reproducible results. The \Rfunction{isa} function returns an
+\Rclass{ISAModules} object. Typing its name returns a brief summary of
+the results:
 <<ISAModules summary>>=
 modules
 @
@@ -93,8 +104,8 @@ details.
 \subsection{Algorithms of the \Rpackage{Biclust} package}
 The \Rpackage{biclust} package implements several biclustering
 algorithms in a unified framework. It uses the \Rclass{Biclust} class 
-to store a set of biclusters. Let us use the Plaid Model Bicluster Algorithm~\cite{turner04}
-on the \Rpackage{ALL} data set
+to store a set of biclusters. Let us use the Plaid Model Bicluster
+Algorithm~\cite{turner04} on the \Rpackage{ALL} data set
 <<biclust bcplaid,cache=FALSE>>=
 library(biclust)
 biclusters <- biclust(exprs(ALL), BCPlaid(), fit.model=~m+a+b, verbose=FALSE)
@@ -110,142 +121,237 @@ as(biclusters, "ISAModules")
 results an \Rclass{ISAModules} object.
 
 \subsection{External clustering programs}
-Since the structure of biclustering results is independent of the applied method, it is straightforward to
-import results obtained from external clustering programs and convert them to \Rclass{ISAModules}.
-To illustrate the conversion, let us consider the sample data and {\bf randomly} assign the  \Sexpr{nrow(ALL)} genes 
-and  \Sexpr{ncol(ALL)} samples to  \Sexpr{length(modules)} modules. The resulting modules can be described by two
-binary matrices
+Since the structure of biclustering results is independent of the
+applied method, it is straightforward to import results obtained from
+external clustering programs and convert them to
+\Rclass{ISAModules}. To illustrate the conversion, let us consider the
+sample data and {\bf randomly} assign the  \Sexpr{nrow(ALL)} genes and
+\Sexpr{ncol(ALL)} samples to  \Sexpr{length(modules)} modules. The
+resulting modules can be described by two binary matrices
 <<random-modules>>=
-modules.genes <- matrix(as.integer(runif(dim(ALL)[1]*length(modules),0,1)>0.8),nrow=dim(ALL)[1])
-modules.conditions <- matrix(as.integer(runif(dim(ALL)[2]*length(modules),0,1)>0.8),nrow=dim(ALL)[2])
+modules.genes <- matrix(as.integer(runif(nrow(ALL) * length(modules)) > 0.8), 
+                        nrow=nrow(ALL))
+modules.conditions <- matrix(as.integer(runif(ncol(ALL) *
+                                        length(modules))>0.8),
+                        nrow=ncol(ALL))
 @
-indicating if a given gene \variable{i} is contained in module \variable{j} if \variable{modules.genes[i,j]$\ne$0}.
-Using these matrices, it is straightforward to create an \Rclass{ISAModules} object:
+indicating if a given gene \variable{i} is contained in module
+\variable{j} if \variable{modules.genes[i,j]$\ne$0}. Using these
+matrices, it is straightforward to create an \Rclass{ISAModules}
+object: 
 <<toisa>>=
 new("ISAModules",
-genes=modules.genes, conditions=modules.conditions,rundata=data.frame(),seeddata=data.frame())
+    genes=modules.genes, conditions=modules.conditions,
+    rundata=data.frame(), seeddata=data.frame())
 @
 
 \section{Order}%
 \label{sec:ordering}
-To present the tens of possibly overlapping biclusters in a visually appealing form, 
-it is necessary to reorder the rows and columns of the gene expression matrix in 
-such a way that biclusters form contiguous rectangles. Since for more than two 
-mutually overlapping biclusters, it is in general impossible to find such an arrangement,
- one has to make concessions. In contrast methods that propose to repeat 
- rows and columns as necessary to achieve this goal~\cite{grothaus06}, we prefer to optimize the 
- arrangement within the original data by maximizing the area of the largest contiguous biclusters. 
+To present the tens of possibly overlapping biclusters in a visually
+appealing form, it is necessary to reorder the rows and columns of the
+gene expression matrix in such a way that biclusters form contiguous
+rectangles. Since for more than two mutually overlapping biclusters,
+it is in general impossible to find such an arrangement, one has to
+make concessions. In contrast methods that propose to repeat rows and
+columns as necessary to achieve this goal~\cite{grothaus06}, we prefer
+to optimize the arrangement within the original data by maximizing the
+area of the largest contiguous biclusters.
 
-The \Rfunction{OrderEV} function implemented in the \Rpackage{ExpressionView} package
-determines the optimal order of the gene expression matrix for a given
-set of biclusters. It can be called with \Rclass{ISAModules} or
-\Rclass{Biclust} objects as the first argument:
+The \Rfunction{OrderEV} function implemented in the
+\Rpackage{ExpressionView} package determines the optimal order of the
+gene expression matrix for a given set of biclusters. It can be called
+with \Rclass{ISAModules} or \Rclass{Biclust} objects as the first argument:
 <<expressionview, results=HIDE>>=
 library(ExpressionView)
 optimalorder <- OrderEV(modules)
 @
 
-The result is a list containing various mappings between the original data and the optimal arrangement.
-Note that the genes and the samples can be ordered separately. Apart form reordering the 
-full gene expression matrix, the algorithm also determines the best arrangement of individual biclusters.
-The mapping of the genes and the samples contained in bicluster \variable{i} can be accessed by 
+The result is a list containing various mappings between the original
+data and the optimal arrangement. Note that the genes and the samples
+can be ordered separately. Apart form reordering the full gene
+expression matrix, the algorithm also determines the best arrangement
+of individual biclusters. The mapping of the genes and the samples
+contained in bicluster \variable{i} can be accessed by
 <<gene maps, eval=FALSE>>=
 optimalorder$genes[i+1]
 optimalorder$samples[i+1]
 @
 The first elements of the lists contain the optimal ordering of the
 complete matrix. By default, the \Rfunction{OrderEV} function
-runs for roughly one minute, this might not be sufficient to find an appropriate order for data 
-containing many overlapping biclusters. The status of the ordering is stored in 
+runs for roughly one minute, this might not be sufficient to find an
+appropriate order for data containing many overlapping biclusters. The
+status of the ordering is stored in
 <<status ordering>>=
 optimalorder$status
 @
-If the status is set to \variable{1}, the algorithm has found the optimal solution. A \variable{0} indicates that the
-the calculation could not be terminated within the given timeframe. The \Rfunction{OrderEV} function
-accepts two additional parameters to circumvent the problem of partial alignment:
-One can start the ordering from a given initial configuration, i.e., the result of a previous arrangement
-by defining the \Rargument{initialorder} argument
+% $
+If the status is set to \variable{1}, the algorithm has found the
+optimal solution. A \variable{0} indicates that the the calculation
+could not be terminated within the given timeframe. The
+\Rfunction{OrderEV} function accepts two additional parameters to
+circumvent the problem of partial alignment: One can start the
+ordering from a given initial configuration, i.e., the result of a
+previous arrangement by defining the \Rargument{initialorder} argument
 <<status ordering, eval=FALSE>>=
 optimalorderp <- OrderEV(modules, initialorder=optimalorder, maxtime=120)
 @
-and one can increase the time limit by specifying \Rargument{maxtime}. Note that the time is indicated in seconds
-and cannot be  smaller than 1.
+and one can increase the time limit by specifying
+\Rargument{maxtime}. Note that the time is indicated in seconds and
+cannot be  smaller than 1.
 
 \section{Export}
-The \Rfunction{ExportEV} function allows the user to combine the available data and export it to an XML file that can be read by the Flash applet:
+The \Rfunction{ExportEV} function allows the user to combine the
+available data and export it to an XML file that can be read by the
+Flash applet:
 <<export, eval=FALSE>>=
 ExportEV(modules, ALL, optimalorder, filename="file.evf")
 @
-The function gathers the data contained in the \Rclass{ExpressionSet} \variable{ALL}, orders it according to the optimal arrangement 
-\variable{optimalorder} and adds the biclusters defined in \variable{modules}. The output is an uncompressed XML file that can be opened with any text viewer. We have chosen to use the extension \variable{.evf} (for ExpressionView file) for the data files. This extension is associated with the stand-alone version of the viewer, so that one can simply double-click on such a file to launch the program and load the data. The file association is the reason why we do not use the \variable{.xml} extension. A description of the XML layout can be found on the \Rpackage{ExpressionView} website at \url{http://www.unil.ch/cbg/ExpressionView}. Before exporting the data, the
-\Rfunction{ExportEV} function automatically calculates GO~\cite{ashburner00} and KEGG~\cite{kanehisa04} enrichments for the given biclusters.
+The function gathers the data contained in the \Rclass{ExpressionSet}
+\variable{ALL}, orders it according to the optimal arrangement
+\variable{optimalorder} and adds the biclusters defined in
+\variable{modules}. The output is an uncompressed XML file that can be
+opened with any text viewer. We have chosen to use the extension
+\variable{.evf} (for ExpressionView file) for the data files. This
+extension is associated with the stand-alone version of the viewer, so
+that one can simply double-click on such a file to launch the program
+and load the data. The file association is the reason why we do not
+use the \variable{.xml} extension. A description of the XML layout can
+be found on the \Rpackage{ExpressionView} website at
+\url{http://www.unil.ch/cbg/ExpressionView}. Before exporting the
+data, the \Rfunction{ExportEV} function automatically calculates
+GO~\cite{ashburner00} and KEGG~\cite{kanehisa04} enrichments for the
+given biclusters.
 
 \section{Visualize}
-The ExpressionView Flash applet can be launched from the R environment:
+The ExpressionView Flash applet can be launched from the R
+environment:
 <<export, eval=FALSE>>=
 LaunchEV()
 @
-Video tutorials describing how to use the applet can be found on the ExpressionView \\
-\href{http://www2.unil.ch/cbg/index.php?title=ExpressionView}{website}. The screenshot shown in Fig.~\ref{fig:screenshot} 
-and the description below illustrate the main features of the applet:
+Video tutorials describing how to use the applet can be found on the
+ExpressionView website at
+\url{http://www.unil.ch/cbg/ExpressionView}. The screenshot shown in
+Fig.~\ref{fig:screenshot} and the description below illustrate the
+main features of the applet:
 \begin{figure} 
-	\begin{center} 
-		\includegraphics[width=0.95\textwidth]{figures/screenshot.pdf}
-	\end{center} 
-	\caption{Screenshot of the ExpressionView Flash applet.} 
-	\label{fig:screenshot} 
+  \begin{center} 
+    \includegraphics[width=0.95\textwidth]{figures/screenshot.pdf}
+  \end{center} 
+  \caption{Screenshot of the ExpressionView Flash applet.} 
+  \label{fig:screenshot} 
 \end{figure}
 \begin{description}
-	\item[a] Opens an ExpressionView data file. Note that before opening a new data file, you should restart the applet, i.e., refresh your browser window.
-	\item[b] Exports the current view to a pdf file. The file also includes the title (o) of the gene expression data.
-	\item[c] Exports the data of the currently viewed module (=bicluster) to a CSV file, that can be opened as a spreadsheet.
-	\item[d] In inspect mode, you can use the mouse to explore the gene expression data. The information about the data under the mouse pointer is shown in the Info Panel (t).
-	\item[e, f] Zoom and pan modes allow you to restrict the view to a particular part of the gene expression data.
-	\item[e] In zoom mode, you can also use keyboard shortcuts: {\bf a} to auto-zoom onto the modules and {\bf e} to see the whole data. In addition to the simple zoom-in feature, you can also use the mouse to select the rectangular area you want to have a closer look at.
-	\item[f] Pan mode.
-	\item[g, h, i, j] Module highlighting and viewing. It is in general impossible to present mutually overlapping biclusters as single rectangles. They are made up of a collection of rectangles. The ordering algorithm used in the R package realigns the gene expression matrix in a way that maximizes the total area of the largest rectangle in every bicluster. The outlines of these parts are drawn in a slightly brighter color than the background, making them easily recognizable.
-	\item[g, h] Modules are highlighted as the user moves the mouse over the gene expression data. The two check boxes allow you to choose between highlighting all the parts of a module (Filling) or alternatively only the largest rectangle (Outline). You can also turn it off completely. For data sets with many modules, it can be helpful to restrict highlighting to Outline.
-	\item[i, j] Similar to the highlighting, these two check boxes allow you to show either all the parts of the modules (Filling) or only the largest rectangles (Outline). By shift-clicking one of the check-boxes you can switch between showing only the modules or only the gene expression data.
-	\item[k] Sets the visibility of the modules layer. Moving the slider to the left fades out the gene expression data, thus focusing on the Biclusters, while towards the opposite direction, the gene expression data moves to the foreground.
-	\item[l] Realigns the windows at their initial positions.
-	\item[m] Puts the program in fullscreen mode. Note that due to security reasons, it is impossible to enter text in this mode. On Mac OS X, a bug in Flash player prevents you from exporting data in fullscreen mode.
-	\item[n] Opens the ExpressionView website, from where you can download sample files and tutorials.
-	\item[o] Description and dimensions of the data set.
-	\item[p] Modules navigator. The Global tab is always available and shows the complete gene expression data. Additional tabs appear as you open individual modules. To close a module, simply move the mouse over the tab and click the close button that appears. 
-	\item[q, r, s] Selected genes, samples and modules. The highlighting reflects the selection in the tables (w). The selection is maintained when switching tabs (p). 
-	\item[q] Selected genes (=probes).
-	\item[r] Selected samples (=conditions).
-	\item[s] Selected modules (=biclusters).
-	\item[t] Info panel showing the data associated with the current mouse position. The GO and KEGG list contain the five most significant categories and pathways associated with the modules under the mouse pointer.
-	\item[u] Lists the selected genes, samples and modules, together with the intersecting modules.
-	\item[u1] Opens intersecting modules.
-	\item[u2] Clears the selection.
-	\item[v] Lists the selected GO categories and KEGG pathways
-	\item[w] List navigator. Note that depending on the view (p), the lists only show genes and samples contained in the currently viewed module. Modules can also be opened by double-clicking on the corresponding row. The Experiment tab contains a brief description of the data.
-	\item[x] Searches the tables for a given expression and restricts the view to the matching entries. The search function uses Perl-style {\bf regular expressions}. By default, the search functions is applied to the whole table. To restrict it to a particular column, shift-click the corresponding column header.
-	\item[z] Select a column header to sort the entries according to that column. Shift-click to restrict the search function to that column.
+\item[a] Opens an ExpressionView data file. Note that before opening a
+  new data file, you should restart the applet, i.e., refresh your
+  browser window.
+\item[b] Exports the current view to a pdf file. The file also
+  includes the title (o) of the gene expression data.
+\item[c] Exports the data of the currently viewed module (=bicluster)
+  to a CSV file, that can be opened as a spreadsheet.
+\item[d] In inspect mode, you can use the mouse to explore the gene
+  expression data. The information about the data under the mouse
+  pointer is shown in the Info Panel (t).
+\item[e, f] Zoom and pan modes allow you to restrict the view to a
+  particular part of the gene expression data.
+\item[e] In zoom mode, you can also use keyboard shortcuts: {\bf a} to
+  auto-zoom onto the modules and {\bf e} to see the whole data. In
+  addition to the simple zoom-in feature, you can also use the mouse
+  to select the rectangular area you want to have a closer look at.
+\item[f] Pan mode.
+\item[g, h, i, j] Module highlighting and viewing. It is in general
+  impossible to present mutually overlapping biclusters as single
+  rectangles. They are made up of a collection of rectangles. The
+  ordering algorithm used in the R package realigns the gene
+  expression matrix in a way that maximizes the total area of the
+  largest rectangle in every bicluster. The outlines of these parts
+  are drawn in a slightly brighter color than the background, making
+  them easily recognizable.
+\item[g, h] Modules are highlighted as the user moves the mouse over
+  the gene expression data. The two check boxes allow you to choose
+  between highlighting all the parts of a module (Filling) or
+  alternatively only the largest rectangle (Outline). You can also
+  turn it off completely. For data sets with many modules, it can be
+  helpful to restrict highlighting to Outline.
+\item[i, j] Similar to the highlighting, these two check boxes allow
+  you to show either all the parts of the modules (Filling) or only
+  the largest rectangles (Outline). By shift-clicking one of the
+  check-boxes you can switch between showing only the modules or only
+  the gene expression data.
+\item[k] Sets the visibility of the modules layer. Moving the slider
+  to the left fades out the gene expression data, thus focusing on the
+  Biclusters, while towards the opposite direction, the gene
+  expression data moves to the foreground.
+\item[l] Realigns the windows at their initial positions.
+\item[m] Puts the program in fullscreen mode. Note that due to
+  security reasons, it is impossible to enter text in this mode. On
+  Mac OS X, a bug in Flash player prevents you from exporting data in
+  fullscreen mode.
+\item[n] Opens the ExpressionView website, from where you can download
+  sample files and tutorials.
+\item[o] Description and dimensions of the data set.
+\item[p] Modules navigator. The Global tab is always available and
+  shows the complete gene expression data. Additional tabs appear as
+  you open individual modules. To close a module, simply move the
+  mouse over the tab and click the close button that appears. 
+\item[q, r, s] Selected genes, samples and modules. The highlighting
+  reflects the selection in the tables (w). The selection is
+  maintained when switching tabs (p).
+\item[q] Selected genes (=probes). 
+\item[r] Selected samples (=conditions).
+\item[s] Selected modules (=biclusters).
+\item[t] Info panel showing the data associated with the current mouse
+  position. The GO and KEGG list contain the five most significant
+  categories and pathways associated with the modules under the mouse
+  pointer.
+\item[u] Lists the selected genes, samples and modules, together with
+  the intersecting modules.
+\item[u1] Opens intersecting modules.
+\item[u2] Clears the selection.
+\item[v] Lists the selected GO categories and KEGG pathways
+\item[w] List navigator. Note that depending on the view (p), the
+  lists only show genes and samples contained in the currently viewed
+  module. Modules can also be opened by double-clicking on the
+  corresponding row. The Experiment tab contains a brief description
+  of the data.
+\item[x] Searches the tables for a given expression and restricts the
+  view to the matching entries. The search function uses Perl-style
+  {\bf regular expressions}. By default, the search functions is
+  applied to the whole table. To restrict it to a particular column,
+  shift-click the corresponding column header.
+\item[z] Select a column header to sort the entries according to that
+  column. Shift-click to restrict the search function to that column.
 \end{description}
 
 \section{Using ExpressionView with non-gene expression data}
-While ExpressionView is designed to work with gene expression data available in the form of a \Rpackage{Bioconductor} \Rclass{ExpressionSet}, it can also be used to visualize other data. Let us for instance use in-silico data generated by the \Rpackage{isa} package with dimensions 50 $\times$ 500 containing 10 overlapping modules:
+While ExpressionView is designed to work with gene expression data
+available in the form of a \Rpackage{Bioconductor}
+\Rclass{ExpressionSet}, it can also be used to visualize other
+data. Let us for instance use in-silico data generated by the
+\Rpackage{isa} package with dimensions 50 $\times$ 500 containing 10
+overlapping modules:
 <<in-silico>>=
 library(ExpressionView)
-# generate in-silico data with dimensions m x n containing M overlapping modules
+# generate in-silico data with dimensions m x n 
+# containing M overlapping modules
 # and add some noise
 m <- 50
 n <- 500
 M <- 10
-data <- isa.in.silico(num.rows=m, num.cols=n, num.fact=M, noise=0.1, overlap.row=5)[[1]]
+data <- isa.in.silico(num.rows=m, num.cols=n, 
+                      num.fact=M, noise=0.1, overlap.row=5)[[1]]
 modules <- isa(data)
 @
 
-The \Rfunction{ExportEV} uses the named list provided by the \variable{description} variable to label the data. First, let us annotate the rows and columns of the data set
+The \Rfunction{ExportEV} uses the named list provided by the
+\variable{description} variable to label the data. First, let us
+annotate the rows and columns of the data set
 <<data set annotation>>=
 rownames(data) <- paste("row", seq_len(nrow(data)))
 colnames(data) <- paste("column", seq_len(ncol(data)))
 @
 
-Next, we assign the meta data associated with the rows of the data matrix. In this example we use 5 tags labelled ''row tag``:
+Next, we assign the meta data associated with the rows of the data
+matrix. In this example we use 5 tags labelled ``row tag'':
 <<rowdata annotation>>=
 rowdata <- outer(1:nrow(data), 1:5, function(x, y) {
   paste("row description (", x, ", ", y, ")", sep="")
@@ -262,7 +368,8 @@ rownames(coldata) <- colnames(data)
 colnames(coldata) <- paste("column tag", seq_len(ncol(coldata)))
 @
 
-To finish  the description, we add some general information and merge it with the above tables to get a single named list:
+To finish  the description, we add some general information and merge
+it with the above tables to get a single named list:
 <<in-silico data annotation>>=
 description <- list(
 experiment=list(
@@ -279,12 +386,17 @@ coldata=coldata,
 rowdata=rowdata
 )
 @
-When dealing with gene expression data, the \variable{xaxislabel} is equal to ''genes`` and the  \variable{yaxislabel} is ''samples``. Finally, we export the data set to an ExpressionView file:
+When dealing with gene expression data, the \variable{xaxislabel} is
+equal to ``genes'' and the  \variable{yaxislabel} is
+``samples''. Finally, we export the data set to an ExpressionView
+file: 
 <<in-silico data export, eval=FALSE>>=
-ExportEV(modules, data, filename="file.evf", description=description)
+ExportEV(modules, data, filename="file.evf", 
+         description=description)
 @
 
-Simply load this file with the Flash applet and check where the various labels appear.
+Simply load this file with the Flash applet and check where the
+various labels appear.
 
 
 \section{Session information}
