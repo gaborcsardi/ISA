@@ -87,7 +87,8 @@
   <xsd:complexType name="SamplesType">
     <xsd:sequence>
       <xsd:element name="sampletags" type="SampleTagsType" />
-      <xsd:element name="sample" maxOccurs="unbounded" type="SampleType" />
+      <xsd:element name="sample" maxOccurs="unbounded" 
+		   type="SampleType" />
     </xsd:sequence>
   </xsd:complexType>
 
@@ -114,7 +115,8 @@
       <xsd:element name="moduletags" type="ModuleTagsType" />
       <xsd:element name="gotags" minOccurs="0" type="GoTagsType" />
       <xsd:element name="keggtags" minOccurs="0" type="KeggTagsType" />
-      <xsd:element name="module" maxOccurs="unbounded" type="ModuleType" />
+      <xsd:element name="module" maxOccurs="unbounded" 
+		   type="ModuleType" />
     </xsd:sequence>      
   </xsd:complexType>
 
