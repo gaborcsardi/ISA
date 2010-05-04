@@ -13,9 +13,7 @@ ExportEV.Biclust <- function(biclusters, eset,
   ExportEV(eisamodules, eset, order, filename, norm, cutoff, description, ...)
 }
 
-if (require(biclust)) {
-  setMethod("ExportEV", signature(biclusters="Biclust"), ExportEV.Biclust)
-}
+setMethod("ExportEV", signature(biclusters="Biclust"), ExportEV.Biclust)
 
 ########################################################################
 ## export EISA
@@ -371,9 +369,7 @@ ExportEV.ISAModules <- function(biclusters, eset,
 
 }
 
-if (require(eisa)) {
-    setMethod("ExportEV", signature(biclusters="ISAModules"), ExportEV.ISAModules)
-}
+setMethod("ExportEV", signature(biclusters="ISAModules"), ExportEV.ISAModules)
 
 ########################################################################
 ## export list
