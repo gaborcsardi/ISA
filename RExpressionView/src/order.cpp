@@ -18,15 +18,18 @@
 #include "R_ext/Rdynload.h"
 
 #include <vector>
+#include <cstring>
 #include "orderclusters.h"
 
 extern "C" {
 	SEXP orderClusters(SEXP, SEXP, SEXP, SEXP);
+        SEXP EV_base64cut(SEXP, SEXP);
 }
 
 // register functions
 R_CallMethodDef callMethods[] = {
     { "orderClusters", (DL_FUNC)&orderClusters, 4 },
+    { "EV_base64cut", (DL_FUNC)&EV_base64cut, 2 },
     { NULL, NULL, 0 }
 };
 
@@ -105,3 +108,35 @@ SEXP orderClusters(SEXP _data, SEXP _order, SEXP _maxtime, SEXP _debug) {
 	return result;
 
 }    
+
+SEXP EV_base64cut(SEXP pstr, SEXP ppos) {
+  
+  int pos=INTEGER(ppos)[0];
+  const char *str=CHAR(STRING_ELT(pstr, 0));
+  int slen=strlen(str);
+  int rem= slen % pos;
+  int clines=slen / pos;
+  int lines=clines + (rem==0 ? 0 : 1);
+  int nlen=slen + lines;
+  const char *p;
+  char *pt;
+  char *cres;
+  
+  cres = R_alloc(nlen+1, sizeof(char));
+  
+  for (p=str, pt=cres; p<str+slen-rem; p+=pos) {
+    memcpy(pt, p, pos);
+    pt += pos;
+    *pt = '\n';
+    pt++;
+  }
+  if (rem != 0) {
+    memcpy(pt, p, rem);
+    pt+=rem;
+    *pt = '\n';
+    pt++;
+  }
+  *pt='\0';
+  
+  return mkString(cres);
+}

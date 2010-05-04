@@ -24,6 +24,11 @@ mytoString <- function(x) {
   paste(x, collapse=" ")
 }
 
+base64cut <- function(x, at=76) {
+  .Call("EV_base64cut", as.character(x), as.integer(at),
+        package="igraph")
+}
+
 allowed <- c("iterations", "oscillation", "thr.row", "thr.col",
              "freq", "rob", "rob.limit")
 
@@ -355,11 +360,8 @@ ExportEV.ISAModules <- function(biclusters, eset,
     ## data
     writeLines("\t<data>", con)
     
-        temp <- base64encode(writeBin(Data, raw(), size=1))
-        ## line breaks after 76 characters
-        for ( i in 1:ceiling(nchar(temp) / 76) ) {
-            writeLines(substr(temp, (i-1)*76 + 1, i*76), con)
-        }
+    temp <- base64encode(writeBin(Data, raw(), size=1))
+    cat(base64cut(temp), file=con)
         
     writeLines("\t</data>", con)
 
@@ -654,11 +656,8 @@ ExportEV.list <- function(biclusters, eset, order=OrderEV(biclusters),
     ## data
     writeLines("\t<data>", con)
     
-        temp <- base64encode(writeBin(Data, raw(), size=1))
-        ## line breaks after 76 characters
-        for ( i in 1:ceiling(nchar(temp) / 76) ) {
-            writeLines(substr(temp, (i-1)*76 + 1, i*76), con)
-        }
+    temp <- base64encode(writeBin(Data, raw(), size=1))
+    cat(base64cut(temp), file=con)
         
     writeLines("\t</data>", con)
 
