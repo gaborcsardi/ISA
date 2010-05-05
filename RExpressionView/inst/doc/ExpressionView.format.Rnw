@@ -2,8 +2,9 @@
 \documentclass{article}
 \usepackage{ragged2e}
 \usepackage{url}
-\usepackage{fancyvrb}
+\usepackage{listings}
 \usepackage{color}
+\usepackage{courier}
 
 \newcommand{\Rfunction}[1]{\texttt{#1}}
 \newcommand{\Rpackage}[1]{\texttt{#1}}
@@ -12,11 +13,13 @@
 \newcommand{\filename}[1]{\texttt{#1}}
 \newcommand{\variable}[1]{\texttt{#1}}
 
-\DefineVerbatimEnvironment%
-    {XML}{Verbatim}{fontsize=\small,frame=single,rulecolor=\color{green}}
-
-\DefineVerbatimEnvironment%
-    {schema}{Verbatim}{fontsize=\small,frame=single,rulecolor=\color{blue}}
+\definecolor{green}{rgb}{0.8,1,0.8}
+\definecolor{blue}{rgb}{0.8,0.8,1}
+\lstset{basicstyle=\footnotesize\ttfamily,%
+        keywordstyle=\footnotesize\ttfamily,%
+        language=XML,frame=single,columns=fullflexible}
+\lstnewenvironment{schema}{\lstset{backgroundcolor=\color{green}}}{}
+\lstnewenvironment{XML}{\lstset{backgroundcolor=\color{blue}}}{}
 
 \begin{document}
 
@@ -28,7 +31,7 @@
 
 \RaggedRight
 
-\setlength{\parindent}{12pt}
+\setlength{\parskip}{12pt}
 
 \section{Introduction}
 
@@ -49,8 +52,8 @@ The EVF data file, used by ExpressionView, is a standard XML file. The
 R package contains an XML Schema file that describes the exact
 format. In the following we will show this schema file and explain its
 parts step by step, while also showing samples from an example EVF
-data file. Parts of the schema file appear in blue boxes, EVF file
-code snipplets are in boxes with green frames.
+data file. Parts of the schema file appear in green boxes, EVF file
+code snipplets are in blue boxes.
 
 \subsection{Header and main parts}
 
@@ -719,9 +722,9 @@ expression value with a single unsigned byte, and then concatenating
 and Base64 encoding these bytes. This data looks like this:
 \begin{XML}
 <data>
-/Acs1hZT+FDeFGH/29zL+3rK4+sTCvzZzxVgvNrM5Bw8Kfjw2vb6Of8qti943/0QIF8xJy7g
-zMoOqyYA4/ne1KsZ1bH69u3c28zewtQM9G8T5zGK7P0szwIM/ub2z9zwHxclIdz3ywC6xtfO
-DewMklghAfGqzsQtDeHZ3wolAC1GSN+9N+/i5Oz99bTzzRb1QvzHE+Qlr1Ej1U697+AFvtyn
+/Acs1hZT+FDeFGH/29zL+3rK4+sTCvzZzxVgvNrM5Bw8Kfjw2vb6Of8qti943/0QIF8xJy7g2ufB
+zMoOqyYA4/ne1KsZ1bH69u3c28zewtQM9G8T5zGK7P0szwIM/ub2z9zwHxclIdz3ywC6xtfOySje
+DewMklghAfGqzsQtDeHZ3wolAC1GSN+9N+/i5Oz99bTzzRb1QvzHE+Qlr1Ej1U697+AFvtynDeHd
 ...
 </data>
 \end{XML}
