@@ -28,20 +28,20 @@
 
 \RaggedRight
 
-\setlength{\parindent}{2em}
+\setlength{\parindent}{12pt}
 
 \section{Introduction}
 
 ExpressionView is an interactive visualization tool for biclusters in
 gene expression data. The software has two parts. The first part is an
-ordering algorithm, written in GNU R, thay shuffles the rows and
+ordering algorithm, written in GNU R, that reorders the rows and
 columns of the gene expression matrix to make (potentially
 overlapping) biclusters more visible. The second part is the
-interactive tool, written in Adobe Flex. This runs in an Adobe Flash
+interactive tool, written in Adobe Flex. It runs in an Adobe Flash
 enabled web browser. The user can export the ordered gene expression
-matrix, with additional meta-data to a data file, that can be openened
-by the Adobe Flash application. In this document we briefly discuss
-the format of this data file.
+matrix, with additional meta-data from R to a data file, that can be
+openened by the Adobe Flash application. In this document we briefly
+discuss the format of this data file.
 
 \section{The file format}
 
@@ -50,7 +50,7 @@ R package contains an XML Schema file that describes the exact
 format. In the following we will show this schema file and explain its
 parts step by step, while also showing samples from an example EVF
 data file. Parts of the schema file appear in blue boxes, EVF file
-code snipplets are in green boxes.
+code snipplets are in boxes with green frames.
 
 \subsection{Header and main parts}
 
@@ -68,12 +68,12 @@ The schema file starts with a standard header:
   </xsd:annotation>
 \end{schema}
 This is the 1.1 version of the EVF file. ExpressionView can also read
-the older 1.0 versions.
+the older 1.0 version.
 
 \begin{schema}
 <xsd:element name="evf" type="evfType" />
 \end{schema}
-An EVF file contains a single \texttt{<evf>} tag, which has a following
+An EVF file contains a single \texttt{<evf>} tag. It has the following
 parts:
 \begin{schema}
 <xsd:complexType name="evfType">
@@ -88,8 +88,6 @@ parts:
 </xsd:complexType>
 \end{schema}
 
-\subsection{Summary}
-
 The \texttt{<summary>} tag contains information about the data set, such
 as the number of genes, samples, modules, etc. \texttt{<experimentdata>}
 is for experiment meta-data, i.e. the lab where it was performed, 
@@ -99,6 +97,9 @@ meta data. \texttt{<modules>} defines the biclusters. Finally
 \texttt{<data>} contains the expression values themselves. Let us see
 all of these tags in detail now.
 
+\subsection{Summary}
+
+This is the type of the \texttt{<summary>} tag:
 \begin{schema}  
 <xsd:complexType name="SummaryType">
   <xsd:sequence>
@@ -115,15 +116,15 @@ all of these tags in detail now.
 \end{schema}
 The \texttt{<summary>} tag optionally contains the description of the
 data file (\texttt{<description>} tag), this is displayed above the main
-gene expression window. The \texttt{<version>} tag is required must be
-\texttt{1.1} for files of the format we are discussing here. The
-\texttt{<dataorigin>} tag is optional and has the value \texttt{eisa} for
-modules generated with the ISA algorithm and exported using the
-ExpressionView R package. \texttt{<xaxislabel>} and \texttt{<yaxislabel>}
-are optional axis labels for the gene expression plot. The last three
-tags (\texttt{<nmodules>}, \texttt{<ngenes>} and \texttt{<nsamples>}) are
-required and give the number of modules, number of genes and number of
-samples in the data set.
+gene expression window in ExpressionView. The \texttt{<version>} tag
+must be \texttt{1.1} for files for the format we are discussing here. The
+\texttt{<dataorigin>} tag is optional and has the value `\texttt{eisa}' for
+modules generated with the ISA algorithm~\cite{bergmann03} and
+exported using the ExpressionView R package. \texttt{<xaxislabel>} and
+\texttt{<yaxislabel>} are optional axis labels for the gene expression
+plot. The last three tags (\texttt{<nmodules>}, \texttt{<ngenes>} and
+\texttt{<nsamples>}) are required and give the number of modules,
+number of genes and number of samples in the data set.
 
 A sample EVF file header, together with the \texttt{<summary>} tag looks
 like this:
@@ -143,7 +144,7 @@ like this:
 \subsection{Experiment meta-data}
 
 The \texttt{<experimentdata>} tag is next, this contains the
-experiment meta-data.
+experiment meta-data. It has the following parts:
 \begin{schema}
 <xsd:complexType name="ExperimentDataType">
   <xsd:all>
@@ -161,9 +162,9 @@ All fields are optional here: \texttt{<title>}, \texttt{<name>},
 \texttt{<lab>}, \texttt{<abstract>}, \texttt{<url>},
 \texttt{<annotation>}, \texttt{<organism>}. They are collected and
 shown in the \emph{Experiment} tab in the interactive ExpressionView
-viewer. The \texttt{<annotation>} tag shoudl contain the name of the
+viewer. The \texttt{<annotation>} tag should contain the name of the
 chip on which the experiment was performed. If the \texttt{<organism>}
-tag contains \emph{Homo sapiens}, then ExpressionView links genes with
+tag contains `\texttt{Homo sapiens}', then ExpressionView links genes with
 the Gene Cards homepage, for other organism is uses Entrez Gene. The
 tags within \texttt{experimentdata} can be specified in arbitrary
 order.
@@ -187,7 +188,8 @@ Here is an example for the \texttt{<experimentdata>} tag:
 
 \subsection{Genes}
 
-The next tag within \texttt{<evf>} is \texttt{<genes>}:
+The next tag within \texttt{<evf>} is \texttt{<genes>}, its type os
+defined as
 \begin{schema}  
 <xsd:complexType name="GenesType">
   <xsd:sequence>
@@ -200,7 +202,7 @@ It has two main parts, a \texttt{<genetags>} tag first, and then a
 number of \texttt{<gene>} tags, one for each gene in the data set.
 
 Before we continue with the gene tags, we define a new tag type, that
-is required to include a \texttt{name} attribute. We call this type
+is required to contain a \texttt{name} attribute. We call this type
 \texttt{ExtraType}. This tag type can be used to add any kind of meta
 data to the table in the \emph{Genes} tab in ExpressionView.
 \begin{schema}  
@@ -228,16 +230,17 @@ subtags:
 </xsd:complexType>
 \end{schema}
 The \texttt{<id>} must be an integer number, that starts with one and
-goes up to the number of genes. \texttt{<name>} is typically the name
-of the probe-set, but be used for other purposes as well,
+goes up to the number of genes. It is used as an id that is refered
+from other tags in the document. \texttt{<name>} is typically the name
+of the probe-set, but it can be used for other purposes as well,
 \texttt{<symbol>} is typically the canonical gene
 symbol. \texttt{<entrezid>} is the Entrez gene id. If a given
 probeset does not map to a known gene, then \texttt{<symbol>} and
 \texttt{<entrezid>} can be set to \texttt{NA}. Finally, the gene tags
-might contain any number number of \texttt{<x>} tags, each defining an
+might contain any number of \texttt{<x>} tags, each defining an
 additional column in the \emph{Genes} tab in ExpressionView. These
 tags must have a \texttt{name} attribute, which is refered by the
-individual genes. Here is an example gene tags section:
+tags of the individual genes. Here is an example gene tags section:
 \begin{XML}
 <genetags>
   <id>#</id>
@@ -247,10 +250,11 @@ individual genes. Here is an example gene tags section:
   <x name="chr">Chromosome</x>
 </genetags>
 \end{XML}
-Here we define an extra column for the gene table, this will give the
+We define an extra column for the gene table, this will give the
 chromosome on which the gene is located.
 
-After the gene tags, we have a typically large number of genes in the file:
+After the gene tags, we have a typically large number of genes in the
+file. The definition of the \texttt{<gene>} tag:
 \begin{schema}
 <xsd:complexType name="GeneType">
   <xsd:sequence>
@@ -263,8 +267,9 @@ After the gene tags, we have a typically large number of genes in the file:
   </xsd:sequence>
 </xsd:complexType>
 \end{schema}
-These must have exactly the same subtags as the ones given in the gene
-tags section. For example:
+The \texttt{<gene>} tags must have exactly the same subtags as the
+ones given in the gene tags section. For example, assuming the
+\texttt{<genetags>} example above we can have:
 \begin{XML}
 <gene>
   <id>1</id>
@@ -286,7 +291,7 @@ Observe, how the extra tag for the chromosomes is referenced here.
 
 \subsection{Samples}
 
-The samples and their associated data have a similar format to the
+The samples and their associated data have a format similar to the
 genes:
 \begin{schema}  
 <xsd:complexType name="SamplesType">
@@ -313,7 +318,8 @@ tag for each sample in the data set.
 \end{schema}
 The \texttt{<id>} and \texttt{<name>} sample tags are
 required. \texttt{<id>} contains numeric ids, from one, up to the
-number of samples in the data set. \texttt{<name>} is an arbitrary
+number of samples in the data set. These are referenced by other tags,
+e.g. the ones that define the modules. \texttt{<name>} is an arbitrary
 string, it is typically the sample name in the R ExpressionSet object,
 that was used to find the biclusters. Similarly to the genes, any
 number of additional \texttt{<x>} tags can be added, each with a
@@ -331,6 +337,7 @@ Here is an example \texttt{<sampletags>} tag:
   <x name="BT"> does the patient have B-cell or T-cell ALL</x>
 </sampletags>
 \end{XML}
+We defined four extra tags for the samples in this example.
 
 Then the samples follow:
 \begin{schema}  
@@ -388,6 +395,7 @@ and/or KEGG pathway enrichment calculation results for the
 biclusters. Finally, there is a list of \texttt{<module>} tags, one
 for each bicluster.
 
+The type of \texttt{<moduletags>}:
 \begin{schema}  
 <xsd:complexType name="ModuleTagsType">
   <xsd:sequence>
@@ -426,18 +434,18 @@ Here is an example \texttt{<moduletags>} tag:
 <moduletags>
   <id>#</id>
   <name>Name</name>
-  <iterations>iterations</iterations>
-  <oscillation>oscillation</oscillation>
-  <thr_row>thr.row</thr_row>
-  <thr_col>thr.col</thr_col>
-  <freq>freq</freq>
-  <rob>rob</rob>
-  <rob_limit>rob.limit</rob_limit>
+  <iterations>Iterations</iterations>
+  <oscillation>Oscillation cycle</oscillation>
+  <thr_row>Gene threshold</thr_row>
+  <thr_col>Column threshold</thr_col>
+  <freq>Frequency</freq>
+  <rob>Robustness</rob>
+  <rob_limit>Robustness limit</rob_limit>
 </moduletags>
 \end{XML}
 
 The optional \texttt{<gotags>} and \texttt{<keggtags>} tags are
-discussed in the next subsection, let us now see how the data for a
+discussed in Section~\ref{sec:gokegg}, let us now see how the data for a
 single module looks like:
 \begin{schema}
 <xsd:complexType name="ModuleType">
@@ -473,8 +481,7 @@ samples in the module; \texttt{<samplescores>}, the scores for these
 samples; \texttt{<intersectingmodules>}, the ids of the modules that
 have an overlap with the given module. \texttt{<gos>} and
 \texttt{<keggs>} are optional and describe the Gene Ontology and KEGG
-pathway enrichment of the given module, see their details in the next
-subsection.
+pathway enrichment of the given module, see their details in Section~\ref{sec:gokegg}.
 
 Here is an example \texttt{<module>} tag:
 \begin{XML}
@@ -518,12 +525,13 @@ we define them:
 </xsd:simpleType>
 \end{schema}
 
-\subsection{Gene Ontology and KEGG pathway enrichment}
+\subsection{Gene Ontology and KEGG pathway enrichment}%
+\label{sec:gokegg}
 
 EVF files can optionally contain Gene Ontology (GO) and/or KEGG
 pathway enrichment calculation results. In this case
 \texttt{<moduletags>} is followed by a \texttt{<gotags>} and/or a
-\texttt{keggtags} tag:
+\texttt{<keggtags>} tag. The definition of \texttt{<gotags>}:
 \begin{schema}
 <xsd:complexType name="GoTagsType">
   <xsd:sequence>
@@ -539,16 +547,18 @@ pathway enrichment calculation results. In this case
   </xsd:sequence>
 </xsd:complexType>
 \end{schema}
-Here \texttt{<id>} is a numeric id, starting from one, up to the total
+\texttt{<id>} is a numeric id, starting from one, up to the total
 number of enriched GO categories; \texttt{<go>} is the GO id;
-\texttt{term} is the GO term; \texttt{ontology} is the GO ontology of
-the term, possible values: \texttt{BP}, \texttt{CC}, \texttt{MF};
-\texttt{pvalue} is the enrichment $p$-value; \texttt{oddsratio} is the
-odds ratio; \texttt{expcount} is the expected number of genes in the
-intersection, by chance; \texttt{count} is the number of genes in the
-intersection; \texttt{size} is the size of the GO term, i.e. the
+\texttt{<term>} is the GO term; \texttt{<ontology>} is the GO ontology of
+the term, its possible values are: \texttt{BP}, \texttt{CC},
+\texttt{MF}, standing for \emph{Biological process}, \emph{Cellular
+  component} and \emph{Molecular function};
+\texttt{<pvalue>} is the enrichment $p$-value; \texttt{<oddsratio>} is the
+odds ratio; \texttt{<expcount>} is the expected number of genes in the
+intersection, by chance; \texttt{<count>} is the number of genes in the
+intersection; \texttt{<size>} is the size of the GO term, i.e. the
 number of genes (in the current gene universe) that are annotated with
-the term.
+the enriched term.
 
 \begin{schema}
 <xsd:complexType name="KeggTagsType">
@@ -569,7 +579,7 @@ The tags for \texttt{<keggtags>} is almost the same as for
 and \texttt{<pathname>} is the name of the pathway. The rest is the
 same.
 
-Here is part of an EVF file with the \texttt{<gotags>} and
+Part of an EVF file with the \texttt{<gotags>} and
 \texttt{<keggtags>} tags:
 \begin{XML}
 <gotags>
@@ -618,7 +628,7 @@ the enrichment $p$-values and other statistics.
 \texttt{<keggs>} is a list of \texttt{<kegg>} tags.
 
 The subtags within a \texttt{<go>} or a \texttt{<kegg>} tag refer to
-the tags already listed in the \texttt{<gotags>} and
+the tags already listed above in the \texttt{<gotags>} and
 \texttt{<keggtags>} tags:
 \begin{schema}
 <xsd:complexType name="go">
@@ -724,7 +734,10 @@ DewMklghAfGqzsQtDeHZ3wolAC1GSN+9N+/i5Oz99bTzzRb1QvzHE+Qlr1Ej1U697+AFvtyn
 
 Please see the ExpressionView homepage at
 \url{http://www.unil.ch/cbg/ExpressionView} for more infomation, the
-schema file and example data file.
+schema file and example data files.
+
+\bibliographystyle{unsrt}
+\bibliography{ExpressionView}
 
 \end{document}
 
