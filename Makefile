@@ -56,7 +56,8 @@ isa2/inst/doc/ISA_tutorial.pdf: vignettes/ISA_tutorial.pdf
 	cp $< $@
 
 vignettes/ISA_tutorial.pdf: vignettes/ISA_tutorial.tex
-	cd vignettes && pdflatex ISA_tutorial.tex
+	cd vignettes && pdflatex ISA_tutorial.tex && \
+		pdflatex ISA_tutorial.tex
 
 vignettes/ISA_tutorial.tex: vignettes/ISA_tutorial.Rnw isa2_$(ISAVERSION)-nv.tar.gz
 	$(R) CMD INSTALL isa2_$(ISAVERSION)-nv.tar.gz
@@ -206,7 +207,7 @@ SWEAVE2HTMLOPTIONS = style,xhtml,graphics-,charset=utf-8 " -cunihtf -utf8" -cval
 REMOVEHTML = sed '/<div class="maketitle">/,/<\/body>/!d' | sed '/<\/body>/d'
 REWRITEIMG = sed 's/src="\([^"]*\)"/src="htmlets\/graphics\/\1"/g'
 
-homepage: vignettes manuals
+homepage: vignettes # manuals
 
 vignettes: homepage/ISA_tutorial.html homepage/ISA_tutorial.pdf \
 	homepage/ISA_parallel.html homepage/ISA_parallel.pdf \
@@ -215,11 +216,16 @@ vignettes: homepage/ISA_tutorial.html homepage/ISA_tutorial.pdf \
 	homepage/EISA_biclust.html homepage/EISA_biclust.pdf \
 	homepage/tissues.html homepage/tissues.pdf \
 	homepage/ISA_internals.html homepage/ISA_internals.pdf \
+	homepage/ExpressionView.tutorial.html \
+	homepage/ExpressionView.tutorial.pdf \
+	homepage/ExpressionView.ordering.html \
+	homepage/ExpressionView.ordering.pdf \
+	homepage/ExpressionView.format.html \
+	homepage/ExpressionView.format.pdf \
 	vignettes/style.cfg
 
 homepage/ISA_tutorial.html: vignettes/ISA_tutorial.tex
-	cp vignettes/style.cfg vignettes/
-	cd isa2/inst/doc && $(SWEAVE2HTML) ISA_tutorial $(SWEAVE2HTMLOPTIONS)
+	cd vignettes && $(SWEAVE2HTML) ISA_tutorial $(SWEAVE2HTMLOPTIONS)
 	cat vignettes/ISA_tutorial.html | $(REMOVEHTML) | $(REWRITEIMG) >homepage/ISA_tutorial.html
 	cp vignettes/ISA_tutorial.css homepage/
 	cp vignettes/ISA_tutorial*.png homepage/
@@ -228,8 +234,7 @@ homepage/ISA_tutorial.pdf: vignettes/ISA_tutorial.pdf
 	cp $< $@
 
 homepage/ISA_parallel.html: vignettes/ISA_parallel.tex
-	cp vignettes/style.cfg vignettes/
-	cd isa2/inst/doc && $(SWEAVE2HTML) ISA_parallel $(SWEAVE2HTMLOPTIONS)
+	cd vignettes && $(SWEAVE2HTML) ISA_parallel $(SWEAVE2HTMLOPTIONS)
 	cat vignettes/ISA_parallel.html | $(REMOVEHTML) | $(REWRITEIMG) >homepage/ISA_parallel.html
 	cp vignettes/ISA_parallel.css homepage/
 #	cp vignettes/ISA_parallel*.png homepage/
@@ -301,6 +306,56 @@ eisa/inst/doc/EISA_biclust.pdf: eisa/inst/doc/EISA_biclust.tex
 	cd eisa/inst/doc/ && pdflatex EISA_biclust.tex
 eisa/inst/doc/EISA_biclust.tex: eisa/inst/doc/EISA_biclust.Rnw
 	cd eisa/inst/doc/ && $(R) CMD Sweave EISA_biclust.Rnw
+
+homepage/ExpressionView.tutorial.html: RExpressionView/inst/doc/ExpressionView.tutorial.tex
+	cp vignettes/style.cfg RExpressionView/inst/doc/
+	cd RExpressionView/inst/doc/ && pdflatex ExpressionView.tutorial.tex && \
+		bibtex ExpressionView.tutorial && pdflatex ExpressionView.tutorial
+	cd RExpressionView/inst/doc && \
+		$(SWEAVE2HTML) ExpressionView.tutorial $(SWEAVE2HTMLOPTIONS)
+	cat RExpressionView/inst/doc/ExpressionView.tutorial.html | \
+		$(REMOVEHTML) | $(REWRITEIMG) >homepage/ExpressionView.tutorial.html
+	cp RExpressionView/inst/doc/ExpressionView.tutorial.css homepage/
+	cp RExpressionView/inst/doc/ExpressionView.tutorial*.png homepage/
+homepage/ExpressionView.tutorial.pdf: RExpressionView/inst/doc/ExpressionView.tutorial.pdf
+	cp $< $@
+RExpressionView/inst/doc/ExpressionView.tutorial.pdf: RExpressionView/inst/doc/ExpressionView.tutorial.tex
+	cd RExpressionView/inst/doc/ && pdflatex ExpressionView.tutorial.tex
+RExpressionView/inst/doc/ExpressionView.tutorial.tex: RExpressionView/inst/doc/ExpressionView.tutorial.Rnw
+	cd RExpressionView/inst/doc/ && $(R) CMD Sweave ExpressionView.tutorial.Rnw
+
+homepage/ExpressionView.ordering.html: RExpressionView/inst/doc/ExpressionView.ordering.tex
+	cp vignettes/style.cfg RExpressionView/inst/doc/
+	cd RExpressionView/inst/doc/ && pdflatex ExpressionView.ordering.tex && \
+		pdflatex ExpressionView.ordering
+	cd RExpressionView/inst/doc && \
+		$(SWEAVE2HTML) ExpressionView.ordering $(SWEAVE2HTMLOPTIONS)
+	cat RExpressionView/inst/doc/ExpressionView.ordering.html | \
+		$(REMOVEHTML) | $(REWRITEIMG) >homepage/ExpressionView.ordering.html
+	cp RExpressionView/inst/doc/ExpressionView.ordering.css homepage/
+	cp RExpressionView/inst/doc/ExpressionView.ordering*.png homepage/
+homepage/ExpressionView.ordering.pdf: RExpressionView/inst/doc/ExpressionView.ordering.pdf
+	cp $< $@
+RExpressionView/inst/doc/ExpressionView.ordering.pdf: RExpressionView/inst/doc/ExpressionView.ordering.tex
+	cd RExpressionView/inst/doc/ && pdflatex ExpressionView.ordering.tex
+RExpressionView/inst/doc/ExpressionView.ordering.tex: RExpressionView/inst/doc/ExpressionView.ordering.Rnw
+	cd RExpressionView/inst/doc/ && $(R) CMD Sweave ExpressionView.ordering.Rnw
+
+homepage/ExpressionView.format.html: RExpressionView/inst/doc/ExpressionView.format.tex
+	cp vignettes/style.cfg RExpressionView/inst/doc/
+	cd RExpressionView/inst/doc/ && pdflatex ExpressionView.format.tex && \
+		bibtex ExpressionView.format && pdflatex ExpressionView.format
+	cd RExpressionView/inst/doc && \
+		$(SWEAVE2HTML) ExpressionView.format $(SWEAVE2HTMLOPTIONS)
+	cat RExpressionView/inst/doc/ExpressionView.format.html | \
+		$(REMOVEHTML) | $(REWRITEIMG) >homepage/ExpressionView.format.html
+	cp RExpressionView/inst/doc/ExpressionView.format.css homepage/
+homepage/ExpressionView.format.pdf: RExpressionView/inst/doc/ExpressionView.format.pdf
+	cp $< $@
+RExpressionView/inst/doc/ExpressionView.format.pdf: RExpressionView/inst/doc/ExpressionView.format.tex
+	cd RExpressionView/inst/doc/ && pdflatex ExpressionView.format.tex
+RExpressionView/inst/doc/ExpressionView.format.tex: RExpressionView/inst/doc/ExpressionView.format.Rnw
+	cd RExpressionView/inst/doc/ && $(R) CMD Sweave ExpressionView.format.Rnw
 
 manuals: homepage/manuals/isa2/.stamp homepage/manuals/eisa/.stamp \
 	homepage/manuals/ExpressionView/.stamp \
