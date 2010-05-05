@@ -17,7 +17,8 @@
 \definecolor{blue}{rgb}{0.8,0.8,1}
 \lstset{basicstyle=\footnotesize\ttfamily,%
         keywordstyle=\footnotesize\ttfamily,%
-        language=XML,frame=single,columns=fullflexible}
+        language=XML,frame=single,columns=fullflexible,%
+        aboveskip=8pt,belowskip=-5pt}
 \lstnewenvironment{schema}{\lstset{backgroundcolor=\color{green}}}{}
 \lstnewenvironment{XML}{\lstset{backgroundcolor=\color{blue}}}{}
 
