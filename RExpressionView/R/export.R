@@ -116,14 +116,12 @@ ExportEV.ISAModules <- function(biclusters, eset,
         writeLines("", con)
 
         genemap <- match(Genes, symbol.table[,1])
-        for ( gene in 1:nGenes ) {
-            writeLines("\t\t<gene>", con)
-                writeLines(paste("\t\t\t<id>", gene, "</id>", sep=""), con)
-                writeLines(paste("\t\t\t<name>", Genes[gene], "</name>", sep=""), con)
-                writeLines(paste("\t\t\t<symbol>", symbol.table[genemap[gene],2], "</symbol>", sep=""), con)
-                writeLines(paste("\t\t\t<entrezid>", entrez.table[genemap[gene],2], "</entrezid>", sep=""), con)
-            writeLines("\t\t</gene>", con)
-        }
+        genetext <- paste(sep="", "\t\t<gene>\n\t\t\t<id>", seq_len(nGenes),
+                          "</id>\n\t\t\t<name>", Genes,
+                          "</name>\n\t\t\t<symbol>", symbol.table[genemap,2],
+                          "</symbol>\n\t\t\t<entrezid>", entrez.table[genemap,2],
+                          "</entrezid>\n\t\t</gene>")
+        writeLines(genetext, con)
             
     writeLines("\t</genes>", con)
 
