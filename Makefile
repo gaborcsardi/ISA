@@ -159,8 +159,8 @@ REVFILES=RExpressionView/inst/ExpressionView.swf	\
 	RExpressionView/R/*.R RExpressionView/man/*.Rd 		\
 	RExpressionView/src/*.h RExpressionView/src/*.cpp       \
 	RExpressionView/inst/doc/*.Rnw                          \
-	RExpressionView/inst/doc/ExpressionView.bib             \
-	RExpressionView/inst/doc/ExpressionView.xmldescription.pdf
+	RExpressionView/inst/doc/ExpressionView.bib
+
 
 ALIVEPDFFILES = $(shell find ExpressionView/src/org -name "*.as" -print)
 ALIVEPDFCLASSES = $(subst ExpressionView.src.,,$(subst /,.,$(basename $(ALIVEPDFFILES))))
