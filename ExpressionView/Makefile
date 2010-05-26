@@ -60,8 +60,8 @@ air: key air/ExpressionView.air
 
 air/ExpressionView.air: air/ExpressionView.swf air/ExpressionView.xml air/ExpressionView.pfx
 	@ echo package air application
-	@ rm -rf air/srcview
-	@ cp -rf bin/srcview air
+	@ rm -rf air/doc
+	@ cp -rf doc air/srcview
 	@ cd air && \
 	adt -package -storepass ExpressionView -storetype pkcs12 -keystore ExpressionView.pfx ExpressionView.air ExpressionView.xml ExpressionView.swf icons/ srcview/
 
