@@ -1,0 +1,225 @@
+\documentclass[a4paper]{article}
+\usepackage{url}
+\usepackage{natbib}
+\usepackage{ragged2e}
+\usepackage{color}
+
+\newcommand{\Rpackage}[1]{`\texttt{#1}'}
+\newcommand{\Rfunction}[1]{`\texttt{#1}'}
+\newcommand{\Rclass}[1]{\textsl{#1}}
+
+\newenvironment{myquote}{\begin{quote}\color{blue}}{\end{quote}}
+
+\setlength{\parskip}{12pt}
+\setlength{\parindent}{0pt}
+
+\title{ExpressionView -- an interactive viewer for
+  modules identified in gene expression data\\[10pt]
+  Answers to reviewers}
+\author{Andreas L\"uscher, G\'abor Cs\'ardi, \\ Aitana Morton de
+  Lachapelle, Zolt\'an Kutalik, \\ and Sven Bergmann}
+
+\begin{document}
+
+\maketitle
+
+\RaggedRight
+
+First of all, we want to thank the reviewers for their thorough work
+and useful suggestions. In the following, the reviewers' comments are
+typeset in blue, and indented as a block.
+
+\section*{Reviewer 1}
+
+\begin{myquote}
+All comments are for minor revisions:
+
+1) BiVisu by Cheng et al shall be cited:
+Bioinformatics. 2007;23(17):2342-4. Please briefly elaborate the major
+difference(s) of ExpressionView from BiVisu and BicOverlapper.
+\end{myquote}
+
+We have added a brief comparison to Bivisu~\citep{cheng07} and
+BicOverlapper\citep{santamaria08}. 
+
+\begin{myquote}
+2) Page 2, line 30: please re-write the sentence "We find that in
+almost every situation, the proposed algorithm finds an order that
+recovers more than 99\% of the score of the optimal solution and in
+most cases, it recovers the correct alignment". 
+\end{myquote}
+
+We have rewritten this part.
+
+\begin{myquote}
+3) Page 2, line 55, change "any computer" to "a computer".
+\end{myquote}
+
+We have corrected this.
+
+\section*{Reviewer 2}
+
+\begin{myquote}
+Comments to the Author
+
+This is a very useful tool which users might  benefit if there is
+clearly stated in the website, what sort of input format the
+application accepts. There does not seem to be a complete and explicit
+description of the various types of input format beyond just a
+expression matrix.
+\end{myquote}
+
+For the matrix reordering, ExpressionView accepts modules in the
+format defined in the eisa R package~\citep{csardi10}
+(\textit{ISAModules} object) and the
+Biclust R package~\citep{kaiser08} (\textit{Biclust} object). These
+cover the existing R implementations of biclustering algorithms (to our
+knowledge). Moreover, the Biclust package defines a very simple class
+for storing biclustering results, so the output of any other algorithm
+(implemented in R or not) can be easily transformed into this
+format. This is documented in the Biclust package.
+
+For the expression data itself, ExpressionView accepts
+\textit{ExpressionSet} objects as the input. This is the standard data
+type in BioConductor for storing expression data. E.g. the GCRMA and
+other normalization methods all output this format and it is also easy
+to create an \textit{ExpressionSet} object from a simple tabular text
+file.
+
+Alternatively, ExpressionView can visualize non-expression data,
+inputted as a simple matrix, this is explained in the R manual that
+comes with the package.
+
+\begin{myquote}
+For example, how do we incorporate GO terms and
+KEGG pathways into the raw input dataset, or are these also computed
+by the application? 
+\end{myquote}
+
+These are computed by the R part of the application, using functions
+in the eisa R package. There are examples for this in the manual that
+comes with the package.
+
+\begin{myquote}
+It is not entirely clear to the casual reader,
+whether the Flash application takes raw data or the intermediate XML
+result from the workflow, which means user may need to use command
+line R anyway to generate the data. If it does so, the format of this
+needs to be clearly stated for a non-bioinformatics biologist to be
+able to load and run the application. 
+\end{myquote}
+
+The Flash application takes the intermediate XML file, we made this
+clear in Fig.~1. The idea is that the user performing the analysis in
+R is usually not the same, as the user browsing the results. So the
+(bioinformatician) user generates the data in R, exports it into an
+XML file, and the other (life scientist) user explores it using an
+ordinary web browser. We have made this distinction clear in the
+manuscript.
+
+The file format of the XML file is not relevant in most cases, as the
+file is produced by the ExpressionView package, and the user does not
+have to produce it by hand. It is only relevant, if the user wants to
+import data that was produced by another reordering algorithm, into
+the Flash applet. We have created an XML Schema document that precisely
+defines the XML data file's format, and also written a document that
+discusses the format. These are available on the ExpressionView website.
+
+\begin{myquote}
+The tutorials are impressive, but the audio volume could be increased
+or spoken by a person with a higher pitch voice. Very difficult to
+hear.  
+\end{myquote}
+
+We have increased the audio volume in the video tutorials.
+
+\begin{myquote}
+ExpressionView source code (for the Flash applet) in winrar
+format contains a lot of empty folders and tmp files some of which may
+not be necessary. 
+\end{myquote}
+
+We have simplified the directory structure of the source code.
+
+\begin{myquote}
+The paper could do with at least a few words in the body of the paper
+or in the website, to explain what improvement over features of other
+existing Expression data biclustering visualisers currently
+available. 
+\end{myquote}
+
+We have included a brief comparison to Bivisu~\citep{cheng07} and
+BiocOverlapper~\citep{santamaria08}, two existing bicluster
+visualization software packages.
+
+\begin{myquote}
+Moreover, the paper must a least emphasize justification
+for why biologists should find this application/algorithm more useful
+over other existing applications/algorithms besides just visual
+appeal. 
+\end{myquote}
+
+We emphasized the advantages of ExpressionView more in the paper:
+\begin{itemize}
+\item visualization of all the modules and the expression values together.
+\item ease of use for the (life scientist) end user, only a web browser is
+  needed, no extra programs needed to be installed.
+\item the inclusion of meta-data and enrichment data into the same
+  environment, with interactive links to corresponding databases.
+\end{itemize}
+
+\section*{Reviewer 3}
+
+\begin{myquote}
+Comments to the Author
+
+General comments:
+
+Luescher et al. describe software for visualizing modules in gene
+expression data using an efficient implementation of matrix
+reordering. Such a package is of high practical value for biologists
+to analyze and visualize gene expression data, and I therefore
+recommend publication as an Applications Note. In particular, I
+appreciate the connection to the Bioconductor package, it is well
+done.
+
+Specific comments:
+
+Minor:
+
+I would recommend a different name for the package, ExpressionView is
+too general.
+\end{myquote}
+
+While this is just criticism, we cannot easily change the name of the
+package, as it is part of BioConductor now, and the name change would
+cause a lot problems for the users and the BioConductor developers.
+
+\begin{myquote}
+Biologists should have no hurdles to access and apply the software
+\ldots I could not easily install it on my LINUX/Ubuntu computer after
+having installed the isa2 package, as recommended by the authors. 
+I assume the download and installation of the package will be as
+straightforward as the isa2 package by the authors.
+\end{myquote}
+
+The ExpressionView package is an official BioConductor package since
+April 2010, so its installation should be easy on any platforms
+supported by BioConductor (Linux, MS Windows, Apple OSX). We have
+updated the installation instructions on the ExpressionView homepage
+accordingly.
+
+\begin{myquote}
+The authors should consider that some computers might not play the
+Flash applets, and should provide short and clear instructions for
+installation on their website.
+\end{myquote}
+
+We have added a note about this, and a link to the relevant Adobe
+website, to the ExpressionView homepage.
+
+\bibliographystyle{natbib}
+\bibliography{expressionview}
+
+\end{document}
+
