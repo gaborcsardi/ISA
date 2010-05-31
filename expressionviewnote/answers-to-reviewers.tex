@@ -19,6 +19,8 @@
 \author{Andreas L\"uscher, G\'abor Cs\'ardi, \\ Aitana Morton de
   Lachapelle, Zolt\'an Kutalik, \\ Bastian Peter and Sven Bergmann}
 
+\hyphenation{Bic-Over-lap-per}
+
 \begin{document}
 
 \maketitle
@@ -27,7 +29,8 @@
 
 First of all, we want to thank the reviewers for their thorough work
 and useful suggestions. In the following, the reviewers' comments are
-typeset in blue, and indented as a block.
+typeset in blue, and indented as a block. Quotations from the
+manuscript itself appear in a slanted font.
 
 \section*{Reviewer 1}
 
@@ -40,7 +43,18 @@ difference(s) of ExpressionView from BiVisu and BicOverlapper.
 \end{myquote}
 
 We have added a citation to Bivisu and a brief comparison to
-Bivisu~\citep{cheng07} and BicOverlapper\citep{santamaria08}. 
+Bivisu~\citep{cheng07} and BicOverlapper\citep{santamaria08}:
+
+\textsl{Existing approaches include Bivisu~\citep{cheng07} and
+BicOverlapper~\citep{santamaria08}. The former is an interactive
+biclustering program that plots modules individually, making it
+difficult to identify the relationship between the overlapping
+modules. The latter is a novel tool for plotting overlapping modules,
+yet in an abstract space. Our approach in ExpressionView is different,
+as we use the usual gene-sample space and visualize all modules
+together, on top of the reordered expression matrix. The reordering
+ensures that the genes and samples that appear in the same module are
+kept together.}
 
 \begin{myquote}
 2) Page 2, line 30: please re-write the sentence "We find that in
@@ -49,7 +63,13 @@ recovers more than 99\% of the score of the optimal solution and in
 most cases, it recovers the correct alignment". 
 \end{myquote}
 
-We have rewritten this part.
+We have cut the ambiguous part of the sentence, it now reads:
+
+\textsl{We find that the proposed algorithm finds an
+order that recovers more than 99\% of the score of the optimal
+solution and in most cases, it recovers the correct
+alignment.}
+
 
 \begin{myquote}
 3) Page 2, line 55, change "any computer" to "a computer".
@@ -87,8 +107,13 @@ to create an \textit{ExpressionSet} object from a simple tabular text
 file.
 
 Alternatively, ExpressionView can visualize non-expression data,
-inputted as a simple matrix, this is explained in the R manual that
-comes with the package.
+provided as a simple matrix, this is explained in the R manual that
+comes with the package, including examples. This manual is also
+available on the ExpressionView website now, under ``Tutorials''.
+
+For the Flash application itself, we have extensively documented the
+ExpressionView XML file format. This is documentation is available on
+the website, under ``Tutorials''.
 
 \begin{myquote}
 For example, how do we incorporate GO terms and
@@ -97,8 +122,9 @@ by the application?
 \end{myquote}
 
 These are computed by the R part of the application, using functions
-in the eisa R package. There are examples for this in the manual that
-comes with the package.
+of the eisa R package. There are examples for this in the manual that
+comes with the package. This manual is also available now on the
+ExpressionView website.
 
 \begin{myquote}
 It is not entirely clear to the casual reader,
@@ -109,13 +135,40 @@ needs to be clearly stated for a non-bioinformatics biologist to be
 able to load and run the application. 
 \end{myquote}
 
-The Flash application takes the intermediate XML file, we made this
-clear in Fig.~1. The idea is that the user performing the analysis in
-R is usually not the same, as the user browsing the results. So the
+The Flash application takes the intermediate XML file, as shown
+in Fig.~1. The idea is that the user performing the analysis in
+R is usually not the same as the user browsing the results. So the
 (bioinformatician) user generates the data in R, exports it into an
-XML file, and the other (life scientist) user explores it using an
+XML file, and the other (e.g. life scientist) user explores it using an
 ordinary web browser. We have made this distinction clear in the
-manuscript.
+manuscript:
+
+{\slshape
+With the ExpressionView package, bicluster analysis can be separated
+into two parts. The first part involves finding the
+modules in the data set with some algorithm, possibly running
+enrichment analysis for the modules, and reordering the rows and
+columns of the expression matrix according to the modules. This
+part is typically done by a bioinformatician. The second part of the
+analysis involves the visualization and interactive exploration of the
+results. This part is typically done by researchers without extensive
+programming knowledge.
+
+The first part of is written in GNU
+R~\citep{R} and contains an implementation of the matrix reordering
+algorithm. The second part is an interactive visualization tool in
+the form of an Adobe Flash applet, for which the user only needs a
+Flash-enabled web browser.
+
+This dual implementation has the advantage that all the power of the
+GNU R environment and the BioConductor~\citep{gentleman04} packages
+can be used for the analysis itself, e.g. all organisms that are (and
+will be) supported by BioConductor are automatically supported by
+ExpressionView. On the other hand, the exploration of the results does
+not need any GNU R knowledge and in most cases no extra software needs to
+be installed. See Fig.~1 for a typical
+ExpressionView workflow.
+}
 
 The file format of the XML file is not relevant in most cases, as the
 file is produced by the ExpressionView package, and the user does not
@@ -139,7 +192,8 @@ format contains a lot of empty folders and tmp files some of which may
 not be necessary. 
 \end{myquote}
 
-We have simplified the directory structure of the source code.
+We have simplified the directory structure of the source code and 
+removed all empty folders.
 
 \begin{myquote}
 The paper could do with at least a few words in the body of the paper
@@ -150,7 +204,19 @@ available.
 
 We have included a brief comparison to Bivisu~\citep{cheng07} and
 BicOverlapper~\citep{santamaria08}, two existing bicluster
-visualization software packages.
+visualization software packages:
+
+\textsl{Existing approaches include Bivisu~\citep{cheng07} and
+BicOverlapper~\citep{santamaria08}. The former is an interactive
+biclustering program that plots modules individually, making it
+difficult to identify the relationship between the overlapping
+modules. The latter is a novel tool for plotting overlapping modules,
+yet in an abstract space. Our approach in ExpressionView is different,
+as we use the usual gene-sample space and visualize all modules
+together, on top of the reordered expression matrix. The reordering
+ensures that the genes and samples that appear in the same module are
+kept together.
+}
 
 \begin{myquote}
 Moreover, the paper must a least emphasize justification
@@ -161,11 +227,43 @@ appeal.
 
 We emphasized the advantages of ExpressionView more in the paper:
 \begin{itemize}
-\item visualization of all the modules and the expression values together.
+\item visualization of all the modules and the expression values
+  together:
+
+  \textsl{\noindent
+    Our approach in ExpressionView is different,
+    as we use the usual gene-sample space and visualize all modules
+    together, on top of the reordered expression matrix. The reordering
+    ensures that the genes and samples that appear in the same module are
+    kept together.
+  }
+\item implementation as a BioConductor package:
+
+  \textsl{\noindent
+    This dual implementation has the advantage that all the power of the
+    GNU R environment and the BioConductor~\citep{gentleman04} packages
+    can be used for the analysis itself, e.g. all organisms that are (and
+    will be) supported by BioConductor are automatically supported by
+    ExpressionView. 
+  }
 \item ease of use for the (life scientist) end user, only a web browser is
-  needed, no extra programs needed to be installed.
+  needed, no extra programs need to be installed.
+
+  \textsl{\noindent
+    On the other hand, the exploration of the results does
+    not need any GNU R knowledge and in most cases no extra software needs to
+    be installed.    
+  }
 \item the inclusion of meta-data and enrichment data into the same
-  environment, with interactive links to corresponding databases.
+  environment, with interactive links to corresponding databases:
+
+  \textsl{\noindent
+    On the right-hand side, the metadata
+    associated with the expression data and the results of the
+    enrichment calculations for GO~\citep{ashburner00} categories and
+    KEGG~\citep{kanehisa04} pathways are shown. Wherever possible, these elements
+    are linked to the corresponding databases.    
+  }
 \end{itemize}
 
 \section*{Reviewer 3}
@@ -191,9 +289,9 @@ I would recommend a different name for the package, ExpressionView is
 too general.
 \end{myquote}
 
-While this is just criticism, we cannot easily change the name of the
+While this is a just criticism, we cannot easily change the name of the
 package, as it is part of BioConductor, and the name change would
-cause a lot of problems for the users and the BioConductor developers.
+cause problems for the users and the BioConductor developers.
 
 \begin{myquote}
 Biologists should have no hurdles to access and apply the software
@@ -204,7 +302,7 @@ straightforward as the isa2 package by the authors.
 \end{myquote}
 
 The ExpressionView package is an official BioConductor package since
-April 2010, so its installation should be easy on any platforms
+April 2010, so its installation should be easy on any platform
 supported by BioConductor (Linux, MS Windows, Apple OSX). We have
 updated the installation instructions on the ExpressionView homepage
 accordingly.

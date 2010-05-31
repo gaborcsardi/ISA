@@ -11,6 +11,8 @@
 \copyrightyear{2010}
 \pubyear{2010}
 
+\hyphenation{Bic-Over-lap-per}
+
 \begin{document}
 
 \firstpage{1}
@@ -71,15 +73,16 @@ see~\cite{madeira04,ihmels04,prelic06}), packages with intuitive
 interfaces that allow for an interactive exploration of the results
 are sparse. 
 
-Two existing approaches are Bivisu~\citep{cheng07}, an interactive
-biclustering program, it plots modules individually, thus the
-relationship between the overlapping modules is hard to identify; and
-BicOverlapper~\citep{santamaria08}, a novel tool for plotting
-overlapping modules in an abstract space. Our approach in
-ExpressionView is different, as we use the usual gene-sample
-space and visualize all modules together, on top of the reordered
-expression matrix. The reordering ensures that, the genes and samples
-that appear in the same module, are kept together.
+Existing approaches include Bivisu~\citep{cheng07} and
+BicOverlapper~\citep{santamaria08}. The former is an interactive
+biclustering program that plots modules individually, making it
+difficult to identify the relationship between the overlapping
+modules. The latter is a novel tool for plotting overlapping modules,
+yet in an abstract space. Our approach in ExpressionView is different,
+as we use the usual gene-sample space and visualize all modules
+together, on top of the reordered expression matrix. The reordering
+ensures that the genes and samples that appear in the same module are
+kept together.
 
 \vspace*{-9pt}
 \section{Package design and workflow}
@@ -93,10 +96,10 @@ analysis involves the visualization and interactive exploration of the
 results. This part is typically done by researchers without extensive
 programming knowledge.
 
-ExpressionView has thus two parts. The first part is written in GNU
+The first part of ExpressionView is written in GNU
 R~\citep{R} and contains an implementation of the matrix reordering
-algorithm. The second part is an interactive visualization tool, in
-the form of an Adobe Flash applet, the user of this part only needs a
+algorithm. The second part is an interactive visualization tool in
+the form of an Adobe Flash applet, for which the user only needs a
 Flash-enabled web browser.
 
 This dual implementation has the advantage that all the power of the
@@ -104,8 +107,8 @@ GNU R environment and the BioConductor~\citep{gentleman04} packages
 can be used for the analysis itself, e.g. all organisms that are (and
 will be) supported by BioConductor are automatically supported by
 ExpressionView. On the other hand, the exploration of the results does
-not need any GNU R knowledge, in most cases no extra software needs to
-be installed. Please see Fig.~\ref{fig:workflow} for a typical
+not need any GNU R knowledge and in most cases no extra software needs to
+be installed. See Fig.~\ref{fig:workflow} for a typical
 ExpressionView workflow.
 
 \begin{figure*}
@@ -135,7 +138,7 @@ ExpressionView workflow.
 ExpressionView is designed to work with gene expression data in the
 form of a Bioconductor \textit{ExpressionSet}. This class provides a
 user-friendly way to access the actual gene expression matrix and its
-associated metadata. ExpressionView can treat results obtained by the 
+associated metadata. ExpressionView can treat biclustering results obtained by the 
 Iterative Signature Algorithm~\citep{bergmann03,csardi10} and any of 
 the methods available in the Biclust package~\citep{kaiser08}. Since 
 the structure of biclustering results is independent of the algorithm, 
@@ -154,15 +157,15 @@ necessary~\citep{grothaus06}, but for many modules this results in
 a very large expression matrix.)
 
 This optimization task is an interesting problem on its own, which to
-the best of our knowledge has not been studied in the literature. Thus
-we briefly outline our strategy here (see our website for details).
-The reordering of the rows and the columns do not depend on each
-other, so the same optimization method can be applied independently
+the best of our knowledge has not been studied in the literature.
+We briefly outline our strategy here (see our website for details).
+The reordering of the rows is independent from that of the columns,
+so the same optimization method can be applied separately
 to rows and columns. For a given order of the
-elements (either genes or conditions) we compute for each module $i$ the
+elements (either genes or conditions), we compute for each module $i$ the
 size of the largest contiguous sequence of elements (i.e. the maximal
 number of neighboring elements $N^\text{max}_i$). Then, as a measure of the
-quality ($Q$) of the order we sum this quantity over all modules
+quality ($Q$) of the order, we sum this quantity over all modules
 ($Q=\sum_i N^\text{max}_i$). To optimize $Q$, an initial sequence is calculated using
 hierarchical clustering. Two operations are then applied to this: (1)
 permutations that exchange two elements within a module and (2) shifts
@@ -202,7 +205,6 @@ behaves as an image viewer, allowing the user to zoom and pan around
 the expression data, getting instant feedback on the selected
 item.
 
-\vspace*{-9pt}
 \section*{Acknowledgement}
 
 \paragraph{Funding\textcolon} The authors are grateful to the Swiss
