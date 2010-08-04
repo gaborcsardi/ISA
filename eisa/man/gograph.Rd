@@ -5,8 +5,8 @@
 \description{These functions help creating a plot of the Gene Ontology
   hierarchy.}
 \usage{
-gograph (table, colbar.length = 30, label.cex = 1, GOGRAPHS = NULL, 
-    go.terms = NULL)
+gograph (table, colbar.length = 30, label.cex = 1, alpha=1, abbrev=5,
+    GOGRAPHS = NULL, go.terms = NULL)
 gographPlot (graph, coords = FALSE, \dots)
 }
 \arguments{
@@ -16,6 +16,9 @@ gographPlot (graph, coords = FALSE, \dots)
   \item{colbar.length}{Numeric scalar, the length of the color bar.}
   \item{label.cex}{Numeric scalar, factor for the label sizes,
     e.g. \sQuote{2} means double size compared to the default.}
+  \item{alpha}{Alpha channel for the fill color of the vertices.}
+  \item{abbrev}{Numeric scalar, the minimum length for the abbreviated
+    GO ids.}
   \item{GOGRAPHS,go.terms}{These are for internal use only.}
   \item{graph}{An \code{igraph} graph, as returned by the \code{gograph}
     function.}

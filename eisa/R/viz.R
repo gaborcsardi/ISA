@@ -1,6 +1,6 @@
 
-gograph <- function(table, colbar.length=30, label.cex=1, GOGRAPHS=NULL,
-                    go.terms=NULL) {
+gograph <- function(table, colbar.length=30, label.cex=1, alpha=1, abbrev=5,
+                    GOGRAPHS=NULL, go.terms=NULL) {
 
   isa2:::isa.status("Creating a GO graph", "in")
   
@@ -73,7 +73,7 @@ gograph <- function(table, colbar.length=30, label.cex=1, GOGRAPHS=NULL,
   #######################
   # Create color bar
   
-  colbar <- hcl(h=260, c=35, l=seq(30, 100, length=colbar.length))
+  colbar <- hcl(h=260, c=35, l=seq(30, 100, length=colbar.length), alpha=alpha)
   colbar <- c("#FFFFFF", rev(colbar))
   if (length(colbar) < max(color.idx)) {
     colbar <- c(colbar, rep(colbar[length(colbar)],
@@ -111,9 +111,9 @@ gograph <- function(table, colbar.length=30, label.cex=1, GOGRAPHS=NULL,
   go.terms.sub <- go.terms[ V(g2)$name, ]
   definition <- go.terms.sub$definition
   desc <- go.terms.sub$term
-  abbrv <- unname(abbreviate(desc))
+  abbrv <- unname(abbreviate(desc, minlength=abbrev))
   if (any(nchar(abbrv) > 10)) {
-    abbrv <- abbreviate(abbrv, method="both.sides")
+    abbrv <- abbreviate(abbrv, method="both.sides", minlength=abbrev)
   }
 
   V(g2)$desc <- desc
