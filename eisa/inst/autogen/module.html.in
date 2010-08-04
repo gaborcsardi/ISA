@@ -176,7 +176,7 @@ using the standard hypergeometric test.) The color of the arrows code
 
 <p>
 The tree was built the following way. First all GO terms with more
-significant enrichment p-value than 0.001 were collected. Then all
+significant enrichment p-value than 0.05 were collected. Then all
 paths from these terms to the root node of the GO tree were included
 too. If a GO term is included more than once in the tree, then the
 green numbers show 1) the id of the node, this makes it easier to find
@@ -197,7 +197,7 @@ on them takes you to the corresponding Gene Ontology web page.
 
 <p>
 If you cannot see a graph here at all, that means that there were no 
-significantly enriched GO categories, at the 0.001 level.
+significantly enriched GO categories, at the 0.05 level.
 </p>
 
 <p class="note">
@@ -248,7 +248,7 @@ using the standard hypergeometric test.) The color of the arrows code
 
 <p>
 The tree was built the following way. First all GO terms with more
-significant enrichment p-value than 0.001 were collected. Then all
+significant enrichment p-value than 0.05 were collected. Then all
 paths from these terms to the root node of the GO tree were included
 too. If a GO term is included more than once in the tree, then the
 green numbers show 1) the id of the node, this makes it easier to find
@@ -269,7 +269,7 @@ on them takes you to the corresponding Gene Ontology web page.
 
 <p>
 If you cannot see a graph here at all, that means that there were no 
-significantly enriched GO categories, at the 0.001 level.
+significantly enriched GO categories, at the 0.05 level.
 </p>
 
 <p class="note">
@@ -320,7 +320,7 @@ using the standard hypergeometric test.) The color of the arrows code
 
 <p>
 The tree was built the following way. First all GO terms with more
-significant enrichment p-value than 0.001 were collected. Then all
+significant enrichment p-value than 0.05 were collected. Then all
 paths from these terms to the root node of the GO tree were included
 too. If a GO term is included more than once in the tree, then the
 green numbers show 1) the id of the node, this makes it easier to find
@@ -341,7 +341,7 @@ on them takes you to the corresponding Gene Ontology web page.
 
 <p>
 If you cannot see a graph here at all, that means that there were no 
-significantly enriched GO categories, at the 0.001 level.
+significantly enriched GO categories, at the 0.05 level.
 </p>
 
 <p class="note">
@@ -384,7 +384,7 @@ p-value level.
 
 <p>
 The columns: 
-<ul><li><b>ECount</b> is the expected count of genes in the
+<ul><li><b>ExpCount</b> is the expected count of genes in the
 module annotated with the given GO term, just by chance. </li>
 <li><b>Count</b>
 is the number of genes in the module annotated with the given GO
@@ -392,6 +392,13 @@ term. </li>
 <li><b>Size</b> is the total number of genes (in our universe)
 annotated with the GO term.</li>
 </ul>
+</p>
+
+<p>
+Clicking on <b>Count</b> shows the genes that drive the
+enrichment. You can also click on the individual numbers in
+the <b>Count</b> column, to show the driving genes for that individual
+GO category.
 </p>
 
 <p>
@@ -438,7 +445,7 @@ p-value level.
 
 <p>
 The columns: 
-<ul><li><b>ECount</b> is the expected count of genes in the
+<ul><li><b>ExpCount</b> is the expected count of genes in the
 module annotated with the given GO term, just by chance. </li>
 <li><b>Count</b>
 is the number of genes in the module annotated with the given GO
@@ -446,6 +453,13 @@ term. </li>
 <li><b>Size</b> is the total number of genes (in our universe)
 annotated with the GO term.</li>
 </ul>
+</p>
+
+<p>
+Clicking on <b>Count</b> shows the genes that drive the
+enrichment. You can also click on the individual numbers in
+the <b>Count</b> column, to show the driving genes for that individual
+GO category.
 </p>
 
 <p>
@@ -491,7 +505,7 @@ p-value level.
 
 <p>
 The columns: 
-<ul><li><b>ECount</b> is the expected count of genes in the
+<ul><li><b>ExpCount</b> is the expected count of genes in the
 module annotated with the given GO term, just by chance. </li>
 <li><b>Count</b>
 is the number of genes in the module annotated with the given GO
@@ -499,6 +513,13 @@ term. </li>
 <li><b>Size</b> is the total number of genes (in our universe)
 annotated with the GO term.</li>
 </ul>
+</p>
+
+<p>
+Clicking on <b>Count</b> shows the genes that drive the
+enrichment. You can also click on the individual numbers in
+the <b>Count</b> column, to show the driving genes for that individual
+GO category.
 </p>
 
 <p>
@@ -544,7 +565,7 @@ p-value level.
 
 <p>
 The columns: 
-<ul><li><b>ECount</b> is the expected count of genes in the
+<ul><li><b>ExpCount</b> is the expected count of genes in the
 module annotated with the given KEGG pathway, just by chance. </li>
 <li><b>Count</b>
 is the number of genes in the module annotated with the given KEGG
@@ -552,6 +573,13 @@ pathway. </li>
 <li><b>Size</b> is the total number of genes (in our universe)
 annotated with the KEGG pathway.</li>
 </ul>
+</p>
+
+<p>
+Clicking on <b>Count</b> shows the genes that drive the
+enrichment. You can also click on the individual numbers in
+the <b>Count</b> column, to show the driving genes for that individual
+KEGG pathway.
 </p>
 
 <p>
@@ -596,7 +624,7 @@ p-value level.
 
 <p>
 The columns: 
-<ul><li><b>ECount</b> is the expected count of genes in the
+<ul><li><b>ExpCount</b> is the expected count of genes in the
 module regulated by the given miRNA family, just by chance. </li>
 <li><b>Count</b>
 is the number of genes in the module regulated by the given miRNA
@@ -604,6 +632,13 @@ family.</li>
 <li><b>Size</b> is the total number of genes (in our universe)
 regulated with the given miRNA family.</li>
 </ul>
+</p>
+
+<p>
+Clicking on <b>Count</b> shows the genes that drive the
+enrichment. You can also click on the individual numbers in
+the <b>Count</b> column, to show the driving genes for that individual
+miRNA family.
 </p>
 
 <p>
@@ -651,13 +686,20 @@ p-value level.
 
 <p>
 The columns: 
-<ul><li><b>ECount</b> is the expected number of genes in the
+<ul><li><b>ExpCount</b> is the expected number of genes in the
 module on the given chromosome, just by chance. </li>
 <li><b>Count</b>
 is the number of genes in the module on the given chromosome.</li>
 <li><b>Size</b> is the total number of genes (in our universe)
 on the given chromosome.</li>
 </ul>
+</p>
+
+<p>
+Clicking on <b>Count</b> shows the genes that drive the
+enrichment. You can also click on the individual numbers in
+the <b>Count</b> column, to show the driving genes for that individual
+chromosome.
 </p>
 
 <p class="note">
@@ -747,6 +789,23 @@ plot above. Red color means over-expression, green under-expression in
 the given condition.
 </p>
 
+<p>
+The barplot below shows the condition (sample) scores. A separate bar
+is shown for each sample, its height is the corresponding score of the
+sample in the module. The red and green numbers on the bars are the
+sample scores expressed in percents, i.e. 100% is 1.0.
+</p>
+
+<p>
+The red and green lines show the module thresholds, samples above
+the red line and below the green line are included in the module.
+</p>
+
+<p>
+The different experiments that were part of the study, are separated
+by dashed vertical lines. 
+</p>
+
 <p class="note">
 &mdash; Click on the <i>Help</i> button again to close this help window.
 </p>
@@ -784,7 +843,7 @@ the given condition.
 </p>
 <p>
   <a href="http://serverdgm.unil.ch/bergmann/">
-   &copy; 2008-2009 Computational Biology Group, Department of Medical Genetics,
+   &copy; 2008-2010 Computational Biology Group, Department of Medical Genetics,
    University of Lausanne, Switzerland
    </a>
 </p>
