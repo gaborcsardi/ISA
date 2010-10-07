@@ -293,7 +293,7 @@ about the enriched GO categories.
 <<GO info,cache=FALSE>>=
 sigCategories(GO$BP)[[1]]
 library(GO.db)
-mget(sigCategories(GO$BP)[[1]][1:3], GOTERM)
+mget(na.omit(sigCategories(GO$BP)[[1]][1:3]), GOTERM)
 @ 
 
 In addition, the following functions are implemented to work on the
