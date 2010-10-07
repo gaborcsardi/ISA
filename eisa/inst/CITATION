@@ -6,12 +6,12 @@ vers <- paste("R package version", desc$Version)
      
 citEntry(entry="Manual",
          title = "eisa: The Iterative Signature Algorithm for Gene Expression Data",
-         author = personList(as.person("Gábor Csárdi")),
+         author = personList(as.person("Gabor Csardi")),
          year = year,
          note = vers,
      
          textVersion =
-         paste("Gábor Csárdi (",
+         paste("Gabor Csardi (",
                 year,
                "). eisa: The Iterative Signature Algorithm for Gene Expression Data. ",
                vers, ".", sep=""))
