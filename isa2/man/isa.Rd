@@ -21,7 +21,8 @@
   This function can be called as
   \preformatted{
     isa(data, thr.row=seq(1,3,by=0.5),
-        thr.col=seq(1,3,by=0.5), no.seeds=100)
+        thr.col=seq(1,3,by=0.5), no.seeds=100,
+        direction=c("updown", "updown"))
       }
   where the arguments are:
   \describe{
@@ -38,6 +39,11 @@
       use all possible combinations of \code{thr.row} and \code{thr.col}.
     }
     \item{no.seeds}{Integer scalar, the number of seeds to use.}
+    \item{direction}{Character vector of length two, one for the rows, one
+      for the columns. It specifies whether we are interested in
+      rows/columns that are higher (\sQuote{\code{up}}) than average,
+      lower than average (\sQuote{\code{down}}), or both
+      (\sQuote{\code{updown}}).}
   }
   
   The \code{isa} function provides an easy to use interface to the

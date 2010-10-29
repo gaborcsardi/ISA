@@ -600,7 +600,7 @@ setMethod("isa", signature(data="matrix"),
 
 isa.default <- function(data, thr.row=seq(1,3,by=0.5),
                         thr.col=seq(1,3,by=0.5),
-                        no.seeds=100, direction="updown") {
+                        no.seeds=100, direction=c("updown", "updown")) {
 
   isa.status("Performing complete ISA work flow", "in")
   
