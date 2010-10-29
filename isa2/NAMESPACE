@@ -1,4 +1,4 @@
-export(isa.in.silico, generate.seeds, images, isa.biclust)
+export(isa.in.silico, ppa.in.silico, generate.seeds, images, isa.biclust)
 
 exportMethods("isa",
               "isa.normalize",
@@ -9,6 +9,11 @@ exportMethods("isa",
               "isa.sweep",
               "sweep.graph",
               "plotModules")
+
+exportMethods("ppa",
+              "ppa.normalize",
+              "ppa.iterate",
+              "ppa.unique")
 
 export(isa.option)
 
