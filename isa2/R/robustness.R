@@ -2,9 +2,17 @@
 setMethod("robustness", signature(normed.data="list"),
           function(normed.data, ...) robustness.default(normed.data, ...))
 
-robustness.default <- function(normed.data, row.scores, col.scores) {
+robustness.default <- function(normed.data, ...) {
+  if (length(normed.data)==2) {
+    robustness.isa(normed.data, ...)
+  } else if (length(normed.data)==4) {
+    robustness.ppa(normed.data, ...)
+  }
+}
 
-  isa.status("Calculating robustness", "in")
+robustness.isa <- function(normed.data, row.scores, col.scores) {
+
+  isa.status("Calculating ISA robustness", "in")
 
   if (ncol(row.scores) != ncol(col.scores)) {
     stop("Row and column column dimensions don't match")
@@ -28,6 +36,61 @@ robustness.default <- function(normed.data, row.scores, col.scores) {
   rob1[ rob1 < 0 ] <- 0
   rob2[ rob2 < 0 ] <- 0
   res <- sqrt(rob1) * sqrt(rob2)
+
+  isa.status("DONE", "out")
+
+  res
+}
+
+robustness.ppa <- function(normed.data, row1.scores, row2.scores,
+                           col.scores) {
+
+  isa.status("Calculating PPA robustness", "in")
+
+  if (!is.matrix(row1.scores) || !is.matrix(row2.scores) ||
+      !is.matrix(col.scores)) {
+    stop("`row1.scores', `row2.scores' and `col.scores' must be matrices")
+  }
+  
+  if (ncol(row1.scores) != ncol(row2.scores) ||
+      ncol(row1.scores) != ncol(col.scores)) {
+    stop("`row1.scores', `row2.scores' and `col.scores' must have the same",
+         "number of columns")
+  }
+
+  if (ncol(row1.scores)==0) return (numeric())
+
+  row1.scores <- apply(row1.scores, 2, function(x) x/sqrt(sum(x^2)))
+  row2.scores <- apply(row2.scores, 2, function(x) x/sqrt(sum(x^2)))
+  col.scores  <- apply(col.scores,  2, function(x) x/sqrt(sum(x^2)))
+
+  hasNA <- c(TRUE, TRUE)
+  if ("hasNA" %in% names(attributes(normed.data))) {
+    hasNA <- attr(normed.data, "hasNA")
+  }
+
+  if (!hasNA[1]) {
+    rob1 <- colSums( col.scores * normed.data$Egc %*% row1.scores)
+    rob4 <- colSums(row1.scores * normed.data$Ecg %*%  col.scores)
+  } else {
+    rob1 <- colSums( col.scores * na.multiply(normed.data$Egc, row1.scores))
+    rob4 <- colSums(row1.scores * na.multiply(normed.data$Ecg,  col.scores))
+  }
+
+  if (!hasNA[2]) {
+    rob2 <- colSums(row2.scores * normed.data$Ecd %*%  col.scores)
+    rob3 <- colSums( col.scores * normed.data$Edc %*% row2.scores)
+  } else {
+    rob2 <- colSums(row2.scores * na.multiply(normed.data$Ecd,  col.scores))
+    rob3 <- colSums( col.scores * na.multiply(normed.data$Edc, row2.scores))
+  }
+
+  rob1[ rob1 < 0 ] <- 0
+  rob2[ rob2 < 0 ] <- 0
+  rob3[ rob3 < 0 ] <- 0
+  rob4[ rob4 < 0 ] <- 0
+  
+  res <- sqrt(rob1) * sqrt(rob2) * sqrt(rob3) * sqrt(rob4)
 
   isa.status("DONE", "out")
 
