@@ -598,8 +598,9 @@ sweep.graph.default <- function(sweep.result) {
 setMethod("isa", signature(data="matrix"),
           function(data, ...) isa.default(data, ...))
 
-isa.default <- function(data, thr.row=seq(1,3,by=0.5), thr.col=seq(1,3,by=0.5),
-                        no.seeds=100) {
+isa.default <- function(data, thr.row=seq(1,3,by=0.5),
+                        thr.col=seq(1,3,by=0.5),
+                        no.seeds=100, direction="updown") {
 
   isa.status("Performing complete ISA work flow", "in")
   
@@ -618,11 +619,13 @@ isa.default <- function(data, thr.row=seq(1,3,by=0.5), thr.col=seq(1,3,by=0.5),
   thr.list <- unlist(apply(thr.list, 1, list), rec=FALSE)
   
   ## Do the ISA, for all thresholds
-  isaresults <- lapply(thr.list, function(x) isa.iterate(normed.data,
-                                                         row.seeds=row.seeds,
-                                                         thr.row=x["thr.row"],
-                                                         thr.col=x["thr.col"]))
-
+  isaresults <- lapply(thr.list, function(x)
+                       isa.iterate(normed.data,
+                                   row.seeds=row.seeds,
+                                   thr.row=x["thr.row"],
+                                   thr.col=x["thr.col"],
+                                   direction=direction))
+  
   ## Make it unique for every threshold combination
   isaresults <- lapply(isaresults, function(x)
                        isa.unique(normed.data, x))

@@ -343,7 +343,7 @@ ppa.default <- function(data,
                         thr.row1=seq(1,3,by=0.5),
                         thr.row2=seq(1,3,by=0.5),
                         thr.col=seq(1,3,by=0.5),
-                        no.seeds=100) {
+                        no.seeds=100, direction="updown") {
 
   isa.status("Performing complete PPA work flow", "in")
 
@@ -369,7 +369,8 @@ ppa.default <- function(data,
                        ppa.iterate(normed.data, row1.seeds=row1.seeds,
                                    thr.row1=x["thr.row1"],
                                    thr.row2=x["thr.row2"],
-                                   thr.col=x["thr.col"]))
+                                   thr.col=x["thr.col"],
+                                   direction=direction))
 
   ## Make it unique for every threshold combination
   pparesults <- lapply(pparesults, function(x) ppa.unique(normed.data, x))
