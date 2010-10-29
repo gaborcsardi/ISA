@@ -333,6 +333,59 @@ ppa.unique.default <- function(normed.data, pparesult, method=c("cor"),
   pparesult
 }
 
-ppa <- function() {
-  ## TODO
+setMethod("ppa", signature(data="list"),
+          function(data, ...) ppa.default(data, ...))
+
+ppa.default <- function(data,
+                        thr.row1=seq(1,3,by=0.5),
+                        thr.row2=seq(1,3,by=0.5),
+                        thr.col=seq(1,3,by=0.5),
+                        no.seeds=100) {
+
+  isa.status("Performing complete PPA work flow", "in")
+
+  if (!is.list(data) || length(data) != 2 ||
+      !is.matrix(data[[1]]) || !is.matrix(data[[2]]) ||
+      ncol(data[[1]]) != ncol(data[[2]])) {
+    stop("`data' must be a list of two matrices, with matching number of columns")
+  }
+
+  ## Normalize the input
+  normed.data <- ppa.normalize(data)
+
+  ## Generate seeds
+  row1.seeds <- generate.seeds(length=nrow(data[[1]]), count=no.seeds)
+
+  ## Determine thresholds
+  thr.list <- expand.grid(thr.row1=thr.row1, thr.row2=thr.row2,
+                          thr.col=thr.col)
+  thr.list <- unlist(apply(thr.list, 1, list), rec=FALSE)
+
+  ## Do the PPA, for all thresholds
+  pparesults <- lapply(thr.list, function(x)
+                       ppa.iterate(normed.data, row1.seeds=row1.seeds,
+                                   thr.row1=x["thr.row1"],
+                                   thr.row2=x["thr.row2"],
+                                   thr.col=x["thr.col"]))
+
+  ## Make it unique for every threshold combination
+  pparesults <- lapply(pparesults, function(x) ppa.unique(normed.data, x))
+
+  ## Filter according to robustness, TODO
+  
+  ## Merge them
+  result <- list()
+  result$rows1 <- do.call(cbind, lapply(pparesults, "[[", "rows1"))
+  result$rows2 <- do.call(cbind, lapply(pparesults, "[[", "rows2"))
+  result$columns <- do.call(cbind, lapply(pparesults, "[[", "columns"))
+  result$seeddata <- do.call(rbind, lapply(pparesults, "[[", "seeddata"))
+  result$rundata <- pparesults[[1]]$rundata
+  result$rundata$N <- sum(sapply(pparesults, function(x) x$rundata$N))
+
+  ## Another filtering
+  result <- ppa.unique(normed.data, result)
+  
+  isa.status("DONE", "out")
+
+  result
 }
