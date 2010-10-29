@@ -330,7 +330,9 @@ isa.unique.default <- function(normed.data, isaresult, method=c("cor"),
     cm <- pmin(ABS(cor(isaresult$rows)), ABS(cor(isaresult$columns)))
     cm[ lower.tri(cm, diag=TRUE) ] <- 0
     uni <- apply(cm < cor.limit, 2, all)
-    freq <- apply(cm >= cor.limit, 1, sum)[uni] + 1
+    freq <- sapply(seq_len(nrow(cm)), function(x) {
+      sum(isaresult$seeddata$freq[cm[x,] >= cor.limit])
+    }) + isaresult$seeddata$freq
   } else if (method=="round") {
     ## TODO
     stop("The `round' method is currently not implemented")
@@ -340,7 +342,7 @@ isa.unique.default <- function(normed.data, isaresult, method=c("cor"),
   isaresult$columns <- isaresult$columns[,uni,drop=FALSE]
 
   isaresult$seeddata <- isaresult$seeddata[uni,,drop=FALSE]
-  isaresult$seeddata$freq <- freq
+  isaresult$seeddata$freq <- freq[uni]
 
   isaresult$rundata$unique <- TRUE
 

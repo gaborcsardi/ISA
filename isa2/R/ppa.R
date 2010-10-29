@@ -293,7 +293,6 @@ setMethod("ppa.unique", signature(normed.data="list", pparesult="list"),
           function(normed.data, pparesult, ...)
           ppa.unique.default(normed.data, pparesult, ...))
 
-## TODO: update 'freq'
 ppa.unique.default <- function(normed.data, pparesult, method=c("cor"),
                                ignore.div=TRUE, cor.limit=0.9, neg.cor=TRUE,
                                drop.zero=TRUE) {
@@ -322,11 +321,15 @@ ppa.unique.default <- function(normed.data, pparesult, method=c("cor"),
       if (neg.cor) { cm <- abs(cm) }
       cm[lower.tri(cm, diag=TRUE)] <- 0
       uni <- apply(cm < cor.limit, 2, all)
+      freq <- sapply(seq_len(nrow(cm)), function(x) {
+        sum(pparesult$seeddata$freq[cm[x,] >= cor.limit])
+      }) + pparesult$seeddata$freq
       
       pparesult$rows1 <- pparesult$rows1[,uni,drop=FALSE]
       pparesult$rows2 <- pparesult$rows2[,uni,drop=FALSE]
       pparesult$columns <- pparesult$columns[,uni,drop=FALSE]
       pparesult$seeddata <- pparesult$seeddata[uni,,drop=FALSE]
+      pparesult$seeddata$freq <- freq[uni]
     }
   }
 
