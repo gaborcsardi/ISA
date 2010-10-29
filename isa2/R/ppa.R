@@ -39,6 +39,7 @@ ppa.normalize.default <- function(data, prenormalize=TRUE) {
 setMethod("ppa.iterate", signature(normed.data="list"),
           function(normed.data, ...) ppa.iterate.default(normed.data, ...))
 
+## TODO: imeplement the other seeds
 ppa.iterate.default <- function(normed.data, row1.seeds, col1.seeds,
                                 row2.seeds, col2.seeds,
                                 thr.row1, thr.col=thr.row1, thr.row2=thr.row1,
@@ -292,6 +293,7 @@ setMethod("ppa.unique", signature(normed.data="list", pparesult="list"),
           function(normed.data, pparesult, ...)
           ppa.unique.default(normed.data, pparesult, ...))
 
+## TODO: update 'freq'
 ppa.unique.default <- function(normed.data, pparesult, method=c("cor"),
                                ignore.div=TRUE, cor.limit=0.9, neg.cor=TRUE,
                                drop.zero=TRUE) {
@@ -311,11 +313,11 @@ ppa.unique.default <- function(normed.data, pparesult, method=c("cor"),
     pparesult$rows1 <- pparesult$rows1[,!drop,drop=FALSE]
     pparesult$rows2 <- pparesult$rows2[,!drop,drop=FALSE]
     pparesult$columns <- pparesult$columns[,!drop,drop=FALSE]
-    pparesult$seedata <- pparesult$seeddata[!drop,,drop=FALSE]
+    pparesult$seeddata <- pparesult$seeddata[!drop,,drop=FALSE]
   }
 
   if (method=="cor") {
-    if (cor.limit < 1) {
+    if (cor.limit < 1 && ncol(pparesult$rows1) > 1) {
       cm <- cor(pparesult$rows1)
       if (neg.cor) { cm <- abs(cm) }
       cm[lower.tri(cm, diag=TRUE)] <- 0
