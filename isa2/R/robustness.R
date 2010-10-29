@@ -103,10 +103,10 @@ setMethod("isa.filter.robust", signature(data="matrix"),
 isa.filter.robust.default <- function(data, normed.data, isares, perms=1,
                                       row.seeds, col.seeds) {
   
-  isa.status("Filtering for robustness...", "in")
+  isa.status("Filtering ISA result for robustness...", "in")
   
   if (perms <= 0) {
-    stop("Number of permutations must be non-negative")
+    stop("Number of permutations must be positive")
   }
 
   if (length(isares$rows) == 0) {
@@ -125,7 +125,8 @@ isa.filter.robust.default <- function(data, normed.data, isares, perms=1,
 
   if (missing(row.seeds) && missing(col.seeds)) {
     row.seeds <- generate.seeds(count=isares$rundata$N,
-                                 length=nrow(isares$rows))
+                                length=nrow(isares$rows))
+    col.seeds <- matrix(nr=nrow(isares$columns), nc=0)
   }
 
   rob.max <- 0
@@ -135,7 +136,8 @@ isa.filter.robust.default <- function(data, normed.data, isares, perms=1,
     data.scrambled[] <- sample(data.scrambled)
     normed.data.scrambled <- isa.normalize(data.scrambled)
     
-    permres <- isa.iterate(normed.data.scrambled, row.seeds=row.seeds,
+    permres <- isa.iterate(normed.data.scrambled,
+                           row.seeds=row.seeds, col.seeds=col.seeds,
                            thr.row=isares$seeddata$thr.row[1],
                            thr.col=isares$seeddata$thr.col[1],
                            direction=isares$rundata$direction,
@@ -167,4 +169,93 @@ isa.filter.robust.default <- function(data, normed.data, isares, perms=1,
   isa.status("DONE.", "out")
   
   isares
+}
+
+setMethod("ppa.filter.robust", signature(data="list"),
+          function(data, ...) ppa.filter.robust.default(data, ...))
+
+ppa.filter.robust.default <- function(data, normed.data, ppares, perms=1,
+                                      row1.seeds, col1.seeds,
+                                      row2.seeds, col2.seeds) {
+
+  isa.status("Filtering PPA result for robustness...", "in")
+
+  if (perms <= 0) {
+    stop("Number of permutations must be positive")
+  }
+
+  if (length(ppares$rows1)==0) {
+    return(ppares)
+  }
+
+  if (length(unique(ppares$seeddata$thr.row1)) != 1) {
+    warning("Different row1 thresholds, using only the first one.")
+  }
+  if (length(unique(ppares$seeddata$thr.row2)) != 1) {
+    warning("Different row2 thresholds, using only the first one.")
+  }
+  if (length(unique(ppares$seeddata$thr.col)) != 1) {
+    warning("Different column thresholds, using only the first one.")
+  }
+
+  ppares$seeddata$rob <- robustness(normed.data, ppares$rows1, ppares$rows2,
+                                    ppares$columns)
+
+  if (missing(row1.seeds) && missing(col1.seeds) &&
+      missing(row2.seeds) && missing(col2.seeds)) {
+    row1.seeds <- generate.seeds(count=ppares$rundata$N,
+                                 length=nrow(ppares$rows1))
+    col1.seeds <- matrix(nr=nrow(ppares$columns), nc=0)
+    row2.seeds <- matrix(nr=nrow(ppares$rows2), nc=0)
+    col2.seeds <- matrix(nr=nrow(ppares$columns), nc=0)
+  }
+
+  rob.max <- 0
+
+  for (i in seq_len(perms)) {
+    data.scrambled <- data
+    data.scrambled[[1]][] <- sample(data.scrambled[[1]])
+    data.scrambled[[2]][] <- sample(data.scrambled[[2]])
+    normed.data.scrambled <- ppa.normalize(data.scrambled)
+
+    permres <- ppa.iterate(normed.data.scrambled,
+                           row1.seeds=row1.seeds,
+#                           col1.seeds=col1.seeds,
+#                           row2.seeds=row2.seeds,
+#                           col2.seeds=col2.seeds,
+                           thr.row1=ppares$seeddata$thr.row1[1],
+                           thr.row2=ppares$seeddata$thr.row2[1],
+                           thr.col =ppares$seeddata$thr.col[1],
+                           direction=ppares$rundata$direction,
+                           convergence=ppares$rundata$convergence,
+                           cor.limit=ppares$rundata$cor.limit,
+                           oscillation=ppares$rundata$oscillation,
+                           maxiter=ppares$rundata$maxiter)
+
+    valid <- apply(permres$rows1 != 0, 2, any)
+    valid <- valid & apply(permres$rows2 != 0, 2, any)
+    valid <- valid & apply(permres$columns != 0, 2, any)
+
+    permres$rows1 <- permres$rows1[,valid,drop=FALSE]
+    permres$rows2 <- permres$rows2[,valid,drop=FALSE]
+    permres$columns <- permres$columns[,valid,drop=FALSE]
+    permres$seeddata <- permres$seeddata[valid,,drop=FALSE]
+
+    rob2 <- robustness(normed.data.scrambled, permres$rows1, permres$rows2,
+                       permres$columns)
+    rob.max <- max(rob2, rob.max, na.rm=TRUE)
+  }
+
+  keep <- ppares$seeddata$rob > rob.max
+
+  ppares$rows1 <- ppares$rows1[, keep, drop=FALSE]
+  ppares$rows2 <- ppares$rows2[, keep, drop=FALSE]
+  ppares$columns <- ppares$columns[, keep, drop=FALSE]
+  ppares$seeddata <- ppares$seeddata[keep, , drop=FALSE]
+  if (nrow(ppares$seeddata)>0) { ppares$seeddata$rob.limit <- rob.max }
+  ppares$rundata$rob.perms <- perms  
+  
+  isa.status("DONE", "out")
+
+  ppares
 }

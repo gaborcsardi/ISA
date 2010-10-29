@@ -13,7 +13,8 @@ exportMethods("isa",
 exportMethods("ppa",
               "ppa.normalize",
               "ppa.iterate",
-              "ppa.unique")
+              "ppa.unique",
+              "ppa.filter.robust")
 
 export(isa.option)
 

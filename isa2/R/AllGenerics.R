@@ -19,6 +19,8 @@ setGeneric("robustness",
            function(normed.data, ...) standardGeneric("robustness"))
 setGeneric("isa.filter.robust",
            function(data, ...) standardGeneric("isa.filter.robust"))
+setGeneric("ppa.filter.robust",
+           function(data, ...) standardGeneric("ppa.filter.robust"))
 
 setGeneric("isa.sweep",
            function(data, ...) standardGeneric("isa.sweep"))

@@ -371,7 +371,12 @@ ppa.default <- function(data,
   ## Make it unique for every threshold combination
   pparesults <- lapply(pparesults, function(x) ppa.unique(normed.data, x))
 
-  ## Filter according to robustness, TODO
+  ## Filter according to robustness
+  pparesults <- lapply(pparesults, function(x)
+                       ppa.filter.robust(data=data,
+                                         normed.data=normed.data,
+                                         ppares=x,
+                                         row1.seeds=row1.seeds))
   
   ## Merge them
   result <- list()
