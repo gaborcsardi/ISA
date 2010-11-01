@@ -123,9 +123,11 @@ isa.filter.robust.default <- function(data, normed.data, isares, perms=1,
   
   isares$seeddata$rob <- robustness(normed.data, isares$rows, isares$columns)
 
-  if (missing(row.seeds) && missing(col.seeds)) {
+  if (missing(row.seeds)) {
     row.seeds <- generate.seeds(count=isares$rundata$N,
                                 length=nrow(isares$rows))
+  }
+  if (missing(col.seeds)) {
     col.seeds <- matrix(nr=nrow(isares$columns), nc=0)
   }
 
