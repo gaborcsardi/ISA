@@ -128,9 +128,9 @@ ppa.in.silico <- function(num.rows1=300, num.rows2=200, num.cols=50,
     idx3 <- crow2.from[i]:crow2.to[i]
     idx1 <- ccol.from[i]:ccol.to[i]
     rnd <- rnorm(length(idx1)*length(idx2), sd=mod.noise[i])
-    data1[idx1,idx2] <- data[idx1,idx2] + rnd
+    data1[idx1,idx2] <- data1[idx1,idx2] + rnd
     rnd <- rnorm(length(idx1)*length(idx3), sd=mod.noise[i])
-    data2[idx1,idx3] <- data[idx1,idx2] + rnd
+    data2[idx1,idx3] <- data2[idx1,idx2] + rnd
   }
 
   res <- list(data1=t(data1), data2=t(data2),
