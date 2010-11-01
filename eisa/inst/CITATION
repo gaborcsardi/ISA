@@ -1,20 +1,19 @@
 citHeader("To cite package 'eisa' in publications use:")
      
-desc <- packageDescription("eisa")
-year <- sub(".*(2[[:digit:]]{3})-.*", "\\1", desc$Date)
-vers <- paste("R package version", desc$Version)
-     
-citEntry(entry="Manual",
-         title = "eisa: The Iterative Signature Algorithm for Gene Expression Data",
-         author = personList(as.person("Gabor Csardi")),
-         year = year,
-         note = vers,
-     
-         textVersion =
-         paste("Gabor Csardi (",
-                year,
-               "). eisa: The Iterative Signature Algorithm for Gene Expression Data. ",
-               vers, ".", sep=""))
+citEntry(entry="Article",
+         title = "Modular analysis of gene expression data with R",
+         author = personList(as.person("Gabor Csardi"),
+           as.person("Zoltan Kutalik"),
+           as.person("Sven Bergmann")),
+         journal = "Bioinformatics",
+         year = "2010",
+         volume = "26",
+         pages = "1376-7",
+         textVersion = 
+         paste(sep="", 
+               "Csardi G, Kutalik Z, Bergmann S: ",
+               "Modular analysis of gene expression data with R ",
+               "Bioinformatics. 2010. 26 1376-7"))
 
 citEntry(entry="Article",
 	 title = "Iterative signature algorithm for the analysis of large-scale gene expression data",
