@@ -75,7 +75,7 @@
 \value{
   A named list is returned with the following elements:
   \item{rows}{The row components in the biclusters, a numeric
-    matrix. Every column in it corresponds to the a bicluster, if an
+    matrix. Every column in it corresponds to a bicluster, if an
     element (the score of the row) is non-zero, that means that the row
     is included in the bicluster, otherwise it is not. Scores are
     between -1 and 1. If the scores of two rows have the same (nonzero)

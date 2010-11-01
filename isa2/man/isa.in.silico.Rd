@@ -68,7 +68,7 @@ isa.in.silico (num.rows = 300, num.cols = 50, num.fact = 3,
 ## Define a function for plotting if we are interactive
 if (interactive()) { layout( rbind(1:2,3:4) ) }
 myimage <- function(mat) {
-  if (interactive()) par(mar=c(1,2,2,1)); image(mat[[1]])
+  if (interactive()) { par(mar=c(1,2,2,1)); image(mat[[1]]) }
 }
 
 ## Create a simple checkerboard without overlap and noise
