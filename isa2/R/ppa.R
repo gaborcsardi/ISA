@@ -2,7 +2,7 @@
 setMethod("ppa.normalize", signature(data="list"),
           function(data, ...) ppa.normalize.default(data, ...))
 
-ppa.normalize.default <- function(data, prenormalize=TRUE) {
+ppa.normalize.default <- function(data, prenormalize=FALSE) {
 
   isa.status("PPA normalization", "in")
 
