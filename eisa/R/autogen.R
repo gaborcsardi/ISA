@@ -2,13 +2,13 @@
 ISAHTML <- function(eset, modules, target.dir,
                      template=system.file("autogen", package="eisa"),
                      GO, KEGG, miRNA=NULL, CHR=NULL, htmltitle=NULL,
-                     notes=NULL, seed=NULL,
+                     notes=NULL, seed=NULL, table.extra=list(),
                      cond.to.include=NULL, cond.col="white", sep=NULL,
                      condPlot=TRUE) {
 
   ISAHTMLTable(modules=modules, target.dir=target.dir, template=template,
                  GO=GO, KEGG=KEGG, miRNA=miRNA, CHR=CHR, htmltitle=htmltitle,
-                 notes=notes, seed=seed)
+                 notes=notes, seed=seed, extra=table.extra)
 
   ISAHTMLModules(eset=eset, modules=modules, target.dir=target.dir,
                    template=template, GO=GO, KEGG=KEGG, miRNA=miRNA, CHR=CHR,
@@ -55,7 +55,8 @@ ISAHTMLTable <- function(modules, target.dir,
                            which=seq_len(length(modules)),
                            template=system.file("autogen", package="eisa"),
                            GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL,
-                           htmltitle=NULL, notes=NULL, seed=NULL) {
+                           htmltitle=NULL, notes=NULL, seed=NULL,
+                           extra=list()) {
 
   isa2:::isa.status("Creating HTML module table", "in")
 
@@ -103,7 +104,8 @@ ISAHTMLTable <- function(modules, target.dir,
 
   #############
 
-  head <- c("#", "Thr.", "#G", "#C", "GO BP", "GO CC", "GO MF", "KEGG")
+  head <- c("#", "Thr.", "#G", "#C", names(extra),
+            "GO BP", "GO CC", "GO MF", "KEGG")
 
   if (!is.null(seed)) {
     head <- c(head[1], "Seed", head[2:length(head)])
@@ -120,6 +122,11 @@ ISAHTMLTable <- function(modules, target.dir,
     tables.CHR <- paste(sep="", "<td>", tables.CHR, "</td>")
     head <- c(head, "CHR")
   }
+
+  td.extra <- lapply(extra, function(x) {
+    paste(sep="", "<td> ", x, " </td>")
+  })
+  tables.extra <- do.call(paste, td.extra)
   
   head <- paste(sep="", collapse="", "<td>", head, "</td>")
   head <- paste(collapse="", "<tr>", head, "</tr>")
@@ -130,6 +137,7 @@ ISAHTMLTable <- function(modules, target.dir,
                  "<td>", thr, "</td>",
                  "<td>", no.genes, "</td>",
                  "<td>", no.conds, "</td>",
+                 tables.extra,
                  "<td>", tables.BP, "</td>",
                  "<td>", tables.CC, "</td>",
                  "<td>", tables.MF, "</td>",

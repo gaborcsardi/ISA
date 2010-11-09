@@ -11,7 +11,7 @@
 ISAHTMLTable (modules, target.dir, which = seq_len(length(modules)), 
     template = system.file("autogen", package = "eisa"), GO = NULL, 
     KEGG = NULL, miRNA = NULL, CHR = NULL, htmltitle = NULL, 
-    notes = NULL, seed = NULL) 
+    notes = NULL, seed = NULL, extra = list()) 
 
 ISAHTMLModules (eset, modules, which = seq_len(length(modules)), target.dir, 
     template = system.file("autogen", package = "eisa"), GO = NULL,    
@@ -20,8 +20,8 @@ ISAHTMLModules (eset, modules, which = seq_len(length(modules)), target.dir,
 
 ISAHTML (eset, modules, target.dir, template = system.file("autogen", 
     package = "eisa"), GO, KEGG, miRNA = NULL, CHR = NULL, htmltitle = NULL, 
-    notes = NULL, seed = NULL, cond.to.include = NULL, cond.col = "white", 
-    sep = NULL, condPlot = TRUE)
+    notes = NULL, seed = NULL, table.extra = list(), cond.to.include = NULL, 
+    cond.col = "white", sep = NULL, condPlot = TRUE)
 }
 \arguments{
   \item{modules}{An \code{ISAModules} object.}
@@ -48,6 +48,11 @@ ISAHTML (eset, modules, target.dir, template = system.file("autogen",
     table.}
   \item{seed}{Either \code{NULL}, or a character vector, with an optional
     column that is added to the module table.}
+  \item{extra}{Extra columns to put in the HTML table. It should be a
+    named list of character vectors, each with the same length as the
+    number of modules.}
+  \item{table.extra}{This is passed to \code{ISAHTMLTable} as the
+    \code{extra} argument.}
   \item{eset}{An \code{ExpressionSet} or \code{ISAExpressionSet}
     object. If an \code{ExpressionSet} object is supplied, then it is
     normalised by calling \code{\link{ISANormalize}} on it.}
