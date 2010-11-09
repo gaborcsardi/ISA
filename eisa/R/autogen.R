@@ -205,9 +205,9 @@ ISAHTMLModules <- function(eset, modules, which=seq_len(length(modules)),
   library(xtable)
 
   chip <- annotation(modules)
-  library(paste(sep="", chip, ".db"),  character.only=TRUE)
+  require(paste(sep="", chip, ".db"),  character.only=TRUE)
   organism <- getOrganism(modules)
-  library(paste(sep="", "org.", abbreviate(organism, 2), ".eg.db"),
+  require(paste(sep="", "org.", abbreviate(organism, 2), ".eg.db"),
           character.only=TRUE)
   
   isa.autogen.create.dirs(template, target.dir)
