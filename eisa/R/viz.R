@@ -519,6 +519,8 @@ condPlot <- function(modules, number, eset,
   }
   
   ylim <- range(to.plot)*1.4
+  if (ylim[1] > 0) ylim[1] <- 0
+  if (ylim[2] < 0) ylim[2] <- 0.2
   par(mar=c(1,3,1,2))
   barplot(to.plot, space=0, col=col, ylim=ylim, ...)
 
