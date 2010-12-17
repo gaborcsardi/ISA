@@ -1,8 +1,0 @@
-$def with (contents)
-
-<ul>
-$for type in contents:
-  <li><a href="${isahtmlpath}#${sub("\W", "", type.name)}">
-      ${type.name}
-  </a></li>
-</ul>
