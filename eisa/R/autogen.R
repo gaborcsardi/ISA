@@ -4,16 +4,17 @@ ISAHTML <- function(eset, modules, target.dir,
                      GO, KEGG, miRNA=NULL, CHR=NULL, htmltitle=NULL,
                      notes=NULL, seed=NULL, table.extra=list(),
                      cond.to.include=NULL, cond.col="white", sep=NULL,
-                     condPlot=TRUE) {
+                     condPlot=TRUE, which=NULL) {
 
   ISAHTMLTable(modules=modules, target.dir=target.dir, template=template,
                  GO=GO, KEGG=KEGG, miRNA=miRNA, CHR=CHR, htmltitle=htmltitle,
-                 notes=notes, seed=seed, extra=table.extra)
+                 notes=notes, seed=seed, extra=table.extra, which=which)
 
   ISAHTMLModules(eset=eset, modules=modules, target.dir=target.dir,
-                   template=template, GO=GO, KEGG=KEGG, miRNA=miRNA, CHR=CHR,
-                   cond.to.include=cond.to.include,
-                   cond.col=cond.col, sep=sep, seed=seed, condPlot=condPlot)
+                 which=if (is.null(which)) which else unique(unlist(which)),
+                 template=template, GO=GO, KEGG=KEGG, miRNA=miRNA, CHR=CHR,
+                 cond.to.include=cond.to.include,
+                 cond.col=cond.col, sep=sep, seed=seed, condPlot=condPlot)
 
   invisible(NULL)
 }
@@ -52,16 +53,20 @@ isa.autogen.create.dirs <- function(template, target.dir) {
 }
 
 ISAHTMLTable <- function(modules, target.dir,
-                           which=seq_len(length(modules)),
-                           template=system.file("autogen", package="eisa"),
-                           GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL,
-                           htmltitle=NULL, notes=NULL, seed=NULL,
-                           extra=list()) {
+                         which=NULL,
+                         template=system.file("autogen", package="eisa"),
+                         GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL,
+                         htmltitle=NULL, notes=NULL, seed=NULL,
+                         extra=list()) {
 
   isa2:::isa.status("Creating HTML module table", "in")
 
   library(GO.db)
   library(KEGG.db)
+
+  if (is.null(which)) {
+    which <- list("All modules"=seq_len(length(modules)))
+  }
   
   isa.autogen.create.dirs(template, target.dir)
 
@@ -89,81 +94,104 @@ ISAHTMLTable <- function(modules, target.dir,
                  "/", gc, "/", uc, ")</span>")
     ifelse(pv <= pvalue, res, "")
   }
-  
-  tables.BP <- f(GO$BP, type="GO")[which]
-  tables.CC <- f(GO$CC, type="GO")[which]
-  tables.MF <- f(GO$MF, type="GO")[which]
-  tables.KEGG <- f(KEGG, type="KEGG")[which]
-  tables.miRNA <- if (!is.null(miRNA)) f(miRNA, type="miRNA")[which] else ""
-  tables.CHR <- if (!is.null(CHR)) f(CHR, type="CHR")[which] else ""
 
-  thr <- paste(sep="/", featureThreshold(modules)[which],
-               sampleThreshold(modules)[which])
-  no.genes <- getNoFeatures(modules)
-  no.conds <- getNoSamples(modules)
-
-  #############
+  f.tables.BP <- f(GO$BP, type="GO")
+  f.tables.CC <- f(GO$CC, type="GO")
+  f.tables.MF <- f(GO$MF, type="GO")
+  f.tables.KEGG <- f(KEGG, type="KEGG")
+  f.tables.miRNA <- if (!is.null(miRNA)) f(miRNA, type="miRNA") else ""
+  f.tables.CHR <- if (!is.null(CHR)) f(CHR, type="CHR") else ""
 
   head <- c("#", "Thr.", "#G", "#C", names(extra),
             "GO BP", "GO CC", "GO MF", "KEGG")
-
+  
   if (!is.null(seed)) {
     head <- c(head[1], "Seed", head[2:length(head)])
     seed <- paste(sep="", "<td>", seed, "</td>")
-  } else {
-    seed <- ""
   }
-  
-  if (length(tables.miRNA) != 1 || tables.miRNA != "") {
-    tables.miRNA <- paste(sep="", "<td>", tables.miRNA, "</td>")
+
+  if (!is.null(miRNA)) {
     head <- c(head, "miRNA")
   }
-  if (length(tables.CHR) != 1 || tables.CHR != "") {
-    tables.CHR <- paste(sep="", "<td>", tables.CHR, "</td>")
+
+  if (!is.null(CHR)) {
     head <- c(head, "CHR")
   }
 
-  td.extra <- lapply(extra, function(x) {
-    paste(sep="", "<td> ", x, " </td>")
-  })
-  tables.extra <- do.call(paste, td.extra)
-  
   head <- paste(sep="", collapse="", "<td>", head, "</td>")
   head <- paste(collapse="", "<tr>", head, "</tr>")
-  table <- paste(sep="",
-                 '<tr onclick="location.href=\'module-', which, '.html\'">',
-                 '<td><a href="module-', which, '.html">', which, "</a></td>",
-                 seed,
-                 "<td>", thr, "</td>",
-                 "<td>", no.genes, "</td>",
-                 "<td>", no.conds, "</td>",
-                 tables.extra,
-                 "<td>", tables.BP, "</td>",
-                 "<td>", tables.CC, "</td>",
-                 "<td>", tables.MF, "</td>",
-                 "<td>", tables.KEGG, "</td>",
-                 tables.miRNA,
-                 tables.CHR,
-                 "</tr>")
 
-  color.table <- function(t) {
-    ## colorify every second row, plus the first one
-    t[1] <- sub('<tr', '<tr class="head"', t[1])
-    if (length(t) > 2) {
-      idx <- seq(3, length(t), by=2)
-      t[ idx ] <- sub('<tr', '<tr class="even"', t[ idx ])
+  ## Do all sections separately
+  alltables <- character()
+  for (w in seq_along(which)) {
+    sec <- which[[w]]
+    secname <- names(which)[w]
+
+    tables.BP <- f.tables.BP[sec]
+    tables.CC <- f.tables.CC[sec]
+    tables.MF <- f.tables.MF[sec]
+    tables.KEGG <- f.tables.KEGG[sec]
+    tables.miRNA <- if (!is.null(miRNA)) f.tables.miRNA[sec] else "" 
+    tables.CHR <- if (!is.null(CHR)) f.tables.CHR[sec] else ""
+    
+    thr <- paste(sep="/", featureThreshold(modules)[sec],
+                 sampleThreshold(modules)[sec])
+    no.genes <- getNoFeatures(modules)[sec]
+    no.conds <- getNoSamples(modules)[sec]
+
+    #############    
+    
+    if (!is.null(miRNA)) {
+      tables.miRNA <- paste(sep="", "<td>", tables.miRNA, "</td>")
     }
-    t
+    if (!is.null(CHR)) {
+      tables.CHR <- paste(sep="", "<td>", tables.CHR, "</td>")
+    }
+    
+    td.extra <- lapply(extra, function(x) {
+      paste(sep="", "<td> ", x[sec], " </td>")
+    })
+    tables.extra <- do.call(paste, td.extra)
+    
+    table <- paste(sep="",
+                   '<tr onclick="location.href=\'module-', sec, '.html\'">',
+                   '<td><a href="module-', sec, '.html">', sec, "</a></td>",
+                   seed[sec],
+                   "<td>", thr, "</td>",
+                   "<td>", no.genes, "</td>",
+                   "<td>", no.conds, "</td>",
+                   tables.extra,
+                   "<td>", tables.BP, "</td>",
+                   "<td>", tables.CC, "</td>",
+                   "<td>", tables.MF, "</td>",
+                   "<td>", tables.KEGG, "</td>",
+                   tables.miRNA,
+                   tables.CHR,
+                   "</tr>")
+
+    color.table <- function(t) {
+      ## colorify every second row, plus the first one
+      t[1] <- sub('<tr', '<tr class="head"', t[1])
+      if (length(t) > 2) {
+        idx <- seq(3, length(t), by=2)
+        t[ idx ] <- sub('<tr', '<tr class="even"', t[ idx ])
+      }
+      t
+    }
+    
+    table <- c(head, table)
+    table <- color.table(table)
+    table <- paste(collapse="\n", table)
+    
+    table <- paste(collapse="",
+                   "<table>",
+                   table,
+                   "</table>")
+
+    secheader <- paste(sep="", "<a name=\"", gsub("\\W", "", secname),
+                       "\"></a>", "<h2>", secname, "</h2>")
+    alltables <- c(alltables, secheader, table)
   }
-  
-  table <- c(head, table)
-  table <- color.table(table)
-  table <- paste(collapse="\n", table)
-  
-  table <- paste(collapse="",
-                 "<table>",
-                 table,
-                 "</table>")
   
   lines <- readLines(paste(sep="", template, "/maintable.html.in"))
   
@@ -178,7 +206,8 @@ ISAHTMLTable <- function(modules, target.dir,
   }
 
   ## The table
-  lines[ grep("<!-- table -->", lines) ] <- table
+  lines[ grep("<!-- table -->", lines) ] <-
+    paste(alltables, collapse="\n")
   
   fname <- paste(sep="", target.dir, "/maintable.html")
   cat(lines, file=fname, sep="\n")
@@ -196,7 +225,7 @@ ISAHTMLTable <- function(modules, target.dir,
 }  
                           
 
-ISAHTMLModules <- function(eset, modules, which=seq_len(length(modules)),
+ISAHTMLModules <- function(eset, modules, which=NULL,
                              target.dir,
                              template=system.file("autogen", package="eisa"),
                              GO=NULL, KEGG=NULL, miRNA=NULL, CHR=NULL,
@@ -212,6 +241,8 @@ ISAHTMLModules <- function(eset, modules, which=seq_len(length(modules)),
   library(igraph)
   library(xtable)
 
+  if (is.null(which)) { which <- seq_len(length(modules)) }
+  
   chip <- annotation(modules)
   require(paste(sep="", chip, ".db"),  character.only=TRUE)
   organism <- getOrganism(modules)
