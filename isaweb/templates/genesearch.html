@@ -1,0 +1,61 @@
+$def with (res, field, key, limit, offset, home, allhits, modules)
+
+$if res:
+  $if int(allhits) <= int(limit):
+    <p>Showing all ${allhits} hits.</p>
+  $else:
+    <p>Showing search hits ${int(offset)+1}-${int(offset)+int(limit)} 
+      out of ${allhits}.</p>
+  <form>
+    <input type="button" value="Expand all" onClick="expandAll(); false"/>
+    <input type="button" value="Collapse all" onClick="collapseAll(); false"/>
+  </form>
+  <ul class="hitlist">
+  $for g in res:
+    <li>
+      <p class="category">
+      <a class="hideabletext" id="display${g.ensembl}" 
+	 href="javascript:toggle('${g.ensembl}');">&#9658;</a>
+      $g.symbol, 
+      <span class="hitcatid">
+      <a href="${ensemblurl % g.ensembl}">$g.ensembl</a>
+      <a href="${entrezurl % g.entrez}">$g.entrez</a>
+      $for m in g.omim.split(";")
+        <a href="${omimurl % m}">$m</a>
+      <a href="${atlasurl % g.symbol}">Brain atlas</a>
+      </span>
+      </p>
+      <div class="hideable" id="toggle$g.ensembl" style="display:none;">
+      <table class="sortable modlist">
+      <tr><th>Id</th><th>#G</th><th>#S</th>
+	<th>Species</th><th>Tissue(s)</th></tr>
+      $for m in g.modules.split(";")
+        <tr><td align="center">
+        <a href="${isahtmlpath}module-${m}.html">$m</a>
+	<td align="center"> ${modules[m].nogenes} </td>
+	<td align="center"> ${modules[m].nosamples} </td>
+        <td>
+	  $for s in modules[m].species.split(";"):
+	    <span style="color:${s.split(':')[0]}">${s.split(':')[1]}</span>
+	</td>
+	<td> 
+	  $for t in modules[m].tissues.split(";"):
+	    <span style="color:${t.split(':')[0]}">${t.split(':')[1]}</span>
+	</td>	  
+      </tr></table>
+      </div>
+    </li>
+  </ul>
+  <table><tr><td>
+  $if int(offset) != 0:
+    <form action="$home/gsearch/$field/$key/$limit/${int(offset)-int(limit)}">
+      <input type="submit" value="Previous $limit" />
+    </form>
+  </td><td>
+  $if int(offset) + int(limit) < int(allhits):
+    <form action="$home/gsearch/$field/$key/$limit/${int(offset)+int(limit)}">
+      <input type="submit" value="Next $limit" />
+    </form>
+  </td></tr></table>
+$else:
+  <p>No genes found!<p>

@@ -1,0 +1,37 @@
+$def with (page)
+
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="$static/style.css"></link> 
+  <script src="$static/sorttable.js"></script>
+  <script src="$static/hideshow.js"></script>
+  <title>ISA modules</title>
+</head>
+<body>
+
+<div class="thin">
+<div class="searchbox" align="center">
+<form action="$home/search" method="post" class="searchbox">
+<table><tr><td>
+      $if 'sexp' in page:
+        <input type="textbox" name="key" size="60" value="${page.sexp}" />
+      $else:
+        <input type="textbox" name="key" size="60" value="" />
+</td><td valign="top" aling="left">
+      <input type="checkbox" name="complete" checked="yes" />
+      Complete dataset<br/>
+      <input type="checkbox" name="primate" checked="yes" />
+      Primate specific
+</td></tr>
+<tr><td align="center">
+      <input type="submit" name="action" value="Search" />
+</td><td></td></tr>
+</table>
+</form>
+</div>
+</div>
+
+$:page
+
+</body>
+</html>

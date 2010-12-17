@@ -1,0 +1,38 @@
+$def with (res, modules)
+
+$if res:
+  <ul class="hitlist">
+  $for s in res:
+    <li>
+      <p class="category">
+	<a class="hideabletext" id="display${s.id}" 
+	   href="javascript:toggle('${s.id}');">&#9658;</a>
+	$s.id, $s.name, $s.sciname
+	<span class="hitcomment">
+	  &mdash; ${len(s.modules.split(";"))} modules
+	</span>
+      </p>
+      <div class="hideable" id="toggle$s.id" style="display:none;">
+      <table class="sortable modlist">
+      <tr><th>Id</th><th>#G</th><th>#S</th>
+	<th>Species</th><th>Tissue(s)</th></tr>
+      $if s.modules != '':
+        $for m in s.modules.split(";")
+          <tr><td align="center">
+          <a href="${isahtmlpath}module-${m}.html">$m</a>
+  	  <td align="center"> ${modules[m].nogenes} </td>
+	  <td align="center"> ${modules[m].nosamples} </td>
+          <td>
+	    $for u in modules[m].species.split(";"):
+	      <span style="color:${u.split(':')[0]}">${u.split(':')[1]}</span>
+  	  </td>
+  	  <td> 
+	    $for t in modules[m].tissues.split(";"):
+	      <span style="color:${t.split(':')[0]}">${t.split(':')[1]}</span>
+  	  </td>	  
+      </tr></table>
+      </div>
+    </li>
+  </ul>
+$else:
+  <p>No species found!</p>

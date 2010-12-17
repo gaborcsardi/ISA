@@ -1,0 +1,65 @@
+$def with (res, modules)
+
+$if res:
+  <ul class="hitlist">
+  $for g in res:
+    <li>
+      <p class="category">
+      <a class="hideabletext" id="display${g.ensembl}" 
+	 href="javascript:toggle('${g.ensembl}');">&#9658;</a>
+      $if g.symbol != '':
+        $g.symbol,
+      $g.name
+      <span class="hitcomment">
+	&mdash; ${len(g.modules.split(";"))} modules
+      </span>
+      </p>
+      <div class="hideable" id="toggle$g.ensembl" style="display:none;">
+      <p class="hitcatid">
+	Ensembl: 
+	<a href="${ensemblurl % ('Homo_sapiens', g.ensembl)}">human</a>,
+	<a href="${ensemblurl % ('Pan_troglodytes', g.ptr)}">chimp/bonobo</a>,
+	<a href="${ensemblurl % ('Gorilla_gorilla', g.ggo)}">gorilla</a>,
+	<a href="${ensemblurl % ('Pongo_pygmaeus', g.ppy)}">orangutan</a>,
+	<a href="${ensemblurl % ('Macaca_mulatta', g.mml)}">macaque</a>,
+	<a href="${ensemblurl % ('Mus_musculus', g.mmu)}">mouse</a>,
+	<a href="${ensemblurl % ('Monodelphis_domestica', g.mdo)}">opossum</a>,
+	<a href="${ensemblurl % ('Ornithorhynchus_anatinus', g.oan)}">platypus</a>,
+	<a href="${ensemblurl % ('Gallus_gallus', g.gga)}">chicken</a>.
+      </p>
+      <p class="hitcatid">
+      $if g.symbol != '':
+        Entrez: 
+        $for m in g.entrez.split(";"):
+          <a href="${entrezurl % m}">$m</a>,
+        Omim: 
+        $for m in g.omim.split(";"):
+	  <a href="${omimurl % m}">$m</a>,
+ 	<a href="${atlasurl % g.symbol}">Brain atlas</a>,
+	<a href="${genecardsurl % g.symbol}">GeneCards</a>.
+      </p>
+      <p class="hitcatid">Modules:</p>
+      <table class="sortable modlist">
+      <tr><th>Id</th><th>#G</th><th>#S</th>
+	<th>Species</th><th>Tissue(s)</th></tr>
+      $if g.modules != '':
+        $for m in g.modules.split(";")
+          <tr><td align="center">
+          <a href="${isahtmlpath}module-${m}.html">$m</a>
+  	  <td align="center"> ${modules[m].nogenes} </td>
+	  <td align="center"> ${modules[m].nosamples} </td>
+          <td>
+	    $for s in modules[m].species.split(";"):
+	      <span style="color:${s.split(':')[0]}">${s.split(':')[1]}</span>
+  	  </td>
+  	  <td> 
+	    $for t in modules[m].tissues.split(";"):
+	      <span style="color:${t.split(':')[0]}">${t.split(':')[1]}</span>
+  	  </td>	  
+      </tr></table>
+      </div>
+    </li>
+  </ul>
+  <table><tr><td>
+$else:
+  <p>No genes found!<p>

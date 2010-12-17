@@ -1,0 +1,35 @@
+$def with (hitcounts, chitcounts, html, offset, home, field, key, limit, what, allhits, sexp)
+
+$var sexp: $sexp
+
+<div class="searchcats">
+$for cat, count in hitcounts.items():
+  <p><a href="$home/search/$what/$field/$key/$limit/${chitcounts[cat]}">
+      $cat ($count)</a></p>
+</div>
+
+<div class="reslist">
+<form>
+  <input type="button" value="Expand all" onClick="expandAll(); false"/>
+  <input type="button" value="Collapse all" onClick="collapseAll(); false"/>
+</form>
+$for cat, text in html.items():
+  $if text != '': 
+    <h3>$cat</h3>
+    <div>
+      $:text
+    </div>
+
+<table><tr><td>
+$if offset != 0:
+  <form action="$home/search/$what/$field/$key/$limit/${offset-limit}">
+    <input type="submit" value="Previous $limit" />
+  </form>
+</td><td>
+$if offset + limit < allhits:
+  <form action="$home/search/$what/$field/$key/$limit/${offset+limit}">
+    <input type="submit" value="Next $limit" />
+  </form>
+</td></tr></table>
+
+</div>

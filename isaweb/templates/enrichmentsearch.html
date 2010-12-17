@@ -1,0 +1,69 @@
+$def with (res, field, key, limit, offset, home, allhits, modules, pvals)
+
+<h3>Enrichment categories</h3>
+
+$if res:
+  $if int(allhits) <= int(limit):
+    <p>Showing all ${allhits} hits.</p>
+  $else:
+    <p>Showing search hits ${int(offset)+1}-${int(offset)+int(limit)} 
+      out of ${allhits}.</p>
+  <form>
+    <input type="button" value="Expand all" onClick="expandAll(); false"/>
+    <input type="button" value="Collapse all" onClick="collapseAll(); false"/>
+  </form>
+  <ul class="hitlist">
+  $for g in res:
+    <li>
+      <p class="category">
+      <a class="hideabletext" id="display${g.id}" 
+	 href="javascript:toggle('${g.id}');">&#9658;</a>
+      $g.name,
+      <span class="hitcatid">
+      $if g.type in ("GOBP", "GOCC", "GOMF"):
+        <a href="${gourl % g.id}">$g.id ($g.type)</a>
+      $elif g.type == "KEGG":
+	<a href="${keggurl % g.id}">$g.id ($g.type)</a>
+      $else:
+	$g.id ($g.type)
+      </span>
+      <span class="hitcomment">
+	&mdash; ${len(g.modules.split(";"))} modules
+      </span>
+      </p>
+      <div class="hideable" id="toggle$g.id" style="display:none;">
+      <table class="sortable modlist">
+      <tr><th>Id</th><th>#G</th><th>#S</th>
+	<th>P-value</th>
+	<th>Species</th><th>Tissue(s)</th></tr>
+      $for m in g.modules.split(";")
+        <tr><td align="center">
+        <a href="${isahtmlpath}module-${m}.html">$m</a>
+	<td align="center"> ${modules[m].nogenes} </td>
+	<td align="center"> ${modules[m].nosamples} </td>
+	<td align="center"> ${pvals[g.id][int(m)]} </td>
+        <td>
+	  $for s in modules[m].species.split(";"):
+	    <span style="color:${s.split(':')[0]}">${s.split(':')[1]}</span>
+	</td>
+	<td> 
+	  $for t in modules[m].tissues.split(";"):
+	    <span style="color:${t.split(':')[0]}">${t.split(':')[1]}</span>
+	</td>	  
+      </tr></table>
+      </div>
+    </li>
+  </ul>
+  <table><tr><td>
+  $if int(offset) != 0:
+    <form action="$home/esearch/$field/$key/$limit/${int(offset)-int(limit)}">
+      <input type="submit" value="Previous $limit" />
+    </form>
+  </td><td>
+  $if int(offset) + int(limit) < int(allhits):
+    <form action="$home/esearch/$field/$key/$limit/${int(offset)+int(limit)}">
+      <input type="submit" value="Next $limit" />
+    </form>
+  </td></tr></table>
+$else:
+  <p>Nothing found!</p>
