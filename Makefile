@@ -1,4 +1,12 @@
 
+####################################################
+## These might require manual configuration
+
+R=R
+FLEXLIB=~/software/flex/frameworks/libs/air
+
+####################################################
+
 ISAVERSION=$(shell grep Version isa2/DESCRIPTION | cut -f2 -d" ")
 EISAVERSION=$(shell grep Version eisa/DESCRIPTION | cut -f2 -d" ")
 EVVERSION=$(shell grep Version RExpressionView/DESCRIPTION | cut -f2 -d" ")
@@ -18,8 +26,6 @@ clean:
 
 ####################################################
 ## R packages
-
-R=/home/gabor/software/R-2.11.0/bin/R
 
 # isa2
 
@@ -169,6 +175,7 @@ REVFILES=RExpressionView/inst/ExpressionView.swf	\
 
 
 ALIVEPDFFILES = $(shell find ExpressionView/src/org -name "*.as" -print)
+ALIVEPDFFILES2 = $(subst ExpressionView/,,$(ALIVEPDFFILES))
 ALIVEPDFCLASSES = $(subst ExpressionView.src.,,$(subst /,.,$(basename $(ALIVEPDFFILES))))
 
 ExpressionView/libs/AlivePDF.swc: $(ALIVEPDFFILES)
@@ -188,10 +195,11 @@ ExpressionView/doc/.stamp: $(EVFILES)
 	cd ExpressionView && \
 	asdoc 	-target-player 10 \
 		-source-path src \
-		-exclude-classes $(ALIVEPDFCLASSES) \
 		-output doc \
 		-doc-sources src \
 		-external-library-path libs \
+		-external-library-path+=$(FLEXLIB) \
+		-exclude-sources $(ALIVEPDFFILES2) \
 		-define+=CONFIG::air,false
 	rm -rf RExpressionView/inst/srcview
 	cp -r ExpressionView/doc RExpressionView/inst/srcview
