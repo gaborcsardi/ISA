@@ -1,5 +1,5 @@
-.onLoad <- function(dir, package) {
-  library.dynam("isa2", package, dir, local=FALSE);
+.onLoad <- function(lib, pkg) {
+  library.dynam("isa2", pkg, lib, local=FALSE);
 
   ## Default ISA options
   isa.options[["verbose"]] <-  FALSE
