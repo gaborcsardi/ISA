@@ -68,8 +68,8 @@ nm <- isa.normalize(insili[[1]])
 max(abs(rowSums(nm[[1]])))
 max(abs(rowSums(nm[[2]])))
 
-max(abs(sd(t(nm[[1]])) - 1))
-max(abs(sd(t(nm[[2]])) - 1))
+max(abs(apply(t(nm[[1]]), 2, sd) - 1))
+max(abs(apply(t(nm[[2]]), 2, sd) - 1))
 
 ## Plot them
 if (interactive()) {
