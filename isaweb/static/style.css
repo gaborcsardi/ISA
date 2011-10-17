@@ -4,34 +4,21 @@ body {
 	background:#f8f8f8;
 	color:#000;
         text-align: left;
-	margin-left: 50px;
-	margin-right: 50px;
-}
-div.thin {
-	width: 900px;
+	width:1100px;
 	margin: auto;
+	padding-top: 20px;
 }
 h1 {
-    color: #fff;
-    margin: 0px 0px 10px 0px;
-    padding: 7px 0 7px 15px;
-    text-shadow: 0px 1px 2px #000;
-    background: #aeaeae url(images/headerbg.png) repeat-x;
-    border-bottom: 1px solid #1c477f;
-    font-size: large;
+    font-size: 1.3em;
+    font-weight: bold;
 }
-h2 {
-    color: #fff;
-    margin: 10px 0px 10px 0px;
-    padding: 7px 0 7px 15px;
-    text-shadow: 0px 1px 2px #000;
-    background: #aeaeae url(images/headerbg.png) repeat-x;
-    border-bottom: 1px solid #1c477f;
-    font-size: 1em;
-    text-align: left;
+h2 { 
+    font-size: 1.1em;
+    font-weight: bold;
 }
 h3 {
     font-size: 1em;
+    font-weight: bold;
     text-align: left;
 }
 h4 {
@@ -40,11 +27,20 @@ h4 {
 }
 table.modlist th { 
     padding-right: 2em;
-    padding-left: 1em;
+    padding-left: 2em;
+    padding-top: 5px;
     padding-bottom: 5px;
-    border: 1px solid #AAA;
+    border: 1px solid #000;
     horizontal-align: center;
     vertical-align: center;
+    line-height: 1.3em;
+    font-weight: bold;
+}
+table.modlist td { 
+    padding-left: 5px;
+    padding-right: 5px;
+    border-left: 1px solid #aaa;
+    margin: 0px;
 }
 a { color: #00f; text-decoration: none }
 a:visited { color: #00c }
@@ -163,8 +159,8 @@ span.pvalue {
   font-size: .8em;
 }
 div.searchbox {
-    padding-top: 50px;
-    font-size: 0.9em;
+    padding-top: 30px;
+    font-size: 0.8em;
 }
 form.searchbox input {
     font-size: 1.6em;
@@ -176,15 +172,23 @@ form.searchbox th {
 form.searchbox td {
     border: none;
 }
+div.searchbox td.searchbuttons {
+    text-align: center;
+}
 table.hit {
     margin-bottom: 20px;
 }
 table.sortable { 
-    font-size: 0.8em;
+    font-size: 0.9em;
     margin-left: 30px;
 }
 p.category {
     font-size: 1.2em;
+    margin-bottom: 5px;
+    margin-top: 10px;
+    margin-right: 0px;
+    margin-left: 25px;
+    text-indent: -25px;
 }
 table.links {
     width: 100%;
@@ -196,8 +200,13 @@ ul.hitlist {
     list-style: none;
 }
 .hitcatid {
+    margin-top: 1px;
+    margin-bottom: 1px;
     font-size: 0.8em;
     font-style: italic;
+}
+p.hitcatid {
+    margin-left: 25px;
 }
 span.hitcomment {
     font-size: 0.8em;
@@ -211,11 +220,69 @@ table.modlist tr:hover {
 }
 div.searchcats {
     padding-right: 20px;
-    height: 200px;
+    height: 400px;
     margin-right: 20px;
     border-right: 1px solid #aaa;
+    clear: left;
     float: left;
 }
 div.reslist {
     float: left;
+    width: 700px;
+}
+div.thin {
+	width: 900px;
+	margin: auto;
+	text-align: center;
+}
+div.thin ul {    
+    margin: auto;
+    padding-top:20px;
+    padding-right:200px;
+    margin-bottom:50px;
+}
+div.thin ul li {
+    display: inline;
+    padding: 20px 30px 20px 30px;
+}
+span.s {
+    color: darkblue;
+}
+span.t {
+    color: black;
+}
+span.g {
+    color: orange;
+}
+span.e {
+    color: darkgreen;
+}
+p.logo {
+    color: darkgreen;
+    font-size: 2.5em;
+    text-align: center;
+    font-weight: bold;
+    font-family: Arial,Helvetica;
+    margin-bottom: 10px;
+}
+p.logo2 {
+    color: darkgreen;
+    font-size: 2em;
+    font-family: Arial,Helvetica;
+    float:left;
+    margin-top: 0px;
+    margin-left: -10px;
+    margin-right: 20px;
+    border: 1px solid #eee;
+    padding: 10px;
+}
+p.copyright {
+    text-align: center;
+    color: grey;
+}
+img.help {
+    margin: 0px 20px 20px 20px;
+    padding: 5px 5px 5px 5px;
+    border: 1px solid #000;
+    background: #eee;
 }

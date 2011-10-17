@@ -27,10 +27,10 @@ $if res:
 	<th>Species</th><th>Tissue(s)</th></tr>
       $for m in g.modules.split(";")
         <tr><td align="center">
-        <a href="${isahtmlpath}module-${m}.html">$m</a>
+        <a href="$modulelink(m)">$m</a>
 	<td align="center"> ${modules[m].nogenes} </td>
 	<td align="center"> ${modules[m].nosamples} </td>
-	<td align="center"> ${pvals[g.id][int(m)]} </td>
+	<td align="center"> ${pvals[g.id][m]} </td>
         <td>
 	  $for s in modules[m].species.split(";"):
 	    <span style="color:${s.split(':')[0]}">${s.split(':')[1]}</span>

@@ -10,11 +10,13 @@ $if res:
       $if g.symbol != '':
         $g.symbol,
       $g.name
-      <span class="hitcomment">
-	&mdash; ${len(g.modules.split(";"))} modules
+      <span class="hitcomment"> &mdash; 
+	$if g.modules != "":
+	  ${len(g.modules.split(";"))} modules
+	$else:
+	  no modules
       </span>
       </p>
-      <div class="hideable" id="toggle$g.ensembl" style="display:none;">
       <p class="hitcatid">
 	Ensembl: 
 	<a href="${ensemblurl % ('Homo_sapiens', g.ensembl)}">human</a>,
@@ -38,6 +40,7 @@ $if res:
  	<a href="${atlasurl % g.symbol}">Brain atlas</a>,
 	<a href="${genecardsurl % g.symbol}">GeneCards</a>.
       </p>
+      <div class="hideable" id="toggle$g.ensembl" style="display:none;">
       <p class="hitcatid">Modules:</p>
       <table class="sortable modlist">
       <tr><th>Id</th><th>#G</th><th>#S</th>
@@ -45,21 +48,22 @@ $if res:
       $if g.modules != '':
         $for m in g.modules.split(";")
           <tr><td align="center">
-          <a href="${isahtmlpath}module-${m}.html">$m</a>
-  	  <td align="center"> ${modules[m].nogenes} </td>
-	  <td align="center"> ${modules[m].nosamples} </td>
-          <td>
-	    $for s in modules[m].species.split(";"):
-	      <span style="color:${s.split(':')[0]}">${s.split(':')[1]}</span>
-  	  </td>
-  	  <td> 
-	    $for t in modules[m].tissues.split(";"):
-	      <span style="color:${t.split(':')[0]}">${t.split(':')[1]}</span>
-  	  </td>	  
-      </tr></table>
+              <a href="$modulelink(m)">$m</a>
+	    </td>
+  	    <td align="center"> ${modules[m].nogenes} </td>
+	    <td align="center"> ${modules[m].nosamples} </td>
+            <td>
+	      $for s in modules[m].species.split(";"):
+  	        <span style="color:${s.split(':')[0]}">${s.split(':')[1]}</span>
+  	    </td>
+  	    <td> 
+	      $for t in modules[m].tissues.split(";"):
+	        <span style="color:${t.split(':')[0]}">${t.split(':')[1]}</span>
+  	    </td>  
+	  </tr>
+      </table>
       </div>
     </li>
   </ul>
-  <table><tr><td>
 $else:
   <p>No genes found!<p>

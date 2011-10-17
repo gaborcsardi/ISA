@@ -19,7 +19,7 @@ $if res:
       $if s.modules != '':
         $for m in s.modules.split(";")
           <tr><td align="center">
-          <a href="${isahtmlpath}module-${m}.html">$m</a>
+          <a href="$modulelink(m)">$m</a>
   	  <td align="center"> ${modules[m].nogenes} </td>
 	  <td align="center"> ${modules[m].nosamples} </td>
           <td>

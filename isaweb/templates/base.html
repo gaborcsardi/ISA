@@ -1,5 +1,15 @@
 $def with (page)
 
+$code:
+  if 'complete' not in page:
+    complete='checked="yes"'
+  else:
+    complete=''
+  if 'primate' not in page:
+    primate='checked="yes"'
+  else:
+    primate=''
+
 <html>
 <head>
   <link rel="stylesheet" type="text/css" href="$static/style.css"></link> 
@@ -9,26 +19,38 @@ $def with (page)
 </head>
 <body>
 
-<div class="thin">
-<div class="searchbox" align="center">
+$if 'title' in page:  
+  <div class="searchbox" align="center">
+$else:
+  <div class="searchbox2">
+$if 'logo2' in page:
+  <a href="$home">$:page.logo2</a>
 <form action="$home/search" method="post" class="searchbox">
-<table><tr><td>
+<table>
+  <tr><td>
+      $if 'logo' in page:
+        $:page.logo
+    </td>
+    <td></td>
+  </tr><tr>
+    <td>
       $if 'sexp' in page:
-        <input type="textbox" name="key" size="60" value="${page.sexp}" />
+        <input type="textbox" name="key" size="40" value="${page.sexp}" />
       $else:
-        <input type="textbox" name="key" size="60" value="" />
-</td><td valign="top" aling="left">
-      <input type="checkbox" name="complete" checked="yes" />
-      Complete dataset<br/>
-      <input type="checkbox" name="primate" checked="yes" />
-      Primate specific
-</td></tr>
-<tr><td align="center">
-      <input type="submit" name="action" value="Search" />
-</td><td></td></tr>
+        <input type="textbox" name="key" size="40" value="" />
+    </td><td valign="top" aling="left">
+      <span style="width:150px;">
+	<input type="checkbox" name="complete" $:complete />
+	Amniote dataset</span><br/>
+      <span><input type="checkbox" name="primate" $:primate />
+	Primate dataset</span>
+  </td></tr>
+  <tr><td class="searchbuttons">
+      <input type="submit" name="action" value="  Search  " />
+      <input type="submit" name="action" value=" Modules " />
+    </td><td></td></tr>
 </table>
 </form>
-</div>
 </div>
 
 $:page
