@@ -531,7 +531,7 @@ condPlot <- function(modules, number, eset,
   if (!is.null(sep)) {
 
     abline(v=sep, lty=2, col=sepcol)
-    text(sep, ylim[2], pos=2, names(sep), font=3, srt=90, cex=0.8)
+    text(sep, ylim[2], pos=2, names(sep), font=3, srt=90, cex=0.8, xpd=NA)
     points(to.plot, type="h")
     points(seq(along=to.plot)-1, to.plot, type="h")
   }
