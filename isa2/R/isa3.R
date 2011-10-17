@@ -616,7 +616,7 @@ isa.default <- function(data, thr.row=seq(1,3,by=0.5),
 
   ## Determine thresholds
   thr.list <- expand.grid(thr.row=thr.row, thr.col=thr.col)
-  thr.list <- unlist(apply(thr.list, 1, list), rec=FALSE)
+  thr.list <- unlist(apply(thr.list, 1, list), recursive=FALSE)
   
   ## Do the ISA, for all thresholds
   isaresults <- lapply(thr.list, function(x)

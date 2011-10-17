@@ -362,7 +362,7 @@ ppa.default <- function(data,
   ## Determine thresholds
   thr.list <- expand.grid(thr.row1=thr.row1, thr.row2=thr.row2,
                           thr.col=thr.col)
-  thr.list <- unlist(apply(thr.list, 1, list), rec=FALSE)
+  thr.list <- unlist(apply(thr.list, 1, list), recursive=FALSE)
 
   ## Do the PPA, for all thresholds
   pparesults <- lapply(thr.list, function(x)
