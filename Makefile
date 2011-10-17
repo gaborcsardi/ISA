@@ -57,7 +57,9 @@ isa2/inst/doc/ISA_tutorial.pdf: vignettes/ISA_tutorial.pdf
 
 vignettes/ISA_tutorial.pdf: vignettes/ISA_tutorial.tex
 	cd vignettes && pdflatex ISA_tutorial.tex && \
-		pdflatex ISA_tutorial.tex
+		pdflatex ISA_tutorial.tex && \
+		qpdf ISA_tutorial.pdf ISA_tutorial2.pdf && \
+		mv ISA_tutorial2.pdf ISA_tutorial.pdf
 
 vignettes/ISA_tutorial.tex: vignettes/ISA_tutorial.Rnw isa2_$(ISAVERSION)-nv.tar.gz
 	$(R) CMD INSTALL isa2_$(ISAVERSION)-nv.tar.gz
@@ -70,7 +72,9 @@ isa2/inst/doc/ISA_parallel.pdf: vignettes/ISA_parallel.pdf
 	cp $< $@
 
 vignettes/ISA_parallel.pdf: vignettes/ISA_parallel.tex
-	cd vignettes && pdflatex ISA_parallel.tex
+	cd vignettes && pdflatex ISA_parallel.tex && \
+		qpdf ISA_parallel.pdf ISA_parallel2.pdf && \
+		mv ISA_parallel2.pdf ISA_parallel.pdf
 
 vignettes/ISA_parallel.tex: vignettes/ISA_parallel.Rnw isa2_$(ISAVERSION)-nv.tar.gz
 	$(R) CMD INSTALL isa2_$(ISAVERSION)-nv.tar.gz
@@ -103,7 +107,9 @@ eisa/inst/doc/ISA_internals.pdf: vignettes/ISA_internals.pdf
 
 vignettes/ISA_internals.pdf: vignettes/ISA_internals.tex
 	cd vignettes && pdflatex ISA_internals && bibtex ISA_internals && \
-		pdflatex ISA_internals && pdflatex ISA_internals
+		pdflatex ISA_internals && pdflatex ISA_internals && \
+		qpdf ISA_internals.pdf ISA_internals2.pdf && \
+		cp ISA_internals2.pdf ISA_internals.pdf
 
 vignettes/ISA_internals.tex: vignettes/ISA_internals.Rnw \
 		eisa_$(EISAVERSION)-nv.tar.gz isa2_$(ISAVERSION)-nv.tar.gz
