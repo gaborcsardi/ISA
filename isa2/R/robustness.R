@@ -128,7 +128,7 @@ isa.filter.robust.default <- function(data, normed.data, isares, perms=1,
                                 length=nrow(isares$rows))
   }
   if (missing(col.seeds)) {
-    col.seeds <- matrix(nr=nrow(isares$columns), nc=0)
+    col.seeds <- matrix(nrow=nrow(isares$columns), ncol=0)
   }
 
   rob.max <- 0
@@ -207,9 +207,9 @@ ppa.filter.robust.default <- function(data, normed.data, ppares, perms=1,
       missing(row2.seeds) && missing(col2.seeds)) {
     row1.seeds <- generate.seeds(count=ppares$rundata$N,
                                  length=nrow(ppares$rows1))
-    col1.seeds <- matrix(nr=nrow(ppares$columns), nc=0)
-    row2.seeds <- matrix(nr=nrow(ppares$rows2), nc=0)
-    col2.seeds <- matrix(nr=nrow(ppares$columns), nc=0)
+    col1.seeds <- matrix(nrow=nrow(ppares$columns), ncol=0)
+    row2.seeds <- matrix(nrow=nrow(ppares$rows2), ncol=0)
+    col2.seeds <- matrix(nrow=nrow(ppares$columns), ncol=0)
   }
 
   rob.max <- 0

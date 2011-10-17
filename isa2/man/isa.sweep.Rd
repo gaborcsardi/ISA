@@ -149,7 +149,7 @@ if (interactive()) {
 
 ## Yet another plot, the scores for the rows within the modules
 if (interactive()) {
-  layout(matrix( 1:15, nc=3 ))
+  layout(matrix( 1:15, ncol=3 ))
   for (i in seq(ncol(isa.tree$rows))) {
     par(mar=c(2,2,1,1))
     plot(isa.tree$rows[,i], axes=FALSE, ylim=c(-1,1))

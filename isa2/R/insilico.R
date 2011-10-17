@@ -29,10 +29,10 @@ isa.in.silico <- function(num.rows=300, num.cols=50, num.fact=3,
 
   mod.signal <- rep(mod.signal, length=num.fact)
   
-  rowMod <- matrix(0, nr=num.rows, nc=num.fact)
-  colMod <- matrix(0, nr=num.cols, nc=num.fact)
+  rowMod <- matrix(0, nrow=num.rows, ncol=num.fact)
+  colMod <- matrix(0, nrow=num.cols, ncol=num.fact)
 
-  data <- matrix(0, nr=num.cols, nc=num.rows)
+  data <- matrix(0, nrow=num.cols, ncol=num.rows)
 
   for (i in seq_len(num.fact)) {
     rowMod[crow.from[i]:crow.to[i],i] <- sqrt(mod.signal[i])
@@ -101,12 +101,12 @@ ppa.in.silico <- function(num.rows1=300, num.rows2=200, num.cols=50,
 
   mod.signal <- rep(mod.signal, length=num.fact)
 
-  row1Mod <- matrix(0, nr=num.rows1, nc=num.fact)
-  row2Mod <- matrix(0, nr=num.rows2, nc=num.fact)
-  colMod <- matrix(0, nr=num.cols, nc=num.fact)
+  row1Mod <- matrix(0, nrow=num.rows1, ncol=num.fact)
+  row2Mod <- matrix(0, nrow=num.rows2, ncol=num.fact)
+  colMod <- matrix(0, nrow=num.cols, ncol=num.fact)
 
-  data1 <- matrix(0, nr=num.cols, nc=num.rows1)
-  data2 <- matrix(0, nr=num.cols, nc=num.rows2)
+  data1 <- matrix(0, nrow=num.cols, ncol=num.rows1)
+  data2 <- matrix(0, nrow=num.cols, ncol=num.rows2)
 
   for (i in seq_len(num.fact)) {
     row1Mod[crow1.from[i]:crow1.to[i],i] <- sqrt(mod.signal[i])
