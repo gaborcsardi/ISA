@@ -1,4 +1,4 @@
-.onLoad <- function(dir, package) {
+.onLoad <- function(lib, pkg) {
 }
 
 .onUnload <- function(libpath) {
