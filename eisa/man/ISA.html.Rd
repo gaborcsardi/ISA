@@ -8,12 +8,12 @@
   ISA biclusters.
 }
 \usage{
-ISAHTMLTable (modules, target.dir, which = seq_len(length(modules)), 
+ISAHTMLTable (modules, target.dir, which = NULL,
     template = system.file("autogen", package = "eisa"), GO = NULL, 
     KEGG = NULL, miRNA = NULL, CHR = NULL, htmltitle = NULL, 
     notes = NULL, seed = NULL, extra = list()) 
 
-ISAHTMLModules (eset, modules, which = seq_len(length(modules)), target.dir, 
+ISAHTMLModules (eset, modules, which = NULL, target.dir, 
     template = system.file("autogen", package = "eisa"), GO = NULL,    
     KEGG = NULL, miRNA = NULL, CHR = NULL, cond.to.include = NULL,     
     cond.col = "white", sep = NULL, seed = NULL, condPlot = TRUE)
@@ -21,16 +21,17 @@ ISAHTMLModules (eset, modules, which = seq_len(length(modules)), target.dir,
 ISAHTML (eset, modules, target.dir, template = system.file("autogen", 
     package = "eisa"), GO, KEGG, miRNA = NULL, CHR = NULL, htmltitle = NULL, 
     notes = NULL, seed = NULL, table.extra = list(), cond.to.include = NULL, 
-    cond.col = "white", sep = NULL, condPlot = TRUE)
+    cond.col = "white", sep = NULL, condPlot = TRUE, which = NULL)
 }
 \arguments{
   \item{modules}{An \code{ISAModules} object.}
   \item{target.dir}{Character vector of length one, the directory in
     which the result is placed. It is created if it does not exist.}
   \item{which}{Numeric vector, which modules to include in the table
-    (for \code{ISAHTMLTable}); or, which modules to
-    create HTML pages for (\code{ISAHTMLModules}). All modules are
-    used by default.}
+    (\code{ISAHTMLTable}); or, which modules to
+    create HTML pages for (\code{ISAHTML} and \code{ISAHTMLModules}).
+    All modules are used if this argument is \code{NULL}, 
+    which is the default.}
   \item{template}{The directory containing the HTML template files. By
     default the template included in the \code{eisa} package is used.}
   \item{GO}{List of three \code{\link{GOListHyperGResult}} objects, as
