@@ -3,7 +3,8 @@
 ## These might require manual configuration
 
 R=R
-FLEXLIB=~/software/flex/frameworks/libs/air
+ASDOC=$(shell which asdoc)
+FLEXLIB=$(subst bin/asdoc,frameworks/libs/air,$(ASDOC))
 
 ####################################################
 
