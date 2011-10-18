@@ -269,7 +269,9 @@ homepage/EISA_tutorial.html: eisa/inst/doc/EISA_tutorial.tex
 homepage/EISA_tutorial.pdf: eisa/inst/doc/EISA_tutorial.pdf
 	cp $< $@
 eisa/inst/doc/EISA_tutorial.pdf: eisa/inst/doc/EISA_tutorial.tex
-	cd eisa/inst/doc/ && pdflatex EISA_tutorial.tex
+	cd eisa/inst/doc/ && pdflatex EISA_tutorial.tex && \
+		qpdf EISA_tutorial.pdf EISA_tutorial2.pdf && \
+		mv EISA_tutorial2.pdf EISA_tutorial.pdf
 eisa/inst/doc/EISA_tutorial.tex: eisa/inst/doc/EISA_tutorial.Rnw
 	cd eisa/inst/doc/ && $(R) CMD Sweave EISA_tutorial.Rnw
 
@@ -318,7 +320,9 @@ homepage/EISA_biclust.html: eisa/inst/doc/EISA_biclust.tex
 homepage/EISA_biclust.pdf: eisa/inst/doc/EISA_biclust.pdf
 	cp $< $@
 eisa/inst/doc/EISA_biclust.pdf: eisa/inst/doc/EISA_biclust.tex
-	cd eisa/inst/doc/ && pdflatex EISA_biclust.tex
+	cd eisa/inst/doc/ && pdflatex EISA_biclust.tex && \
+		qpdf EISA_biclust.pdf EISA_biclust2.pdf && \
+		mv EISA_biclust2.pdf EISA_biclust.pdf
 eisa/inst/doc/EISA_biclust.tex: eisa/inst/doc/EISA_biclust.Rnw
 	cd eisa/inst/doc/ && $(R) CMD Sweave EISA_biclust.Rnw
 
