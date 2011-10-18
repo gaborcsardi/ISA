@@ -1,5 +1,5 @@
-.onLoad <- function(dir, package) {
-    library.dynam("ExpressionView", package, dir, local=FALSE);
+.onLoad <- function(libname, pkgname) {
+    library.dynam("ExpressionView", pkgname, libname, local=FALSE);
 }
 
 .onUnload <- function(libpath) {

@@ -161,7 +161,7 @@ The \Rfunction{OrderEV} function implemented in the
 \Rpackage{ExpressionView} package determines the optimal order of the
 gene expression matrix for a given set of biclusters. It can be called
 with \Rclass{ISAModules} or \Rclass{Biclust} objects as the first argument:
-<<expressionview, results=HIDE>>=
+<<expressionview, results=hide>>=
 library(ExpressionView)
 optimalorder <- OrderEV(modules)
 @
