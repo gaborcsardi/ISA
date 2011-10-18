@@ -1,23 +1,29 @@
 
+annotate <- function(biclusters, data) {
+
+  if (!inherits(biclusters, "Biclust")) {
+    stop("`biclusters' must be a Biclust")
+  }
+  
+  if (!inherits(ALL, "ExpressionSet")) {
+    stop("`data' must be an ExpressionSet")
+  }
+
+  par <- biclusters@Parameters
+  par$annotation <- annotation(data)
+  par$featureNames <- featureNames(data)
+  par$sampleNames <- sampleNames(data)
+  par$pData <- pData(data)
+  biclusters@Parameters <- par
+
+  biclusters
+}
+
 setAs(from="Biclust", to="ISAModules", def=function(from) {
 
-  feat <- rownames(from@Parameters$Data)
-  samp <- colnames(from@Parameters$Data)
-  anno <- from@Parameters$annotation
-  
-  if (is.null(feat)) {
-    warning("No feature names in `Biclust' object")
-  }
-  if (is.null(samp)) {
-    warning("No sample names in `Biclust' object")
-  }
-  if (is.null(anno)) {
-    warning("No `annotation' in `Biclust' object")
-  }
-  if (is.null(from@Parameters$pData) && !is.null(samp)) {
-    from@Parameters$pData <- data.frame(row.names=samp)
-  }
-  
+  feat <- from@Parameters$featureNames
+  samp <- from@Parameters$sampleNames
+
   new("ISAModules",
       genes=structure(from@RowxNumber, dimnames=list(feat, NULL)),
       conditions=structure(t(from@NumberxCol), dimnames=list(samp, NULL)),

@@ -1069,10 +1069,14 @@ condPlot(modules2.robust, which.min(tt2$p.value), ALL.normed, col=color,
           main="Best separator, smart seeds")
 @ 
 
-\begin{figure}
-<<conditions-plots-dysreg-real,fig=TRUE,width=10,height=8,echo=FALSE,results=hide>>=
+<<conditions-plots-dysreg-real,width=10,height=8,echo=FALSE,results=hide>>=
+png("cond-dysreg.png", width=800, height=400)
 <<conditions-plots-dysreg>>
+dev.off()
 @
+
+\begin{figure}
+\includegraphics[width=\textwidth]{cond-dysreg.png}
 \caption{Condition plots for the best separator module found with
   random seeds and the one found with the smart seeds. They are
   essentially the same, with some minor differences. 
@@ -1149,11 +1153,14 @@ condPlot(modules2.robust, which.min(tt.B1.2$p.value), ALL.normed, col=color,
           main="Best B1 separator, smart seeds")
 @ 
 
+<<B1-cond-plots-real,echo=FALSE,results=hide,width=10,height=8>>=
+png("cond-dysreg2.png", width=800, height=400)
+<<B1-cond-plots>>
+dev.off()
+@ 
 \begin{figure}
 \centering
-<<B1-cond-plots-real,fig=TRUE,echo=FALSE,results=hide,width=10,height=8>>=
-<<B1-cond-plots>>
-@ 
+\includegraphics[width=\textwidth]{cond-dysreg2.png}
 \caption{Condition plots for the modules that best separate the B1-type 
   ALL samples from the other B-cell ALL samples. The two modules are essentially
   the same.}

@@ -111,17 +111,15 @@ Bc
 
 Now we will convert the \Rclass{Biclust} object to an \Rclass{ISAModules} 
 object, that is used in the \Rpackage{eisa} package. To help
-some \Rpackage{eisa} functions, we add the name of the annotation package to 
+some \Rpackage{eisa} functions, we add some biological annotation to
+the \Rclass{Biclust} object.  of the annotation package to 
 the parameters stored in the \Rclass{Biclust} object, this is always advised.
-We also need to add the input data to the \Rclass{Biclust} object by
-hand, as this is not included in the \Rclass{Biclust} object, when
-using a recent version of the \Rpackage{biclust} package. The column
-and row names of the data will be used later, e.g. for the enrichment
-analysis. The conversion itself can be performed with the usual
-\Rfunction{as} function.  
+The procedure makes use of the probe and sample names that are kept and stored 
+in the \Rclass{Biclust} object, this information will be used later, e.g. for 
+the enrichment analysis. The conversion itself can be performed with
+the usual \Rfunction{as} function. 
 <<convert bc to isa>>=
-Bc@Parameters$annotation <- annotation(ALL.filtered)
-Bc@Parameters$Data <- exprs(ALL.filtered)
+Bc <- annotate(Bc, ALL.filtered)
 modules <- as(Bc, "ISAModules")
 modules
 @

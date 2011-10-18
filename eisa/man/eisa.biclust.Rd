@@ -1,6 +1,7 @@
 \name{ISA-Biclust conversion}
 \alias{coerce,Biclust,ISAModules-method}
 \alias{coerce,ISAModules,Biclust-method}
+\alias{annotate}
 \concept{Biclust package}
 \title{Convert ISA modules to a Biclust object, or the opposite}
 \description{The biclust package implements several biclustering
@@ -8,6 +9,13 @@
   \code{\link[biclust]{Biclust}} object. These functions allow the
   conversion between \code{\link[biclust]{Biclust}} and
   \code{\link{ISAModules}} objects.
+}
+\usage{
+annotate(biclusters, data)
+}
+\arguments{
+  \item{biclusters}{A \code{Biclust} object.}
+  \item{data}{An \code{ExpressionSet} object.}
 }
 \details{
   To convert an \code{ISAModules} object (\code{mods}) to a
@@ -26,11 +34,15 @@
   }
   The \code{Parameters} slot of the \code{Biclust} object is used as the
   run data of the \code{ISAModules} object. The seed data of the new
-  object will be an empty data frame. We suggest that the used adds the
-  name of the appropriate annotation package to the \code{Biclust}
-  object, before converting it to an \code{ISAModules} object. See an
-  example on how to do this below.
-  
+  object will be an empty data frame. 
+
+  The \code{annotate} function puts biological annotation into a
+  \code{Biclust} object. It is suggested to use it before converting the
+  \code{Biclust} object to \code{ISAModules}, so that ISA visualization
+  functions and enrichment calculations can make use of this information.
+}
+\value{
+  \code{annotate} returns a \code{Biclust} object.
 }
 \author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
 \references{
@@ -54,7 +66,7 @@ if (require(biclust)) {
   set.seed(1)
   Bc <- biclust(exprs(ALL.filtered), BCPlaid(),
                 fit.model = ~m + a + b, verbose = FALSE)
-  Bc@Parameters$annotation <- annotation(ALL)
+  Bc <- annotate(Bc, ALL.filtered)
   modules <- as(Bc, "ISAModules")
   Bc
   modules

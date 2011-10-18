@@ -39,3 +39,5 @@ exportMethods("summary", "htmlReport", "pvalues", "geneCounts",
               "condGeneIdUniverse", "geneIdsByCategory", "sigCategories")
 
 exportMethods("coerce")
+
+export("annotate")
