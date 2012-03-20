@@ -282,7 +282,7 @@ ppa.step <- function(normed.data, rows1, thr.row1, thr.row2, thr.col,
   if (!hasNA[1]) {
     row1.new <- filter(normed.data$Ecg %*% col.new, thr.row1, direction[4])
   } else {
-    row1.new <- filter(na.multiply(normed.data$Ecg %*% col.new), thr.row1,
+    row1.new <- filter(na.multiply(normed.data$Ecg, col.new), thr.row1,
                        direction[4])
   }
 
