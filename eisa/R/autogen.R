@@ -449,7 +449,7 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   m <- which
 
   ep <- expPlotCreate(eset, modules, m, norm="sample")
-  png(file=paste(sep="", target.dir, "/expression-", m, ".png"),
+  png(filename=paste(sep="", target.dir, "/expression-", m, ".png"),
       width=ep$width, height=ep$height)
   ## returns the box coordinates of the expression image
   bbox <- expPlot(ep)
@@ -458,7 +458,7 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   dev.off() 
 
   ## Color bar
-  png(file=paste(sep="", target.dir, "/expcolbar-", m, ".png"),
+  png(filename=paste(sep="", target.dir, "/expcolbar-", m, ".png"),
       width=840, height=56)
   expPlotColbar(ep)
   dev.off()
@@ -564,7 +564,7 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
     gop <- gograph(data.frame(pval),
                    colbar.length=20, label.cex=1,
                    go.terms=go.terms, GOGRAPHS=GOGRAPHS)
-    png(file=filename, width=gop$width*4, height=gop$height*4)
+    png(filename=filename, width=gop$width*4, height=gop$height*4)
     co <- gographPlot(gop, coords=TRUE)
     dev.off()
     list(graph=gop, coords=co)
@@ -720,7 +720,7 @@ isa.autogen.module <- function(eset, modules, which, target.dir, template,
   ## Create the condition plot
 
   if (condPlot) {
-    png(file=paste(sep="", target.dir, "/condplot-", m, ".png"),
+    png(filename=paste(sep="", target.dir, "/condplot-", m, ".png"),
         width=1200, height=400)
     condPlot(modules, number=m, eset=eset,
              col=cond.col, sep=sep)

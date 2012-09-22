@@ -396,10 +396,10 @@ print.ISAexpPlot <- function(x, ...) {
 
 expPlotColbar <- function(epo) {
   par(mar=c(1,1,2,1))
-  image( matrix((-30):30, nc=1), col=epo$colbar, axes=FALSE)
+  image( matrix((-30):30, ncol=1), col=epo$colbar, axes=FALSE)
   at <- seq(0, 60, length=13)/60
   label <- round(seq(epo$zlim[1], epo$zlim[2], length=13), 2)
-  axis(3, at=at, label=label, tick=FALSE, line=-1, cex.axis=1.5)
+  axis(3, at=at, labels=label, tick=FALSE, line=-1, cex.axis=1.5)
   abline(v=(0:61-0.5)/60)
   abline(h=c(-1,1))
   invisible(NULL)
@@ -409,7 +409,7 @@ expPlot <- function(epo, scores=TRUE) {
 
   if (scores) {
   
-    layout( matrix(c(5,2,4, 6,1,3, 7,8,9), nc=3, byrow=TRUE),
+    layout( matrix(c(5,2,4, 6,1,3, 7,8,9), ncol=3, byrow=TRUE),
            c( 50/epo$width, epo$exp.width/epo$width, 100/epo$width ),
            c( 70/epo$height, epo$exp.height/epo$height, 50/epo$height) )
 
@@ -426,7 +426,7 @@ expPlot <- function(epo, scores=TRUE) {
   label1 <- unique(round(seq(1, no.genes, length=10)))
   at1 <- (label1-1) / (no.genes-1)
   if (length(at1) != 1) {
-    axis(1, at=at1, label=label1, cex.axis=2)
+    axis(1, at=at1, labels=label1, cex.axis=2)
   }
   if (epo$cond.height.px >= 10) {
     label2 <- seq(1, no.conds, by=2)
@@ -435,7 +435,7 @@ expPlot <- function(epo, scores=TRUE) {
   }
   at2 <- (no.conds-label2) / (no.conds-1)
   if (any(is.finite(at2))) {
-    axis(2, at=at2, label=label2, cex.axis=2, tick=FALSE)
+    axis(2, at=at2, labels=label2, cex.axis=2, tick=FALSE)
   }
 
   usr <- par("usr")
@@ -448,13 +448,13 @@ expPlot <- function(epo, scores=TRUE) {
     if (!is.finite(pp)) pp <- 0.5
     
     par(mar=c(1,0,1,0))
-    image(matrix(c(0,0,0,0), nr=1, nc=1), zlim=epo$zlim,
+    image(matrix(c(0,0,0,0), nrow=1, ncol=1), zlim=epo$zlim,
           col="#00000000", axes=FALSE, xaxs="i", yaxs="i",
           xlab=NA, ylab=NA, xlim=c(-pp,1+pp), ylim=c(-1,1))
     abline(v=at1, col="black")
     abline(h=seq(-1,1,by=0.5), col="black")
-    axis(2, at=c(-1,0,1), label=c(-1,0,1), cex.axis=2)
-    axis(4, at=c(-1,0,1), label=c(-1,0,1), cex.axis=2)
+    axis(2, at=c(-1,0,1), labels=c(-1,0,1), cex.axis=2)
+    axis(4, at=c(-1,0,1), labels=c(-1,0,1), cex.axis=2)
     if (epo$gene.width.px >= 10) { type <- "b" } else { type <- "l" }
     lines( (seq(no.genes)-1)/ (no.genes-1),
         epo$gene.score, type=type, lwd=3, col="brown", xpd=NA, pch=20)
@@ -462,7 +462,7 @@ expPlot <- function(epo, scores=TRUE) {
 #########
     
     par(mar=c(0,1,0,4))
-    image(matrix(c(0,0,0,0), nr=1, nc=1), zlim=epo$zlim,
+    image(matrix(c(0,0,0,0), nrow=1, ncol=1), zlim=epo$zlim,
           col="#00000000", axes=FALSE,
           xlab=NA, ylab=NA, xlim=c(0,1), ylim=c(0,1))  
     text(seq(0,1,by=0.5), .5/(ncol(epo$exp)+1), c(-1,0,1), pos=1, xpd=NA,
@@ -473,7 +473,7 @@ expPlot <- function(epo, scores=TRUE) {
     }
     abline( h=at3, col="black")
     abline( h=(no.conds-0.5)/no.conds, col="black")
-    axis(4, at=at3, label=label2, cex.axis=2)
+    axis(4, at=at3, labels=label2, cex.axis=2)
     lines((epo$cond.score+1)/2, pch=20,
           (seq(ncol(epo$exp))-0.5)/ncol(epo$exp), type="b",
           lwd=3, col="brown", xpd=NA  )
@@ -586,7 +586,7 @@ overlap <- function(modules, algorithm=c("mds", "fr", "drl"), edge.limit=0.5) {
     g2 <- graph.adjacency(A, weighted=TRUE, mode="undirected")  
     B [ A < edge.limit ] <- 0
     if (all(B==0)) {
-      g <- graph.empty(n=nrow(B), dir=FALSE)
+      g <- graph.empty(n=nrow(B), directed=FALSE)
       E(g)$weight <- numeric()
     } else {
       g <- graph.adjacency(B, weighted=TRUE, mode="undirected")
@@ -602,7 +602,7 @@ overlap <- function(modules, algorithm=c("mds", "fr", "drl"), edge.limit=0.5) {
     g2 <- graph.adjacency(A, weighted=TRUE, mode="undirected")  
     B [ A < edge.limit ] <- 0
     if (all(B==0)) {
-      g <- graph.empty(n=nrow(B), dir=FALSE)
+      g <- graph.empty(n=nrow(B), directed=FALSE)
       E(g)$weight <- numeric()
     } else {
       g <- graph.adjacency(B, weighted=TRUE, mode="undirected")
