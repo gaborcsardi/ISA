@@ -61,7 +61,7 @@ gographPlot (graph, coords = FALSE, \dots)
     Nonlin Soft Matter Phys.} 2003 Mar;67(3 Pt 1):031902. Epub 2003 Mar 11.
 }
 \seealso{
-  The \code{igraph} package for more about \code{igraph} graphs.
+  The \code{igraph0} package for more about \code{igraph} graphs.
 }
 \examples{
 data(ALLModulesSmall)

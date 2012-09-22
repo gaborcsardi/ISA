@@ -238,7 +238,7 @@ ISAHTMLModules <- function(eset, modules, which=NULL,
   library(Biobase)
   library(GO.db)
   library(KEGG.db)
-  library(igraph)
+  library(igraph0)
   library(xtable)
 
   if (is.null(which)) { which <- seq_len(length(modules)) }

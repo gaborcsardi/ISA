@@ -48,7 +48,7 @@ overlapPlot (graph, xsize = 400, ysize = 400, vertex.size = 20,
   \code{layout.fruchterman.reingold} function of the \code{igraph}
   package. If it is \sQuote{\code{drl}}, then the DrL graph layout
   algorithm is used, see the \code{layout.drl} function
-  in the \code{igraph} package.
+  in the \code{igraph0} package.
 }
 \value{
   \code{overlap} returns an igraph graph.

@@ -35,3 +35,8 @@ setGeneric("getNoSamples", function(modules, ...) standardGeneric("getNoSamples"
 
 setGeneric("featureThreshold", function(modules, ...) standardGeneric("featureThreshold"))
 setGeneric("sampleThreshold", function(modules, ...) standardGeneric("sampleThreshold"))
+
+setGeneric("condGeneIdUniverse",
+           function(r) {
+               standardGeneric("condGeneIdUniverse")
+           })
