@@ -5,7 +5,7 @@ annotate <- function(biclusters, data) {
     stop("`biclusters' must be a Biclust")
   }
   
-  if (!inherits(ALL, "ExpressionSet")) {
+  if (!inherits(data, "ExpressionSet")) {
     stop("`data' must be an ExpressionSet")
   }
 
