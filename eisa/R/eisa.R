@@ -207,7 +207,7 @@ ISASweepGraphPlot <- function(graph, vertex.label=V(graph)$id,
   
   if (thresholds) {
     la <- sort(unique(V(graph)$thr))
-    at <- sort(unique(graph$layout[,1]))
+    at <- sort(unique(round(graph$layout[,1], 3)))
     axis(1, at=at, labels=la)
     axis(3, at=at, labels=la)
     par(xpd=FALSE)
