@@ -70,7 +70,6 @@ package.
 <<load the data,cache=FALSE>>=
 library(ALL)
 library(hgu95av2.db)
-library(affy)
 data(ALL)
 @
 This is a data set from a clinical trial in acute
