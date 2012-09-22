@@ -536,7 +536,7 @@ sweep.graph.default <- function(sweep.result) {
     stop("Not a sweep result")
   }
 
-  require(igraph)
+  require(igraph0)
 
   nnodes <- nrow(sweep.result$seeddata)
 
