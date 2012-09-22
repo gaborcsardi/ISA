@@ -103,7 +103,7 @@ ALL.filt <- ALL[genefilter(ALL, flist), ]
 ALL.filt2 <- ALL.filt[, grepl("^B", ALL.filt$BT)]
 
 # Run ISA
-set.seed(1)
+set.seed(2)
 modules <- ISA(ALL.filt2, flist=NA, thr.gene=seq(2,4,by=0.5), thr.cond=1)
 
 # Do the sweep
