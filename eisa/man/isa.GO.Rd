@@ -60,7 +60,7 @@ ISAGO (modules, ann = annotation(modules), features = featureNames(modules),
   \item{CC}{aka Cellular Components}
   \item{MF}{aka Molecular Function}
 }
-\author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com} }
 \references{
   The Gene Ontology Consortium. Gene ontology: tool for the unification
   of biology. \emph{Nat. Genet.} May 2000;25(1):25-9.

@@ -130,7 +130,7 @@
   
   \code{drive} returns a logical vector of length one.  
 }
-\author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com} }
 \seealso{Functions for enrichment calculation of ISA modules:
   \code{\link{ISAGO}}, \code{\link{ISAKEGG}}, \code{\link{ISACHR}},
   \code{\link{ISAmiRNA}}.

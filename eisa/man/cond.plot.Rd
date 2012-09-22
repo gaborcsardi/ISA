@@ -70,7 +70,7 @@ condPlot (modules, number, eset, col = "white", all = TRUE, sep = NULL,
   None.
 }
 \author{
-  Gabor Csardi \email{Gabor.Csardi@unil.ch}
+  Gabor Csardi \email{csardi.gabor@gmail.com}
 }
 \references{
   Bergmann S, Ihmels J, Barkai N: Iterative signature algorithm for the

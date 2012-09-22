@@ -70,7 +70,7 @@ profilePlot (modules, module, eset, plot = c("samples", "features",
   None. (Well, \code{NULL}, invisibly.)
 }
 \author{
-  Gabor Csardi \email{Gabor.Csardi@uni.ch}
+  Gabor Csardi \email{csardi.gabor@gmail.com}
 }
 \references{
   Bergmann S, Ihmels J, Barkai N: Iterative signature algorithm for the

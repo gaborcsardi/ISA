@@ -48,12 +48,10 @@ ISAmiRNA (modules, ann = annotation(modules), features = featureNames(modules),
   for all miRNAs in the TargetScan database.
 
   In order to use this function, TargetScan annotation packages are
-  needed. These are currently available for Homo Sapiens and Mus
-  Musculus and they can be downloaded from
-  \url{http://www.unil.ch/cbg/index.php?title=Software}.
+  needed.
 }
 \value{A \code{\link{miRNAListHyperGResult}} object.}
-\author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com} }
 \references{
   Conserved Seed Pairing, Often Flanked by Adenosines, Indicates that
   Thousands of Human Genes are MicroRNA Targets Benjamin P Lewis,

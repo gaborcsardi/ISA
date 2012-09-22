@@ -47,7 +47,7 @@ ISAKEGG (modules,ann = annotation(modules), features = featureNames(modules),
   \code{ISAKEGG} currently cannot test for under-representation.
 }
 \value{A \code{\link{KEGGListHyperGResult}} object.}
-\author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com} }
 \references{
   \url{http://www.genome.jp/kegg/}
 

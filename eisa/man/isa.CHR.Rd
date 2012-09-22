@@ -44,7 +44,7 @@ ISACHR (modules, ann = annotation(modules), features = featureNames(modules),
 \value{
   A \code{\link{CHRListHyperGResult}} object.
 }
-\author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com} }
 \references{
   Bergmann S, Ihmels J, Barkai N: Iterative signature algorithm for the
   analysis of large-scale gene expression data \emph{Phys Rev E Stat

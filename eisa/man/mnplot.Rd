@@ -47,7 +47,7 @@ ISAmnplot (modules, number, eset, norm = c("raw", "feature", "sample"),
   Both functions return invisibly a matrix with two lines, the mean
   expression values for the two groups, for all the specified genes.
 }
-\author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com} }
 \references{
   Bergmann S, Ihmels J, Barkai N: Iterative signature algorithm for the
   analysis of large-scale gene expression data \emph{Phys Rev E Stat

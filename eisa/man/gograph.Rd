@@ -51,7 +51,7 @@ gographPlot (graph, coords = FALSE, \dots)
   \code{coords} argument is \code{TRUE}, then it returns the coordinates
   of the vertices on the plot.
 }
-\author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com} }
 \references{
   The Gene Ontology Consortium. Gene ontology: tool for the unification
   of biology. \emph{Nat. Genet.} May 2000;25(1):25-9.

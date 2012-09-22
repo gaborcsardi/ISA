@@ -31,7 +31,7 @@ ISA2heatmap (modules, module, eset, norm = c("raw", "feature", "sample"),
 }
 %\details{}
 \value{The same as \code{\link[stats]{heatmap}}.}
-\author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com} }
 \references{
   Bergmann S, Ihmels J, Barkai N: Iterative signature algorithm for the
   analysis of large-scale gene expression data \emph{Phys Rev E Stat

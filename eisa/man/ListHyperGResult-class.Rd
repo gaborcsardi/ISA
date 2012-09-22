@@ -262,7 +262,7 @@
   \code{conditional} returns a logical vector of length one.
   \code{ontology} returns a character vector of length one.
 }
-\author{ Gabor Csardi \email{Gabor.Csardi@gmail.com} }
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com} }
 \seealso{Functions for enrichment calculation of ISA modules:
   \code{\link{ISAGO}}, \code{\link{ISAKEGG}}, \code{\link{ISACHR}},
   \code{\link{ISAmiRNA}}, \code{\link{ISAEnrichment}}.

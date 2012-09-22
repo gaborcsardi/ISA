@@ -46,7 +46,7 @@ ISAIterate(data, feature.seeds, sample.seeds, thr.feat,
   \code{\link[isa2]{isa.iterate}} manual for details about them.
 }
 \value{An \code{\link{ISAModules}} object.}
-\author{ Gabor Csardi \email{Gabor.Csardi@unil.ch} }
+\author{ Gabor Csardi \email{csardi.gabor@gmail.com} }
 \references{
   Bergmann S, Ihmels J, Barkai N: Iterative signature algorithm for the
   analysis of large-scale gene expression data \emph{Phys Rev E Stat
