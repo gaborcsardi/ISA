@@ -469,6 +469,7 @@ isa.sweep.default <- function(data, normed.data, isaresult, method=c("cor"),
       tmpures$columns <- tmpures$columns[,keep,drop=FALSE]
       tmpures$seeddata <- tmpures$seeddata[keep,,drop=FALSE]
       tmpures$seeddata$rob <- rob[keep]
+      tmpures$seeddata$rob.limit <- NA
       tmpures$seeddata$rob.limit[] <- max(isalist.seed[[i]]$rob.limit)
     }
 
