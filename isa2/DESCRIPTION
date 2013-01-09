@@ -1,6 +1,6 @@
 Package: isa2
-Version: 0.3.1-1
-Date: Jun 11, 2012
+Version: 0.3.2
+Date: 2013-01-07
 Title: The Iterative Signature Algorithm
 Author: Gabor Csardi <csardi.gabor@gmail.com>
 Maintainer: Gabor Csardi <csardi.gabor@gmail.com>
