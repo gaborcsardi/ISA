@@ -168,6 +168,8 @@
   want to change the default ISA parameters.
 }
 \examples{
+## WE do not run this, it takes relatively long
+\dontrun{
 data <- ppa.in.silico(noise=0.1)
 ppa.result <- ppa(data[1:2], direction="up")
 
@@ -199,6 +201,6 @@ if (interactive()) {
                                        ppa.result$columns[,b]),
                                  main=paste("Module", b)))  
 }
-
+}
 }
 \keyword{cluster}
