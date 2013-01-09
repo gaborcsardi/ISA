@@ -11,6 +11,3 @@
   library.dynam.unload("isa2", libpath)
 }
 
-.Last.lib <- function(libpath) {
-  isa2::.onUnload(libpath)
-}
