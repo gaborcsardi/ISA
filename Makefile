@@ -33,7 +33,7 @@ clean:
 isa2-final: isa2_$(ISAVERSION).tar.gz
 isa2: isa2_$(ISAVERSION)-nv.tar.gz
 
-ISA2FILES = isa2/DESCRIPTION isa2/LICENCE isa2/NAMESPACE \
+ISA2FILES = isa2/DESCRIPTION isa2/NAMESPACE \
 	isa2/R/AllGenerics.R isa2/R/insilico.R isa2/R/option.R \
 	isa2/R/status.R isa2/R/zzz.R isa2/R/biclust.R isa2/R/isa3.R \
 	isa2/R/robustness.R isa2/R/viz.R \
