@@ -5,19 +5,12 @@
   This function can be used to set various options that affect many
   functions in the isa package.
 }
-\synopsis{
-isa.option(...)
-}
 \usage{
-isa.option()
-isa.option(option)
-isa.option(option=value, ...)
+isa.option(\dots)
 }
 \arguments{
-  \item{option}{In the second form (query) this is a character
-    scalar. In the third form, it is the new value of the option, in
-    this case it must be named.}
-  \item{...}{Further option assignments, these must be named, too.}
+  \item{\dots}{A single option query, or option assignments, these must
+    be named, too. See details below.}
 }
 \details{
   The \code{isa.option} function can be used in three forms. First,
