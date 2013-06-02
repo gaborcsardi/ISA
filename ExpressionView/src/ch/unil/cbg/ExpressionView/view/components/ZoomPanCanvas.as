@@ -26,7 +26,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 	import flash.display.BitmapData;
 	import flash.display.Shape;
 	import flash.events.KeyboardEvent;
-	import flash.events.MouseEvent;
+	import flash.events.MouseEvent;	
 	import flash.geom.ColorTransform;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
@@ -39,6 +39,7 @@ package ch.unil.cbg.ExpressionView.view.components {
 	import mx.controls.VScrollBar;
 	import mx.events.ItemClickEvent;
 	import mx.events.ScrollEvent;
+	import mx.controls.Alert;
 
 
 	public class ZoomPanCanvas extends Canvas {
@@ -439,7 +440,9 @@ package ch.unil.cbg.ExpressionView.view.components {
 
 			if ( !overlayCanvas ) {
 				overlayCanvas = new Canvas();
-				overlayCanvas.alpha = 1;
+				overlayCanvas.setStyle("backgroundAlpha",0);
+				overlayCanvas.setStyle("backgroundColor","#FFFFFF");
+				//overlayCanvas.alpha = 1;
 				overlayCanvas.addEventListener(MouseEvent.MOUSE_MOVE, inspectMouseMoveHandler);
 				overlayCanvas.addEventListener(MouseEvent.MOUSE_OUT, inspectMouseOutHandler);
 				overlayCanvas.addEventListener(MouseEvent.CLICK, inspectMouseClickHandler);

@@ -2,17 +2,19 @@
 http://examples.adobe.com/flex3/consulting/styleexplorer/Flex3StyleExplorer.html
 */
 
-Application {
+@namespace mx "library://ns.adobe.com/flex/mx";
+
+mx|Application {
 	backgroundColor: #d5e5f5;
 	backgroundGradientAlphas: 0, 0;
 	fontFamily: Verdana;
 }
 
-Canvas {
+mx|Canvas {
 	borderThickness: 1;
 }
 
-Button {
+mx|Button {
 	cornerRadius: 5;
 	fontWeight: normal;
 	fontFamily: Verdana;
@@ -37,7 +39,7 @@ Button {
 	fillAlphas: 0.2, 0.2, 0.6, 0.6;
 }
 
-CheckBox {
+mx|CheckBox {
 	verticalGap: -0.5;
 	textAlign: center;
 	fontWeight: normal;
@@ -46,7 +48,7 @@ CheckBox {
 	color: #000000;
 }	
 
-HSlider {
+mx|HSlider {
 	tickOffset: -2;
 	labelOffset: -5;
 	fontWeight: normal;
@@ -55,7 +57,7 @@ HSlider {
 	color: #000000;
 }	
 
-Panel {
+mx|Panel {
 	borderThicknessLeft: 0;
 	borderThicknessTop: 0;
 	borderThicknessBottom: 0;
@@ -81,7 +83,7 @@ Panel {
 .selectModulesPanel {
 }
 
-TabNavigator {
+mx|TabNavigator {
 	tabOffset: 0;
 	borderColor: #aaccee;
 	borderColor: #ffffff;
@@ -92,7 +94,7 @@ TabNavigator {
 	dropShadowEnabled: true;
 }
 
-ButtonBar {
+mx|ButtonBar {
 	buttonStyleName: "buttonBarButtons";
 }
 
@@ -100,19 +102,19 @@ ButtonBar {
 	fillAlphas: 1, 1;
 }
 
-ToolTip {
+mx|ToolTip {
    color: #000000;
    fontFamily: Verdana;
 }
 
-HDividedBox, VDividedBox {
+mx|HDividedBox, mx|VDividedBox {
 	dividerAffordance: 30;
 	dividerAlpha: 1;
 	dividerColor: #999999;
 	dividerThickness: 5;
 }
 
-DataGrid {
+mx|DataGrid {
 	horizontalGridLines: true;
 	horizontalGridLineColor: #cccccc;
 	verticalGridLineColor: #cccccc;

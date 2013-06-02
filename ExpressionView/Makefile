@@ -22,7 +22,7 @@ libs/AlivePDF.swc: $(ALIVEPDFFILES)
 doc: $(EXPRESSIONVIEWFILES)
 	@ rm -rf doc
 	@ mkdir doc
-	@ asdoc -target-player 10 \
+	@ asdoc -target-player 11 \
 			-source-path src \
 			-exclude-classes $(ALIVEPDFCLASSES) \
 			-output doc \
@@ -38,9 +38,11 @@ bin/ExpressionView.swf: alivepdf $(EXPRESSIONVIEWFILES)
 	@ cd src && \
 	mxmlc -compiler.library-path+=../libs/AlivePDF.swc \
 			-use-network=false ExpressionView.mxml \
-			-target-player=10 \
+			-target-player=11 \
 			-debug=false \
 			-define+=CONFIG::air,false \
+			-show-unused-type-selector-warnings=false \
+			-show-invalid-css-property-warnings=false \
 			-output ../$(@)
 
 debug: bin-debug/ExpressionView.swf
@@ -51,8 +53,10 @@ bin-debug/ExpressionView.swf: alivepdf $(EXPRESSIONVIEWFILES)
 	@ cd src && \
 	mxmlc -compiler.library-path+=../libs/AlivePDF.swc \
 			-use-network=false ExpressionView.mxml \
-			-target-player=10 \
+			-target-player=11 \
 			-define+=CONFIG::air,false \
+			-show-unused-type-selector-warnings=false \
+			-show-invalid-css-property-warnings=false \
 			-debug=true \
 			-output ../$(@)
 
@@ -70,9 +74,11 @@ air/ExpressionView.swf: alivepdf $(EXPRESSIONVIEWFILES)
 	@ cd src && \
 	amxmlc -compiler.library-path+=../libs/AlivePDF.swc \
 	-use-network=false ExpressionView.mxml \
-	-target-player=10 \
+	-target-player=11 \
 	-debug=false \
-	-define+=CONFIG::air,true
+	-define+=CONFIG::air,true \
+	-show-unused-type-selector-warnings=false \
+	 -show-invalid-css-property-warnings=false
 	@ mv src/$(@F) $(@)
 
 key: air/ExpressionView.pfx

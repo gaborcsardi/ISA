@@ -17,11 +17,12 @@
      You should have received a copy of the GNU General Public License
      along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-     This code compiles fine with Flex SDK 3.4.1, SDK 4 is not yet supported.
+     This code compiles fine with Apache Flex 4.9.1.
 -->
 
 <mx:Application
 	xmlns:mx = "http://www.adobe.com/2006/mxml"
+	xmlns:s="library://ns.adobe.com/flex/spark"
 	xmlns:view = "ch.unil.cbg.ExpressionView.view.*"
 	layout = "absolute"
 	width = "100%" 
@@ -41,6 +42,7 @@
 			import ch.unil.cbg.ExpressionView.view.*;
 			
 			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
 			
 			CONFIG::air {
 				import flash.events.InvokeEvent;
@@ -115,8 +117,8 @@
 				stage.addEventListener(MenuEvent.FULLSCREEN, toggleFullScreenHandler);
 				
 				filename = "";
-				if ( Application.application.parameters.filename ) { 
-					filename = Application.application.parameters.filename;
+				if ( FlexGlobals.topLevelApplication.parameters.filename ) { 
+					filename = FlexGlobals.topLevelApplication.parameters.filename;
 				}
 
 				if ( filename != "" ) {
@@ -207,7 +209,7 @@
             		var match:Boolean = regExp.test(Capabilities.os)
 					if ( match ) {
 						var alert:String = "The fullscreen mode on " + Capabilities.os;
-						alert += " is NOT working properly due to a bug in the Flash Player. ";
+						alert += " has limitations. ";
 						alert += "Opening files and exporting PDFs is not possible. ";
 					}
 					alert += "Due to security reasons, the fullscreen mode does not allow ";

@@ -38,7 +38,9 @@ package ch.unil.cbg.ExpressionView.view {
 	import mx.controls.ToggleButtonBar;
 	import mx.events.ItemClickEvent;
 	import mx.events.SliderEvent;
-
+	
+	//import spark.components.*;
+	
 	public class MenuBar extends Canvas {
 		
 		private var menuBox:HBox;

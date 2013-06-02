@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<actionScriptProperties mainApplicationPath="ExpressionView.mxml" projectUUID="3efcdf9f-8560-427a-872c-35a55a7dff7d" version="6">
-  <compiler additionalCompilerArguments="-locale en_US -use-network=false -define+=CONFIG::air,false" autoRSLOrdering="false" copyDependentFiles="false" flex3CompatMode="false" flexSDK="Flex 3.4" generateAccessible="false" htmlExpressInstall="true" htmlGenerate="true" htmlHistoryManagement="false" htmlPlayerVersionCheck="true" includeNetmonSwc="false" outputFolderPath="bin-debug" sourceFolderPath="src" strict="true" targetPlayerVersion="10.0.0" useApolloConfig="false" useDebugRSLSwfs="true" verifyDigests="true" warn="true">
+<actionScriptProperties analytics="false" mainApplicationPath="ExpressionView.mxml" projectUUID="3efcdf9f-8560-427a-872c-35a55a7dff7d" version="11">
+  <compiler additionalCompilerArguments="-locale en_US -use-network=false -define+=CONFIG::air,false -show-unused-type-selector-warnings=false -show-invalid-css-property-warnings=false" autoRSLOrdering="false" copyDependentFiles="false" flex3CompatMode="false" fteInMXComponents="false" generateAccessible="false" htmlExpressInstall="true" htmlGenerate="true" htmlHistoryManagement="false" htmlPlayerVersionCheck="true" includeNetmonSwc="false" outputFolderPath="bin-debug" removeUnusedRSL="true" sourceFolderPath="src" strict="true" targetPlayerVersion="0.0.0" useApolloConfig="false" useDebugRSLSwfs="true" useFlashSDK="false" verifyDigests="true" warn="true">
     <compilerSourcePath/>
     <libraryPath defaultLinkType="1">
       <libraryPathEntry kind="4" path=""/>
@@ -12,6 +12,7 @@
     <application path="ExpressionView.mxml"/>
   </applications>
   <modules/>
+  <workers/>
   <buildCSSFiles/>
   <publishSource>
     <sourcePathIncludes/>
@@ -22,4 +23,5 @@
       <exclude path="libs"/>
     </sourceExcludes>
   </publishSource>
+  <flashCatalyst validateFlashCatalystCompatibility="false"/>
 </actionScriptProperties>

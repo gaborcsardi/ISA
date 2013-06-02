@@ -22,7 +22,7 @@ package ch.unil.cbg.ExpressionView.events {
 
 		public static const MOUSE_OVER:String = "MouseOver";
 		public static const MOUSE_CLICK:String = "MouseClick";
-		public static const MOUSE_DOUBLE_CLICK:String = "MouseDubleClick";
+		public static const MOUSE_DOUBLE_CLICK:String = "MouseDoubleClick";
 
 		// data
 		public var data:Array;
