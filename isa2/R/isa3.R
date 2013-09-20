@@ -537,7 +537,7 @@ sweep.graph.default <- function(sweep.result) {
     stop("Not a sweep result")
   }
 
-  require(igraph0)
+  require(igraph)
 
   nnodes <- nrow(sweep.result$seeddata)
 
@@ -548,7 +548,7 @@ sweep.graph.default <- function(sweep.result) {
   from <- from[valid]
   to <- to[valid]
 
-  G <- graph( rbind(from, to)-1, n=nnodes )
+  G <- graph( rbind(from, to), n=nnodes )
 
   if (length(unique(sweep.result$seeddata$thr.row)) == 1) {
     V(G)$thr <- sweep.result$seeddata$thr.col

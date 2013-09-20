@@ -59,7 +59,7 @@
   of the seed data.
 
   \code{sweep.graph} takes the output of \code{isa.sweep} and creates a
-  graph object of it. For this the \sQuote{igraph0} package is required
+  graph object of it. For this the \sQuote{igraph} package is required
   to be installed on the system.
 }
 \value{
@@ -124,10 +124,10 @@ nm <- isa.normalize(insili[[1]])
 isa.tree <- isa.sweep(insili[[1]], nm, isares)
 network <- sweep.graph(isa.tree)
 
-## Plot the network of modules, only if the igraph0 package is
+## Plot the network of modules, only if the igraph package is
 ## installed
-if (interactive() && require(igraph0) &&
-    compareVersion(packageDescription("igraph0")$Version, "0.6")>=0) {
+if (interactive() && require(igraph) &&
+    compareVersion(packageDescription("igraph")$Version, "0.6")>=0) {
   lab <- paste(sep="", seq_len(ncol(isa.tree$rows)), ": ",
                colSums(isa.tree$rows!=0), ",",
                colSums(isa.tree$columns!=0))
