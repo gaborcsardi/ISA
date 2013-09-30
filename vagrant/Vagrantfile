@@ -1,0 +1,23 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  # Every Vagrant virtual environment requires a box to build off of.
+  config.vm.box = "ubuntu-x86_64"
+
+  config.vm.customize ["modifyvm", :id, "--memory", 4096]
+  config.vm.customize ["modifyvm", :id, "--cpus", 2]
+
+  config.vm.provision :shell, :path => "provisioners/createdir.sh", :args => "~vagrant/vagrant/provisions"
+  config.vm.provision :shell, :path => "provisioners/deps.sh"
+  config.vm.provision :shell, :path => "provisioners/installR.sh", :args => "3.0.1"
+  config.vm.provision :shell, :path => "provisioners/installR.sh", :args => "3.0.2"
+  config.vm.provision :shell, :path => "provisioners/bioc.sh", :args => "~vagrant/R/R-3.0.1/bin/R"
+  config.vm.provision :shell, :path => "provisioners/bioc.sh", :args => "~vagrant/R/R-3.0.2/bin/R"
+  config.vm.provision :shell, :path => "provisioners/ISA.sh"
+
+end
