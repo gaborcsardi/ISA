@@ -5,7 +5,7 @@ gograph <- function(table, colbar.length=30, label.cex=1, alpha=1, abbrev=5,
   isa2:::isa.status("Creating a GO graph", "in")
   
   library(GO.db)
-  library(igraph0)
+  library(igraph)
   
   terms <- rownames(table)
   pval <- table[,1]
@@ -49,8 +49,8 @@ gograph <- function(table, colbar.length=30, label.cex=1, alpha=1, abbrev=5,
   # Create a subgraph containing all up-paths from the
   # given vertices
 
-  vv <- which( V(go.graph)$name %in% terms )-1
-  root <- which(igraph0::degree(go.graph, 1:vcount(go.graph)-1, mode="out")==0)-1
+  vv <- which( V(go.graph)$name %in% terms )
+  root <- which(igraph::degree(go.graph, 1:vcount(go.graph), mode="out")==0)
   
   vert <- numeric()
   for (i in vv) {
@@ -566,7 +566,7 @@ overlap <- function(modules, algorithm=c("mds", "fr", "drl"), edge.limit=0.5) {
 
   genes <- getFeatureMatrix(modules)
 
-  library(igraph0)
+  library(igraph)
 
   if (algorithm=="mds") {
     library(MASS)
