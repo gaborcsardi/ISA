@@ -54,7 +54,6 @@ ISAEnrichment <- function(modules, categories,
   }
   
   library(paste(sep="", ann, ".db"), character.only=TRUE)
-  library(Category)
 
   ENTREZ <- get(paste(sep="", ann, "ENTREZID"))
 

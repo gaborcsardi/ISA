@@ -881,6 +881,7 @@ expression value: only probesets that have a variance of at least
 \variable{varLimit} and that have at least \variable{kLimit} samples
 with expression values over \variable{ALimit} are kept.
 <<filtering>>=
+library(genefilter)
 varLimit <- 0.5
 kLimit <- 4
 ALimit <- 5

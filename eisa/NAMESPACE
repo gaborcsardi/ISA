@@ -3,6 +3,9 @@ import(isa2)
 import(Category)
 import(AnnotationDbi)
 import(Biobase)
+import(genefilter)
+import(methods)
+import(DBI)
 
 export(ISA, ISANormalize, ISAIterate, ISAUnique, ISASweep,
        ISASweepGraph, ISASweepGraphPlot, ISARobustness, ISAFilterRobust)

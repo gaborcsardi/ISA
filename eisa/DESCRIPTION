@@ -12,9 +12,8 @@ Description: The Iterative Signature Algorithm (ISA) is a biclustering
   BioConductor data structures; and also contains various
   visualization tools that can be used with other biclustering
   algorithms.
-Depends: BiocGenerics (>= 0.3.2), methods, isa2, Biobase (>= 2.17.8),
-         AnnotationDbi, Category (>= 2.23.4), genefilter, DBI
-Imports: BiocGenerics
+Depends: isa2, Biobase (>= 2.17.8), AnnotationDbi, methods
+Imports: BiocGenerics, Category, genefilter, DBI
 Suggests: igraph (>= 0.6), Matrix, GOstats,
 	  GO.db, KEGG.db, biclust, MASS, xtable, ALL, hgu95av2.db,
 	  targetscan.Hs.eg.db, org.Hs.eg.db

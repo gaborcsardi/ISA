@@ -92,6 +92,7 @@ ISASweepGraphPlot (graph, vertex.label=V(graph)$id,
 }
 % \seealso{}
 \examples{
+library(genefilter)
 library(ALL)
 data(ALL)
 

@@ -76,7 +76,6 @@ ISAmiRNA <- function(modules,
   library(paste(sep=".", "targetscan", short.organism, "eg.db"),
                 character.only=TRUE)
   library(paste(sep="", ann, ".db"), character.only=TRUE)
-  library(Category)
 
   ENTREZ <- get(paste(sep="", ann, "ENTREZID"))
 
