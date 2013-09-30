@@ -45,6 +45,7 @@
 \alias{getOrganism,ISAModules-method}
 \alias{[,ISAModules,ANY-method}
 \alias{[,ISAModules,ANY,ANY-method}
+\alias{[,ISAModules,ANY,ANY,ANY-method}
 \alias{[[,ISAModules,ANY-method}
 \alias{[[,ISAModules,ANY,ANY-method}
 \title{A set of ISA modules}
