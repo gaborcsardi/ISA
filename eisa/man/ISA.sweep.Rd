@@ -112,8 +112,8 @@ modules2 <- ISASweep(ALL.filt2, modules)
 modules2
 
 # Plot it
-G <- ISASweepGraph(modules2)
-if (interactive()) {
+\dontrun{
+  G <- ISASweepGraph(modules2)
   ISASweepGraphPlot(G)
 }
 }
