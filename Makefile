@@ -90,11 +90,11 @@ vignettes/ISA_parallel.tex: vignettes/ISA_parallel.Rnw isa2_$(ISAVERSION)-nv.tar
 # eisa
 
 EISAFILES = eisa/DESCRIPTION eisa/NAMESPACE eisa/R/*.R eisa/man/*.Rd \
-	eisa/inst/CITATION eisa/data/*.rda eisa/inst/doc/*.Rnw \
-	eisa/inst/doc/EISA.bib eisa/inst/doc/*.png
+	eisa/inst/CITATION eisa/data/*.rda eisa/vignettes/*.Rnw \
+	eisa/vignettes/EISA.bib eisa/vignettes/*.png
 
-EISAVIG=eisa/inst/doc/ISA_internals.pdf eisa/inst/doc/ISA_internals.vignette \
-	eisa/inst/doc/tissues.pdf eisa/inst/doc/tissues.vignette
+EISAVIG=eisa/vignettes/ISA_internals.pdf eisa/vignettes/ISA_internals.vignette \
+	eisa/vignettes/tissues.pdf eisa/vignettes/tissues.vignette
 
 eisa-final: eisa_$(EISAVERSION).tar.gz
 eisa: eisa_$(EISAVERSION)-nv.tar.gz
@@ -106,10 +106,10 @@ eisa_$(EISAVERSION)-nv.tar.gz: $(EISAFILES)
 	$(R) CMD build --no-build-vignettes eisa
 	mv eisa_$(EISAVERSION).tar.gz eisa_$(EISAVERSION)-nv.tar.gz
 
-eisa/inst/doc/ISA_internals.vignette: vignettes/ISA_internals.Rnw
+eisa/vignettes/ISA_internals.vignette: vignettes/ISA_internals.Rnw
 	cp $< $@
 
-eisa/inst/doc/ISA_internals.pdf: vignettes/ISA_internals.pdf
+eisa/vignettes/ISA_internals.pdf: vignettes/ISA_internals.pdf
 	cp $< $@
 
 vignettes/ISA_internals.pdf: vignettes/ISA_internals.tex
@@ -125,10 +125,10 @@ vignettes/ISA_internals.tex: vignettes/ISA_internals.Rnw \
 	cd vignettes && $(R) -e 'Sweave("ISA_internals.Rnw")' || \
 		rm ISA_internals.tex
 
-eisa/inst/doc/tissues.vignette: vignettes/tissues.Rnw
+eisa/vignettes/tissues.vignette: vignettes/tissues.Rnw
 	cp $< $@
 
-eisa/inst/doc/tissues.pdf: vignettes/tissues.pdf
+eisa/vignettes/tissues.pdf: vignettes/tissues.pdf
 	cp $< $@
 
 vignettes/tissues.pdf: vignettes/tissues.tex
@@ -141,10 +141,10 @@ vignettes/tissues.tex: vignettes/tissues.Rnw \
 	$(R) CMD INSTALL eisa_$(EISAVERSION)-nv.tar.gz
 	cd vignettes && $(R) -e 'Sweave("tissues.Rnw")' || rm tissues.tex
 
-eisa/inst/doc/EISA_module_trees.vignette: vignettes/EISA_module_trees.Rnw
+eisa/vignettes/EISA_module_trees.vignette: vignettes/EISA_module_trees.Rnw
 	cp $< $@
 
-eisa/inst/doc/EISA_module_trees.pdf: vignettes/EISA_module_trees.pdf
+eisa/vignettes/EISA_module_trees.pdf: vignettes/EISA_module_trees.pdf
 	cp $< $@
 
 vignettes/EISA_module_trees.pdf: vignettes/EISA_module_trees.tex
