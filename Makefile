@@ -53,7 +53,7 @@ isa2_$(ISAVERSION).tar.gz: $(ISA2FILES) $(ISAVIG) isa2_$(ISAVERSION)-nv.tar.gz
 	$(R) CMD build isa2
 
 isa2_$(ISAVERSION)-nv.tar.gz: $(ISA2FILES)
-	$(R) CMD build --no-vignettes isa2
+	$(R) CMD build --no-build-vignettes isa2
 	mv isa2_$(ISAVERSION).tar.gz isa2_$(ISAVERSION)-nv.tar.gz
 
 isa2/inst/doc/ISA_tutorial.vignette: vignettes/ISA_tutorial.Rnw
@@ -103,7 +103,7 @@ eisa_$(EISAVERSION).tar.gz: $(EISAFILES) $(EISAVIG)
 	$(R) CMD build eisa
 
 eisa_$(EISAVERSION)-nv.tar.gz: $(EISAFILES)
-	$(R) CMD build --no-vignettes eisa
+	$(R) CMD build --no-build-vignettes eisa
 	mv eisa_$(EISAVERSION).tar.gz eisa_$(EISAVERSION)-nv.tar.gz
 
 eisa/inst/doc/ISA_internals.vignette: vignettes/ISA_internals.Rnw
@@ -210,7 +210,7 @@ ExpressionView_$(EVVERSION).tar.gz: $(REVFILES) ExpressionView/doc/.stamp
 	$(R) CMD build RExpressionView
 
 ExpressionView_$(EVVERSION)-nv.tar.gz: $(REVFILES) ExpressionView/doc/.stamp
-	$(R) CMD build --no-vignettes RExpressionView
+	$(R) CMD build --no-build-vignettes RExpressionView
 	mv 	ExpressionView_$(EVVERSION).tar.gz \
 		ExpressionView_$(EVVERSION)-nv.tar.gz
 
