@@ -476,7 +476,7 @@ document, we only include the first 20 modules.
 caption <- paste("The most significantly enriched GO categories",
                  "and KEGG pathways for the (first 20)",
                  "transcription modules.",
-                 "Oppositely regulated tissues are marged with `d'.")
+                 "Oppositely regulated tissues are marked with d.")
 if (nrow(eTable)>20) { eTable2 <- eTable[1:20,] }
 print(xtable(eTable2, caption=caption,
              align=c("r@{\\hspace{1em}}", 
