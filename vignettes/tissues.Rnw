@@ -121,6 +121,8 @@ if (!file.exists(ABfile)) {
   celfiles <- list.files(GEO, pattern="\\.CEL.gz", full.names=TRUE)
   AB <- ReadAffy(filenames=celfiles)
   save(AB, file=ABfile)
+} else {
+  load(ABfile)
 }
 @
 
