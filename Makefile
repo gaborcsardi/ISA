@@ -70,7 +70,7 @@ vignettes/ISA_tutorial.pdf: vignettes/ISA_tutorial.tex
 
 vignettes/ISA_tutorial.tex: vignettes/ISA_tutorial.Rnw isa2_$(ISAVERSION)-nv.tar.gz
 	$(R) CMD INSTALL isa2_$(ISAVERSION)-nv.tar.gz
-	cd vignettes && $(R) CMD Sweave ISA_tutorial.Rnw || rm ISA_tutorial.tex
+	cd vignettes && $(R) -e 'Sweave("ISA_tutorial.Rnw")' || rm ISA_tutorial.tex
 
 isa2/inst/doc/ISA_parallel.vignette: vignettes/ISA_parallel.Rnw
 	cp $< $@
@@ -85,7 +85,7 @@ vignettes/ISA_parallel.pdf: vignettes/ISA_parallel.tex
 
 vignettes/ISA_parallel.tex: vignettes/ISA_parallel.Rnw isa2_$(ISAVERSION)-nv.tar.gz
 	$(R) CMD INSTALL isa2_$(ISAVERSION)-nv.tar.gz
-	cd vignettes && $(R) CMD Sweave ISA_parallel.Rnw || rm ISA_parallel.tex
+	cd vignettes && $(R) -e 'Sweave("ISA_parallel.Rnw")' || rm ISA_parallel.tex
 
 # eisa
 
@@ -122,7 +122,7 @@ vignettes/ISA_internals.tex: vignettes/ISA_internals.Rnw \
 		eisa_$(EISAVERSION)-nv.tar.gz isa2_$(ISAVERSION)-nv.tar.gz
 	$(R) CMD INSTALL isa2_$(ISAVERSION)-nv.tar.gz
 	$(R) CMD INSTALL eisa_$(EISAVERSION)-nv.tar.gz
-	cd vignettes && $(R) CMD Sweave ISA_internals.Rnw || \
+	cd vignettes && $(R) -e 'Sweave("ISA_internals.Rnw")' || \
 		rm ISA_internals.tex
 
 eisa/inst/doc/tissues.vignette: vignettes/tissues.Rnw
@@ -139,7 +139,7 @@ vignettes/tissues.tex: vignettes/tissues.Rnw \
 		eisa_$(EISAVERSION)-nv.tar.gz isa2_$(ISAVERSION)-nv.tar.gz
 	$(R) CMD INSTALL isa2_$(ISAVERSION)-nv.tar.gz
 	$(R) CMD INSTALL eisa_$(EISAVERSION)-nv.tar.gz
-	cd vignettes && $(R) CMD Sweave tissues.Rnw || rm tissues.tex
+	cd vignettes && $(R) -e 'Sweave("tissues.Rnw")' || rm tissues.tex
 
 eisa/inst/doc/EISA_module_trees.vignette: vignettes/EISA_module_trees.Rnw
 	cp $< $@
@@ -155,7 +155,7 @@ vignettes/EISA_module_trees.tex: vignettes/EISA_module_trees.Rnw \
 		eisa_$(EISAVERSION)-nv.tar.gz isa2_$(ISAVERSION)-nv.tar.gz
 	$(R) CMD INSTALL isa2_$(ISAVERSION)-nv.tar.gz
 	$(R) CMD INSTALL eisa_$(EISAVERSION)-nv.tar.gz
-	cd vignettes && $(R) CMD Sweave EISA_module_trees.Rnw
+	cd vignettes && $(R) -e 'Sweave("EISA_module_trees.Rnw")'
 
 # ExpressionView
 
@@ -273,7 +273,7 @@ eisa/inst/doc/EISA_tutorial.pdf: eisa/inst/doc/EISA_tutorial.tex
 		qpdf EISA_tutorial.pdf EISA_tutorial2.pdf && \
 		mv EISA_tutorial2.pdf EISA_tutorial.pdf
 eisa/inst/doc/EISA_tutorial.tex: eisa/inst/doc/EISA_tutorial.Rnw
-	cd eisa/inst/doc/ && $(R) CMD Sweave EISA_tutorial.Rnw
+	cd eisa/inst/doc/ && $(R) -e 'Sweave("EISA_tutorial.Rnw")'
 
 homepage/EISA_module_trees.html: vignettes/EISA_module_trees.tex
 	cd vignettes && pdflatex EISA_module_trees.tex && \
@@ -324,7 +324,7 @@ eisa/inst/doc/EISA_biclust.pdf: eisa/inst/doc/EISA_biclust.tex
 		qpdf EISA_biclust.pdf EISA_biclust2.pdf && \
 		mv EISA_biclust2.pdf EISA_biclust.pdf
 eisa/inst/doc/EISA_biclust.tex: eisa/inst/doc/EISA_biclust.Rnw
-	cd eisa/inst/doc/ && $(R) CMD Sweave EISA_biclust.Rnw
+	cd eisa/inst/doc/ && $(R) -e 'Sweave("EISA_biclust.Rnw")'
 
 homepage/ExpressionView.tutorial.html: RExpressionView/inst/doc/ExpressionView.tutorial.tex
 	cp vignettes/style.cfg RExpressionView/inst/doc/
@@ -341,7 +341,7 @@ homepage/ExpressionView.tutorial.pdf: RExpressionView/inst/doc/ExpressionView.tu
 RExpressionView/inst/doc/ExpressionView.tutorial.pdf: RExpressionView/inst/doc/ExpressionView.tutorial.tex
 	cd RExpressionView/inst/doc/ && pdflatex ExpressionView.tutorial.tex
 RExpressionView/inst/doc/ExpressionView.tutorial.tex: RExpressionView/inst/doc/ExpressionView.tutorial.Rnw
-	cd RExpressionView/inst/doc/ && $(R) CMD Sweave ExpressionView.tutorial.Rnw
+	cd RExpressionView/inst/doc/ && $(R) -e 'Sweave("ExpressionView.tutorial.Rnw")'
 
 homepage/ExpressionView.ordering.html: RExpressionView/inst/doc/ExpressionView.ordering.tex
 	cp vignettes/style.cfg RExpressionView/inst/doc/
@@ -358,7 +358,7 @@ homepage/ExpressionView.ordering.pdf: RExpressionView/inst/doc/ExpressionView.or
 RExpressionView/inst/doc/ExpressionView.ordering.pdf: RExpressionView/inst/doc/ExpressionView.ordering.tex
 	cd RExpressionView/inst/doc/ && pdflatex ExpressionView.ordering.tex
 RExpressionView/inst/doc/ExpressionView.ordering.tex: RExpressionView/inst/doc/ExpressionView.ordering.Rnw
-	cd RExpressionView/inst/doc/ && $(R) CMD Sweave ExpressionView.ordering.Rnw
+	cd RExpressionView/inst/doc/ && $(R) -e 'Sweave("ExpressionView.ordering.Rnw")'
 
 homepage/ExpressionView.format.html: RExpressionView/inst/doc/ExpressionView.format.tex
 	cp vignettes/style.cfg RExpressionView/inst/doc/
@@ -374,7 +374,7 @@ homepage/ExpressionView.format.pdf: RExpressionView/inst/doc/ExpressionView.form
 RExpressionView/inst/doc/ExpressionView.format.pdf: RExpressionView/inst/doc/ExpressionView.format.tex
 	cd RExpressionView/inst/doc/ && pdflatex ExpressionView.format.tex
 RExpressionView/inst/doc/ExpressionView.format.tex: RExpressionView/inst/doc/ExpressionView.format.Rnw
-	cd RExpressionView/inst/doc/ && $(R) CMD Sweave ExpressionView.format.Rnw
+	cd RExpressionView/inst/doc/ && $(R) -e 'Sweave("ExpressionView.format.Rnw")'
 
 manuals: homepage/manuals/isa2/.stamp homepage/manuals/eisa/.stamp \
 	homepage/manuals/ExpressionView/.stamp \
