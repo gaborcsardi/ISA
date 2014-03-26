@@ -195,7 +195,7 @@ ps.options(fonts=c("serif", "mono"))
 <<GOtreeplot,eval=FALSE>>=
 library(GO.db)
 GO <- ISAGO(modules)
-gog <- gograph(summary(GO$CC)[[2]])
+gog <- gograph(summary(GO$CC)[[3]])
 summary(gog)
 gographPlot(gog)
 @ 
