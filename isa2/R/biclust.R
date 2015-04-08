@@ -1,7 +1,7 @@
 
 isa.biclust <- function(modules) {
 
-  if (!require(biclust)) {
+  if (!requireNamespace("biclust")) {
     stop("The `biclust' package is required for this")
   }
 

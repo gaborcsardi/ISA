@@ -537,7 +537,9 @@ sweep.graph.default <- function(sweep.result) {
     stop("Not a sweep result")
   }
 
-  require(igraph)
+  if (!requireNamespace("igraph")) {
+    stop("The igraph package is required for sweeping")
+  }
 
   nnodes <- nrow(sweep.result$seeddata)
 
@@ -548,25 +550,26 @@ sweep.graph.default <- function(sweep.result) {
   from <- from[valid]
   to <- to[valid]
 
-  G <- graph( rbind(from, to), n=nnodes )
+  G <- igraph::graph( rbind(from, to), n=nnodes )
 
   if (length(unique(sweep.result$seeddata$thr.row)) == 1) {
-    V(G)$thr <- sweep.result$seeddata$thr.col
+    igraph::V(G)$thr <- sweep.result$seeddata$thr.col
   } else {
-    V(G)$thr <- sweep.result$seeddata$thr.row
+    igraph::V(G)$thr <- sweep.result$seeddata$thr.row
   }
 
-  V(G)$id <- seq(vcount(G))
-  graphs <- decompose.graph(G)
+  igraph::V(G)$id <- seq(igraph::vcount(G))
+  graphs <- igraph::decompose.graph(G)
 
   layouts <- lapply(graphs, function(g) {
-    l <- layout.reingold.tilford(g, root=tail(topological.sort(g, mode="out"), 1))
+    l <- igraph::layout.reingold.tilford(
+      g, root=tail(igraph::topological.sort(g, mode="out"), 1))
     r <- sqrt(l[,1]^2 + l[,2]^2)
     phi <- atan2(l[,2], l[,1]) - pi/2
     l[,1] <- r * cos(phi)
     l[,2] <- r * sin(phi)
-    labels <- sort(unlist(V(g)$thr))
-    l <- layout.norm(l, labels[1]-2, labels[length(labels)]-2, NULL, NULL)
+    labels <- sort(unlist(igraph::V(g)$thr))
+    l <- igraph::layout.norm(l, labels[1]-2, labels[length(labels)]-2, NULL, NULL)
     l[,2] <- l[,2] - min(l[,2])
     l})
 
@@ -578,20 +581,23 @@ sweep.graph.default <- function(sweep.result) {
     offs <- offs + r[2] - r[1]
   }
   offs <- offs-0.5
-  
-  G$layout <- do.call(rbind, layouts)
-  G$layout[unlist(sapply(graphs, get.vertex.attribute, "id")),] <- G$layout
-  G$width <- length(unique(G$layout[,1])) * 2
-  G$height <- (max(G$layout[,2])-min(G$layout[,2])) * 0.4
 
-  V(G)$color <- "lightgray"
-  V(G)$shape <- "vrectangle"
-  V(G)$size  <- 16
-  V(G)$size2 <- offs * 1.5
-  V(G)$label <- V(G)$id
-  E(G)$arrow.size <- 0.5
-  V(G)$rows <- colSums(sweep.result$rows != 0)
-  V(G)$cols <- colSums(sweep.result$columns != 0)  
+  G <- igraph::set.graph.attribute(G, "layout", do.call(rbind, layouts))
+  lay <- igraph::get.graph.attribute(G, "layout")
+  lay[unlist(sapply(graphs, igraph::get.vertex.attribute, "id")),] <- lay
+  G <- igraph::set.graph.attribute(G, "layout", lay)
+  G <- igraph::set.graph.attribute(G, "width", length(unique(G$layout[,1])) * 2)
+  G <- igraph::set.graph.attribute(
+    G, "height", (max(G$layout[,2])-min(G$layout[,2])) * 0.4)
+
+  igraph::V(G)$color <- "lightgray"
+  igraph::V(G)$shape <- "vrectangle"
+  igraph::V(G)$size  <- 16
+  igraph::V(G)$size2 <- offs * 1.5
+  igraph::V(G)$label <- igraph::V(G)$id
+  igraph::E(G)$arrow.size <- 0.5
+  igraph::V(G)$rows <- colSums(sweep.result$rows != 0)
+  igraph::V(G)$cols <- colSums(sweep.result$columns != 0)
   
   G
 }

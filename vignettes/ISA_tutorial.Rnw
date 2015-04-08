@@ -70,6 +70,7 @@ each of size $10\times 10$.
 <<toymatrix,echo=FALSE,fig=TRUE,width=6,height=3>>=
 library(isa2)
 library(Matrix)
+library(lattice)
 data <- data2 <- isa.in.silico(20,20,2,10,10)[[1]]
 perm1 <- sample(seq_len(nrow(data)))
 data2 <- data2[perm1,]

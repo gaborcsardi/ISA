@@ -21,3 +21,6 @@ export(isa.option)
 ##########
 
 useDynLib(isa2)
+
+importFrom(lattice, levelplot)
+importFrom(methods, .TraceWithMethods)

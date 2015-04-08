@@ -32,8 +32,6 @@ plotModules.default <- function(modules, to.plot=seq_len(ncol(modules$rows)),
                                 xlab="", ylab="",
                                 ...) {
 
-  require(lattice)
-  
   no.mods <- length(to.plot)
   no.rows <- nrow(modules$rows)
   no.cols <- nrow(modules$columns)
