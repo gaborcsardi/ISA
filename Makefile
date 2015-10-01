@@ -94,7 +94,8 @@ EISAFILES = eisa/DESCRIPTION eisa/NAMESPACE eisa/R/*.R eisa/man/*.Rd \
 	eisa/vignettes/EISA.bib eisa/vignettes/*.png
 
 EISAVIG=eisa/vignettes/ISA_internals.pdf eisa/vignettes/ISA_internals.vignette \
-	eisa/vignettes/tissues.pdf eisa/vignettes/tissues.vignette
+	eisa/vignettes/tissues.pdf eisa/vignettes/tissues.vignette \
+	eisa/vignettes/EISA_biclust.pdf eisa/vignettes/EISA_biclust.vignette
 
 eisa-final: eisa_$(EISAVERSION).tar.gz
 eisa: eisa_$(EISAVERSION)-nv.tar.gz
@@ -140,6 +141,12 @@ vignettes/tissues.tex: vignettes/tissues.Rnw \
 	$(R) CMD INSTALL isa2_$(ISAVERSION)-nv.tar.gz
 	$(R) CMD INSTALL eisa_$(EISAVERSION)-nv.tar.gz
 	cd vignettes && $(R) -e 'Sweave("tissues.Rnw")' || rm tissues.tex
+
+eisa/vignettes/EISA_biclust.vignette: vignettes/EISA_biclust.Rnw
+	cp $< $@
+
+eisa/vignettes/EISA_biclust.pdf: vignettes/EISA_biclust.pdf
+	cp $< $@
 
 eisa/vignettes/EISA_module_trees.vignette: vignettes/EISA_module_trees.Rnw
 	cp $< $@
@@ -319,12 +326,6 @@ homepage/EISA_biclust.html: eisa/inst/doc/EISA_biclust.tex
 	cp eisa/inst/doc/*.png homepage/
 homepage/EISA_biclust.pdf: eisa/inst/doc/EISA_biclust.pdf
 	cp $< $@
-eisa/inst/doc/EISA_biclust.pdf: eisa/inst/doc/EISA_biclust.tex
-	cd eisa/inst/doc/ && pdflatex EISA_biclust.tex && \
-		qpdf EISA_biclust.pdf EISA_biclust2.pdf && \
-		mv EISA_biclust2.pdf EISA_biclust.pdf
-eisa/inst/doc/EISA_biclust.tex: eisa/inst/doc/EISA_biclust.Rnw
-	cd eisa/inst/doc/ && $(R) -e 'Sweave("EISA_biclust.Rnw")'
 
 homepage/ExpressionView.tutorial.html: RExpressionView/inst/doc/ExpressionView.tutorial.tex
 	cp vignettes/style.cfg RExpressionView/inst/doc/
