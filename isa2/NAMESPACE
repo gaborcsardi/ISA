@@ -24,3 +24,8 @@ useDynLib(isa2)
 
 importFrom(lattice, levelplot)
 importFrom(methods, .TraceWithMethods)
+
+importFrom(grDevices, colorRampPalette)
+importFrom(methods, new)
+importFrom(stats, cor, rnorm)
+importFrom(utils, tail)
