@@ -1,5 +1,6 @@
 
 #include <Rdefines.h>
+#include <R_ext/Rdynload.h>
 #include <math.h>
   
 SEXP beta_filter_up_vart(SEXP matrix, SEXP threshold) {
@@ -157,3 +158,16 @@ SEXP beta_filter_updown_vart(SEXP matrix, SEXP threshold) {
   UNPROTECT(1);
   return result;  
 }  
+
+static const R_CallMethodDef callMethods[]  = {
+  {"beta_filter_up_vart", (DL_FUNC) &beta_filter_up_vart, 2},
+  {"beta_filter_down_vart", (DL_FUNC) &beta_filter_up_vart, 2},
+  {"beta_filter_updown_vart", (DL_FUNC) &beta_filter_up_vart, 2},
+  {NULL, NULL, 0}
+};
+
+void R_init_isa2(DllInfo *dll) {
+  R_registerRoutines(dll, NULL, callMethods, NULL, NULL);
+  R_useDynamicSymbols(dll, FALSE);
+  R_forceSymbols(dll, TRUE);
+}

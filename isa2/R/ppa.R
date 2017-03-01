@@ -241,11 +241,11 @@ ppa.step <- function(normed.data, rows1, thr.row1, thr.row2, thr.col,
 
   filter <- function(x, t, dir) {
     if (dir=="updown") {
-      x <- .Call("beta_filter_updown_vart", x, as.double(t), PACKAGE="isa2")
+      x <- .Call(C_beta_filter_updown_vart, x, as.double(t), PACKAGE="isa2")
     } else if (dir=="up") {
-      x <- .Call("beta_filter_up_vart", x, as.double(t), PACKAGE="isa2")
+      x <- .Call(C_beta_filter_up_vart, x, as.double(t), PACKAGE="isa2")
     } else { ## dir=="down"
-      x <- .Call("beta_filter_down_vart", x, as.double(t), PACKAGE="isa2")
+      x <- .Call(C_beta_filter_down_vart, x, as.double(t), PACKAGE="isa2")
     }
   }
 

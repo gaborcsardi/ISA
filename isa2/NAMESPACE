@@ -20,7 +20,7 @@ export(isa.option)
 
 ##########
 
-useDynLib(isa2)
+useDynLib(isa2, .registration = TRUE, .fixes = "C_")
 
 importFrom(lattice, levelplot)
 importFrom(methods, .TraceWithMethods)
