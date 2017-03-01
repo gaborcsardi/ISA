@@ -31,6 +31,7 @@ isa.biclust(modules)
 %\seealso{}
 \examples{
 ## You need the biclust package for this
+\dontrun{
 if (require(biclust)) {
   set.seed(1)
   data <- isa.in.silico()
@@ -63,5 +64,6 @@ if (require(biclust)) {
      modules$columns)
 
   cor( cbind(cV, aV, mV, sV, rob) )
+}
 }
 }

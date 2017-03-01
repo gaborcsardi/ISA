@@ -166,6 +166,7 @@
   change the default ISA parameters.
 }
 \examples{
+\dontrun{
 ## We generate some noisy in-silico data with modules and try to find
 ## them with the ISA. This might take one or two minutes.
 data <- isa.in.silico(noise=0.1)
@@ -189,6 +190,7 @@ if (interactive()) {
   sapply(best, function(b) image(outer(isa.result$rows[,b],
                                        isa.result$columns[,b]),
                                  main=paste("Module", b)))  
+}
 }
 }
 \keyword{cluster}
